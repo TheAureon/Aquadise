@@ -423,53 +423,84 @@
   };
 
   // ---------- player ----------
+  // ---------- player: white humanoid robot diver ----------
+  // Palette from the reference: white armour, grey shading, dark joints/chest plate,
+  // navy face visor + shoulder pad, cyan trim and accent lights.
+  const ROBO = {
+    w: hex('#eef1f7'), g: hex('#c3cad6'), gd: hex('#8f98a8'), k: hex('#3b4352'), kd: hex('#262c37'),
+    n: hex('#26389a'), nl: hex('#4a63c9'), c: hex('#6ef0ef'), cd: hex('#2fb8c0')
+  };
+
+  // Swimming pose (horizontal, facing right). Anchor = frame centre (12,12).
   S.diver = function (p, o) {
     if (o.anim === 'stand' || o.anim === 'walk' || o.anim === 'jump') return S.diverUpright(p, o);
-    const ph = o.t * Math.PI * 2;
-    const kick = o.anim === 'swim' ? Math.round(Math.sin(ph) * 2.5) : Math.round(Math.sin(ph) * 1);
+    const R = ROBO, ph = o.t * Math.PI * 2;
+    const kick = o.anim === 'swim' ? Math.round(Math.sin(ph) * 2) : Math.round(Math.sin(ph) * 0.8);
     const bob = o.anim === 'idle' ? Math.round(Math.sin(ph) * 0.6) : 0;
-    const suit = hex('#2f8f9d'), suitD = hex('#1f5e70'), fin = hex('#f2c14e'), visor = hex('#ffe26b'), tank = hex('#d9774a'), hood = hex('#20374a');
-    const cy = 13 + bob;
-    p.line(7, cy, 3, cy - 1 + kick, suitD); p.line(7, cy + 1, 3, cy + 2 - kick, suitD);
-    p.tri([3, cy - 1 + kick], [0, cy - 3 + kick], [0, cy + 1 + kick], fin);
-    p.tri([3, cy + 2 - kick], [0, cy - kick], [0, cy + 4 - kick], fin);
-    p.rect(9, cy - 5, 6, 3, tank);
-    p.ellipse(12, cy, 6.5, 3.2, suit);
-    p.circle(19, cy - 1, 3.1, hood);
-    if (o.anim === 'net') {
-      const ext = [0, 2, 4, 3][o.frame] || 0;
-      p.line(15, cy + 1, 18 + ext, cy - 1 - ext, suitD);
-    } else p.line(15, cy + 1, 17, cy + 3, suitD);
-    p.shade();
-    p.rect(20, cy - 2, 2, 2, visor); p.set(21, cy - 2, WHITE);
-    p.outline();
+    const y = 11 + bob;                       // top line of the body
+    // back leg (behind) then front leg, trailing left and kicking
+    // thigh -> dark knee -> shin -> foot, back leg first (greyer), front leg on top (white)
+    const leg = (yy, base, shin, foot, accent) => {
+      p.rect(5, yy, 3, 2, base); p.rect(4, yy, 1, 2, R.k);
+      p.rect(1, yy, 3, 1, shin); p.rect(0, yy, 2, 2, foot);
+      if (accent) p.set(6, yy, R.c);
+    };
+    leg(y + 3 - kick, R.g, R.gd, R.kd, false);
+    leg(y + 1 + kick, R.w, R.g, R.k, true);
+    // hips + torso (back is white, chest faces down with a dark segmented plate)
+    p.rect(8, y, 9, 2, R.w);
+    p.rect(8, y + 2, 9, 3, R.k);
+    for (let x = 9; x < 17; x += 3) p.set(x, y + 3, R.kd);
+    p.rect(8, y + 5, 9, 1, R.c);              // cyan trim along the chest plate
+    p.set(8, y + 2, R.c); p.set(8, y + 3, R.c);
+    // navy shoulder pad
+    p.rect(14, y - 1, 3, 2, R.n); p.set(14, y - 1, R.nl);
+    // head: white helmet with a big navy visor facing forward
+    p.rect(17, y - 1, 4, 5, R.w); p.rect(18, y - 2, 3, 1, R.w);
+    p.rect(19, y, 3, 3, R.n); p.set(20, y, R.nl);
+    p.set(18, y + 1, R.c);                    // ear light
+    // arm reaching forward under the head (extends during a net swing)
+    const ext = o.anim === 'net' ? [0, 2, 4, 3][o.frame] || 0 : 0;
+    p.rect(15, y + 5, 3 + ext, 1, R.g); p.set(17 + ext, y + 5, R.k); p.set(16, y + 5, R.k);
+    p.outline(0.28);
   };
-  // Upright diver for walking on land. Anchor is the frame centre (12,12); feet sit on row 16
-  // (the bottom of the collision box), so the figure stands on the ground line.
+
+  // Upright pose for walking on land. Anchor = (12,12); feet sit on row 16.
   S.diverUpright = function (p, o) {
-    const suit = hex('#2f8f9d'), suitD = hex('#1f5e70'), fin = hex('#f2c14e'), visor = hex('#ffe26b'), tank = hex('#d9774a'), hood = hex('#20374a');
+    const R = ROBO;
     const walk = o.anim === 'walk', jump = o.anim === 'jump';
-    const step = walk ? [0, 1, 0, -1][o.frame] : 0, bob = walk && o.frame % 2 ? -1 : (o.anim === 'stand' && o.frame ? -0 : 0);
-    const top = 1 + bob + (jump ? -1 : 0);
-    // legs
-    if (jump) { p.rect(10, top + 11, 2, 3, suitD); p.rect(13, top + 11, 2, 3, suitD); p.rect(10, top + 14, 4, 1, fin); p.rect(13, top + 13, 4, 1, fin); }
-    else {
-      p.rect(10 + Math.max(0, step), top + 11, 2, 5 - Math.abs(step), suitD);
-      p.rect(13 - Math.max(0, -step), top + 11, 2, 5 - Math.abs(step) + (step ? 0 : 0), suitD);
-      p.rect(10 + Math.max(0, step), 16 - 0, 4, 1, fin);
-      p.rect(13 - Math.max(0, -step), 16, 4, 1, fin);
+    const step = walk ? [0, 1, 0, -1][o.frame] : 0;
+    const top = (walk && o.frame % 2 ? 1 : 0) + (jump ? -1 : 0) + (o.anim === 'stand' && o.frame ? 0 : 0);
+    // legs: back leg grey, front leg white, dark knees, cyan thigh stripe
+    if (jump) {
+      p.rect(10, top + 12, 2, 3, R.g); p.set(10, top + 13, R.k);
+      p.rect(13, top + 12, 2, 3, R.w); p.set(14, top + 13, R.k); p.rect(12, top + 15, 4, 1, R.g); p.rect(9, top + 15, 3, 1, R.gd);
+    } else {
+      const bx = 10 - step, fx = 13 + step;
+      p.rect(bx, top + 12, 2, 16 - (top + 12), R.g); p.set(bx, top + 14, R.k); p.set(bx + 1, top + 14, R.k);
+      p.rect(fx, top + 12, 2, 16 - (top + 12), R.w); p.set(fx, top + 14, R.k); p.set(fx + 1, top + 14, R.k);
+      p.set(fx + 1, top + 12, R.c);
+      p.rect(bx - 1, 16, 3, 1, R.gd); p.rect(fx, 16, 3, 1, R.g);   // feet
     }
-    // tank + torso
-    p.rect(7, top + 5, 3, 6, tank);
-    p.rect(10, top + 5, 5, 7, suit);
-    // arm (swings when walking)
-    p.line(14, top + 6, 15 + (walk ? step : 0), top + 10, suitD);
-    // head
-    p.circle(12.5, top + 2.5, 2.6, hood);
-    p.shade();
-    p.rect(14, top + 1, 1, 2, visor); p.rect(13, top + 2, 1, 1, visor); p.set(14, top + 1, WHITE);
-    p.outline();
+    // hips + dark waist band
+    p.rect(10, top + 11, 5, 1, R.w); p.rect(10, top + 10, 5, 1, R.k);
+    // torso: dark chest plate with cyan trim
+    p.rect(10, top + 6, 5, 4, R.k); p.set(12, top + 7, R.kd); p.set(12, top + 9, R.kd);
+    p.rect(9, top + 6, 1, 4, R.c); p.rect(15, top + 6, 1, 4, R.c);
+    // broad white shoulders + navy pad on the front shoulder
+    p.rect(8, top + 5, 9, 1, R.w); p.rect(9, top + 4, 7, 1, R.w);
+    p.rect(14, top + 4, 3, 2, R.n); p.set(14, top + 4, R.nl);
+    // arms: back arm grey, front arm white with dark elbow + hand (swings while walking)
+    p.rect(8, top + 6, 1, 5, R.g); p.set(8, top + 8, R.k); p.set(8, top + 11, R.kd);
+    p.rect(16 + (walk ? Math.max(0, step) : 0), top + 6, 1, 5, R.w); p.set(16 + (walk ? Math.max(0, step) : 0), top + 8, R.k); p.set(16 + (walk ? Math.max(0, step) : 0), top + 11, R.k);
+    // neck + head with navy visor facing right, cyan ear light
+    p.set(12, top + 3, R.k);
+    p.rect(10, top, 5, 3, R.w); p.rect(11, top - 1, 3, 1, R.w);
+    p.rect(13, top, 2, 3, R.n); p.set(14, top, R.nl); p.set(15, top + 1, R.n);
+    p.set(11, top + 1, R.c);
+    p.outline(0.28);
   };
+
   S.chest = function (p, o) {
     const W = p.w, H = p.h, wood = hex('#9b5a2e'), gold = hex('#f2c14e');
     const open = o.anim === 'open';
