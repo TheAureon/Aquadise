@@ -132,7 +132,14 @@ AQ.TUNING = {
     glow: 0.55                // beam brightness (0..1)
   },
 
-  climb: { speed: 42 },       // ladder climbing speed in the aquarium building (px/s)
+  climb: { speed: 42 },
+
+  station: {                  // the aquarium building in space
+    zoomedOutByDefault: false, // OPTIONAL view: true starts zoomed out to see the whole building (all tanks)
+    zoomKey: 'KeyV',          // toggles the zoomed-out view in the building (your choice is saved)
+    zoomSeconds: 0.6,         // how long the zoom in/out takes
+    zoomMargin: 10            // space (px) kept around the building when zoomed out
+  },       // ladder climbing speed in the aquarium building (px/s)
 
   save: { key: 'aquadise.save.v1', autosaveEvery: 10 }
 };

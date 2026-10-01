@@ -27,6 +27,7 @@ npx http-server -c-1 .      # or: python3 -m http.server
 | drop bait           | B / K, or right-click                    |
 | interact (beam up/down, open a tank) | E                         |
 | climb a ladder      | W / S (or Up / Down) on a ladder         |
+| building: whole-view toggle | V                                |
 | collection log      | L                                        |
 | map                 | M                                        |
 | pause / home / reset | Esc                                     |
@@ -58,7 +59,8 @@ Click a creature for its info card. Hover the stars for what's helping and what'
   then press **E**: you're lifted up and arrive in the aquarium building, which floats in space.
   Inside there's normal gravity. Walk, jump and climb the ladders, and press **E** at a tank to tend
   it, or at the DIRECTORY console for the overview of every tank. The BEAM PAD on the ground floor
-  (**E**) sends you back to the hilltop; walk down the hill's right edge to return to Tide Pools.
+  (**E**) sends you back to the hilltop. Optional: **V** zooms out to the whole building so you see every
+  tank at once, while you keep control of the robot (default in `AQ.TUNING.station`, your choice is saved); walk down the hill's right edge to return to Tide Pools.
   The hill and the building are their own scenes and never appear on the world map. The game
   saves which scene you're in. Caught creatures still go straight to their tank. (The old Tab
   shortcut is a test-only setting: `AQ.TUNING.debug.tabOpensAquarium`, off by default.)

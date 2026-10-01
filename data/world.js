@@ -160,12 +160,15 @@ AQ.data.world = {
     { op: 'carve', shape: 'poly', pts: [[2044, 264], [2036, 242], [2264, 238], [2292, 250], [2286, 264]] },
     { op: 'solid', shape: 'rect', mat: 'wood', x: 2080, y: 206, w: 64, h: 26 },
     { op: 'carve', shape: 'rect', x: 2086, y: 212, w: 52, h: 20 },
-    { op: 'carve', shape: 'rect', x: 2140, y: 218, w: 6, h: 12 },
     { op: 'solid', shape: 'rect', mat: 'wood', x: 2108, y: 140, w: 4, h: 68 },
     { op: 'carve', shape: 'circle', x: 2226, y: 250, r: 4 },
     { op: 'carve', shape: 'circle', x: 2248, y: 250, r: 4 },
-    { op: 'carve', shape: 'circle', x: 2028, y: 254, r: 7 },
-    { op: 'carve', shape: 'rect', x: 2180, y: 226, w: 26, h: 8 },
+    // ways in (all wide enough to swim through): a broken bow, a deck hatch, and the cabin door
+    // with a ladder-well down from the cabin into the hold
+    { op: 'carve', shape: 'tunnel', r: 8, path: [[2000, 255], [2030, 254], [2062, 252]] },
+    { op: 'carve', shape: 'rect', x: 2180, y: 222, w: 24, h: 20 },
+    { op: 'carve', shape: 'rect', x: 2136, y: 213, w: 16, h: 18 },
+    { op: 'carve', shape: 'rect', x: 2094, y: 228, w: 18, h: 14 },
     { op: 'solid', shape: 'circle', mat: 'metal', x: 2372, y: 266, r: 10, jitter: 1 },
 
     // --- Volcanic vents: smoking craters on top of the mounds (y is found automatically)

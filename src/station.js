@@ -61,6 +61,7 @@ AQ.Station = (function () {
     St.t += dt;
     if (!tanks.length) layoutTanks();
     if (St.mode === 'walk') {
+      if (input.wasPressed(AQ.TUNING.station.zoomKey)) St.toggleZoom();
       P.update(dt, W, input);
       const n = nearby(P);
       if (n && input.wasPressed(...AQ.TUNING.interactKeys)) {
@@ -75,6 +76,7 @@ AQ.Station = (function () {
       if (St.mode === 'beamout' && St.t > 0.5 && !St.leaving) { St.leaving = true; AQ.Scenes.go(game, 'hill', 'fromStation'); }
     }
     AQ.Camera.update(dt, P, W);
+    if (zoomAmt >= 0) zoomAmt = U.approach(zoomAmt, St.zoomedOut() ? 1 : 0, dt / AQ.TUNING.station.zoomSeconds);
     AQ.FX.update(dt, W);
     if (St.dust.length < 30 && R.chance(dt * 8)) St.dust.push({ x: R.range(0, L.width), y: R.range(0, L.height), vx: R.range(-3, 3), vy: R.range(-2, 2), life: R.range(6, 12), t: 0 });
     for (let i = St.dust.length - 1; i >= 0; i--) { const d = St.dust[i]; d.t += dt; d.x += d.vx * dt; d.y += d.vy * dt; if (d.t > d.life) St.dust.splice(i, 1); }
@@ -162,12 +164,12 @@ AQ.Station = (function () {
   }
 
   // ---------------------------------------------------------------- drawing
-  function drawSpace(ctx, left, top) {
+  function drawSpace(ctx, left, top, vw = 320, vh = 180) {
     const sp = AQ.Assets.sprites['bg.space'], t = AQ.Render.t;
     if (sp) {
       const ox = -(((left * 0.15) % 320) + 320) % 320, oy = -(((top * 0.15) % 180) + 180) % 180;
-      for (let x = ox; x < 320; x += 320) for (let y = oy; y < 180; y += 180) ctx.drawImage(sp.img, x, y);
-    } else { ctx.fillStyle = '#0b0f26'; ctx.fillRect(0, 0, 320, 180); }
+      for (let x = ox; x < vw; x += 320) for (let y = oy; y < vh; y += 180) ctx.drawImage(sp.img, x, y);
+    } else { ctx.fillStyle = '#0b0f26'; ctx.fillRect(0, 0, vw, vh); }
     const pr = AQ.Assets.sprites['bg.planet_ringed'], ps = AQ.Assets.sprites['bg.planet_small'];
     if (pr) ctx.drawImage(pr.img, Math.round(230 - left * 0.3 + 60), Math.round(30 - top * 0.3 + 40));
     if (ps) ctx.drawImage(ps.img, Math.round(40 - left * 0.25 + 30), Math.round(120 - top * 0.25 + 30));
@@ -202,17 +204,74 @@ AQ.Station = (function () {
     ctx.fillStyle = 'rgba(220,245,255,0.12)'; ctx.fillRect(ix + 2, iy + 1, 6, ih - 2);       // glass sheen
     if (frame) AQ.Assets.draw(ctx, 'misc.tank_frame', 'idle', tk.x, tk.y, {});
     // name above, star pips on the plate
-    F().draw(ctx, (b.short || b.name).toUpperCase(), tk.x, y0 - 7, '#e8fbff', { align: 'center', shadow: 'rgba(4,12,24,0.8)' });
+    if (!noLabels) F().draw(ctx, (b.short || b.name).toUpperCase(), tk.x, y0 - 7, '#e8fbff', { align: 'center', shadow: 'rgba(4,12,24,0.8)' });
     if (!tk.v || t - tk.vT > 1) { tk.v = AQ.Vibe.evaluate(b.id); tk.vT = t; }   // refreshed once a second
     const v = tk.v;
     for (let i = 0; i < 5; i++) { ctx.fillStyle = v.stars >= i + 1 ? '#ffd25a' : v.stars >= i + 0.5 ? '#c8a050' : '#3a4a5a'; ctx.fillRect(tk.x - 10 + i * 4, tk.y - 4, 3, 2); }
   }
 
+  // ---------------------------------------------------------------- optional zoomed-out view
+  // V toggles between following the player and a view of the whole building (every tank at once).
+  // You keep full control of the robot either way. Default + key: AQ.TUNING.station; the choice is saved.
+  let zoomAmt = -1, full = null, noLabels = false;
+  St.zoomedOut = () => {
+    const s = AQ.State.settings;
+    return s && s.stationZoomOut != null ? s.stationZoomOut : AQ.TUNING.station.zoomedOutByDefault;
+  };
+  St.toggleZoom = () => {
+    AQ.State.settings = AQ.State.settings || {};
+    AQ.State.settings.stationZoomOut = !St.zoomedOut();
+    AQ.Save && AQ.Save.dirty();
+  };
+  const ease = (x) => x * x * (3 - 2 * x);
+
   St.draw = function (ctx, game) {
     if (!canvas) paint();
     if (!tanks.length) layoutTanks();
-    const cam = AQ.Camera, left = cam.left(), top = cam.top(), t = AQ.Render.t, P = game.player;
-    drawSpace(ctx, left, top);
+    const cfg = AQ.TUNING.station, want = St.zoomedOut() ? 1 : 0;
+    if (zoomAmt < 0) zoomAmt = want;                                     // first frame: no animation
+    const P = game.player, cam = AQ.Camera;
+    if (zoomAmt <= 0) {
+      renderScene(ctx, game, cam.left(), cam.top(), 320, 180);
+      drawPrompt(ctx, P, cam.left(), cam.top(), 1);
+    } else {
+      // render the whole building once, then show a (scaled) window of it
+      if (!full) { full = document.createElement('canvas'); full.width = L.width; full.height = L.height; }
+      const fg = full.getContext('2d'); fg.imageSmoothingEnabled = false;
+      noLabels = zoomAmt > 0.5;                                           // shrunk labels blur; redrawn crisp below
+      renderScene(fg, game, 0, 0, L.width, L.height);
+      noLabels = false;
+      const h = L.hull, e = ease(zoomAmt);
+      const fit = Math.min(320 / (h.w + cfg.zoomMargin * 2), 180 / (h.h + cfg.zoomMargin * 2));
+      const z = U.lerp(1, fit, e);
+      const cx = U.lerp(cam.x, h.x + h.w / 2, e), cy = U.lerp(cam.y, h.y + h.h / 2, e);
+      const sw = 320 / z, sh = 180 / z;
+      const sx = U.clamp(cx - sw / 2, 0, Math.max(0, L.width - sw)), sy = U.clamp(cy - sh / 2, 0, Math.max(0, L.height - sh));
+      ctx.fillStyle = '#0b0f26'; ctx.fillRect(0, 0, 320, 180);
+      ctx.save();
+      ctx.imageSmoothingEnabled = true; ctx.imageSmoothingQuality = 'high';   // soft downscale instead of dropped pixels
+      ctx.drawImage(full, sx, sy, sw, sh, 0, 0, 320, 180);
+      ctx.restore();
+      if (zoomAmt > 0.5) {
+        ctx.globalAlpha = U.clamp((zoomAmt - 0.5) * 3, 0, 1);
+        tanks.forEach((tk) => F().draw(ctx, (tk.b.short || tk.b.name).toUpperCase(), Math.round((tk.x - sx) * z), Math.round((tk.y - 44 - sy) * z) - 7, '#e8fbff', { align: 'center', shadow: 'rgba(4,12,24,0.9)' }));
+        ctx.globalAlpha = 1;
+      }
+      drawPrompt(ctx, P, sx, sy, z);
+    }
+    if (St.mode === 'walk' && !AQ.Transition.active) {
+      const F = AQ.Font, txt = `${cfg.zoomKey.replace('Key', '')}: ${St.zoomedOut() ? 'FOLLOW ROBOT' : 'SEE ALL TANKS'}`;
+      ctx.globalAlpha = 0.75; F.draw(ctx, txt, 316, 172, '#cfe8ff', { align: 'right', shadow: 'rgba(4,12,24,0.85)' }); ctx.globalAlpha = 1;
+    }
+  };
+  function drawPrompt(ctx, P, left, top, z) {
+    const n = St.mode === 'walk' && !AQ.Transition.active && nearby(P);
+    if (n) AQ.Scenes.prompt(ctx, (P.x - left) * z, (P.y - top) * z - 10 - 12 * z, n.text);
+  }
+
+  function renderScene(ctx, game, left, top, vw, vh) {
+    const t = AQ.Render.t, P = game.player;
+    drawSpace(ctx, left, top, vw, vh);
     ctx.save(); ctx.translate(-left, -top);
     ctx.fillStyle = 'rgba(230,240,255,0.5)';
     for (const d of St.dust) { ctx.globalAlpha = Math.sin(d.t / d.life * Math.PI) * 0.6; ctx.fillRect(Math.round(d.x), Math.round(d.y), 1, 1); }
@@ -243,9 +302,7 @@ AQ.Station = (function () {
     ctx.globalAlpha = a; P.draw(ctx); ctx.globalAlpha = 1;
     AQ.FX.draw(ctx);
     ctx.restore();
-    const n = St.mode === 'walk' && !AQ.Transition.active && nearby(P);
-    if (n) AQ.Scenes.prompt(ctx, P.x - left, P.y - top - 22, n.text);
-  };
+  }
 
   AQ.Scenes.register('station', St);
   return St;
