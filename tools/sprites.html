@@ -1,0 +1,33 @@
+<!doctype html>
+<!-- Dev page: previews every sprite in assets/manifest.js (all animations, animated). Open via a local server. -->
+<html><head><meta charset="utf-8"><title>Aquadise sprite preview</title>
+<style>
+  body { background: #0d2a44; color: #dff; font: 12px monospace; margin: 16px; }
+  .grid { display: flex; flex-wrap: wrap; gap: 10px; }
+  .cell { background: #1d4f73; padding: 6px; border-radius: 4px; text-align: center; }
+  canvas { image-rendering: pixelated; display: block; margin: 0 auto 4px; }
+</style></head><body>
+<h3>Sprites (manifest) - 3x, animated</h3><div class="grid" id="g"></div>
+<script src="../assets/manifest.js"></script>
+<script>
+  const S = 3, cells = [];
+  for (const [key, e] of Object.entries(AQ.manifest.sprites)) {
+    const img = new Image(); img.src = '../assets/' + e.file;
+    for (const [anim, a] of Object.entries(e.anims)) {
+      const div = document.createElement('div'); div.className = 'cell';
+      const c = document.createElement('canvas'); c.width = e.fw * S; c.height = e.fh * S;
+      div.appendChild(c); div.appendChild(document.createTextNode(key + ' / ' + anim));
+      document.getElementById('g').appendChild(div);
+      cells.push({ img, e, a, ctx: c.getContext('2d') });
+    }
+  }
+  function tick(t) {
+    for (const c of cells) {
+      const f = Math.floor(t / 1000 * c.a.fps) % c.a.frames;
+      c.ctx.imageSmoothingEnabled = false; c.ctx.clearRect(0, 0, 999, 999);
+      if (c.img.complete) c.ctx.drawImage(c.img, ((c.a.col || 0) + f) * c.e.fw, c.a.row * c.e.fh, c.e.fw, c.e.fh, 0, 0, c.e.fw * S, c.e.fh * S);
+    }
+    requestAnimationFrame(tick);
+  }
+  requestAnimationFrame(tick);
+</script></body></html>

@@ -47,10 +47,10 @@ AQ.Assets = (function () {
     const prevA = ctx.globalAlpha;
     if (opts.alpha !== undefined) ctx.globalAlpha = prevA * opts.alpha;
     const px = Math.round(x), py = Math.round(y);
-    if (opts.flip) {
+    if (opts.flip || opts.flipY) {
       ctx.save();
-      ctx.translate(px + (e.fw - ax), py - ay);
-      ctx.scale(-1, 1);
+      ctx.translate(opts.flip ? px + (e.fw - ax) : px - ax, opts.flipY ? py + (e.fh - ay) : py - ay);
+      ctx.scale(opts.flip ? -1 : 1, opts.flipY ? -1 : 1);
       ctx.drawImage(s.img, sx, sy, e.fw, e.fh, 0, 0, e.fw, e.fh);
       ctx.restore();
     } else {

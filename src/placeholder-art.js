@@ -517,6 +517,14 @@
     p.shade(0.25); p.outline();
   };
   S.treasure = function (p, o) { S.chest(p, { anim: 'open' }); for (let i = 0; i < 6; i++) p.set(4 + i * 1.5, 6 - (i % 2), hex('#ffe26b')); };
+  S.barrel = function (p, o) {
+    const W = p.w, H = p.h;
+    p.ellipse(W / 2, H * 0.58, W * 0.32, H * 0.4, o.c);
+    p.shade(0.25);
+    for (const f of [0.32, 0.8]) p.rect(Math.round(W * 0.2), Math.round(H * f), Math.round(W * 0.6), 1, [90, 90, 96, 255]);
+    p.rect(Math.round(W / 2 - 2), Math.round(H * 0.5), 4, 3, [30, 20, 18, 255]);
+    p.outline();
+  };
   S.bubbler = function (p, o) {
     const W = p.w, H = p.h;
     p.rect(2, H - 5, W - 4, 4, o.c); p.rect(W / 2 - 1, H - 7, 2, 2, mul(o.c, 0.8));
