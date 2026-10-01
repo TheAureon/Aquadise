@@ -205,8 +205,10 @@ AQ.Creatures = (function () {
     const F = AQ.Font;
     for (const c of C.list) {
       if (!onScreen(c)) continue;
-      const icon = c.iconT > 0 ? c.icon : c.icon;
-      if (icon && c.alpha > 0.2) {
+      // markers only near the diver, so the screen doesn't fill up with symbols
+      const P = AQ.Game.player, near = Math.abs(c.x - P.x) < 90 && Math.abs(c.y - P.y) < 70;
+      const icon = c.icon;
+      if (icon && near && c.alpha > 0.2) {
         const col = icon === '!' ? '#ffdf5a' : icon === '?' ? '#9fe8ff' : '#e8f4ff';
         F.draw(g, icon, c.x, c.y - c.r - 9 + Math.round(Math.sin(c.t * 4)), col, { align: 'center' });
       }

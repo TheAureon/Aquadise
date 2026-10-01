@@ -20,7 +20,7 @@ AQ.Render = (function () {
     R.light.width = canvas.width; R.light.height = canvas.height;
     R.lctx = R.light.getContext('2d');
     R.snow = [];
-    for (let i = 0; i < 70; i++) R.snow.push({ x: Math.random() * 400, y: Math.random() * 220, s: 0.3 + Math.random() * 0.5, v: 2 + Math.random() * 4 });
+    for (let i = 0; i < 32; i++) R.snow.push({ x: Math.random() * 400, y: Math.random() * 220, s: 0.3 + Math.random() * 0.5, v: 2 + Math.random() * 4 });
   };
 
   function depthColor(depth) {
@@ -86,10 +86,10 @@ AQ.Render = (function () {
     const seaY = W.sea - top;
     if (seaY > -260 && seaY < cam.h) {
       ctx.save();
-      ctx.globalAlpha = 0.07;
+      ctx.globalAlpha = 0.045;
       ctx.fillStyle = '#e8fbff';
-      for (let i = 0; i < 9; i++) {
-        const span = 520, x = ((i * 137 - left * 0.7 + Math.sin(R.t * 0.3 + i) * 12) % span + span) % span - 80;
+      for (let i = 0; i < 6; i++) {
+        const span = 520, x = ((i * 89 - left * 0.7 + Math.sin(R.t * 0.3 + i) * 12) % span + span) % span - 80;
         const w = 10 + (i % 3) * 7;
         ctx.beginPath();
         ctx.moveTo(x, seaY); ctx.lineTo(x + w, seaY); ctx.lineTo(x + w + 70, seaY + 230); ctx.lineTo(x + 70 - w * 0.5, seaY + 230);
@@ -98,7 +98,7 @@ AQ.Render = (function () {
       ctx.restore();
     }
     // drifting marine snow (parallax)
-    ctx.fillStyle = 'rgba(220,240,255,0.35)';
+    ctx.fillStyle = 'rgba(220,240,255,0.22)';
     for (const s of R.snow) {
       const x = ((s.x - left * s.s) % 400 + 400) % 400 - 40;
       const y = ((s.y - top * s.s + R.t * s.v) % 220 + 220) % 220 - 20;
@@ -134,7 +134,7 @@ AQ.Render = (function () {
       if (x < -L.r || y < -L.r || x > cam.w + L.r || y > cam.h + L.r) continue;
       // stepped rings instead of smooth gradients keep it pixel-art
       const flick = L.flicker ? Math.sin(R.t * 3 + L.x) * 1.5 : 0;
-      [[1, 0.18], [0.84, 0.22], [0.68, 0.28], [0.52, 0.36], [0.36, 0.55]].forEach(([f, a]) => {
+      [[1, 0.1], [0.9, 0.12], [0.8, 0.14], [0.7, 0.17], [0.6, 0.2], [0.5, 0.24], [0.4, 0.3], [0.3, 0.4]].forEach(([f, a]) => {
         l.globalAlpha = a * (L.power || 1);
         l.beginPath(); l.arc(x, y, Math.max(1, Math.round(L.r * f + flick)), 0, Math.PI * 2); l.fill();
       });

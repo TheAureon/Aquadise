@@ -44,7 +44,9 @@ AQ.FX = (function () {
       } else if (p.type === 'trail') {
         ctx.fillStyle = p.color; ctx.globalAlpha = k * 0.8; ctx.fillRect(x, y, 1, 1); ctx.globalAlpha = 1;
       } else if (p.type === 'puff') {
-        ctx.fillStyle = p.color; ctx.globalAlpha = k; const r = Math.round(p.r); ctx.fillRect(x - r, y - r, r * 2, r * 2); ctx.globalAlpha = 1;
+        // soft rounded blob (plus-shaped) instead of a hard square
+        ctx.fillStyle = p.color; ctx.globalAlpha = k * 0.8; const r = Math.max(1, Math.round(p.r));
+        ctx.fillRect(x - r + 1, y - r, r * 2 - 2, r * 2); ctx.fillRect(x - r, y - r + 1, r * 2, r * 2 - 2); ctx.globalAlpha = 1;
       } else if (p.type === 'text') {
         ctx.globalAlpha = Math.min(1, k * 2);
         AQ.Font.draw(ctx, p.str, x, y, p.color, { align: 'center' });

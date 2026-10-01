@@ -373,11 +373,13 @@ AQ.Aquarium = (function () {
     drawBars(g, tank, b);
   };
 
+  // Lightweight hint text: no box, just a soft shadow so it doesn't cover the tank.
   function tip(g, text, x, y, col) {
-    const w = F().width(text) + 6;
-    const tx = U.clamp(Math.round(x - w / 2), 2, 318 - w);
-    g.fillStyle = 'rgba(6,16,30,0.85)'; g.fillRect(tx, Math.round(y) - 2, w, 9);
-    F().draw(g, text, tx + 3, y, col, { shadow: false });
+    const w = F().width(text);
+    const tx = U.clamp(Math.round(x - w / 2), 3, 317 - w);
+    g.globalAlpha = 0.9;
+    F().draw(g, text, tx, y, col, { shadow: 'rgba(4,12,24,0.85)' });
+    g.globalAlpha = 1;
   }
   A.tip = tip;
 
@@ -416,10 +418,10 @@ AQ.Aquarium = (function () {
     if (!items.length) F().draw(g, A.tray === 'fish' ? 'NO CREATURES FROM THIS BIOME YET' : 'NOTHING HERE YET', 178, TRAY_Y + 12, '#8aa4b8', { align: 'center' });
     // hints
     if (A.hover && (A.hover.id === 'item' || A.hover.id === 'fish')) {
-      tip(g, A.hover.id === 'fish' ? `${A.hover.name}: CLICK TO MOVE ${A.hover.where === 'tank' ? 'TO STORAGE' : 'INTO TANK'}` : `${A.hover.name}: CLICK, THEN CLICK IN TANK`, A.hover.x + 12, TRAY_Y - 10, '#fff');
-    } else if (A.holding) tip(g, 'CLICK TO PLACE - RIGHT CLICK / ESC TO STOP', 160, TRAY_Y - 10, '#ffe9a8');
-    else if (!tank.creatures.length && !tank.decor.length) tip(g, 'CATCH CREATURES FROM THIS BIOME TO FILL THIS TANK', 160, 70, '#cfe8ff');
-    else if (inTank(AQ.Input.mouse) && decorAt(tank, AQ.Input.mouse)) tip(g, 'CLICK: MOVE   RIGHT CLICK: REMOVE', 160, TRAY_Y - 10, '#cfe8ff');
+      tip(g, A.hover.id === 'fish' ? `${A.hover.name}: CLICK TO MOVE ${A.hover.where === 'tank' ? 'TO STORAGE' : 'INTO TANK'}` : `${A.hover.name}: CLICK, THEN CLICK IN TANK`, A.hover.x + 12, TANK.waterTop + 4, '#fff');
+    } else if (A.holding) tip(g, 'CLICK TO PLACE - RIGHT CLICK / ESC TO STOP', 160, TANK.waterTop + 4, '#ffe9a8');
+    else if (!tank.creatures.length && !tank.decor.length) tip(g, 'CATCH CREATURES FROM THIS BIOME TO FILL THIS TANK', 160, 70, '#ffffff');
+    else if (inTank(AQ.Input.mouse) && decorAt(tank, AQ.Input.mouse)) tip(g, 'CLICK: MOVE   RIGHT CLICK: REMOVE', 160, TANK.waterTop + 4, '#cfe8ff');
   }
 
   return A;

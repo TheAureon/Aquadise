@@ -321,7 +321,7 @@ AQ.Behaviors = (function () {
       s.covered = p.cover && !bait && s.fleeT <= 0;
       const alertR = (p.alertR || 60) * (bait ? 0.5 : 1) * (s.covered ? 1.3 : 1);
       if (s.fleeT <= 0 && d < alertR && (ctx.noise > (s.covered ? 0.25 : (p.carelessNoise || 0.5)))) {
-        s.fleeT = 2.2; s.members.forEach((m) => { if (!m.straggler) H.alertMark(m); });
+        s.fleeT = 2.2; if (s.members[0]) H.alertMark(s.members[0]);
         const L = d || 1; s.fx = (s.x - ctx.P.x) / L; s.fy = (s.y - ctx.P.y) / L;
       }
       let tx, ty, sp = p.speed || 22;

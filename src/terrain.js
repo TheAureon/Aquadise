@@ -46,6 +46,8 @@ AQ.Terrain = (function () {
     return c;
   };
 
+  const BAYER = [[0, 8, 2, 10], [12, 4, 14, 6], [3, 11, 1, 9], [15, 7, 13, 5]].map((r) => r.map((v) => v / 16));
+
   // ---------------------------------------------------------------- build
   T.build = function (W) {
     T.chunks = []; T.lights = []; T.emitters = [];
@@ -83,8 +85,8 @@ AQ.Terrain = (function () {
       if (Math.abs(v.x - cam.x) > 260 || Math.abs(v.y - cam.y) > 200) continue;
       v.t -= dt;
       if (v.t <= 0) {
-        v.t = R.range(0.08, 0.18);
-        AQ.FX.add({ type: 'puff', x: v.x + R.range(-2, 2), y: v.y, vx: R.range(-4, 4), vy: -R.range(14, 26), life: R.range(1.5, 2.6), color: R.chance(0.3) ? 'rgba(255,150,80,0.35)' : 'rgba(70,60,66,0.55)', r: R.range(1.5, 3.5) });
+        v.t = R.range(0.16, 0.3);
+        AQ.FX.add({ type: 'puff', x: v.x + R.range(-2, 2), y: v.y, vx: R.range(-4, 4), vy: -R.range(14, 26), life: R.range(1.5, 2.6), color: R.chance(0.3) ? 'rgba(255,150,80,0.3)' : 'rgba(70,60,66,0.45)', r: R.range(1.2, 2.6) });
         if (R.chance(0.25)) AQ.FX.bubble(v.x + R.range(-3, 3), v.y - 2);
       }
     }
@@ -94,7 +96,7 @@ AQ.Terrain = (function () {
     if (!p) return null;
     return {
       top: p.top.map(hex), rock: p.rock.map(hex), accent: hex(p.accent || p.rock[0]),
-      style: p.style || '', air: hex(p.air || '#1e2a2c'), backwall: p.backwall
+      style: p.style || '', air: hex(p.air || '#1e2a2c'), backwall: p.backwall, embers: !!p.embers
     };
   }
 
@@ -139,8 +141,9 @@ AQ.Terrain = (function () {
             const n = U.fbm2(x * 0.05, y * 0.05, seed);
             P.set(x, y, U.scale(pal.air, 0.8 + n * 0.4 + (((x + y) & 1) && n > 0.6 ? 0.08 : 0)));
           } else if (pal.backwall && m === 0) {
-            const n = U.fbm2(x * 0.04, y * 0.06, seed + 5);
-            if (n > 0.45) P.set(x, y, U.scale(pal.rock[2], 0.75 * depthF), n > 0.6 ? 130 : 80);
+            // faint, large-scale back wall so enclosed water reads as a cave without getting busy
+            const n = U.noise2(x * 0.02, y * 0.03, seed + 5);
+            if (n > 0.55) P.set(x, y, U.scale(pal.rock[2], 0.75 * depthF), 50);
           }
           continue;
         }
@@ -159,23 +162,24 @@ AQ.Terrain = (function () {
             c = mp.top[k < sandT * 0.5 ? 0 : k < sandT ? 1 : 2] || mp.top[1];
             if (td === sandT - 1 && ((x + y) & 1)) c = mp.rock[0];
           }
-          if (mp.style === 'mossy' && td < 2 && h < 0.4) c = mp.accent;
+          if (mp.style === 'mossy' && td < 2) c = mp.accent;
         } else {
-          let v = n;
-          if (mp.style === 'strata' || mp.style === 'ice') v += Math.sin(y * 0.35 + n * 5) * 0.09;
-          const dith = ((x + y) & 1) ? 0.025 : -0.025;
-          const idx = v + dith < 0.4 ? 2 : v + dith < 0.58 ? 1 : 0;
-          c = mp.rock[idx];
-          if (d <= 1) c = W.mask[i + ww] !== 1 ? U.scale(mp.rock[2], 0.8) : U.scale(mp.rock[0], 1.1);
-          if (mp.style === 'ice' && ((x * 2 + y) % 11 === 0) && d < 12) c = U.scale(mp.rock[0], 1.15);
+          // Calm cross-section: a few depth bands (distance from open water/air) with softly
+          // wobbling, ordered-dithered boundaries. Detail lives at the surface, the body stays quiet.
+          let dw = d + (U.noise2(x * 0.035, y * 0.035, seed) - 0.5) * 7;
+          if (mp.style === 'strata' || mp.style === 'ice') dw += Math.sin(y * 0.28 + U.noise1(x * 0.02, seed) * 3) * 2.2;
+          const th = BAYER[y & 3][x & 3];
+          const band = (lim) => dw + (th - 0.5) * 3 < lim;
+          c = band(7) ? mp.rock[0] : band(16) ? mp.rock[1] : band(30) ? mp.rock[2] : U.scale(mp.rock[2], 0.66);
+          if (d <= 1) c = W.mask[i + ww] !== 1 ? U.scale(mp.rock[2], 0.82) : U.scale(mp.rock[0], 1.08);
+          if (mp.style === 'ice' && ((x * 2 + y) % 13 === 0) && d < 10) c = U.scale(mp.rock[0], 1.12);
           if (mp.style === 'wood' && y % 5 === 0) c = U.scale(mp.rock[2], 0.85);
           if (mp.style === 'wood' && (x * 7 + Math.floor(y / 5) * 13) % 23 === 0) c = U.scale(mp.rock[2], 0.7);
-          if (mp.style === 'metal' && x % 9 === 0 && y % 4 === 0) c = U.scale(mp.rock[0], 1.25);
-          if (h < 0.012) c = mp.accent; else if (h < 0.035) c = U.scale(c, 0.86);
+          if (mp.style === 'metal' && x % 9 === 0 && y % 4 === 0) c = U.scale(mp.rock[0], 1.2);
+          if (mp.embers && h < 0.006 && d < 20) c = mp.accent;
+          else if (h < 0.004 && d < 14) c = U.scale(c, 1.12);
         }
-        let f = 1 - Math.min(1, Math.max(0, d - 3) / 26) * 0.55;
-        f = Math.round(f * 8) / 8;
-        P.set(x, y, U.scale(c, f * depthF));
+        P.set(x, y, U.scale(c, depthF));
       }
     }
   }
@@ -268,7 +272,7 @@ AQ.Terrain = (function () {
   PROPS.coral = function (P, x, y, r, b, pal, s) {
     const kinds = s.kinds || ['branch', 'fan', 'brain', 'tube', 'table'];
     const kind = r.pick(kinds);
-    const c = C(r.pick(s.colors || ['#ff7f6a', '#f5a742', '#c46cd1', '#ff9fb5', '#6fd0c0', '#ffd35c'])), hi = U.scale(c, 1.25), lo = U.scale(c, 0.7);
+    const c = C(r.pick(s.colors || ['#f58a78', '#f2b05e', '#c99ae0', '#6fcfc0'])), hi = U.scale(c, 1.25), lo = U.scale(c, 0.7);
     const sc = r.range(0.8, 1.5) * (s.scale || 1);
     if (kind === 'branch') {
       const grow = (gx, gy, a, len, d) => {
