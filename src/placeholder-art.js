@@ -432,36 +432,46 @@
   };
 
   // Swimming pose (horizontal, facing right). Anchor = frame centre (12,12).
+  // Flutter kick: both legs pivot at the hip in a smooth scissor motion (feet move most,
+  // knees about half), the torso stays steady, the arm only reaches out for the net.
   S.diver = function (p, o) {
     if (o.anim === 'stand' || o.anim === 'walk' || o.anim === 'jump') return S.diverUpright(p, o);
     const R = ROBO, ph = o.t * Math.PI * 2;
-    const kick = o.anim === 'swim' ? Math.round(Math.sin(ph) * 2) : Math.round(Math.sin(ph) * 0.8);
-    const bob = o.anim === 'idle' ? Math.round(Math.sin(ph) * 0.6) : 0;
-    const y = 11 + bob;                       // top line of the body
-    // back leg (behind) then front leg, trailing left and kicking
-    // thigh -> dark knee -> shin -> foot, back leg first (greyer), front leg on top (white)
-    const leg = (yy, base, shin, foot, accent) => {
-      p.rect(5, yy, 3, 2, base); p.rect(4, yy, 1, 2, R.k);
-      p.rect(1, yy, 3, 1, shin); p.rect(0, yy, 2, 2, foot);
-      if (accent) p.set(6, yy, R.c);
+    const swim = o.anim === 'swim';
+    const amp = swim ? 2.7 : o.anim === 'net' ? 0.6 : 1.2;
+    const bob = o.anim === 'idle' ? (o.frame === 1 || o.frame === 2 ? 1 : 0) : 0;   // slow 1px breathing bob
+    const y = 11 + bob;
+    const hipX = 9, hipY = y + 2.5;
+    // phase offset so all 6 frames differ; the knee lags the foot for a whip-like kick
+    const leg = (phase, gain, base, shin, boot) => {
+      const footY = hipY + Math.sin(ph + phase + Math.PI / 6) * amp * gain;
+      const kneeY = hipY + Math.sin(ph + phase + Math.PI / 6 - 0.9) * amp * gain * 0.5;
+      const kx = 5, fx = 2;
+      for (let i = 0; i <= 4; i++) { const t = i / 4, xx = hipX - t * (hipX - kx), yy = hipY + t * (kneeY - hipY); p.set(xx, yy - 0.5, base); p.set(xx, yy + 0.5, base); }
+      for (let i = 1; i <= 3; i++) { const t = i / 3, xx = kx - t * (kx - fx), yy = kneeY + t * (footY - kneeY); p.set(xx, yy, shin); }
+      p.set(kx, kneeY, R.k);
+      p.set(fx - 1, footY, boot); p.set(fx - 2, footY, boot);           // boot / sole
     };
-    leg(y + 3 - kick, R.g, R.gd, R.kd, false);
-    leg(y + 1 + kick, R.w, R.g, R.k, true);
-    // hips + torso (back is white, chest faces down with a dark segmented plate)
+    leg(Math.PI, 0.65, R.gd, R.g, R.k);   // back leg (behind, in shadow, smaller kick)
+    // hips + torso: white back, dark segmented chest plate facing down, cyan trim
     p.rect(8, y, 9, 2, R.w);
     p.rect(8, y + 2, 9, 3, R.k);
-    for (let x = 9; x < 17; x += 3) p.set(x, y + 3, R.kd);
-    p.rect(8, y + 5, 9, 1, R.c);              // cyan trim along the chest plate
+    for (let x = 10; x < 17; x += 3) p.set(x, y + 3, R.kd);
+    p.rect(9, y + 5, 7, 1, R.c);
     p.set(8, y + 2, R.c); p.set(8, y + 3, R.c);
+    leg(0, 1, R.w, R.w, R.g);          // front leg (on top, white)
+    p.set(7, y + 2, R.c);                // cyan thigh light
     // navy shoulder pad
     p.rect(14, y - 1, 3, 2, R.n); p.set(14, y - 1, R.nl);
-    // head: white helmet with a big navy visor facing forward
+    // head: white helmet with a big navy visor facing forward, cyan ear light
     p.rect(17, y - 1, 4, 5, R.w); p.rect(18, y - 2, 3, 1, R.w);
     p.rect(19, y, 3, 3, R.n); p.set(20, y, R.nl);
-    p.set(18, y + 1, R.c);                    // ear light
-    // arm reaching forward under the head (extends during a net swing)
-    const ext = o.anim === 'net' ? [0, 2, 4, 3][o.frame] || 0 : 0;
-    p.rect(15, y + 5, 3 + ext, 1, R.g); p.set(17 + ext, y + 5, R.k); p.set(16, y + 5, R.k);
+    p.set(18, y + 1, R.c);
+    // arm: tucked along the body while swimming, reaching forward during a net swing
+    if (o.anim === 'net') {
+      const ext = [1, 3, 5, 4][o.frame] || 0;
+      p.rect(15, y + 4, 2 + ext, 1, R.g); p.set(16 + ext, y + 4, R.k); p.set(16 + ext, y + 3, R.k);
+    } else p.rect(12, y + 5, 3, 1, R.g);
     p.outline(0.28);
   };
 

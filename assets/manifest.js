@@ -20,7 +20,7 @@ AQ.manifest = {
     "swim": {
      "row": 1,
      "frames": 6,
-     "fps": 12
+     "fps": 10
     },
     "net": {
      "row": 2,
