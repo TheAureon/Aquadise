@@ -16,7 +16,8 @@ AQ.Aquarium = (function () {
   function order(b) { return b.rect[0] + (b.id === 'lush_cave' ? 1 : 0) + (b.id === 'cave' ? -1 : 0); }
 
   // ---------------------------------------------------------------- open / close
-  A.open = function (game) {
+  A.open = function (game, from) {
+    A.returnTo = from || 'play';
     game.state = 'aquarium';
     if (!A.biome) {
       const here = AQ.World.biomeAt(game.player.x, game.player.y).id;
@@ -30,6 +31,7 @@ AQ.Aquarium = (function () {
   A.close = function (game) {
     cancelHold();
     AQ.FX.list.length = 0;
+    if (A.returnTo === 'title') { AQ.Save && AQ.Save.save(game); AQ.Title.open(game); return; }
     game.state = 'play';
     AQ.Save && AQ.Save.save(game);
   };
@@ -147,7 +149,7 @@ AQ.Aquarium = (function () {
     ui.push({ id: 'next', x: 152, y: 2, w: 10, h: 10, label: '>' });
     ui.push({ id: 'feed', x: 168, y: 2, w: 30, h: 10, label: 'FEED' });
     ui.push({ id: 'log', x: 202, y: 2, w: 26, h: 10, label: 'LOG' });
-    ui.push({ id: 'back', x: 260, y: 2, w: 56, h: 10, label: 'BACK (TAB)' });
+    ui.push({ id: 'back', x: 260, y: 2, w: 56, h: 10, label: A.returnTo === 'title' ? 'HOME (TAB)' : 'BACK (TAB)' });
     ui.push({ id: 'tray_decor', x: 4, y: TRAY_Y, w: 34, h: 10, label: 'DECOR', on: A.tray === 'decor' });
     ui.push({ id: 'tray_fish', x: 4, y: TRAY_Y + 11, w: 34, h: 10, label: 'FISH', on: A.tray === 'fish' });
     ui.push({ id: 'tray_left', x: 40, y: TRAY_Y, w: 8, h: 29, label: '<' });

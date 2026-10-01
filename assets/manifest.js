@@ -6,10 +6,10 @@ AQ.manifest = {
   "player": {
    "file": "sprites/misc/player.png",
    "fw": 24,
-   "fh": 24,
+   "fh": 32,
    "anchor": [
     12,
-    12
+    16
    ],
    "anims": {
     "idle": {

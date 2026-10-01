@@ -111,7 +111,7 @@ AQ.Game = (function () {
     AQ.Terrain.draw(ctx, cam);
     ctx.save();
     ctx.translate(-cam.left(), -cam.top());
-    const title = G.state === 'title';
+    const title = G.state === 'title' || (G.state === 'log' && AQ.LogUI.from === 'title');
     if (AQ.Chests) AQ.Chests.draw(ctx, G);
     if (AQ.Creatures) AQ.Creatures.drawBack(ctx, G);
     if (!title) {
@@ -124,7 +124,7 @@ AQ.Game = (function () {
     if (AQ.Terrain.drawFront) AQ.Terrain.drawFront(ctx, cam);
     AQ.Render.surface(cam);
     AQ.Render.lighting(cam, collectLights(), targetDarkness());
-    if (title) { AQ.Title.draw(ctx, G); return; }
+    if (title) { if (G.state === 'log') AQ.LogUI.draw(ctx, G); else AQ.Title.draw(ctx, G); return; }
     AQ.HUD.draw(ctx, G);
     if (G.state === 'map') AQ.MapUI.draw(ctx, G);
     if (G.state === 'log') AQ.LogUI.draw(ctx, G);

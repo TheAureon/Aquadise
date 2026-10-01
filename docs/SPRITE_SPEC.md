@@ -27,7 +27,7 @@ it shows up in game with no code changes.
 | `wide`      | 32 × 16 | eels, snakes, weed mat, driftwood                           |
 | `widelarge` | 48 × 24 | dwarf croc                                                  |
 
-The player diver is 24 × 24. A creature's class is its `sprite_size` in `data/creatures.js`.
+The player diver frame is 24 × 32 (anchor 12,16), which leaves headroom for the upright pose. A creature's class is its `sprite_size` in `data/creatures.js`.
 
 ## Animations (rows)
 
@@ -36,7 +36,7 @@ The player diver is 24 × 24. A creature's class is its `sprite_size` in `data/c
 | creature           | `idle`: 4 frames @ 5 fps   | `move`: 4 frames @ 10 fps | —                      |
 | plant              | `idle` (sway): 4 @ 3 fps   | —                        | —                      |
 | decoration         | `idle`: 1 frame            | —                        | —                      |
-| player (24×24)     | `idle`: 4 @ 5 fps          | `swim`: 6 @ 12 fps       | `net` swing: 4 @ 14 fps |
+| player (24×32)     | `idle`: 4 @ 5 fps          | `swim`: 6 @ 12 fps       | `net` swing: 4 @ 14 fps |
 | player, cont.      | row 3 `stand`: 2 @ 2 fps   | row 4 `walk`: 4 @ 9 fps  | row 5 `jump`: 1 frame   |
 | chest (16×16)      | col 0 `closed`, col 1 `open` (one row, 2 frames)        |                        |
 | bait (8×8)         | `idle` glint: 2 @ 3 fps    |                          |                        |
@@ -50,8 +50,10 @@ icons), so they need no extra rows.
 
 The anchor is the pixel inside a frame that sits on the entity's world position.
 
-- **Player upright rows (stand/walk/jump):** same centre anchor, but the feet go on row 16
-  (centre + 4, the bottom of the collision box) and the figure is about 16 px tall.
+- **Player:** anchor (12,16). Swimming poses are centred on it. In the upright rows
+  (stand/walk/jump/standnet), the feet go on row 20 (anchor + 4, the bottom of the collision box)
+  and the figure is about 18 px tall. `standnet` is the upright pose without the front arm, because
+  the game draws the reaching arm during a net swing.
 - **Creatures, player, bait:** the frame centre `(floor(fw/2), floor(fh/2))`. Centre the body in the frame.
 - **Plants, decorations, chests:** bottom-centre `(floor(fw/2), fh-1)`. The bottom row of pixels
   touches the ground, so don't leave empty rows under the base.

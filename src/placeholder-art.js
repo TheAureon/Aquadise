@@ -8,7 +8,7 @@
   Pix.prototype.get = function (x, y) { if (x < 0 || y < 0 || x >= this.w || y >= this.h) return null; const i = (y * this.w + x) * 4; return [this.d[i], this.d[i + 1], this.d[i + 2], this.d[i + 3]]; };
   Pix.prototype.a = function (x, y) { if (x < 0 || y < 0 || x >= this.w || y >= this.h) return 0; return this.d[(y * this.w + x) * 4 + 3]; };
   Pix.prototype.set = function (x, y, c) {
-    x = Math.round(x); y = Math.round(y);
+    x = Math.round(x); y = Math.round(y + (this.oy || 0));   // oy: vertical drawing offset
     if (x < 0 || y < 0 || x >= this.w || y >= this.h || !c) return;
     const i = (y * this.w + x) * 4;
     this.d[i] = c[0]; this.d[i + 1] = c[1]; this.d[i + 2] = c[2]; this.d[i + 3] = c[3] === undefined ? 255 : c[3];
@@ -436,6 +436,7 @@
   // knees about half), the torso stays steady, the arm only reaches out for the net.
   S.diver = function (p, o) {
     if (o.anim === 'stand' || o.anim === 'walk' || o.anim === 'jump' || o.anim === 'standnet') return S.diverUpright(p, o);
+    p.oy = p.h - 24 - 4;   // 24x32 frame: art drawn in 24x24 coordinates, centred on the anchor (12,16)
     const R = ROBO, ph = o.t * Math.PI * 2;
     const swim = o.anim === 'swim';
     const amp = swim ? 2.7 : o.anim === 'net' ? 0.6 : 1.2;
@@ -474,6 +475,7 @@
 
   // Upright pose for walking on land. Anchor = (12,12); feet sit on row 16.
   S.diverUpright = function (p, o) {
+    p.oy = p.h - 24 - 4;   // headroom above the head in the 24x32 frame
     const R = ROBO;
     const walk = o.anim === 'walk', jump = o.anim === 'jump';
     const step = walk ? [0, 1, 0, -1][o.frame] : 0;
