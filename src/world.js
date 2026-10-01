@@ -19,6 +19,8 @@ AQ.World = (function () {
     buildBiomeGrid();
     const mask = new Uint8Array(W.w * W.h);
     W.mask = mask;
+    W.mat = new Uint8Array(W.w * W.h);          // material id per pixel (0 = biome default)
+    W.materials = ['default'].concat(Object.keys(data.materials || {}));
     // 1) floor polyline
     const floor = floorProfile(data.floor, data.seed || 1);
     W.floorY = floor;
@@ -27,7 +29,9 @@ AQ.World = (function () {
       for (let y = 0; y < W.h; y++) mask[y * W.w + x] = y >= fy ? SOLID : (y < W.sea ? AIR : WATER);
     }
     // 2) shapes in order
-    (data.shapes || []).forEach((s, i) => applyShape(s, (data.seed || 1) + i * 31));
+    (data.shapes || []).forEach((s, i) => { curMat = s.mat ? W.materials.indexOf(s.mat) : 0; applyShape(s, (data.seed || 1) + i * 31); });
+    curMat = 0;
+    buildPools(data.pools || []);
     // 3) distance-to-open transform (used for terrain shading & spawning)
     W.dist = distanceTransform();
   };
@@ -47,14 +51,16 @@ AQ.World = (function () {
     return out;
   }
 
+  let curMat = 0;
   function setPx(x, y, op) {
     if (x < 0 || y < 0 || x >= W.w || y >= W.h) return;
     const i = y * W.w + x, m = W.mask[i];
     switch (op) {
-      case 'solid': W.mask[i] = SOLID; break;
+      case 'solid': W.mask[i] = SOLID; W.mat[i] = curMat; break;
       case 'carve': W.mask[i] = y < W.sea ? AIR : WATER; break;
       case 'pool': W.mask[i] = WATER; break;
       case 'air': if (m !== SOLID) W.mask[i] = AIR; break;
+      case 'clear': W.mask[i] = AIR; break;
       case 'water': if (m !== SOLID) W.mask[i] = WATER; break;
     }
   }
@@ -140,6 +146,28 @@ AQ.World = (function () {
         break;
       }
     }
+  }
+
+  // Tide pools: little basins of water carved into rock above the sea surface.
+  function buildPools(list) {
+    W.pools = [];
+    list.forEach((p) => {
+      let surf = -Infinity;
+      for (let x = p.x - p.w / 2; x <= p.x + p.w / 2; x++) surf = Math.max(surf, W.floorY[Math.round(x)] || 0);
+      surf = Math.round(surf) + 1;
+      const rx = p.w / 2, d = p.d || 6;
+      for (let y = surf - 12; y <= surf + d; y++) for (let x = Math.floor(p.x - rx - 2); x <= Math.ceil(p.x + rx + 2); x++) {
+        const dx = (x + 0.5 - p.x) / rx, dy = (y + 0.5 - surf) / d;
+        if (y >= surf && dx * dx + dy * dy <= 1) setPx(x, y, 'pool');
+        else if (y < surf && Math.abs(dx) <= 1 && W.at(x, y) === SOLID && y < W.sea) setPx(x, y, 'clear');
+      }
+      // raised rims on both sides
+      for (const side of [-1, 1]) for (let k = 0; k < 3; k++) {
+        const x = Math.round(p.x + side * (rx + k));
+        for (let y = surf - 3 + k; y <= surf + 1; y++) setPx(x, y, 'solid');
+      }
+      W.pools.push({ x: p.x, y: surf + 2, w: p.w, surface: surf, id: W.pools.length });
+    });
   }
 
   function distanceTransform() {

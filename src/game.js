@@ -28,6 +28,7 @@ AQ.Game = (function () {
     setLoading('Painting terrain...');
     await frame();
     AQ.Terrain.build(AQ.World);
+    AQ.Render.buildTintField();
 
     const save = AQ.Save ? AQ.Save.load() : null;
     const start = AQ.data.world.playerStart;
