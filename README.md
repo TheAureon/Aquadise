@@ -31,9 +31,12 @@ npx http-server -c-1 .      # or: python3 -m http.server
 | pause / home / reset | Esc                                     |
 | help overlay        | H                                        |
 
-In the aquarium: **Q/E** switch tanks, **F** feeds. Click a tray item, then click in the tank to
-place it. Click a placed item to move it, and right-click it to remove it. The **FISH** tray moves
-creatures between the tank and storage.
+In the aquarium: **Q/E** switch tanks, **F** feeds, **T** (or TANKS) shows every tank at a glance.
+Click a tray item, then click in the tank to place it. Click a placed item to move it, and right-click
+it to remove it. **X** flips the held or hovered piece, **Z** moves it in front of / behind everything,
+**U** (or UNDO, Ctrl+Z) undoes the last decor change, and CLEAR (click twice) empties the tank's decor.
+Click a creature for its info card. Hover the stars for what's helping and what's missing. The
+**FISH** tray moves creatures between the tank and storage.
 
 ## How it plays
 
@@ -50,8 +53,22 @@ creatures between the tank and storage.
 - **Progression** comes only from chests: a bigger net (3 levels) and faster swimming (3 levels).
   Six chests exist at a time, and they despawn and respawn around the world.
 - **Aquarium.** One tank per biome, and a creature can only live in its own biome's tank.
-  Predators sharing a tank with smaller creatures make them stressed (they hide, shake, and stop
-  playing or feeding). Nothing gets hurt.
+  Nothing ever dies and nothing is punished:
+  - **Tank vibe (0-5 stars):** decor variety and amount, biome-themed pieces, plants, being fed
+    recently, calm (no predator stress), room to swim, and creatures having things they like.
+    Weights and targets are in `AQ.TUNING.aquarium` (`src/vibe.js` does the maths).
+  - **Likes and mood:** each creature has one or two `likes` (decor/plant tags). It visits liked
+    things and does a happy idle there with hearts and sparkles. A small icon shows its mood:
+    heart = delighted, sparkle = happy, ".." = uneasy, blinking drop = nervous.
+  - **Everyday life:** creatures rest on rocks and logs, tuck into hideouts, graze plants, swim
+    in schools, nap, drift and blow bubbles. FEED tips a shaker and everyone gathers to munch.
+    Predators make smaller tankmates nervous (they hide but are never hurt).
+  - **Decor:** basics plus themed pieces for every biome. Dark tanks (trench, cave, vents, lush
+    cave) glow around light pieces. Each biome has its own water colours, light and particles
+    (`data/aquarium.js`).
+  - **Unlocks:** when a tank first reaches 2, 3.5 and 5 stars it unlocks new themed decor for
+    that biome. There is no currency or shop.
+  - **Overview (TANKS):** stars, species count and who's nervous or hungry, for every tank.
 
 ## Project layout
 
@@ -59,7 +76,8 @@ creatures between the tank and storage.
 index.html, style.css
 data/world.js         world layout: floor profile, biome rects/palettes/props, terrain shapes, tide pools
 data/creatures.js     every creature + plant (behaviour, params, spawn rules, hints)
-data/decorations.js   base aquarium decorations
+data/decorations.js   aquarium decorations (tags, theme biomes, unlock tiers, glow)
+data/aquarium.js      per-biome tank looks (water colours, light, darkness, particles)
 data/sprite-spec.js   sprite size classes + animation rows
 assets/manifest.js    sprite list (generated) -> assets/sprites/**.png
 src/config.js         ALL tuning constants (swim speed/accel/drag, camera, net, bait, chests...)
@@ -68,7 +86,8 @@ src/terrain.js        paints each biome into its own low-res pixel bitmap + prop
 src/behaviors.js      reusable catch behaviour types
 src/creatures.js      spawning / simulation / drawing of creatures + plants
 src/catching.js       net, pry, bait
-src/aquarium.js       tanks, decorating, idle behaviour, stress
+src/aquarium.js       tanks, decorating, creature life + moods, info card, overview, undo
+src/vibe.js           tank happiness (stars), helping/missing reasons, unlock milestones
 src/ui.js             collection log, map, pause
 tools/gen-placeholders.js   writes placeholder PNGs + manifest from the data files
 tools/sprites.html          animated preview of every sprite
@@ -97,8 +116,10 @@ docs/SPRITE_SPEC.md         how to make sprites that drop in cleanly
 
 - **Bait:** unlimited. One piece in the water at a time, and dropping a new one replaces it.
   It sinks, lasts 22 s, and lures nearby calm creatures.
-- **Decorations:** 13 base decorations are always available and unlimited. Harvested plants are
-  added with counts, and placing one uses one up. Removing a plant returns it to your stock.
+- **Decorations:** 13 base pieces plus one themed piece per biome are always available and
+  unlimited. Three more per biome unlock through tank happiness. Harvested plants are added with
+  counts, and placing one uses one up. Removing a plant returns it to your stock.
+- **Fed** lasts 20 real minutes, then fades over 40 more. A hungry tank only loses a little vibe.
 - **Tank capacity:** 12 creatures per tank, with extras going to that tank's storage (swap them in
   the FISH tray). Up to 40 decorations per tank.
 - **Saving:** automatic to `localStorage` every 10 s, when leaving the aquarium, and on page

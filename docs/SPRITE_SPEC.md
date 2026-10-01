@@ -71,6 +71,11 @@ assets/sprites/misc/player.png | chest.png | bait.png
 
 IDs are the `id` fields in `data/creatures.js` and `data/decorations.js` (lowercase, underscores).
 
+Decorations are one static frame, face right (the aquarium can flip them), and sit on their bottom
+row. Floating pieces (`kind: 'float'`, like the buoy and lily pad) hang from the surface: `hang` in
+`data/decorations.js` sets how many pixels of the sprite dip below the waterline. Pieces with a `glow`
+colour light up dark tanks around them, so leave their bright parts bright.
+
 ## Using a different layout
 
 If a generated sheet needs a different frame size or frame count, edit its entry in
