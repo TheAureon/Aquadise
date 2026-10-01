@@ -95,7 +95,8 @@ AQ.TUNING = {
     pace: [0.8, 1.25],        // each creature gets its own speed multiplier in this range
     feedShakeSeconds: 1.4,    // how long the food shaker sprinkles
     feedPellets: 8,
-    chompSeconds: 0.45
+    chompSeconds: 0.45,
+    undoSteps: 30             // how many decor changes UNDO remembers per tank visit
   },
 
   save: { key: 'aquadise.save.v1', autosaveEvery: 10 }

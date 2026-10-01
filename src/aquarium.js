@@ -9,6 +9,7 @@ AQ.Aquarium = (function () {
   const SIZE_RANK = { tiny: 0, small: 1, medium: 2, wide: 2, tall: 2, large: 3, widelarge: 3, huge: 4 };
   const TRAY_Y = 149, CELL = 26;
 
+  const styleOf = (id) => Object.assign({}, AQ.data.tankStyles.default, AQ.data.tankStyles[id] || {});
   const defOf = (id) => AQ.Creatures.defs[id] || AQ.data.creatures.find((d) => d.id === id);
   const decorDef = (id) => AQ.data.decorations.find((d) => d.id === id);
   const biomes = () => AQ.World.biomes.slice().sort((a, b) => order(a) - order(b));
@@ -24,12 +25,13 @@ AQ.Aquarium = (function () {
       A.biome = here;
     }
     A.prevState = 'play';
+    A.undo = []; A.notes = [];
     AQ.FX.list.length = 0;
     A.rebuild();
     AQ.Audio.music('aquarium');
   };
   A.close = function (game) {
-    cancelHold();
+    putBack();
     AQ.FX.list.length = 0;
     if (A.returnTo === 'title') { AQ.Save && AQ.Save.save(game); AQ.Title.open(game); return; }
     game.state = 'play';
@@ -366,6 +368,8 @@ AQ.Aquarium = (function () {
     ui.push({ id: 'prev', x: 2, y: 2, w: 9, h: 10, label: '<' });
     ui.push({ id: 'next', x: 72, y: 2, w: 9, h: 10, label: '>' });
     ui.push({ id: 'stars', x: 84, y: 2, w: 40, h: 10, label: '' });
+    ui.push({ id: 'undo', x: 188, y: 2, w: 22, h: 10, label: 'UNDO', off: !A.undo.length });
+    ui.push({ id: 'clear', x: 212, y: 2, w: 28, h: 10, label: A.clearArm > 0 ? 'SURE?' : 'CLEAR', warn: A.clearArm > 0 });
     ui.push({ id: 'feed', x: 248, y: 2, w: 22, h: 10, label: 'FEED' });
     ui.push({ id: 'log', x: 272, y: 2, w: 18, h: 10, label: 'LOG' });
     ui.push({ id: 'back', x: 292, y: 2, w: 26, h: 10, label: A.returnTo === 'title' ? 'HOME' : 'BACK' });
@@ -382,7 +386,9 @@ AQ.Aquarium = (function () {
   function trayItems() {
     const out = [];
     if (A.tray === 'decor') {
-      AQ.data.decorations.forEach((d) => out.push({ id: 'item', kind: 'decor', ref: d.id, key: 'decor.' + d.id, name: d.name, count: Infinity }));
+      const rank = (d) => (d.biomes && d.biomes.indexOf(A.biome) >= 0 ? 0 : !d.biomes ? 1 : 2);
+      AQ.data.decorations.map((d, i) => [d, i]).sort((a, b) => rank(a[0]) - rank(b[0]) || a[1] - b[1])
+        .forEach(([d]) => out.push({ id: 'item', kind: 'decor', ref: d.id, key: 'decor.' + d.id, name: d.name, count: Infinity }));
       Object.entries(AQ.State.plants).forEach(([id, n]) => { const d = defOf(id); if (d && n > 0) out.push({ id: 'item', kind: 'plant', ref: id, key: 'plant.' + id, name: d.name, count: n }); });
     } else {
       const tank = AQ.Collection.tank(A.biome);
@@ -395,7 +401,12 @@ AQ.Aquarium = (function () {
   const hit = (r, m) => m.x >= r.x && m.y >= r.y && m.x < r.x + r.w && m.y < r.y + r.h;
   const inTank = (m) => m.x >= TANK.x && m.x < TANK.x + TANK.w && m.y >= TANK.y && m.y < TANK.y + TANK.h;
 
-  function placeY(kind, my) { return kind === 'float' ? TANK.waterTop + 1 : U.clamp(Math.round(my), TANK.sandTop + 3, TANK.bottom); }
+  function placeY(kind, my, hang) { return kind === 'float' ? TANK.waterTop + 1 + (hang || 0) : U.clamp(Math.round(my), TANK.sandTop + 3, TANK.bottom); }
+  // how a held / placed thing sits: floor or float, and how far a floating piece dips in
+  function placement(h) {
+    if (h.kind === 'decor') { const dd = decorDef(h.id); return { kind: dd.kind || 'floor', hang: dd.hang || 0 }; }
+    return { kind: defOf(h.id).params.drift ? 'float' : 'floor', hang: 0 };
+  }
 
   A.update = function (dt, game) {
     const I = AQ.Input, m = I.mouse, tank = AQ.Collection.tank(A.biome);
@@ -407,6 +418,11 @@ AQ.Aquarium = (function () {
     if (I.wasPressed('KeyQ', 'ArrowLeft')) switchTank(-1);
     if (I.wasPressed('KeyE', 'ArrowRight')) switchTank(1);
     if (I.wasPressed('KeyF')) feed();
+    if (I.wasPressed('KeyU') || (I.wasPressed('KeyZ') && I.isDown('ControlLeft', 'ControlRight', 'MetaLeft', 'MetaRight'))) undo(tank);
+    else if (I.wasPressed('KeyZ')) cycleLayer(tank);
+    if (I.wasPressed('KeyX')) flipIt(tank);
+    if (A.clearArm > 0) A.clearArm -= dt;
+    for (let i = A.notes.length - 1; i >= 0; i--) if ((A.notes[i].t += dt) > A.notes[i].life) A.notes.splice(i, 1);
     if (m.wheel) A.trayScroll += m.wheel;
     if ((I.wasPressed('Escape') || m.pressed[2]) && A.holding) { cancelHold(); }
 
@@ -442,7 +458,7 @@ AQ.Aquarium = (function () {
       if (p.t > 25) A.food.splice(i, 1);
     }
     // bubbles from bubblers + ambient
-    tank.decor.forEach((d) => { const dd = decorDef(d.id); if (d.type === 'decor' && dd && dd.bubbles && R.chance(dt * 4)) A.bubbles.push({ x: d.x + R.range(-1, 1), y: d.y - 6, vy: -R.range(16, 26), p: R() * 6 }); });
+    tank.decor.forEach((d) => { const dd = decorDef(d.id); if (d.type === 'decor' && dd && dd.bubbles && R.chance(dt * 4)) { const gm = geo(d); A.bubbles.push({ x: gm.cx + R.range(-1, 1), y: gm.top + 1, vy: -R.range(16, 26), p: R() * 6 }); } });
     if (R.chance(dt * 1.5)) A.bubbles.push({ x: R.range(10, 310), y: TANK.bottom - 2, vy: -R.range(10, 18), p: R() * 6 });
     for (let i = A.bubbles.length - 1; i >= 0; i--) { const b = A.bubbles[i]; b.y += b.vy * dt; b.x += Math.sin(A.t * 4 + b.p) * 4 * dt; if (b.y < TANK.waterTop + 1) A.bubbles.splice(i, 1); }
     AQ.FX.update(dt, { water: () => true });
@@ -452,7 +468,8 @@ AQ.Aquarium = (function () {
     const list = biomes();
     const i = list.findIndex((b) => b.id === A.biome);
     A.biome = list[(i + dir + list.length) % list.length].id;
-    A.fish = []; A.holding = null; A.shaker = null; A.card = null; A.rebuild();
+    putBack();
+    A.fish = []; A.shaker = null; A.card = null; A.undo = []; A.clearArm = 0; A.rebuild();
   }
   // Feeding: a little shaker tips over the lid and sprinkles pellets as it slides along.
   function feed() {
@@ -498,6 +515,11 @@ AQ.Aquarium = (function () {
       case 'next': switchTank(1); break;
       case 'feed': feed(); break;
       case 'stars': break;
+      case 'undo': undo(tank); break;
+      case 'clear':
+        if (!tank.decor.length) { note('Nothing to clear.', '#cfe8ff'); break; }
+        if (A.clearArm > 0) clearTank(tank); else { A.clearArm = 3; note('Click CLEAR again to empty this tank\'s decor.', '#ffcf8a'); }
+        break;
       case 'log': AQ.LogUI.open(game, 'aquarium'); break;
       case 'back': A.close(game); break;
       case 'tray_decor': A.tray = 'decor'; A.trayScroll = 0; break;
@@ -505,13 +527,13 @@ AQ.Aquarium = (function () {
       case 'tray_left': A.trayScroll -= 3; break;
       case 'tray_right': A.trayScroll += 3; break;
       case 'item':
-        if (tank.decor.length >= AQ.TUNING.tank.decorCapacity) { AQ.HUD.toast('This tank is full of decorations.', '#ffd56b'); break; }
+        if (tank.decor.length >= AQ.TUNING.tank.decorCapacity) { note('This tank is full of decorations.', '#ffd56b'); break; }
         if (A.holding) cancelHold();
         A.holding = { kind: r.kind, id: r.ref, key: r.key };
         break;
       case 'fish': {
         const from = r.where === 'tank' ? tank.creatures : tank.storage, to = r.where === 'tank' ? tank.storage : tank.creatures;
-        if (r.where === 'storage' && tank.creatures.length >= AQ.TUNING.tank.capacity) { AQ.HUD.toast(`Tank full (${AQ.TUNING.tank.capacity}). Move one to storage first.`, '#ffd56b'); break; }
+        if (r.where === 'storage' && tank.creatures.length >= AQ.TUNING.tank.capacity) { note(`Tank full (${AQ.TUNING.tank.capacity}). Move one to storage first.`, '#ffd56b'); break; }
         const i = from.findIndex((e) => e.uid === r.uid);
         if (i >= 0) to.push(from.splice(i, 1)[0]);
         A.rebuild(); AQ.Save && AQ.Save.dirty();
@@ -521,7 +543,7 @@ AQ.Aquarium = (function () {
   }
 
   function decorAt(tank, m) {
-    const sorted = tank.decor.slice().sort((a, b) => b.y - a.y);
+    const sorted = tank.decor.slice().sort((a, b) => zOf(b) - zOf(a));
     for (const d of sorted) {
       const e = AQ.Assets.entry(d.type === 'plant' ? 'plant.' + d.id : 'decor.' + d.id);
       if (!e) continue;
@@ -529,53 +551,135 @@ AQ.Aquarium = (function () {
     }
     return null;
   }
+  // Draw order: back-layer pieces sit behind everything, front-layer pieces in front of everything.
+  function zOf(d) { return d.layer === 'back' ? d.y - 1000 : d.layer === 'front' ? d.y + 1000 : d.y; }
   function place(tank, m) {
-    const h = A.holding;
-    const kind = h.kind === 'decor' ? (decorDef(h.id).kind || 'floor') : (defOf(h.id).params.drift ? 'float' : 'floor');
+    const h = A.holding, pl = placement(h);
     if (h.kind === 'plant' && !h.fromTank) {
       if (!(AQ.State.plants[h.id] > 0)) { A.holding = null; return; }
       AQ.State.plants[h.id]--;
     }
-    tank.decor.push({ uid: AQ.U.uid(), type: h.kind, id: h.id, x: Math.round(U.clamp(m.x, TANK.x + 6, TANK.x + TANK.w - 6)), y: placeY(kind, m.y) });
-    AQ.FX.puff(m.x, placeY(kind, m.y) - 2, 'rgba(240,230,200,0.6)', 4);
+    const y = placeY(pl.kind, m.y, pl.hang);
+    const item = { uid: h.fromTank ? h.orig.uid : AQ.U.uid(), type: h.kind, id: h.id, x: Math.round(U.clamp(m.x, TANK.x + 6, TANK.x + TANK.w - 6)), y };
+    if (h.flip) item.flip = true;
+    if (h.layer) item.layer = h.layer;
+    if (h.fromTank) { tank.decor.splice(Math.min(h.index, tank.decor.length), 0, item); pushUndo({ t: 'move', uid: item.uid, prev: h.orig }); }
+    else { tank.decor.push(item); pushUndo({ t: 'add', uid: item.uid }); }
+    AQ.FX.puff(m.x, y - 2, 'rgba(240,230,200,0.6)', 4);
     // keep holding base decor for quick multi-placement; plants need stock
     if (h.fromTank || (h.kind === 'plant' && !(AQ.State.plants[h.id] > 0))) A.holding = null;
     AQ.Save && AQ.Save.dirty();
   }
   function pickUp(tank, d) {
-    tank.decor.splice(tank.decor.indexOf(d), 1);
-    A.holding = { kind: d.type, id: d.id, key: (d.type === 'plant' ? 'plant.' : 'decor.') + d.id, fromTank: true };
+    const index = tank.decor.indexOf(d);
+    tank.decor.splice(index, 1);
+    A.holding = { kind: d.type, id: d.id, key: (d.type === 'plant' ? 'plant.' : 'decor.') + d.id, fromTank: true, orig: Object.assign({}, d), index, flip: !!d.flip, layer: d.layer };
+  }
+  // leaving the tank while carrying a piece puts it back where it was
+  function putBack() {
+    const h = A.holding;
+    if (h && h.fromTank) { const t = AQ.Collection.tank(A.biome); t.decor.splice(Math.min(h.index, t.decor.length), 0, h.orig); A.holding = null; }
+    else cancelHold();
   }
   function cancelHold() {
     const h = A.holding;
-    if (h && h.fromTank && h.kind === 'plant') AQ.State.plants[h.id] = (AQ.State.plants[h.id] || 0) + 1;
+    if (h && h.fromTank) {
+      // dropping a piece picked up from the tank removes it (undo brings it back)
+      if (h.kind === 'plant') AQ.State.plants[h.id] = (AQ.State.plants[h.id] || 0) + 1;
+      pushUndo({ t: 'del', item: h.orig, index: h.index });
+      AQ.Save && AQ.Save.dirty();
+    }
     A.holding = null;
   }
   function removeDecor(tank, d) {
-    tank.decor.splice(tank.decor.indexOf(d), 1);
+    const index = tank.decor.indexOf(d);
+    tank.decor.splice(index, 1);
     if (d.type === 'plant') AQ.State.plants[d.id] = (AQ.State.plants[d.id] || 0) + 1;
+    pushUndo({ t: 'del', item: Object.assign({}, d), index });
     AQ.FX.puff(d.x, d.y - 3, 'rgba(240,230,200,0.6)', 4);
     AQ.Save && AQ.Save.dirty();
   }
+  function clearTank(tank) {
+    const items = tank.decor.map((d) => Object.assign({}, d));
+    items.forEach((d) => { if (d.type === 'plant') AQ.State.plants[d.id] = (AQ.State.plants[d.id] || 0) + 1; AQ.FX.puff(d.x, d.y - 3, 'rgba(240,230,200,0.6)', 3); });
+    tank.decor.length = 0;
+    A.clearArm = 0;
+    pushUndo({ t: 'clear', items });
+    note('Tank cleared. Plants went back to your stock. (UNDO to restore)', '#cfe8ff');
+    AQ.Save && AQ.Save.dirty();
+  }
+  // X: flip the held piece, or the placed piece under the mouse
+  function flipIt(tank) {
+    if (A.holding) { A.holding.flip = !A.holding.flip; return; }
+    const d = inTank(AQ.Input.mouse) && decorAt(tank, AQ.Input.mouse);
+    if (!d) return;
+    pushUndo({ t: 'edit', uid: d.uid, flip: d.flip, layer: d.layer });
+    if (d.flip) delete d.flip; else d.flip = true;
+    AQ.Save && AQ.Save.dirty();
+  }
+  // Z: middle -> front -> back -> middle
+  const NEXT_LAYER = { undefined: 'front', front: 'back', back: undefined };
+  const LAYER_NAME = { undefined: 'MIDDLE', front: 'IN FRONT', back: 'IN BACK' };
+  function cycleLayer(tank) {
+    let target = A.holding;
+    const d = !target && inTank(AQ.Input.mouse) && decorAt(tank, AQ.Input.mouse);
+    if (!target && !d) return;
+    if (d) { pushUndo({ t: 'edit', uid: d.uid, flip: d.flip, layer: d.layer }); target = d; }
+    const nl = NEXT_LAYER[target.layer];
+    if (nl) target.layer = nl; else delete target.layer;
+    const m = AQ.Input.mouse;
+    AQ.FX.text(m.x, m.y - 8, LAYER_NAME[target.layer], '#ffe9a8');
+    AQ.Save && AQ.Save.dirty();
+  }
+  function pushUndo(a) { A.undo.push(a); if (A.undo.length > AQ.TUNING.aquarium.undoSteps) A.undo.shift(); }
+  function undo(tank) {
+    if (A.holding) { const h = A.holding; A.holding = null; if (h.fromTank) { tank.decor.splice(Math.min(h.index, tank.decor.length), 0, h.orig); return; } }
+    const a = A.undo.pop();
+    if (!a) { note('Nothing to undo.', '#cfe8ff'); return; }
+    const find = (uid) => tank.decor.find((d) => d.uid === uid);
+    const takePlant = (d) => { if (d.type !== 'plant') return true; if (!(AQ.State.plants[d.id] > 0)) return false; AQ.State.plants[d.id]--; return true; };
+    if (a.t === 'add') {
+      const d = find(a.uid);
+      if (d) { tank.decor.splice(tank.decor.indexOf(d), 1); if (d.type === 'plant') AQ.State.plants[d.id] = (AQ.State.plants[d.id] || 0) + 1; }
+    } else if (a.t === 'move') {
+      const d = find(a.uid);
+      if (d) { d.x = a.prev.x; d.y = a.prev.y; if (a.prev.flip) d.flip = true; else delete d.flip; if (a.prev.layer) d.layer = a.prev.layer; else delete d.layer; }
+    } else if (a.t === 'del') {
+      if (takePlant(a.item)) tank.decor.splice(Math.min(a.index, tank.decor.length), 0, Object.assign({}, a.item));
+      else note('That plant is already placed somewhere else.', '#ffcf8a');
+    } else if (a.t === 'edit') {
+      const d = find(a.uid);
+      if (d) { if (a.flip) d.flip = true; else delete d.flip; if (a.layer) d.layer = a.layer; else delete d.layer; }
+    } else if (a.t === 'clear') {
+      a.items.forEach((d) => { if (takePlant(d)) tank.decor.push(Object.assign({}, d)); });
+    }
+    AQ.Save && AQ.Save.dirty();
+  }
+  function note(text, color = '#ffffff', life = 3) {
+    A.notes = A.notes || [];
+    A.notes.push({ text: text.toUpperCase(), color, t: 0, life });
+    if (A.notes.length > 2) A.notes.shift();
+  }
+  A.note = note;
 
   // ---------------------------------------------------------------- drawing
   A.draw = function (g, game) {
     const b = AQ.World.biomeById[A.biome], tank = AQ.Collection.tank(A.biome);
-    const pal = b.palette, water = U.hex(b.water || '#3497bd');
+    const st = styleOf(b.id);
     g.fillStyle = '#0b1a2c'; g.fillRect(0, 0, 320, 180);
     g.drawImage(backdrop(b), TANK.x, TANK.y);
     // light shafts from the lid, gently swaying
     g.save();
     for (let i = 0; i < 6; i++) {
       const x = 22 + i * 52 + Math.sin(A.t * 0.35 + i * 1.7) * 8, w = 8 + (i % 3) * 5;
-      g.globalAlpha = 0.05 + 0.025 * Math.sin(A.t * 0.8 + i);
+      g.globalAlpha = Math.max(0, st.shafts * (1 + 0.5 * Math.sin(A.t * 0.8 + i)));
       g.fillStyle = '#ffffff';
       g.beginPath(); g.moveTo(x, TANK.waterTop); g.lineTo(x + w, TANK.waterTop); g.lineTo(x + w + 26, TANK.sandTop + 6); g.lineTo(x + 18, TANK.sandTop + 6); g.fill();
     }
     g.restore();
     // caustics: shifting light ripples on the sand
-    g.fillStyle = 'rgba(255,255,240,0.22)';
-    for (let x = TANK.x; x < TANK.x + TANK.w; x += 1) for (let k = 0; k < 9; k++) {
+    g.fillStyle = `rgba(255,255,240,${st.caustics})`;
+    if (st.caustics > 0) for (let x = TANK.x; x < TANK.x + TANK.w; x += 1) for (let k = 0; k < 9; k++) {
       const y = TANK.sandTop + 1 + k * 2 + (x & 1);
       if (Math.sin(x * 0.31 + A.t * 1.6 + k * 0.9) + Math.sin(x * 0.13 - A.t * 1.1 + k * 1.7) > 1.45) g.fillRect(x, y, 1, 1);
     }
@@ -589,13 +693,13 @@ AQ.Aquarium = (function () {
 
     // depth-sorted decor + creatures
     const items = [];
-    tank.decor.forEach((d) => items.push({ z: d.y, d }));
+    tank.decor.forEach((d) => items.push({ z: zOf(d), d }));
     A.fish.forEach((f) => items.push({ z: f.zDraw != null ? f.zDraw : f.z, f }));
     items.sort((a, b) => a.z - b.z);
     for (const it of items) {
       if (it.d) {
         const d = it.d, key = (d.type === 'plant' ? 'plant.' : 'decor.') + d.id;
-        AQ.Assets.draw(g, key, 'idle', d.x, d.y, { t: A.t + d.x * 0.01 });
+        AQ.Assets.draw(g, key, 'idle', d.x, d.y, { t: A.t + d.x * 0.01, flip: !!d.flip, alpha: d.layer === 'back' ? 0.78 : 1 });
       } else {
         const f = it.f;
         // soft shadow on the sand
@@ -614,11 +718,8 @@ AQ.Aquarium = (function () {
     g.fillStyle = 'rgba(230,250,255,0.8)';
     A.bubbles.forEach((b) => g.fillRect(Math.round(b.x), Math.round(b.y), 1, 1));
     AQ.FX.draw(g);
-    // drifting motes
-    for (let i = 0; i < 26; i++) {
-      const x = TANK.x + ((i * 53 + A.t * (3 + (i % 4))) % TANK.w), y = TANK.waterTop + 6 + ((i * 37 + Math.sin(A.t * 0.5 + i) * 6) % (TANK.sandTop - TANK.waterTop - 8));
-      g.fillStyle = `rgba(230,250,255,${0.18 + (i % 3) * 0.08})`; g.fillRect(Math.round(x), Math.round(y), 1, 1);
-    }
+    drawParticles(g, st.particles);
+    if (st.dark > 0) drawDarkness(g, st, tank);
     // soft vignette in the tank corners
     for (let i = 0; i < 6; i++) {
       g.fillStyle = `rgba(4,16,30,${(0.12 - i * 0.018).toFixed(3)})`;
@@ -628,7 +729,7 @@ AQ.Aquarium = (function () {
     g.fillStyle = '#1c2c3d'; g.fillRect(TANK.x - 3, TANK.y - 3, TANK.w + 6, 3); g.fillRect(TANK.x - 3, TANK.y + TANK.h, TANK.w + 6, 3);
     g.fillRect(TANK.x - 3, TANK.y, 3, TANK.h); g.fillRect(TANK.x + TANK.w, TANK.y, 3, TANK.h);
     g.fillStyle = '#4a6a86'; g.fillRect(TANK.x - 3, TANK.y - 3, TANK.w + 6, 1); g.fillRect(TANK.x - 3, TANK.y, 1, TANK.h);
-    g.fillStyle = '#9feff0'; for (let x = TANK.x + 20; x < TANK.x + TANK.w - 20; x += 2) g.fillRect(x, TANK.y - 1, 1, 1);   // lamp LEDs
+    g.fillStyle = st.lamp; for (let x = TANK.x + 20; x < TANK.x + TANK.w - 20; x += 2) g.fillRect(x, TANK.y - 1, 1, 1);   // lamp LEDs
     for (const rx of [TANK.x - 2, TANK.x + TANK.w + 1]) for (const ry of [TANK.y + 4, TANK.y + TANK.h - 5]) { g.fillStyle = '#7f9ab2'; g.fillRect(rx, ry, 1, 1); }
     g.save(); g.globalAlpha = 0.07; g.fillStyle = '#fff';
     g.beginPath(); g.moveTo(TANK.x + 20, TANK.y); g.lineTo(TANK.x + 34, TANK.y); g.lineTo(TANK.x + 4, TANK.y + 40); g.lineTo(TANK.x, TANK.y + 40); g.fill();
@@ -639,8 +740,8 @@ AQ.Aquarium = (function () {
     // ghost of held item
     const m = AQ.Input.mouse;
     if (A.holding && inTank(m)) {
-      const kind = A.holding.kind === 'decor' ? (decorDef(A.holding.id).kind || 'floor') : (defOf(A.holding.id).params.drift ? 'float' : 'floor');
-      AQ.Assets.draw(g, A.holding.key, 'idle', m.x, placeY(kind, m.y), { alpha: 0.6, t: A.t });
+      const pl = placement(A.holding);
+      AQ.Assets.draw(g, A.holding.key, 'idle', m.x, placeY(pl.kind, m.y, pl.hang), { alpha: 0.6, t: A.t, flip: !!A.holding.flip });
     }
     // hover tooltip on creatures
     if (!A.holding && inTank(m)) {
@@ -736,6 +837,75 @@ AQ.Aquarium = (function () {
     ic.forEach((row, ry) => [...row].forEach((v, rx) => { if (v === '#') g.fillRect(x + rx, y + ry, 1, 1); }));
   }
 
+  // Ambient particles per tank style.
+  function drawParticles(g, kind) {
+    const H = TANK.sandTop - TANK.waterTop - 8, top = TANK.waterTop + 4;
+    if (kind === 'snow') {
+      for (let i = 0; i < 34; i++) {
+        const x = TANK.x + ((i * 53 + Math.sin(A.t * 0.4 + i) * 6 + 400) % TANK.w), y = top + ((i * 37 + A.t * (2.5 + (i % 3))) % H);
+        g.fillStyle = `rgba(240,248,255,${0.35 + (i % 3) * 0.15})`; g.fillRect(Math.round(x), Math.round(y), 1, 1);
+      }
+    } else if (kind === 'embers') {
+      for (let i = 0; i < 22; i++) {
+        const x = TANK.x + ((i * 47 + Math.sin(A.t * 0.9 + i) * 4 + 400) % TANK.w), y = TANK.sandTop - ((i * 29 + A.t * (5 + (i % 4) * 2)) % H);
+        g.fillStyle = Math.sin(A.t * 6 + i) > 0 ? '#ffb070' : '#ff7a3a'; g.globalAlpha = 0.45 + (i % 3) * 0.15;
+        g.fillRect(Math.round(x), Math.round(y), 1, 1); g.globalAlpha = 1;
+      }
+    } else if (kind === 'fireflies') {
+      for (let i = 0; i < 12; i++) {
+        const x = TANK.x + TANK.w / 2 + Math.sin(A.t * 0.23 * (1 + i % 3) + i * 2.1) * TANK.w * 0.44, y = top + 6 + (Math.sin(A.t * 0.31 + i * 1.3) * 0.5 + 0.5) * (H - 12);
+        const on = Math.sin(A.t * 1.7 + i * 2.7);
+        if (on < -0.2) continue;
+        g.fillStyle = 'rgba(232,255,140,0.25)'; g.fillRect(Math.round(x) - 1, Math.round(y) - 1, 3, 3);
+        g.fillStyle = '#efff9a'; g.fillRect(Math.round(x), Math.round(y), 1, 1);
+      }
+    } else {
+      const spores = kind === 'spores';
+      for (let i = 0; i < 26; i++) {
+        const x = TANK.x + ((i * 53 + A.t * (spores ? 1.5 : 3 + (i % 4))) % TANK.w);
+        const y = spores ? TANK.sandTop - 6 - ((i * 41 + A.t * (1 + (i % 3) * 0.6)) % H) : top + 2 + ((i * 37 + Math.sin(A.t * 0.5 + i) * 6) % H);
+        g.fillStyle = spores ? `rgba(220,255,190,${0.22 + (i % 3) * 0.1})` : `rgba(230,250,255,${0.18 + (i % 3) * 0.08})`;
+        g.fillRect(Math.round(x), Math.round(y), 1, 1);
+      }
+    }
+  }
+  // Dark tanks: a dim overlay with soft holes around glowing decor (and a faint halo round each
+  // creature so they stay easy to see), plus a gentle coloured glow.
+  let lightC = null;
+  function glowSources(tank) {
+    const out = [];
+    tank.decor.forEach((d) => {
+      let col = null;
+      if (d.type === 'plant') { const pd = defOf(d.id); if (pd && (pd.tags || []).indexOf('light') >= 0) col = pd.accent || pd.color; }
+      else { const dd = decorDef(d.id); col = dd && dd.glow; }
+      if (!col) return;
+      const gm = geo(d);
+      out.push({ x: gm.cx, y: gm.top + gm.h * 0.4, col, r: 26 + gm.h * 0.4 + Math.sin(A.t * 1.5 + d.x) * 2 });
+    });
+    return out;
+  }
+  function drawDarkness(g, st, tank) {
+    if (!lightC) { lightC = document.createElement('canvas'); lightC.width = TANK.w; lightC.height = TANK.h; }
+    const lg = lightC.getContext('2d'), src = glowSources(tank);
+    lg.globalCompositeOperation = 'source-over';
+    lg.clearRect(0, 0, TANK.w, TANK.h);
+    const grad = lg.createLinearGradient(0, 0, 0, TANK.h);
+    grad.addColorStop(0, `rgba(2,6,16,${st.dark * 0.55})`); grad.addColorStop(1, `rgba(2,6,16,${st.dark})`);
+    lg.fillStyle = grad; lg.fillRect(0, 0, TANK.w, TANK.h);
+    lg.globalCompositeOperation = 'destination-out';
+    const hole = (x, y, r, a) => { const rg = lg.createRadialGradient(x, y, 0, x, y, r); rg.addColorStop(0, `rgba(0,0,0,${a})`); rg.addColorStop(1, 'rgba(0,0,0,0)'); lg.fillStyle = rg; lg.fillRect(x - r, y - r, r * 2, r * 2); };
+    src.forEach((s) => hole(s.x - TANK.x, s.y - TANK.y, s.r, 1));
+    A.fish.forEach((f) => hole(f.x - TANK.x, f.y - TANK.y, f.r + 8, 0.55));
+    g.drawImage(lightC, TANK.x, TANK.y);
+    g.save(); g.globalCompositeOperation = 'lighter';
+    src.forEach((s) => {
+      const c = U.hex(s.col), rg = g.createRadialGradient(s.x, s.y, 0, s.x, s.y, s.r * 0.8);
+      rg.addColorStop(0, `rgba(${c[0]},${c[1]},${c[2]},0.22)`); rg.addColorStop(1, `rgba(${c[0]},${c[1]},${c[2]},0)`);
+      g.fillStyle = rg; g.fillRect(s.x - s.r, s.y - s.r, s.r * 2, s.r * 2);
+    });
+    g.restore();
+  }
+
   // Cached, biome-themed backdrop: dithered water gradient, distant rock silhouettes, themed
   // mid-ground silhouettes and a rippled sand bed with pebbles.
   const backdrops = {};
@@ -744,7 +914,8 @@ AQ.Aquarium = (function () {
     if (backdrops[b.id]) return backdrops[b.id];
     const W = TANK.w, H = TANK.h, c = document.createElement('canvas'); c.width = W; c.height = H;
     const g = c.getContext('2d'), img = g.createImageData(W, H), d = img.data;
-    const water = U.hex(b.water || '#3497bd'), top = U.mix([150, 225, 235], water, 0.35), deep = U.mix([26, 70, 110], water, 0.45);
+    const st = styleOf(b.id), water = U.hex(b.water || '#3497bd');
+    const top = st.top ? U.hex(st.top) : U.mix([150, 225, 235], water, 0.35), deep = st.deep ? U.hex(st.deep) : U.mix([26, 70, 110], water, 0.45);
     const pal = b.palette, sand = pal.top.map(U.hex), rock = U.mix(U.hex(pal.rock[1]), deep, 0.55), rockFar = U.mix(rock, deep, 0.5);
     const seed = b.index * 31 + 7, theme = b.id;
     const sandY = (x) => TANK.sandTop - TANK.y + Math.round(Math.sin(x * 0.05) * 1.5 + Math.sin(x * 0.13) * 0.8);
@@ -817,10 +988,10 @@ AQ.Aquarium = (function () {
   A.tip = tip;
 
   function button(g, r, hover) {
-    g.fillStyle = r.on ? '#2e7d96' : hover ? '#24506b' : '#16334a';
+    g.fillStyle = r.warn ? (hover ? '#a8503a' : '#8a3f2e') : r.on ? '#2e7d96' : hover && !r.off ? '#24506b' : '#16334a';
     g.fillRect(r.x, r.y, r.w, r.h);
     g.fillStyle = 'rgba(160,220,240,0.35)'; g.fillRect(r.x, r.y, r.w, 1);
-    if (r.label) F().draw(g, r.label, r.x + r.w / 2, r.y + Math.floor((r.h - 5) / 2), '#e8fbff', { align: 'center' });
+    if (r.label) F().draw(g, r.label, r.x + r.w / 2, r.y + Math.floor((r.h - 5) / 2), r.off ? '#5f7a8c' : '#e8fbff', { align: 'center' });
   }
   A.button = button;
 
@@ -854,10 +1025,18 @@ AQ.Aquarium = (function () {
     // hints
     if (A.hover && (A.hover.id === 'item' || A.hover.id === 'fish')) {
       tip(g, A.hover.id === 'fish' ? `${A.hover.name}: CLICK TO MOVE ${A.hover.where === 'tank' ? 'TO STORAGE' : 'INTO TANK'}` : `${A.hover.name}: CLICK, THEN CLICK IN TANK`, A.hover.x + 12, TANK.waterTop + 4, '#fff');
-    } else if (A.holding) tip(g, 'CLICK TO PLACE - RIGHT CLICK / ESC TO STOP', 160, TANK.waterTop + 4, '#ffe9a8');
+    } else if (A.holding) tip(g, 'CLICK: PLACE   X: FLIP   Z: FRONT/BACK   RIGHT CLICK: STOP', 160, TANK.waterTop + 4, '#ffe9a8');
     else if (!tank.creatures.length && !tank.decor.length) tip(g, 'CATCH CREATURES FROM THIS BIOME TO FILL THIS TANK', 160, 70, '#ffffff');
     else if (inTank(AQ.Input.mouse) && fishAt(AQ.Input.mouse)) { if (!A.card) tip(g, 'CLICK A CREATURE TO LEARN ABOUT IT', 160, TANK.waterTop + 4, '#cfe8ff'); }
-    else if (inTank(AQ.Input.mouse) && decorAt(tank, AQ.Input.mouse)) tip(g, 'CLICK: MOVE   RIGHT CLICK: REMOVE', 160, TANK.waterTop + 4, '#cfe8ff');
+    else if (inTank(AQ.Input.mouse) && decorAt(tank, AQ.Input.mouse)) tip(g, 'CLICK: MOVE   RIGHT CLICK: REMOVE   X: FLIP   Z: FRONT/BACK', 160, TANK.waterTop + 4, '#cfe8ff');
+    else if (A.hover && A.hover.id === 'undo') tip(g, 'UNDO LAST DECOR CHANGE (U)', 160, TANK.waterTop + 4, '#cfe8ff');
+    else if (A.hover && A.hover.id === 'clear') tip(g, 'REMOVE ALL DECOR FROM THIS TANK', 160, TANK.waterTop + 4, '#cfe8ff');
+    // notices (tank full, cleared, unlocks...)
+    (A.notes || []).forEach((n, i) => {
+      g.globalAlpha = U.clamp(Math.min(n.t * 4, (n.life - n.t) * 2), 0, 1);
+      tip(g, n.text, 160, TANK.y + TANK.h - 14 - (A.notes.length - 1 - i) * 8, n.color);
+      g.globalAlpha = 1;
+    });
   }
 
   return A;

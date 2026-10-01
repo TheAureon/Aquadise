@@ -1988,6 +1988,974 @@ AQ.manifest = {
     10,
     11
    ]
+  },
+  "decor.sand_dollar": {
+   "file": "sprites/decor/sand_dollar.png",
+   "fw": 12,
+   "fh": 12,
+   "anchor": [
+    6,
+    11
+   ],
+   "anims": {
+    "idle": {
+     "row": 0,
+     "frames": 1,
+     "fps": 1
+    }
+   },
+   "vis": [
+    1,
+    6,
+    10,
+    11
+   ]
+  },
+  "decor.anemone_rock": {
+   "file": "sprites/decor/anemone_rock.png",
+   "fw": 24,
+   "fh": 24,
+   "anchor": [
+    12,
+    23
+   ],
+   "anims": {
+    "idle": {
+     "row": 0,
+     "frames": 1,
+     "fps": 1
+    }
+   },
+   "vis": [
+    1,
+    7,
+    22,
+    23
+   ]
+  },
+  "decor.sand_pail": {
+   "file": "sprites/decor/sand_pail.png",
+   "fw": 24,
+   "fh": 24,
+   "anchor": [
+    12,
+    23
+   ],
+   "anims": {
+    "idle": {
+     "row": 0,
+     "frames": 1,
+     "fps": 1
+    }
+   },
+   "vis": [
+    2,
+    10,
+    22,
+    23
+   ]
+  },
+  "decor.lighthouse": {
+   "file": "sprites/decor/lighthouse.png",
+   "fw": 16,
+   "fh": 32,
+   "anchor": [
+    8,
+    31
+   ],
+   "anims": {
+    "idle": {
+     "row": 0,
+     "frames": 1,
+     "fps": 1
+    }
+   },
+   "vis": [
+    2,
+    1,
+    13,
+    31
+   ]
+  },
+  "decor.kelp_stalk": {
+   "file": "sprites/decor/kelp_stalk.png",
+   "fw": 16,
+   "fh": 32,
+   "anchor": [
+    8,
+    31
+   ],
+   "anims": {
+    "idle": {
+     "row": 0,
+     "frames": 1,
+     "fps": 1
+    }
+   },
+   "vis": [
+    3,
+    2,
+    14,
+    31
+   ]
+  },
+  "decor.otter_rock": {
+   "file": "sprites/decor/otter_rock.png",
+   "fw": 32,
+   "fh": 16,
+   "anchor": [
+    16,
+    15
+   ],
+   "anims": {
+    "idle": {
+     "row": 0,
+     "frames": 1,
+     "fps": 1
+    }
+   },
+   "vis": [
+    1,
+    7,
+    30,
+    15
+   ]
+  },
+  "decor.sea_urchin": {
+   "file": "sprites/decor/sea_urchin.png",
+   "fw": 16,
+   "fh": 16,
+   "anchor": [
+    8,
+    15
+   ],
+   "anims": {
+    "idle": {
+     "row": 0,
+     "frames": 1,
+     "fps": 1
+    }
+   },
+   "vis": [
+    2,
+    3,
+    14,
+    13
+   ]
+  },
+  "decor.kelp_arch": {
+   "file": "sprites/decor/kelp_arch.png",
+   "fw": 32,
+   "fh": 32,
+   "anchor": [
+    16,
+    31
+   ],
+   "anims": {
+    "idle": {
+     "row": 0,
+     "frames": 1,
+     "fps": 1
+    }
+   },
+   "vis": [
+    4,
+    4,
+    27,
+    31
+   ]
+  },
+  "decor.branch_coral": {
+   "file": "sprites/decor/branch_coral.png",
+   "fw": 24,
+   "fh": 24,
+   "anchor": [
+    12,
+    23
+   ],
+   "anims": {
+    "idle": {
+     "row": 0,
+     "frames": 1,
+     "fps": 1
+    }
+   },
+   "vis": [
+    1,
+    4,
+    22,
+    23
+   ]
+  },
+  "decor.giant_clam": {
+   "file": "sprites/decor/giant_clam.png",
+   "fw": 24,
+   "fh": 24,
+   "anchor": [
+    12,
+    23
+   ],
+   "anims": {
+    "idle": {
+     "row": 0,
+     "frames": 1,
+     "fps": 1
+    }
+   },
+   "vis": [
+    1,
+    9,
+    22,
+    23
+   ]
+  },
+  "decor.sea_fan": {
+   "file": "sprites/decor/sea_fan.png",
+   "fw": 32,
+   "fh": 32,
+   "anchor": [
+    16,
+    31
+   ],
+   "anims": {
+    "idle": {
+     "row": 0,
+     "frames": 1,
+     "fps": 1
+    }
+   },
+   "vis": [
+    3,
+    8,
+    29,
+    31
+   ]
+  },
+  "decor.coral_tower": {
+   "file": "sprites/decor/coral_tower.png",
+   "fw": 32,
+   "fh": 32,
+   "anchor": [
+    16,
+    31
+   ],
+   "anims": {
+    "idle": {
+     "row": 0,
+     "frames": 1,
+     "fps": 1
+    }
+   },
+   "vis": [
+    1,
+    7,
+    30,
+    31
+   ]
+  },
+  "decor.glow_stone": {
+   "file": "sprites/decor/glow_stone.png",
+   "fw": 16,
+   "fh": 16,
+   "anchor": [
+    8,
+    15
+   ],
+   "anims": {
+    "idle": {
+     "row": 0,
+     "frames": 1,
+     "fps": 1
+    }
+   },
+   "vis": [
+    1,
+    5,
+    14,
+    15
+   ]
+  },
+  "decor.tube_worms": {
+   "file": "sprites/decor/tube_worms.png",
+   "fw": 24,
+   "fh": 24,
+   "anchor": [
+    12,
+    23
+   ],
+   "anims": {
+    "idle": {
+     "row": 0,
+     "frames": 1,
+     "fps": 1
+    }
+   },
+   "vis": [
+    5,
+    3,
+    19,
+    23
+   ]
+  },
+  "decor.whale_bones": {
+   "file": "sprites/decor/whale_bones.png",
+   "fw": 48,
+   "fh": 24,
+   "anchor": [
+    24,
+    23
+   ],
+   "anims": {
+    "idle": {
+     "row": 0,
+     "frames": 1,
+     "fps": 1
+    }
+   },
+   "vis": [
+    1,
+    4,
+    46,
+    23
+   ]
+  },
+  "decor.abyss_lantern": {
+   "file": "sprites/decor/abyss_lantern.png",
+   "fw": 16,
+   "fh": 16,
+   "anchor": [
+    8,
+    15
+   ],
+   "anims": {
+    "idle": {
+     "row": 0,
+     "frames": 1,
+     "fps": 1
+    }
+   },
+   "vis": [
+    3,
+    1,
+    12,
+    15
+   ]
+  },
+  "decor.stalagmite": {
+   "file": "sprites/decor/stalagmite.png",
+   "fw": 16,
+   "fh": 32,
+   "anchor": [
+    8,
+    31
+   ],
+   "anims": {
+    "idle": {
+     "row": 0,
+     "frames": 1,
+     "fps": 1
+    }
+   },
+   "vis": [
+    1,
+    2,
+    14,
+    31
+   ]
+  },
+  "decor.cave_crystals": {
+   "file": "sprites/decor/cave_crystals.png",
+   "fw": 24,
+   "fh": 24,
+   "anchor": [
+    12,
+    23
+   ],
+   "anims": {
+    "idle": {
+     "row": 0,
+     "frames": 1,
+     "fps": 1
+    }
+   },
+   "vis": [
+    2,
+    6,
+    21,
+    23
+   ]
+  },
+  "decor.rock_den": {
+   "file": "sprites/decor/rock_den.png",
+   "fw": 32,
+   "fh": 32,
+   "anchor": [
+    16,
+    31
+   ],
+   "anims": {
+    "idle": {
+     "row": 0,
+     "frames": 1,
+     "fps": 1
+    }
+   },
+   "vis": [
+    1,
+    9,
+    30,
+    31
+   ]
+  },
+  "decor.geode": {
+   "file": "sprites/decor/geode.png",
+   "fw": 24,
+   "fh": 24,
+   "anchor": [
+    12,
+    23
+   ],
+   "anims": {
+    "idle": {
+     "row": 0,
+     "frames": 1,
+     "fps": 1
+    }
+   },
+   "vis": [
+    4,
+    9,
+    19,
+    23
+   ]
+  },
+  "decor.buoy": {
+   "file": "sprites/decor/buoy.png",
+   "fw": 16,
+   "fh": 16,
+   "anchor": [
+    8,
+    15
+   ],
+   "anims": {
+    "idle": {
+     "row": 0,
+     "frames": 1,
+     "fps": 1
+    }
+   },
+   "vis": [
+    4,
+    2,
+    12,
+    15
+   ]
+  },
+  "decor.message_bottle": {
+   "file": "sprites/decor/message_bottle.png",
+   "fw": 16,
+   "fh": 16,
+   "anchor": [
+    8,
+    15
+   ],
+   "anims": {
+    "idle": {
+     "row": 0,
+     "frames": 1,
+     "fps": 1
+    }
+   },
+   "vis": [
+    1,
+    8,
+    14,
+    15
+   ]
+  },
+  "decor.glass_floats": {
+   "file": "sprites/decor/glass_floats.png",
+   "fw": 16,
+   "fh": 16,
+   "anchor": [
+    8,
+    15
+   ],
+   "anims": {
+    "idle": {
+     "row": 0,
+     "frames": 1,
+     "fps": 1
+    }
+   },
+   "vis": [
+    1,
+    3,
+    14,
+    13
+   ]
+  },
+  "decor.ships_wheel": {
+   "file": "sprites/decor/ships_wheel.png",
+   "fw": 24,
+   "fh": 24,
+   "anchor": [
+    12,
+    23
+   ],
+   "anims": {
+    "idle": {
+     "row": 0,
+     "frames": 1,
+     "fps": 1
+    }
+   },
+   "vis": [
+    2,
+    2,
+    22,
+    23
+   ]
+  },
+  "decor.broken_column": {
+   "file": "sprites/decor/broken_column.png",
+   "fw": 24,
+   "fh": 24,
+   "anchor": [
+    12,
+    23
+   ],
+   "anims": {
+    "idle": {
+     "row": 0,
+     "frames": 1,
+     "fps": 1
+    }
+   },
+   "vis": [
+    5,
+    4,
+    20,
+    23
+   ]
+  },
+  "decor.statue_head": {
+   "file": "sprites/decor/statue_head.png",
+   "fw": 32,
+   "fh": 32,
+   "anchor": [
+    16,
+    31
+   ],
+   "anims": {
+    "idle": {
+     "row": 0,
+     "frames": 1,
+     "fps": 1
+    }
+   },
+   "vis": [
+    2,
+    2,
+    29,
+    31
+   ]
+  },
+  "decor.old_cannon": {
+   "file": "sprites/decor/old_cannon.png",
+   "fw": 32,
+   "fh": 16,
+   "anchor": [
+    16,
+    15
+   ],
+   "anims": {
+    "idle": {
+     "row": 0,
+     "frames": 1,
+     "fps": 1
+    }
+   },
+   "vis": [
+    1,
+    4,
+    29,
+    15
+   ]
+  },
+  "decor.golden_idol": {
+   "file": "sprites/decor/golden_idol.png",
+   "fw": 16,
+   "fh": 16,
+   "anchor": [
+    8,
+    15
+   ],
+   "anims": {
+    "idle": {
+     "row": 0,
+     "frames": 1,
+     "fps": 1
+    }
+   },
+   "vis": [
+    2,
+    1,
+    13,
+    15
+   ]
+  },
+  "decor.mini_vent": {
+   "file": "sprites/decor/mini_vent.png",
+   "fw": 16,
+   "fh": 16,
+   "anchor": [
+    8,
+    15
+   ],
+   "anims": {
+    "idle": {
+     "row": 0,
+     "frames": 1,
+     "fps": 1
+    }
+   },
+   "vis": [
+    1,
+    1,
+    14,
+    15
+   ]
+  },
+  "decor.basalt_columns": {
+   "file": "sprites/decor/basalt_columns.png",
+   "fw": 24,
+   "fh": 24,
+   "anchor": [
+    12,
+    23
+   ],
+   "anims": {
+    "idle": {
+     "row": 0,
+     "frames": 1,
+     "fps": 1
+    }
+   },
+   "vis": [
+    2,
+    5,
+    22,
+    23
+   ]
+  },
+  "decor.sulfur_crystals": {
+   "file": "sprites/decor/sulfur_crystals.png",
+   "fw": 16,
+   "fh": 16,
+   "anchor": [
+    8,
+    15
+   ],
+   "anims": {
+    "idle": {
+     "row": 0,
+     "frames": 1,
+     "fps": 1
+    }
+   },
+   "vis": [
+    1,
+    5,
+    14,
+    15
+   ]
+  },
+  "decor.magma_rock": {
+   "file": "sprites/decor/magma_rock.png",
+   "fw": 24,
+   "fh": 24,
+   "anchor": [
+    12,
+    23
+   ],
+   "anims": {
+    "idle": {
+     "row": 0,
+     "frames": 1,
+     "fps": 1
+    }
+   },
+   "vis": [
+    1,
+    7,
+    22,
+    23
+   ]
+  },
+  "decor.mangrove_roots": {
+   "file": "sprites/decor/mangrove_roots.png",
+   "fw": 48,
+   "fh": 24,
+   "anchor": [
+    24,
+    23
+   ],
+   "anims": {
+    "idle": {
+     "row": 0,
+     "frames": 1,
+     "fps": 1
+    }
+   },
+   "vis": [
+    1,
+    7,
+    46,
+    23
+   ]
+  },
+  "decor.lily_pad": {
+   "file": "sprites/decor/lily_pad.png",
+   "fw": 16,
+   "fh": 16,
+   "anchor": [
+    8,
+    15
+   ],
+   "anims": {
+    "idle": {
+     "row": 0,
+     "frames": 1,
+     "fps": 1
+    }
+   },
+   "vis": [
+    2,
+    2,
+    13,
+    15
+   ]
+  },
+  "decor.mud_mound": {
+   "file": "sprites/decor/mud_mound.png",
+   "fw": 32,
+   "fh": 16,
+   "anchor": [
+    16,
+    15
+   ],
+   "anims": {
+    "idle": {
+     "row": 0,
+     "frames": 1,
+     "fps": 1
+    }
+   },
+   "vis": [
+    1,
+    7,
+    30,
+    15
+   ]
+  },
+  "decor.hollow_log": {
+   "file": "sprites/decor/hollow_log.png",
+   "fw": 32,
+   "fh": 16,
+   "anchor": [
+    16,
+    15
+   ],
+   "anims": {
+    "idle": {
+     "row": 0,
+     "frames": 1,
+     "fps": 1
+    }
+   },
+   "vis": [
+    1,
+    3,
+    30,
+    15
+   ]
+  },
+  "decor.ice_chunk": {
+   "file": "sprites/decor/ice_chunk.png",
+   "fw": 24,
+   "fh": 24,
+   "anchor": [
+    12,
+    23
+   ],
+   "anims": {
+    "idle": {
+     "row": 0,
+     "frames": 1,
+     "fps": 1
+    }
+   },
+   "vis": [
+    1,
+    5,
+    22,
+    23
+   ]
+  },
+  "decor.icicle_spire": {
+   "file": "sprites/decor/icicle_spire.png",
+   "fw": 16,
+   "fh": 32,
+   "anchor": [
+    8,
+    31
+   ],
+   "anims": {
+    "idle": {
+     "row": 0,
+     "frames": 1,
+     "fps": 1
+    }
+   },
+   "vis": [
+    1,
+    2,
+    14,
+    31
+   ]
+  },
+  "decor.ice_cave": {
+   "file": "sprites/decor/ice_cave.png",
+   "fw": 32,
+   "fh": 32,
+   "anchor": [
+    16,
+    31
+   ],
+   "anims": {
+    "idle": {
+     "row": 0,
+     "frames": 1,
+     "fps": 1
+    }
+   },
+   "vis": [
+    7,
+    8,
+    24,
+    31
+   ]
+  },
+  "decor.frost_crystal": {
+   "file": "sprites/decor/frost_crystal.png",
+   "fw": 24,
+   "fh": 24,
+   "anchor": [
+    12,
+    23
+   ],
+   "anims": {
+    "idle": {
+     "row": 0,
+     "frames": 1,
+     "fps": 1
+    }
+   },
+   "vis": [
+    2,
+    6,
+    21,
+    23
+   ]
+  },
+  "decor.glow_mushrooms": {
+   "file": "sprites/decor/glow_mushrooms.png",
+   "fw": 16,
+   "fh": 16,
+   "anchor": [
+    8,
+    15
+   ],
+   "anims": {
+    "idle": {
+     "row": 0,
+     "frames": 1,
+     "fps": 1
+    }
+   },
+   "vis": [
+    2,
+    3,
+    13,
+    15
+   ]
+  },
+  "decor.mossy_stone": {
+   "file": "sprites/decor/mossy_stone.png",
+   "fw": 32,
+   "fh": 16,
+   "anchor": [
+    16,
+    15
+   ],
+   "anims": {
+    "idle": {
+     "row": 0,
+     "frames": 1,
+     "fps": 1
+    }
+   },
+   "vis": [
+    1,
+    7,
+    30,
+    15
+   ]
+  },
+  "decor.flower_arch": {
+   "file": "sprites/decor/flower_arch.png",
+   "fw": 32,
+   "fh": 32,
+   "anchor": [
+    16,
+    31
+   ],
+   "anims": {
+    "idle": {
+     "row": 0,
+     "frames": 1,
+     "fps": 1
+    }
+   },
+   "vis": [
+    4,
+    4,
+    27,
+    31
+   ]
+  },
+  "decor.fairy_lantern": {
+   "file": "sprites/decor/fairy_lantern.png",
+   "fw": 16,
+   "fh": 16,
+   "anchor": [
+    8,
+    15
+   ],
+   "anims": {
+    "idle": {
+     "row": 0,
+     "frames": 1,
+     "fps": 1
+    }
+   },
+   "vis": [
+    3,
+    1,
+    12,
+    15
+   ]
   }
  }
 };

@@ -727,6 +727,288 @@
     p.shade(0.2); p.outline();
   };
 
+  // ---------- themed decorations (aquarium stage 4) ----------
+  const CLEAR = [0, 0, 0, 0];
+  S.anemonerock = function (p, o) {          // tide-pool rock with anemones + barnacles
+    const W = p.w, H = p.h;
+    S.rock(p, Object.assign({}, o, { seed: 7 }));
+    for (const [x, c] of [[0.3, o.a], [0.62, mul(o.a, 0.85)]]) {
+      const cx = W * x, cy = H * 0.42;
+      for (let k = -2; k <= 2; k++) p.line(cx, cy + 2, cx + k * 1.2, cy - 2 + Math.abs(k) * 0.5, c);
+      p.set(cx, cy + 2, mul(c, 0.7));
+    }
+    for (let i = 0; i < 5; i++) p.set(W * (0.2 + i * 0.15), H * 0.7 + (i % 2), [236, 228, 214, 255]);
+  };
+  S.sanddollar = function (p, o) {
+    const W = p.w, H = p.h;
+    p.ellipse(W / 2, H - 3, W * 0.42, 2.2, o.c); p.shade(0.2);
+    for (let k = 0; k < 5; k++) { const a = -Math.PI / 2 + k * 1.2566; p.set(W / 2 + Math.cos(a) * 2.5, H - 3 + Math.sin(a) * 1.1, mul(o.c, 0.75)); }
+    p.outline();
+  };
+  S.pail = function (p, o) {                 // a lost sand pail on its side - a cosy hideout
+    const W = p.w, H = p.h;
+    p.tri([2, H - 2], [W - 3, H - 4], [W - 3, H - 1], o.c);
+    p.rect(3, H - 10, W - 6, 8, o.c);
+    p.ellipse(3, H - 6, 2, 4.5, mul(o.c, 0.5)); p.ellipse(3, H - 6, 1.2, 3.4, [20, 18, 30, 255]);
+    p.rect(5, H - 9, W - 9, 1, o.a);
+    p.line(W - 4, H - 10, W - 1, H - 13, [90, 90, 96, 255]); p.line(W - 1, H - 13, W - 1, H - 4, [90, 90, 96, 255]);
+    p.shade(0.2); p.outline();
+  };
+  S.lighthouse = function (p, o) {
+    const W = p.w, H = p.h, cx = W / 2;
+    for (let y = 6; y < H - 1; y++) { const w = Math.round((y - 6) / (H - 7) * 4.5) + 1; const band = Math.floor((y - 6) / 4) % 2; p.rect(cx - w, y, w * 2, 1, band ? o.a : o.c); }
+    p.rect(cx - 2, 3, 4, 3, [255, 236, 140, 255]); p.rect(cx - 3, 2, 6, 1, [60, 60, 70, 255]); p.set(cx, 1, [60, 60, 70, 255]);
+    p.shade(0.15); p.outline();
+  };
+  S.flatrock = function (p, o) {
+    const W = p.w, H = p.h, r = mkRand(o.seed || 4);
+    p.ellipse(W / 2, H * 0.72, W * 0.46, H * 0.26, o.c);
+    p.rect(Math.round(W * 0.14), Math.round(H * 0.5), Math.round(W * 0.72), 2, mul(o.c, 1.06));
+    p.shade(0.25);
+    for (let i = 0; i < W; i++) { const x = Math.floor(r() * W), y = Math.floor(H * 0.55 + r() * H * 0.4); if (p.a(x, y)) p.set(x, y, mul(o.c, 0.86)); }
+    if (o.moss) for (let x = W * 0.15; x < W * 0.85; x++) if (p.a(x, H * 0.5)) p.set(x, H * 0.5 - (x % 3 ? 0 : 1), hex(o.moss));
+    p.outline();
+  };
+  S.urchin = function (p, o) {
+    const W = p.w, H = p.h, cx = W / 2, cy = H - 5;
+    for (let k = 0; k < 14; k++) { const a = Math.PI + k * Math.PI / 13; p.line(cx, cy, cx + Math.cos(a) * W * 0.46, cy + Math.sin(a) * H * 0.55, mul(o.c, 0.8)); }
+    p.ellipse(cx, cy, W * 0.26, 3.6, o.c); p.rect(cx - W * 0.26, cy + 2, W * 0.52, 3, CLEAR);
+    p.shade(0.25); p.outline(0.3); p.set(cx - 1, cy - 2, o.a);
+  };
+  S.kelparch = function (p, o) {
+    const W = p.w, H = p.h;
+    S.arch(p, Object.assign({}, o));
+    const g = hex(o.kelp || '#4f8a43');
+    for (let k = 0; k < 5; k++) { const x0 = W * (0.12 + k * 0.19); for (let y = H * 0.12; y < H * 0.6; y++) if (p.a(x0, y) || y > H * 0.2) p.set(x0 + Math.sin(y * 0.5 + k) * 1.2, y + (k % 2) * 3, k % 2 ? g : mul(g, 1.2)); }
+  };
+  S.clam = function (p, o) {
+    const W = p.w, H = p.h, cx = W / 2;
+    p.ellipse(cx, H - 4, W * 0.45, 4, o.c);                                    // lower shell
+    p.ellipse(cx, H - 9, W * 0.44, 5, mul(o.c, 1.08)); p.rect(1, H - 8, W - 2, 3, CLEAR);   // open lid
+    for (let i = -3; i <= 3; i++) p.line(cx, H - 2, cx + i * W * 0.12, H - 7, mul(o.c, 0.8));
+    p.ellipse(cx, H - 6.5, W * 0.3, 1.4, o.a); p.circle(cx, H - 6.5, 1.2, [250, 246, 236, 255]);   // pearl
+    p.shade(0.2); p.outline();
+  };
+  S.seafan = function (p, o) {
+    const W = p.w, H = p.h, cx = W / 2, base = H - 1;
+    for (let k = 0; k < 9; k++) { const a = -Math.PI * 0.92 + k * Math.PI * 0.84 / 8; p.line(cx, base, cx + Math.cos(a) * W * 0.46, base + Math.sin(a) * H * 0.9, o.c); }
+    for (let r = 4; r < H * 0.9; r += 3) for (let a = -Math.PI * 0.9; a < -Math.PI * 0.1; a += 0.06) p.set(cx + Math.cos(a) * r * (W / H) * 1.0, base + Math.sin(a) * r, mul(o.c, 0.9));
+    p.shade(0.2); p.outline(0.4);
+    for (let i = 0; i < 6; i++) p.set(cx + (i - 3) * W * 0.12, base - H * (0.4 + (i % 3) * 0.15), o.a);
+  };
+  S.glowstone = function (p, o) {
+    const W = p.w, H = p.h;
+    S.rock(p, Object.assign({}, o, { seed: 9 }));
+    const gl = hex(o.glow || '#7ff6ff');
+    [[0.3, 0.6], [0.58, 0.5], [0.7, 0.74], [0.42, 0.8]].forEach(([x, y], i) => { p.set(W * x, H * y, gl); p.set(W * x + 1, H * y, mul(gl, 0.8)); if (i % 2 === 0) { p.set(W * x, H * y + 1, mul(gl, 0.8)); p.set(W * x + 1, H * y + 1, mul(gl, 0.6)); } });
+  };
+  S.tubeworms = function (p, o) {
+    const W = p.w, H = p.h;
+    [[0.25, 0.45], [0.42, 0.2], [0.58, 0.32], [0.74, 0.5], [0.36, 0.6]].forEach(([x, t]) => {
+      p.rect(W * x - 1, H * t, 3, H * (1 - t), o.c); p.rect(W * x - 1, H * t, 1, H * (1 - t), mul(o.c, 1.1));
+    });
+    p.shade(0.2); p.outline(0.4);
+    [[0.25, 0.45], [0.42, 0.2], [0.58, 0.32], [0.74, 0.5], [0.36, 0.6]].forEach(([x, t]) => { p.rect(W * x - 2, H * t - 2, 5, 2, o.a); p.set(W * x, H * t - 3, o.a); });
+  };
+  S.ribs = function (p, o) {                 // old whale bones: a ribcage arch
+    const W = p.w, H = p.h;
+    p.rect(1, H - 3, W - 2, 2, o.c);
+    for (let k = 0; k < 4; k++) {
+      const x0 = 4 + k * (W - 8) / 3, h = H * (0.75 - Math.abs(k - 1.5) * 0.1);
+      for (let y = 0; y < h; y++) { const bend = Math.sin(y / h * Math.PI * 0.9) * 4; p.set(x0 + bend * (k < 2 ? 1 : -1) * 0.6, H - 3 - y, o.c); p.set(x0 + 1 + bend * (k < 2 ? 1 : -1) * 0.6, H - 3 - y, mul(o.c, 0.85)); }
+    }
+    p.shade(0.2); p.outline();
+  };
+  S.lantern = function (p, o) {
+    const W = p.w, H = p.h, cx = W / 2, metal = hex(o.metal || '#4a4a52');
+    p.rect(cx - 4, H - 3, 8, 2, metal);
+    p.rect(cx - 3, H - 11, 6, 8, o.a); p.rect(cx - 2, H - 10, 4, 6, mul(o.a, 1.2));
+    p.rect(cx - 4, H - 12, 8, 1, metal); p.rect(cx - 3, H - 13, 6, 1, metal); p.set(cx, H - 14, metal);
+    p.rect(cx - 4, H - 11, 1, 8, metal); p.rect(cx + 3, H - 11, 1, 8, metal);
+    p.outline();
+  };
+  S.stalagmite = function (p, o) {
+    const W = p.w, H = p.h, r = mkRand(o.seed || 2);
+    for (let y = 1; y < H; y++) {
+      const u = y / H, w = Math.max(0.6, Math.pow(u, 0.85) * W * 0.46 + (r() - 0.5) * 0.8);
+      p.rect(Math.round(W / 2 - w), y, Math.round(w * 2), 1, o.c);
+    }
+    p.tri([W * 0.02, H - 1], [W * 0.36, H - 1], [W * 0.16, H * 0.62], mul(o.c, 0.92));
+    p.shade(0.25);
+    for (let y = 6; y < H - 2; y += 5) p.rect(Math.round(W / 2 - Math.pow(y / H, 0.85) * W * 0.3), y, 2, 1, mul(o.c, 0.82));
+    p.line(W / 2 + 1, 3, W / 2 + 3, H - 3, mul(o.c, 1.15));
+    p.outline();
+  };
+  S.den = function (p, o) {
+    const W = p.w, H = p.h;
+    p.ellipse(W / 2, H * 0.7, W * 0.47, H * 0.42, o.c);
+    p.rect(0, H - 1, W, 1, CLEAR);
+    p.shade(0.25);
+    p.ellipse(W * 0.5, H - 3, W * 0.17, H * 0.22, [24, 22, 30, 255]);
+    p.outline();
+  };
+  S.geode = function (p, o) {
+    const W = p.w, H = p.h, cx = W / 2;
+    p.ellipse(cx, H - 2, W * 0.45, H * 0.6, o.c); p.rect(0, H - 1, W, 2, CLEAR);
+    p.shade(0.2);
+    p.ellipse(cx, H - 2, W * 0.32, H * 0.42, [40, 30, 60, 255]);
+    for (let i = 0; i < 7; i++) { const x = cx - W * 0.26 + i * W * 0.087; p.tri([x - 1.5, H - 2], [x + 1.5, H - 2], [x, H - 2 - H * (0.18 + (i % 3) * 0.08)], i % 2 ? o.a : mul(o.a, 1.25)); }
+    p.rect(0, H - 1, W, 2, CLEAR); p.outline();
+  };
+  S.buoy = function (p, o) {
+    const W = p.w, H = p.h, cx = W / 2;
+    p.rect(cx - 1, 0, 2, 4, [70, 70, 80, 255]); p.set(cx, 0, [255, 236, 140, 255]);
+    p.ellipse(cx, H * 0.45, W * 0.32, H * 0.3, o.c);
+    p.rect(cx - W * 0.32, H * 0.42, W * 0.64, 2, o.a);
+    p.line(cx, H * 0.72, cx, H - 1, [70, 70, 80, 255]);
+    p.shade(0.25); p.outline();
+  };
+  S.bottle = function (p, o) {
+    const W = p.w, H = p.h;
+    p.ellipse(W * 0.45, H - 4, W * 0.32, 3, o.c);
+    p.rect(W * 0.72, H - 5, 3, 2, o.c); p.rect(W * 0.72 + 3, H - 5, 1, 2, [150, 100, 60, 255]);
+    p.rect(W * 0.3, H - 5, W * 0.28, 2, [240, 228, 196, 255]);
+    p.shade(0.3); p.outline(0.5);
+  };
+  S.glassfloat = function (p, o) {
+    const W = p.w, H = p.h;
+    [[0.32, 0.45, 0.24, o.c], [0.66, 0.55, 0.2, o.a]].forEach(([x, y, r, c]) => {
+      p.circle(W * x, H * y, W * r, c);
+      for (let a = 0; a < 6.28; a += 0.5) p.set(W * x + Math.cos(a) * W * r, H * y + Math.sin(a) * W * r, [150, 110, 70, 255]);
+      p.set(W * x - W * r * 0.4, H * y - W * r * 0.4, WHITE);
+    });
+    p.outline(0.5);
+  };
+  S.wheel = function (p, o) {
+    const W = p.w, H = p.h, cx = W / 2, cy = H / 2;
+    for (let k = 0; k < 8; k++) { const a = k * Math.PI / 4; p.line(cx, cy, cx + Math.cos(a) * W * 0.46, cy + Math.sin(a) * H * 0.46, o.c); }
+    for (let a = 0; a < 6.28; a += 0.08) { p.set(cx + Math.cos(a) * W * 0.32, cy + Math.sin(a) * H * 0.32, o.c); p.set(cx + Math.cos(a) * W * 0.28, cy + Math.sin(a) * H * 0.28, mul(o.c, 0.8)); }
+    p.circle(cx, cy, 2, o.a);
+    p.shade(0.2); p.outline();
+  };
+  S.brokencolumn = function (p, o) {
+    const W = p.w, H = p.h, cx = W / 2;
+    p.rect(cx - 6, H - 3, 12, 2, o.c); p.rect(cx - 4, H * 0.35, 8, H * 0.65 - 3, o.c);
+    p.tri([cx - 4, H * 0.35], [cx + 4, H * 0.35], [cx + 4, H * 0.22], o.c);
+    p.shade(0.2);
+    for (let x = -2; x <= 2; x += 2) p.line(cx + x, H * 0.38, cx + x, H - 4, mul(o.c, 0.85));
+    p.rect(cx + 5, H - 5, 3, 2, o.c);
+    p.outline();
+  };
+  S.statuehead = function (p, o) {
+    const W = p.w, H = p.h, cx = W / 2;
+    p.ellipse(cx, H * 0.55, W * 0.34, H * 0.42, o.c);
+    p.rect(cx - W * 0.4, H - 4, W * 0.8, 3, mul(o.c, 0.9));
+    p.shade(0.25);
+    const d = mul(o.c, 0.6);
+    p.rect(cx - 4, H * 0.45, 3, 1, d); p.rect(cx + 2, H * 0.45, 3, 1, d);   // closed eyes
+    p.rect(cx, H * 0.48, 1, 4, d); p.rect(cx - 2, H * 0.68, 4, 1, d);
+    p.ellipse(cx, H * 0.2, W * 0.3, H * 0.1, o.a);                          // a little moss cap
+    p.outline();
+  };
+  S.cannon = function (p, o) {
+    const W = p.w, H = p.h, wood = hex('#7a5232');
+    p.rect(3, H * 0.35, W * 0.78, H * 0.3, o.c); p.rect(W * 0.8, H * 0.3, 3, H * 0.4, o.c);
+    p.ellipse(W * 0.82 + 2, H * 0.5, 1.2, 2, [20, 18, 30, 255]);
+    p.rect(2, H * 0.62, W * 0.55, H * 0.2, wood);
+    p.circle(W * 0.18, H - 3, 2.5, mul(wood, 0.8)); p.circle(W * 0.48, H - 3, 2.5, mul(wood, 0.8));
+    p.shade(0.25); p.outline();
+  };
+  S.idol = function (p, o) {
+    const W = p.w, H = p.h, cx = W / 2;
+    p.rect(cx - 5, H - 3, 10, 2, hex('#6d6b5c'));
+    p.ellipse(cx, H * 0.6, W * 0.26, H * 0.28, o.c); p.circle(cx, H * 0.26, W * 0.2, o.c);
+    p.shade(0.3);
+    p.set(cx - 1, H * 0.24, [60, 30, 10, 255]); p.set(cx + 1, H * 0.24, [60, 30, 10, 255]);
+    p.set(cx, H * 0.1, WHITE); p.set(cx + 2, H * 0.5, [255, 250, 200, 255]);
+    p.outline();
+  };
+  S.chimney = function (p, o) {              // a tiny vent chimney that puffs bubbles
+    const W = p.w, H = p.h, cx = W / 2;
+    p.tri([cx - W * 0.4, H - 1], [cx + W * 0.4, H - 1], [cx - 1, H * 0.15], o.c);
+    p.rect(cx - 2, H * 0.12, 4, H * 0.3, o.c);
+    p.shade(0.25);
+    p.rect(cx - 1, H * 0.12, 2, 1, hex(o.glow || '#ffb060'));
+    for (let y = H * 0.5; y < H - 2; y += 3) p.set(cx + ((y | 0) % 2 ? 1 : -2), y, hex(o.glow || '#ff8a3a'));
+    p.outline();
+  };
+  S.basalt = function (p, o) {
+    const W = p.w, H = p.h;
+    [[0.08, 0.5], [0.3, 0.2], [0.52, 0.35], [0.74, 0.55]].forEach(([x, t], i) => {
+      p.rect(W * x, H * t, W * 0.2, H * (1 - t), i % 2 ? o.c : mul(o.c, 0.88));
+      p.rect(W * x, H * t, W * 0.2, 1, mul(o.c, 1.25));
+    });
+    p.shade(0.15); p.outline();
+  };
+  S.magmarock = function (p, o) {
+    const W = p.w, H = p.h, gl = hex(o.glow || '#ff7a2a');
+    S.rock(p, Object.assign({}, o, { seed: 3 }));
+    p.line(W * 0.3, H * 0.5, W * 0.45, H * 0.75, gl); p.line(W * 0.45, H * 0.75, W * 0.62, H * 0.6, gl); p.line(W * 0.62, H * 0.6, W * 0.72, H * 0.8, mul(gl, 0.85));
+    p.set(W * 0.45, H * 0.75, [255, 230, 140, 255]);
+  };
+  S.roots = function (p, o) {                // arching mangrove prop roots
+    const W = p.w, H = p.h;
+    for (let k = 0; k < 4; k++) {
+      const x0 = W * (0.1 + k * 0.27), top = H * (0.2 + (k % 2) * 0.12);
+      for (let y = top; y < H; y++) { const u = (y - top) / (H - top); const x = x0 + Math.sin(u * 2.4) * W * 0.12 * (k % 2 ? 1 : -1); p.set(x, y, o.c); p.set(x + 1, y, mul(o.c, 0.85)); }
+    }
+    p.rect(W * 0.08, H * 0.18, W * 0.84, 3, o.c);
+    p.shade(0.2); p.outline();
+    for (let i = 0; i < 4; i++) p.set(W * (0.2 + i * 0.2), H * 0.18 - 1, o.a);
+  };
+  S.lilypad = function (p, o) {
+    const W = p.w, H = p.h, cx = W / 2;
+    p.ellipse(cx, 3, W * 0.45, 2.2, o.c); p.tri([cx, 3], [cx + 3, 0], [cx + 5, 1], CLEAR);
+    p.line(cx, 4, cx, H - 1, mul(o.c, 0.7));
+    p.shade(0.2); p.outline();
+    if (o.flower) { p.set(cx - 3, 1, hex(o.flower)); p.set(cx - 2, 0, hex(o.flower)); p.set(cx - 4, 0, hex(o.flower)); }
+  };
+  S.log = function (p, o) {                  // hollow log
+    const W = p.w, H = p.h;
+    p.rect(3, H * 0.35, W - 8, H * 0.6, o.c); p.ellipse(W - 5, H * 0.65, 2.5, H * 0.3, mul(o.c, 1.15));
+    p.ellipse(4, H * 0.65, 3, H * 0.3, mul(o.c, 0.8)); p.ellipse(4, H * 0.65, 1.8, H * 0.2, [24, 20, 18, 255]);
+    p.shade(0.2);
+    for (let x = 8; x < W - 8; x += 5) p.line(x, H * 0.45, x + 3, H * 0.45, mul(o.c, 0.8));
+    p.set(W * 0.6, H * 0.35 - 1, o.a); p.set(W * 0.6 + 1, H * 0.35 - 2, o.a);
+    p.outline();
+  };
+  S.icechunk = function (p, o) {
+    const W = p.w, H = p.h;
+    p.tri([1, H - 1], [W - 1, H - 1], [W * 0.62, H * 0.2], o.c);
+    p.tri([1, H - 1], [W * 0.5, H - 1], [W * 0.25, H * 0.42], mul(o.c, 0.94));
+    p.shade(0.15);
+    p.line(W * 0.62, H * 0.24, W * 0.5, H * 0.7, WHITE); p.line(W * 0.25, H * 0.48, W * 0.3, H * 0.75, mul(o.a, 1.1));
+    p.outline(0.55);
+  };
+  S.icecave = function (p, o) {
+    const W = p.w, H = p.h;
+    p.ellipse(W / 2, H * 0.72, W * 0.48, H * 0.66, o.c); p.rect(0, H - 1, W, 2, CLEAR);
+    p.shade(0.15);
+    for (let a = Math.PI; a < Math.PI * 2; a += 0.35) p.line(W / 2 + Math.cos(a) * W * 0.47, H * 0.72 + Math.sin(a) * H * 0.65, W / 2 + Math.cos(a) * W * 0.3, H * 0.72 + Math.sin(a) * H * 0.42, mul(o.c, 0.9));
+    p.ellipse(W / 2, H - 2, W * 0.2, H * 0.32, [40, 70, 100, 255]); p.ellipse(W / 2, H - 2, W * 0.14, H * 0.24, [24, 44, 70, 255]);
+    p.rect(0, H - 1, W, 2, CLEAR); p.outline(0.55);
+  };
+  S.mushroom = function (p, o) {
+    const W = p.w, H = p.h;
+    [[0.35, 0.3, 0.3], [0.68, 0.55, 0.2]].forEach(([x, t, r]) => {
+      p.rect(W * x - 1, H * t, 2, H * (1 - t), [230, 222, 200, 255]);
+      p.ellipse(W * x, H * t, W * r, H * r * 0.55, o.c); p.rect(W * x - W * r, H * t + 1, W * r * 2, H * r, CLEAR);
+      p.rect(W * x - 1, H * t + 1, 2, H * (1 - t) - 1, [230, 222, 200, 255]);
+    });
+    p.shade(0.25); p.outline(0.4);
+    p.set(W * 0.3, H * 0.2, o.a); p.set(W * 0.4, H * 0.24, o.a); p.set(W * 0.66, H * 0.5, o.a);
+  };
+  S.florarch = function (p, o) {
+    const W = p.w, H = p.h;
+    S.arch(p, Object.assign({}, o));
+    const leaf = hex(o.leaf || '#4f8a43'), r = mkRand(5);
+    for (let a = Math.PI * 1.05; a < Math.PI * 1.95; a += 0.12) {
+      const x = W / 2 + Math.cos(a) * W * 0.44, y = H * 0.6 + Math.sin(a) * H * 0.53;
+      p.set(x, y, leaf); p.set(x, y + 1, mul(leaf, 0.8));
+      if (r() < 0.35) p.set(x + (r() < 0.5 ? 1 : -1), y - 1, r() < 0.5 ? o.a : hex(o.flower2 || '#fff1a8'));
+    }
+  };
+
   function mkRand(seed) { let s = seed * 9301 + 49297; return () => { s = (s * 9301 + 49297) % 233280; return s / 233280; }; }
 
   // ---------- sheet builder ----------
