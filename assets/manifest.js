@@ -47,7 +47,13 @@ AQ.manifest = {
      "frames": 1,
      "fps": 1
     }
-   }
+   },
+   "vis": [
+    0,
+    0,
+    24,
+    26
+   ]
   },
   "chest": {
    "file": "sprites/misc/chest.png",
@@ -70,7 +76,13 @@ AQ.manifest = {
      "frames": 1,
      "fps": 1
     }
-   }
+   },
+   "vis": [
+    1,
+    1,
+    14,
+    14
+   ]
   },
   "bait": {
    "file": "sprites/misc/bait.png",
@@ -86,7 +98,13 @@ AQ.manifest = {
      "frames": 2,
      "fps": 3
     }
-   }
+   },
+   "vis": [
+    0,
+    1,
+    6,
+    6
+   ]
   },
   "plant.saltbloom": {
    "file": "sprites/plants/saltbloom.png",
@@ -102,7 +120,13 @@ AQ.manifest = {
      "frames": 4,
      "fps": 3
     }
-   }
+   },
+   "vis": [
+    1,
+    4,
+    14,
+    15
+   ]
   },
   "creature.drift_snail": {
    "file": "sprites/creatures/drift_snail.png",
@@ -123,7 +147,13 @@ AQ.manifest = {
      "frames": 4,
      "fps": 10
     }
-   }
+   },
+   "vis": [
+    1,
+    3,
+    10,
+    9
+   ]
   },
   "creature.knuckle_crab": {
    "file": "sprites/creatures/knuckle_crab.png",
@@ -144,7 +174,13 @@ AQ.manifest = {
      "frames": 4,
      "fps": 10
     }
-   }
+   },
+   "vis": [
+    2,
+    4,
+    14,
+    12
+   ]
   },
   "creature.glasswinged_minnow": {
    "file": "sprites/creatures/glasswinged_minnow.png",
@@ -165,7 +201,13 @@ AQ.manifest = {
      "frames": 4,
      "fps": 10
     }
-   }
+   },
+   "vis": [
+    1,
+    1,
+    10,
+    10
+   ]
   },
   "creature.puddlejack": {
    "file": "sprites/creatures/puddlejack.png",
@@ -186,7 +228,13 @@ AQ.manifest = {
      "frames": 4,
      "fps": 10
     }
-   }
+   },
+   "vis": [
+    1,
+    3,
+    14,
+    13
+   ]
   },
   "creature.bladefin_perch": {
    "file": "sprites/creatures/bladefin_perch.png",
@@ -207,7 +255,13 @@ AQ.manifest = {
      "frames": 4,
      "fps": 10
     }
-   }
+   },
+   "vis": [
+    2,
+    2,
+    14,
+    13
+   ]
   },
   "creature.kelp_otter": {
    "file": "sprites/creatures/kelp_otter.png",
@@ -228,7 +282,13 @@ AQ.manifest = {
      "frames": 4,
      "fps": 10
     }
-   }
+   },
+   "vis": [
+    1,
+    7,
+    22,
+    18
+   ]
   },
   "creature.frond_squid": {
    "file": "sprites/creatures/frond_squid.png",
@@ -249,7 +309,13 @@ AQ.manifest = {
      "frames": 4,
      "fps": 10
     }
-   }
+   },
+   "vis": [
+    1,
+    5,
+    14,
+    11
+   ]
   },
   "creature.coilback_newt": {
    "file": "sprites/creatures/coilback_newt.png",
@@ -270,7 +336,13 @@ AQ.manifest = {
      "frames": 4,
      "fps": 10
     }
-   }
+   },
+   "vis": [
+    1,
+    5,
+    14,
+    12
+   ]
   },
   "creature.sandveil_skink": {
    "file": "sprites/creatures/sandveil_skink.png",
@@ -291,7 +363,13 @@ AQ.manifest = {
      "frames": 4,
      "fps": 10
     }
-   }
+   },
+   "vis": [
+    1,
+    5,
+    14,
+    12
+   ]
   },
   "plant.bell_kelp": {
    "file": "sprites/plants/bell_kelp.png",
@@ -307,7 +385,13 @@ AQ.manifest = {
      "frames": 4,
      "fps": 3
     }
-   }
+   },
+   "vis": [
+    0,
+    5,
+    14,
+    31
+   ]
   },
   "creature.fanray_damsel": {
    "file": "sprites/creatures/fanray_damsel.png",
@@ -328,7 +412,13 @@ AQ.manifest = {
      "frames": 4,
      "fps": 10
     }
-   }
+   },
+   "vis": [
+    2,
+    1,
+    13,
+    14
+   ]
   },
   "creature.coral_whelk": {
    "file": "sprites/creatures/coral_whelk.png",
@@ -349,7 +439,13 @@ AQ.manifest = {
      "frames": 4,
      "fps": 10
     }
-   }
+   },
+   "vis": [
+    1,
+    3,
+    10,
+    9
+   ]
   },
   "creature.pincer_hermit": {
    "file": "sprites/creatures/pincer_hermit.png",
@@ -370,7 +466,13 @@ AQ.manifest = {
      "frames": 4,
      "fps": 10
     }
-   }
+   },
+   "vis": [
+    2,
+    3,
+    14,
+    14
+   ]
   },
   "creature.reef_mimic": {
    "file": "sprites/creatures/reef_mimic.png",
@@ -391,7 +493,13 @@ AQ.manifest = {
      "frames": 4,
      "fps": 10
     }
-   }
+   },
+   "vis": [
+    2,
+    4,
+    22,
+    18
+   ]
   },
   "plant.fire_coral": {
    "file": "sprites/plants/fire_coral.png",
@@ -407,7 +515,13 @@ AQ.manifest = {
      "frames": 4,
      "fps": 3
     }
-   }
+   },
+   "vis": [
+    1,
+    3,
+    14,
+    15
+   ]
   },
   "creature.ridgeback_basker": {
    "file": "sprites/creatures/ridgeback_basker.png",
@@ -428,7 +542,13 @@ AQ.manifest = {
      "frames": 4,
      "fps": 10
     }
-   }
+   },
+   "vis": [
+    1,
+    9,
+    22,
+    18
+   ]
   },
   "creature.coral_viper": {
    "file": "sprites/creatures/coral_viper.png",
@@ -449,7 +569,13 @@ AQ.manifest = {
      "frames": 4,
      "fps": 10
     }
-   }
+   },
+   "vis": [
+    1,
+    3,
+    29,
+    12
+   ]
   },
   "plant.brain_coral": {
    "file": "sprites/plants/brain_coral.png",
@@ -465,7 +591,13 @@ AQ.manifest = {
      "frames": 4,
      "fps": 3
     }
-   }
+   },
+   "vis": [
+    1,
+    11,
+    22,
+    23
+   ]
   },
   "creature.lanternjaw": {
    "file": "sprites/creatures/lanternjaw.png",
@@ -486,7 +618,13 @@ AQ.manifest = {
      "frames": 4,
      "fps": 10
     }
-   }
+   },
+   "vis": [
+    2,
+    2,
+    22,
+    19
+   ]
   },
   "creature.vent_shell": {
    "file": "sprites/creatures/vent_shell.png",
@@ -507,7 +645,13 @@ AQ.manifest = {
      "frames": 4,
      "fps": 10
     }
-   }
+   },
+   "vis": [
+    2,
+    6,
+    14,
+    13
+   ]
   },
   "creature.abyss_drifter": {
    "file": "sprites/creatures/abyss_drifter.png",
@@ -528,7 +672,13 @@ AQ.manifest = {
      "frames": 4,
      "fps": 10
     }
-   }
+   },
+   "vis": [
+    1,
+    2,
+    22,
+    22
+   ]
   },
   "creature.trenchmaw": {
    "file": "sprites/creatures/trenchmaw.png",
@@ -549,7 +699,13 @@ AQ.manifest = {
      "frames": 4,
      "fps": 10
     }
-   }
+   },
+   "vis": [
+    3,
+    15,
+    43,
+    32
+   ]
   },
   "plant.glow_tuft": {
    "file": "sprites/plants/glow_tuft.png",
@@ -565,7 +721,13 @@ AQ.manifest = {
      "frames": 4,
      "fps": 3
     }
-   }
+   },
+   "vis": [
+    1,
+    4,
+    14,
+    15
+   ]
   },
   "creature.blindgill": {
    "file": "sprites/creatures/blindgill.png",
@@ -586,7 +748,13 @@ AQ.manifest = {
      "frames": 4,
      "fps": 10
     }
-   }
+   },
+   "vis": [
+    2,
+    2,
+    14,
+    13
+   ]
   },
   "creature.cave_newt": {
    "file": "sprites/creatures/cave_newt.png",
@@ -607,7 +775,13 @@ AQ.manifest = {
      "frames": 4,
      "fps": 10
     }
-   }
+   },
+   "vis": [
+    1,
+    2,
+    14,
+    14
+   ]
   },
   "creature.stoneshell": {
    "file": "sprites/creatures/stoneshell.png",
@@ -628,7 +802,13 @@ AQ.manifest = {
      "frames": 4,
      "fps": 10
     }
-   }
+   },
+   "vis": [
+    1,
+    4,
+    14,
+    14
+   ]
   },
   "creature.cave_crawler": {
    "file": "sprites/creatures/cave_crawler.png",
@@ -649,7 +829,13 @@ AQ.manifest = {
      "frames": 4,
      "fps": 10
     }
-   }
+   },
+   "vis": [
+    2,
+    11,
+    30,
+    24
+   ]
   },
   "plant.mineral_bloom": {
    "file": "sprites/plants/mineral_bloom.png",
@@ -665,7 +851,13 @@ AQ.manifest = {
      "frames": 4,
      "fps": 3
     }
-   }
+   },
+   "vis": [
+    1,
+    5,
+    14,
+    15
+   ]
   },
   "creature.driftfin": {
    "file": "sprites/creatures/driftfin.png",
@@ -686,7 +878,13 @@ AQ.manifest = {
      "frames": 4,
      "fps": 10
     }
-   }
+   },
+   "vis": [
+    1,
+    4,
+    21,
+    18
+   ]
   },
   "creature.blue_runner": {
    "file": "sprites/creatures/blue_runner.png",
@@ -707,7 +905,13 @@ AQ.manifest = {
      "frames": 4,
      "fps": 10
     }
-   }
+   },
+   "vis": [
+    1,
+    7,
+    30,
+    23
+   ]
   },
   "creature.open_drifter": {
    "file": "sprites/creatures/open_drifter.png",
@@ -728,7 +932,13 @@ AQ.manifest = {
      "frames": 4,
      "fps": 10
     }
-   }
+   },
+   "vis": [
+    1,
+    1,
+    14,
+    14
+   ]
   },
   "creature.longneck_sea_lizard": {
    "file": "sprites/creatures/longneck_sea_lizard.png",
@@ -749,7 +959,13 @@ AQ.manifest = {
      "frames": 4,
      "fps": 10
     }
-   }
+   },
+   "vis": [
+    1,
+    7,
+    29,
+    25
+   ]
   },
   "plant.floating_weed_mat": {
    "file": "sprites/plants/floating_weed_mat.png",
@@ -765,7 +981,13 @@ AQ.manifest = {
      "frames": 4,
      "fps": 3
     }
-   }
+   },
+   "vis": [
+    1,
+    3,
+    30,
+    12
+   ]
   },
   "creature.reeftooth": {
    "file": "sprites/creatures/reeftooth.png",
@@ -786,7 +1008,13 @@ AQ.manifest = {
      "frames": 4,
      "fps": 10
     }
-   }
+   },
+   "vis": [
+    1,
+    8,
+    45,
+    34
+   ]
   },
   "creature.wandershell_nautilus": {
    "file": "sprites/creatures/wandershell_nautilus.png",
@@ -807,7 +1035,13 @@ AQ.manifest = {
      "frames": 4,
      "fps": 10
     }
-   }
+   },
+   "vis": [
+    1,
+    3,
+    14,
+    14
+   ]
   },
   "creature.crimsonback": {
    "file": "sprites/creatures/crimsonback.png",
@@ -828,7 +1062,13 @@ AQ.manifest = {
      "frames": 4,
      "fps": 10
     }
-   }
+   },
+   "vis": [
+    1,
+    4,
+    21,
+    18
+   ]
   },
   "creature.ironfin": {
    "file": "sprites/creatures/ironfin.png",
@@ -849,7 +1089,13 @@ AQ.manifest = {
      "frames": 4,
      "fps": 10
     }
-   }
+   },
+   "vis": [
+    1,
+    4,
+    21,
+    19
+   ]
   },
   "creature.porthole_darter": {
    "file": "sprites/creatures/porthole_darter.png",
@@ -870,7 +1116,13 @@ AQ.manifest = {
      "frames": 4,
      "fps": 10
     }
-   }
+   },
+   "vis": [
+    2,
+    2,
+    14,
+    13
+   ]
   },
   "creature.rustclaw": {
    "file": "sprites/creatures/rustclaw.png",
@@ -891,7 +1143,13 @@ AQ.manifest = {
      "frames": 4,
      "fps": 10
     }
-   }
+   },
+   "vis": [
+    2,
+    4,
+    14,
+    12
+   ]
   },
   "creature.chest_octopus": {
    "file": "sprites/creatures/chest_octopus.png",
@@ -912,7 +1170,13 @@ AQ.manifest = {
      "frames": 4,
      "fps": 10
     }
-   }
+   },
+   "vis": [
+    2,
+    4,
+    22,
+    18
+   ]
   },
   "creature.wreck_eel": {
    "file": "sprites/creatures/wreck_eel.png",
@@ -933,7 +1197,13 @@ AQ.manifest = {
      "frames": 4,
      "fps": 10
     }
-   }
+   },
+   "vis": [
+    1,
+    3,
+    29,
+    12
+   ]
   },
   "creature.barnacle_crawler": {
    "file": "sprites/creatures/barnacle_crawler.png",
@@ -954,7 +1224,13 @@ AQ.manifest = {
      "frames": 4,
      "fps": 10
     }
-   }
+   },
+   "vis": [
+    1,
+    4,
+    10,
+    10
+   ]
   },
   "plant.rustweed": {
    "file": "sprites/plants/rustweed.png",
@@ -970,7 +1246,13 @@ AQ.manifest = {
      "frames": 4,
      "fps": 3
     }
-   }
+   },
+   "vis": [
+    1,
+    2,
+    14,
+    15
+   ]
   },
   "creature.ember_goby": {
    "file": "sprites/creatures/ember_goby.png",
@@ -991,7 +1273,13 @@ AQ.manifest = {
      "frames": 4,
      "fps": 10
     }
-   }
+   },
+   "vis": [
+    2,
+    2,
+    9,
+    10
+   ]
   },
   "creature.sulfur_crab": {
    "file": "sprites/creatures/sulfur_crab.png",
@@ -1012,7 +1300,13 @@ AQ.manifest = {
      "frames": 4,
      "fps": 10
     }
-   }
+   },
+   "vis": [
+    2,
+    4,
+    14,
+    12
+   ]
   },
   "creature.vent_limpet": {
    "file": "sprites/creatures/vent_limpet.png",
@@ -1033,7 +1327,13 @@ AQ.manifest = {
      "frames": 4,
      "fps": 10
     }
-   }
+   },
+   "vis": [
+    1,
+    4,
+    10,
+    10
+   ]
   },
   "creature.vent_salamander": {
    "file": "sprites/creatures/vent_salamander.png",
@@ -1054,7 +1354,13 @@ AQ.manifest = {
      "frames": 4,
      "fps": 10
     }
-   }
+   },
+   "vis": [
+    1,
+    7,
+    22,
+    19
+   ]
   },
   "plant.vent_moss": {
    "file": "sprites/plants/vent_moss.png",
@@ -1070,7 +1376,13 @@ AQ.manifest = {
      "frames": 4,
      "fps": 3
     }
-   }
+   },
+   "vis": [
+    2,
+    8,
+    14,
+    15
+   ]
   },
   "creature.rootback_mudskipper": {
    "file": "sprites/creatures/rootback_mudskipper.png",
@@ -1091,7 +1403,13 @@ AQ.manifest = {
      "frames": 4,
      "fps": 10
     }
-   }
+   },
+   "vis": [
+    2,
+    2,
+    14,
+    13
+   ]
   },
   "creature.mangrove_fiddler": {
    "file": "sprites/creatures/mangrove_fiddler.png",
@@ -1112,7 +1430,13 @@ AQ.manifest = {
      "frames": 4,
      "fps": 10
     }
-   }
+   },
+   "vis": [
+    2,
+    4,
+    14,
+    12
+   ]
   },
   "creature.rootcoil_snake": {
    "file": "sprites/creatures/rootcoil_snake.png",
@@ -1133,7 +1457,13 @@ AQ.manifest = {
      "frames": 4,
      "fps": 10
     }
-   }
+   },
+   "vis": [
+    1,
+    4,
+    29,
+    11
+   ]
   },
   "creature.dwarf_croc": {
    "file": "sprites/creatures/dwarf_croc.png",
@@ -1154,7 +1484,13 @@ AQ.manifest = {
      "frames": 4,
      "fps": 10
     }
-   }
+   },
+   "vis": [
+    1,
+    9,
+    45,
+    20
+   ]
   },
   "creature.bankside_monitor": {
    "file": "sprites/creatures/bankside_monitor.png",
@@ -1175,7 +1511,13 @@ AQ.manifest = {
      "frames": 4,
      "fps": 10
     }
-   }
+   },
+   "vis": [
+    1,
+    9,
+    22,
+    18
+   ]
   },
   "creature.muckhide_octopus": {
    "file": "sprites/creatures/muckhide_octopus.png",
@@ -1196,7 +1538,13 @@ AQ.manifest = {
      "frames": 4,
      "fps": 10
     }
-   }
+   },
+   "vis": [
+    2,
+    4,
+    22,
+    18
+   ]
   },
   "plant.root_tangle": {
    "file": "sprites/plants/root_tangle.png",
@@ -1212,7 +1560,13 @@ AQ.manifest = {
      "frames": 4,
      "fps": 3
     }
-   }
+   },
+   "vis": [
+    2,
+    5,
+    21,
+    21
+   ]
   },
   "creature.frostfin": {
    "file": "sprites/creatures/frostfin.png",
@@ -1233,7 +1587,13 @@ AQ.manifest = {
      "frames": 4,
      "fps": 10
     }
-   }
+   },
+   "vis": [
+    2,
+    2,
+    14,
+    13
+   ]
   },
   "creature.iceback_seal_pup": {
    "file": "sprites/creatures/iceback_seal_pup.png",
@@ -1254,7 +1614,13 @@ AQ.manifest = {
      "frames": 4,
      "fps": 10
     }
-   }
+   },
+   "vis": [
+    1,
+    6,
+    22,
+    19
+   ]
   },
   "creature.frost_isopod": {
    "file": "sprites/creatures/frost_isopod.png",
@@ -1275,7 +1641,13 @@ AQ.manifest = {
      "frames": 4,
      "fps": 10
     }
-   }
+   },
+   "vis": [
+    2,
+    6,
+    14,
+    13
+   ]
   },
   "creature.iceshell_snail": {
    "file": "sprites/creatures/iceshell_snail.png",
@@ -1296,7 +1668,13 @@ AQ.manifest = {
      "frames": 4,
      "fps": 10
     }
-   }
+   },
+   "vis": [
+    1,
+    3,
+    10,
+    9
+   ]
   },
   "creature.cavepetalia": {
    "file": "sprites/creatures/cavepetalia.png",
@@ -1317,7 +1695,13 @@ AQ.manifest = {
      "frames": 4,
      "fps": 10
     }
-   }
+   },
+   "vis": [
+    1,
+    7,
+    22,
+    19
+   ]
   },
   "decor.pebble_rock": {
    "file": "sprites/decor/pebble_rock.png",
@@ -1333,7 +1717,13 @@ AQ.manifest = {
      "frames": 1,
      "fps": 1
     }
-   }
+   },
+   "vis": [
+    1,
+    5,
+    14,
+    15
+   ]
   },
   "decor.boulder": {
    "file": "sprites/decor/boulder.png",
@@ -1349,7 +1739,13 @@ AQ.manifest = {
      "frames": 1,
      "fps": 1
     }
-   }
+   },
+   "vis": [
+    1,
+    7,
+    22,
+    23
+   ]
   },
   "decor.seashell": {
    "file": "sprites/decor/seashell.png",
@@ -1365,7 +1761,13 @@ AQ.manifest = {
      "frames": 1,
      "fps": 1
     }
-   }
+   },
+   "vis": [
+    1,
+    4,
+    10,
+    11
+   ]
   },
   "decor.starfish": {
    "file": "sprites/decor/starfish.png",
@@ -1381,7 +1783,13 @@ AQ.manifest = {
      "frames": 1,
      "fps": 1
     }
-   }
+   },
+   "vis": [
+    1,
+    3,
+    10,
+    11
+   ]
   },
   "decor.driftwood": {
    "file": "sprites/decor/driftwood.png",
@@ -1397,7 +1805,13 @@ AQ.manifest = {
      "frames": 1,
      "fps": 1
     }
-   }
+   },
+   "vis": [
+    1,
+    4,
+    30,
+    14
+   ]
   },
   "decor.amphora": {
    "file": "sprites/decor/amphora.png",
@@ -1413,7 +1827,13 @@ AQ.manifest = {
      "frames": 1,
      "fps": 1
     }
-   }
+   },
+   "vis": [
+    2,
+    1,
+    13,
+    15
+   ]
   },
   "decor.castle": {
    "file": "sprites/decor/castle.png",
@@ -1429,7 +1849,13 @@ AQ.manifest = {
      "frames": 1,
      "fps": 1
     }
-   }
+   },
+   "vis": [
+    3,
+    1,
+    28,
+    31
+   ]
   },
   "decor.arch": {
    "file": "sprites/decor/arch.png",
@@ -1445,7 +1871,13 @@ AQ.manifest = {
      "frames": 1,
      "fps": 1
     }
-   }
+   },
+   "vis": [
+    4,
+    4,
+    27,
+    31
+   ]
   },
   "decor.treasure": {
    "file": "sprites/decor/treasure.png",
@@ -1461,7 +1893,13 @@ AQ.manifest = {
      "frames": 1,
      "fps": 1
     }
-   }
+   },
+   "vis": [
+    1,
+    1,
+    14,
+    14
+   ]
   },
   "decor.pillar": {
    "file": "sprites/decor/pillar.png",
@@ -1477,7 +1915,13 @@ AQ.manifest = {
      "frames": 1,
      "fps": 1
     }
-   }
+   },
+   "vis": [
+    1,
+    1,
+    14,
+    31
+   ]
   },
   "decor.anchor": {
    "file": "sprites/decor/anchor.png",
@@ -1493,7 +1937,13 @@ AQ.manifest = {
      "frames": 1,
      "fps": 1
     }
-   }
+   },
+   "vis": [
+    4,
+    1,
+    21,
+    23
+   ]
   },
   "decor.barrel": {
    "file": "sprites/decor/barrel.png",
@@ -1509,7 +1959,13 @@ AQ.manifest = {
      "frames": 1,
      "fps": 1
     }
-   }
+   },
+   "vis": [
+    2,
+    2,
+    13,
+    15
+   ]
   },
   "decor.bubbler": {
    "file": "sprites/decor/bubbler.png",
@@ -1525,7 +1981,13 @@ AQ.manifest = {
      "frames": 1,
      "fps": 1
     }
-   }
+   },
+   "vis": [
+    1,
+    4,
+    10,
+    11
+   ]
   }
  }
 };

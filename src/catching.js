@@ -162,7 +162,7 @@ AQ.Catching = (function () {
     if (!net) return;
     // the robot's arm reaches from the shoulder toward the net (2px white, dark outline, elbow + hand)
     const swim = P.mode === 'swim';
-    const sx = P.x + P.facing * (swim ? 4 : 6), sy = P.y + (swim ? 0 : -9);
+    const sx = P.x + P.facing * (swim ? 4 : 3), sy = P.y + (swim ? 0 : -9);
     let dx = net.x - sx, dy = net.y - sy;
     const L = Math.hypot(dx, dy) || 1; dx /= L; dy /= L;
     const reach = Math.min(8, L - 2), hx = sx + dx * reach, hy = sy + dy * reach;

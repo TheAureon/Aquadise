@@ -53,7 +53,8 @@ AQ.Aquarium = (function () {
       x: R.range(30, 290), y: loco === 'swim' ? R.range(40, 110) : 0, vx: 0, vy: 0, facing: R.chance(0.5) ? 1 : -1,
       z: R.range(TANK.sandTop + 2, TANK.bottom), state: 'swim', st: R.range(1, 4), t: R.range(0, 9), stress: false, target: null
     };
-    if (loco !== 'swim') f.y = f.z - r * 0.6;
+    f.foot = AQ.Creatures.footOf(def);
+    if (loco !== 'swim') f.y = f.z - f.foot;
     return f;
   }
 
@@ -79,7 +80,7 @@ AQ.Aquarium = (function () {
   function clampFish(f) {
     f.x = U.clamp(f.x, TANK.x + 8, TANK.x + TANK.w - 8);
     if (f.loco === 'swim') f.y = U.clamp(f.y, TANK.waterTop + 6, TANK.sandTop - 2);
-    else f.y = f.z - f.r * 0.6;
+    else f.y = f.z - f.foot;
   }
   function nextState(f) {
     if (f.stress) { f.state = 'hide'; return; }

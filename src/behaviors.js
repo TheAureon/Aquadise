@@ -69,7 +69,7 @@ AQ.Behaviors = (function () {
     H.crawlStep(c, c.dir * speed * dt, radius);
   };
   H.crawlStep = function (c, dx, radius = 9999) {
-    const W = AQ.World, half = c.r * 0.6;
+    const W = AQ.World, half = c.foot || c.r * 0.6;
     const nx = c.x + dx;
     if (Math.abs(nx - c.hx) > radius) { c.dir = -Math.sign(nx - c.hx); return false; }
     const g = W.groundBelow(nx, c.y - 6, 16);
@@ -559,7 +559,7 @@ AQ.Behaviors = (function () {
       const side = R.chance(0.5) ? -1 : 1;
       c.ax = c.anchor.x + side * (c.anchor.w / 2 + 4);
       const g = AQ.World.groundBelow(c.ax, c.anchor.surface - 14, 30);
-      c.ay = (g === null ? c.anchor.surface : g) - c.r * 0.6;
+      c.ay = (g === null ? c.anchor.surface : g) - (c.foot || c.r * 0.6);
       if (snap) { c.x = c.hx = c.ax; c.y = c.hy = c.ay; }
     },
     update(c, ctx, dt) {

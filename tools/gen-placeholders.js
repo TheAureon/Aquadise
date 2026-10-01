@@ -32,8 +32,15 @@ function add(key, file, kind, size, art) {
   const entry = { file, fw, fh, anchor: anchorFor(kind, fw, fh), anims: JSON.parse(JSON.stringify(spec.anims[kind])) };
   sprites[key] = entry;
   const out = path.join(ROOT, 'assets', file);
-  if (!FORCE && fs.existsSync(out)) return;
   const pix = PH.buildSheet(Object.assign({}, entry, { art }));
+  // visible bounds [x0, y0, x1, y1] of the art inside a frame (union of all frames): the game uses
+  // this to stand crawlers exactly on the ground instead of guessing from the frame size.
+  let b = [fw, fh, -1, -1];
+  for (let y = 0; y < pix.h; y++) for (let x = 0; x < pix.w; x++) if (pix.d[(y * pix.w + x) * 4 + 3]) {
+    const fx = x % fw, fy = y % fh; b = [Math.min(b[0], fx), Math.min(b[1], fy), Math.max(b[2], fx), Math.max(b[3], fy)];
+  }
+  entry.vis = b;
+  if (!FORCE && fs.existsSync(out)) return;
   fs.mkdirSync(path.dirname(out), { recursive: true });
   fs.writeFileSync(out, encodePNG(pix.w, pix.h, pix.d));
 }

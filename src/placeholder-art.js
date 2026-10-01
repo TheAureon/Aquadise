@@ -555,7 +555,7 @@
     const amp = swim ? 2.7 : o.anim === 'net' ? 0.6 : 1.2;
     const bob = o.anim === 'idle' ? (o.frame === 1 || o.frame === 2 ? 1 : 0) : 0;   // slow 1px breathing bob
     const y = 11 + bob;
-    const hipX = 9, hipY = y + 2.5;
+    const hipX = 9, hipY = y + 2;
     // phase offset so all 6 frames differ; the knee lags the foot for a whip-like kick
     const leg = (phase, gain, base, shin, boot) => {
       const footY = hipY + Math.sin(ph + phase + Math.PI / 6) * amp * gain;
@@ -569,10 +569,10 @@
     leg(Math.PI, 0.65, R.gd, R.g, R.k);   // back leg (behind, in shadow, smaller kick)
     // hips + torso: white back, dark segmented chest plate facing down, cyan trim
     p.rect(8, y, 9, 2, R.w);
-    p.rect(8, y + 2, 9, 3, R.k);
-    for (let x = 10; x < 17; x += 3) p.set(x, y + 3, R.kd);
-    p.rect(9, y + 5, 7, 1, R.c);
-    p.set(8, y + 2, R.c); p.set(8, y + 3, R.c);
+    p.rect(8, y + 2, 9, 2, R.k);
+    for (let x = 10; x < 17; x += 3) p.set(x, y + 2, R.kd);
+    p.rect(9, y + 4, 7, 1, R.c);
+    p.set(8, y + 2, R.c);
     leg(0, 1, R.w, R.w, R.g);          // front leg (on top, white)
     p.set(7, y + 2, R.c);                // cyan thigh light
     // navy shoulder pad
@@ -582,7 +582,7 @@
     p.rect(19, y, 3, 3, R.n); p.set(20, y, R.nl);
     p.set(18, y + 1, R.c);
     // arm: tucked along the body while swimming, reaching forward during a net swing
-    if (o.anim !== 'net') p.rect(12, y + 5, 3, 1, R.g);   // during a swing the game draws the reaching arm
+    if (o.anim !== 'net') p.rect(12, y + 4, 3, 1, R.g);   // during a swing the game draws the reaching arm
     p.outline(0.28);
   };
 
@@ -596,30 +596,30 @@
     const t = 3 + (walk && o.frame % 2 ? 1 : 0) + (jump ? -2 : 0);
     // legs (2px each, 5px long + feet): back leg grey, front leg white, dark knees, cyan thigh light
     if (jump) {
-      p.rect(9, t + 16, 2, 3, R.g); p.set(9, t + 17, R.k); p.set(10, t + 17, R.k); p.rect(7, t + 19, 4, 2, R.gd);
-      p.rect(13, t + 16, 2, 3, R.w); p.set(13, t + 17, R.k); p.set(14, t + 17, R.k); p.rect(13, t + 19, 4, 2, R.g);
+      p.rect(10, t + 16, 2, 3, R.g); p.set(10, t + 17, R.k); p.set(11, t + 17, R.k); p.rect(8, t + 19, 4, 1, R.gd);
+      p.rect(12, t + 16, 2, 3, R.w); p.set(12, t + 17, R.k); p.set(13, t + 17, R.k); p.rect(12, t + 19, 4, 1, R.g);
     } else {
-      const bx = 9 - step, fx = 13 + step, feet = 24;
+      const bx = 10 - step, fx = 12 + step, feet = 24;
       p.rect(bx, t + 16, 2, feet - (t + 16), R.g); p.rect(bx, t + 18, 2, 1, R.k);
       p.rect(fx, t + 16, 2, feet - (t + 16), R.w); p.rect(fx, t + 18, 2, 1, R.k); p.set(fx + 1, t + 16, R.c);
       p.rect(bx - 1, feet, 3, 1, R.gd); p.rect(fx, feet, 3, 1, R.g);
     }
     // hips + dark waist band
-    p.rect(9, t + 15, 7, 1, R.w); p.rect(9, t + 14, 7, 1, R.k);
-    // torso: dark segmented chest plate with cyan trim
-    p.rect(9, t + 9, 7, 5, R.k); p.set(12, t + 10, R.kd); p.set(12, t + 12, R.kd); p.set(11, t + 11, R.kd); p.set(13, t + 11, R.kd);
-    p.rect(8, t + 9, 1, 5, R.c); p.rect(16, t + 9, 1, 5, R.c);
-    // broad white shoulders + navy pad on the front shoulder
-    p.rect(7, t + 7, 11, 2, R.w);
-    p.rect(15, t + 7, 3, 2, R.n); p.set(15, t + 7, R.nl);
-    // arms (2px): back arm grey, front arm white; dark elbows + hands; swing while walking
+    p.rect(10, t + 15, 4, 1, R.w); p.rect(10, t + 14, 4, 1, R.k);
+    // torso: slim dark chest plate with cyan trim
+    p.rect(10, t + 9, 4, 5, R.k); p.set(11, t + 10, R.kd); p.set(12, t + 12, R.kd);
+    p.rect(9, t + 9, 1, 5, R.c); p.rect(14, t + 9, 1, 5, R.c);
+    // shoulders + navy pad on the front shoulder
+    p.rect(8, t + 7, 8, 2, R.w);
+    p.rect(13, t + 7, 3, 2, R.n); p.set(13, t + 7, R.nl);
+    // arms (1px): back arm grey, front arm white; dark elbows + hands; swing while walking
     const sw = walk ? step : 0;
-    p.rect(5, t + 8, 2, 6, R.g); p.rect(5, t + 10, 2, 1, R.k); p.rect(5 - Math.max(0, sw), t + 14, 2, 1, R.kd);
-    if (!noArm) { p.rect(18, t + 8, 2, 6, R.w); p.rect(18, t + 10, 2, 1, R.k); p.rect(18 + Math.max(0, -sw), t + 14, 2, 1, R.k); }
-    // neck + head: white helmet, big navy visor facing right, cyan ear light
-    p.rect(11, t + 6, 3, 1, R.k);
-    p.rect(10, t, 5, 1, R.w); p.rect(9, t + 1, 7, 4, R.w); p.rect(10, t + 5, 5, 1, R.w);
-    p.rect(13, t + 1, 3, 4, R.n); p.set(14, t + 1, R.nl); p.set(13, t + 1, R.nl);
+    p.rect(7, t + 8, 1, 6, R.g); p.set(7, t + 10, R.k); p.set(7 - Math.max(0, sw), t + 14, R.kd);
+    if (!noArm) { p.rect(16, t + 8, 1, 6, R.w); p.set(16, t + 10, R.k); p.set(16 + Math.max(0, -sw), t + 14, R.k); }
+    // neck + head: white helmet, navy visor facing right, cyan ear light
+    p.rect(11, t + 6, 2, 1, R.k);
+    p.rect(10, t, 4, 1, R.w); p.rect(9, t + 1, 6, 4, R.w); p.rect(10, t + 5, 4, 1, R.w);
+    p.rect(12, t + 1, 3, 4, R.n); p.set(13, t + 1, R.nl); p.set(12, t + 1, R.nl);
     p.set(10, t + 3, R.c);
     p.outline(0.28);
   };

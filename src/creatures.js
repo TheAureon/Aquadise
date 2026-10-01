@@ -27,6 +27,16 @@ AQ.Creatures = (function () {
     return e ? Math.max(3, Math.min(e.fw, e.fh * 1.4) * 0.32) : 5;
   }
   C.spriteR = spriteR;
+  // pixels from the sprite's anchor down to its lowest visible pixel (so it stands on the ground)
+  function footOf(def) {
+    const e = AQ.Assets.entry(def.spriteKey || ((def.is_plant ? 'plant.' : 'creature.') + def.id));
+    return e && e.vis ? e.vis[3] - e.anchor[1] + 1 : spriteR(def) * 0.6;
+  }
+  function headOf(def) {
+    const e = AQ.Assets.entry(def.spriteKey || ((def.is_plant ? 'plant.' : 'creature.') + def.id));
+    return e && e.vis ? e.anchor[1] - e.vis[1] : spriteR(def) * 0.6;
+  }
+  C.footOf = footOf;
 
   function movementOf(def) {
     if (def.is_plant || def.catch_behavior === 'clinger') return 'still';
@@ -40,7 +50,7 @@ AQ.Creatures = (function () {
       def, p: def.params, slot, x, y, hx: x, hy: y, vx: 0, vy: 0, facing: R.chance(0.5) ? 1 : -1,
       t: R.range(0, 10), st: 0, seed: R.range(0, 100), alpha: 0, targetAlpha: 1,
       catchable: true, pryable: false, hidden: false, hostileActive: false, hitCD: 0,
-      icon: null, iconT: 0, r: spriteR(def), movement: movementOf(def), harvested: false
+      icon: null, iconT: 0, r: spriteR(def), foot: footOf(def), movement: movementOf(def), harvested: false
     };
     if (AQ.World.air(x, y)) c.allowAir = true;   // lives on dry land
     c.bhv = AQ.Behaviors[def.catch_behavior] || AQ.Behaviors.easy;
@@ -105,24 +115,24 @@ AQ.Creatures = (function () {
         if (!list.length) continue;
         const g = R.pick(list);
         if (plant) return [x, g];
-        if (W.open(x, g - r * 1.2)) return [x, g - r * 0.6];
+        if (W.open(x, g - r * 1.2)) return [x, g - footOf(def)];
         continue;
       }
       if (at === 'floor' || at === 'reef' || at === 'ceiling' || at === 'ice_top') {
         const list = columnSurfaces(b, x, at === 'reef' ? 'floor' : at).filter(yOK);
         if (!list.length) continue;
         const g = R.pick(list);
-        if (at === 'ceiling') return [x, g + 1 + r * 0.6];
+        if (at === 'ceiling') return [x, g + 1 + footOf(def)];   // drawn upside-down: its 'feet' touch the ceiling
         if (at === 'ice_top') {
           // must be near the edge of the ice so it's reachable from the water
           let edge = false;
           for (let dx = -14; dx <= 14 && !edge; dx += 2) edge = W.water(x + dx, W.sea + 3) && !W.solid(x + dx, W.sea - 1);
           if (!edge) continue;
-          return [x, g - r * 0.6];
+          return [x, g - footOf(def)];
         }
         if (plant) return [x, g];
         if (at === 'reef') { const y = g - R.range(8, 26); if (W.water(x, y) && W.water(x, y - r)) return [x, y]; continue; }
-        if (W.water(x, g - r * 1.2)) return [x, g - r * 0.6];
+        if (W.water(x, g - r * 1.2)) return [x, g - footOf(def)];
       } else if (at === 'surface') {
         const y = W.sea + 3;
         if (plant) return [x, W.sea + 1];
@@ -196,7 +206,7 @@ AQ.Creatures = (function () {
   C.drawBack = function (g) {
     for (const c of C.list) {
       if (!onScreen(c)) continue;
-      if (c.p.home && AQ.Assets.has(c.p.home)) AQ.Assets.draw(g, c.p.home, 'idle', c.hx, c.hy + c.r * 0.6 + 1);
+      if (c.p.home && AQ.Assets.has(c.p.home)) AQ.Assets.draw(g, c.p.home, 'idle', c.hx, c.hy + c.foot);
       if (c.alpha < 0.02) continue;
       AQ.Assets.draw(g, c.def.spriteKey, c.moving ? 'move' : 'idle', c.x, c.y, { t: c.t, flip: c.facing < 0, flipY: c.flipY, alpha: Math.min(1, c.alpha) });
     }

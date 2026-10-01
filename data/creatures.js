@@ -180,7 +180,7 @@ AQ.data.creatures = [
     spawn: { n: 3, at: 'water', y: [200, 600] }, hint: 'Slow and easy to mistake for floating debris.' },
   { id: 'crimsonback', name: 'Crimsonback', biome: 'open_ocean', category: 'fish', catch_behavior: 'school', draft: true,
     params: { size: [5, 7], tight: 1.6, leap: true, speed: 40, alertR: 50 },
-    sprite_size: 'medium', color: '#c23a3a', accent: '#f2a0a0', art: { shape: 'fish', blackEye: true },
+    sprite_size: 'medium', color: '#c23a3a', accent: '#f2a0a0', art: { shape: 'fish', blackEye: true, long: 1.15 },   // 2px longer than a default fish
     spawn: { n: 1, at: 'surface' }, hint: 'Tight schools that leap at the surface. Red inside and out.' },
   { id: 'ironfin', name: 'Ironfin', biome: 'open_ocean', category: 'fish', catch_behavior: 'timing', draft: true,
     params: { phases: [
@@ -292,6 +292,6 @@ AQ.data.creatures = [
   // ------------------------------------------------------------------ Half-Flooded Lush Cave
   { id: 'cavepetalia', name: 'Cavepetalia', biome: 'lush_cave', category: 'amphibian', catch_behavior: 'easy',
     params: { speed: 7 },
-    sprite_size: 'medium', color: '#f7c3d3', accent: '#e8607a', art: { shape: 'axolotl' },
+    sprite_size: 'medium', color: '#f5c6d6', accent: '#ffffff', art: { shape: 'lizard', gills: true, belly: true },
     spawn: { n: 3, at: 'water' }, hint: 'Pale pink with feathery gills. Barely reacts to you at all.' }
 ];
