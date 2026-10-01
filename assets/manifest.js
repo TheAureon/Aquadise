@@ -46,6 +46,11 @@ AQ.manifest = {
      "row": 6,
      "frames": 1,
      "fps": 1
+    },
+    "climb": {
+     "row": 7,
+     "frames": 2,
+     "fps": 6
     }
    },
    "vis": [
@@ -104,6 +109,336 @@ AQ.manifest = {
     1,
     6,
     6
+   ]
+  },
+  "misc.signpost": {
+   "file": "sprites/scene/signpost.png",
+   "fw": 16,
+   "fh": 24,
+   "anchor": [
+    8,
+    23
+   ],
+   "anims": {
+    "idle": {
+     "row": 0,
+     "frames": 1,
+     "fps": 1
+    }
+   },
+   "vis": [
+    0,
+    6,
+    14,
+    23
+   ]
+  },
+  "misc.ufo": {
+   "file": "sprites/scene/ufo.png",
+   "fw": 64,
+   "fh": 32,
+   "anchor": [
+    32,
+    16
+   ],
+   "anims": {
+    "idle": {
+     "row": 0,
+     "frames": 4,
+     "fps": 6
+    }
+   },
+   "vis": [
+    1,
+    3,
+    62,
+    26
+   ]
+  },
+  "misc.beam": {
+   "file": "sprites/scene/beam.png",
+   "fw": 32,
+   "fh": 96,
+   "anchor": [
+    16,
+    0
+   ],
+   "anims": {
+    "idle": {
+     "row": 0,
+     "frames": 4,
+     "fps": 8
+    }
+   },
+   "vis": [
+    0,
+    0,
+    31,
+    95
+   ]
+  },
+  "misc.beampad": {
+   "file": "sprites/scene/beampad.png",
+   "fw": 40,
+   "fh": 12,
+   "anchor": [
+    20,
+    11
+   ],
+   "anims": {
+    "idle": {
+     "row": 0,
+     "frames": 4,
+     "fps": 6
+    }
+   },
+   "vis": [
+    1,
+    3,
+    38,
+    11
+   ]
+  },
+  "misc.console": {
+   "file": "sprites/scene/console.png",
+   "fw": 20,
+   "fh": 28,
+   "anchor": [
+    10,
+    27
+   ],
+   "anims": {
+    "idle": {
+     "row": 0,
+     "frames": 4,
+     "fps": 6
+    }
+   },
+   "vis": [
+    1,
+    2,
+    18,
+    27
+   ]
+  },
+  "misc.tank_frame": {
+   "file": "sprites/scene/tank_frame.png",
+   "fw": 64,
+   "fh": 44,
+   "anchor": [
+    32,
+    43
+   ],
+   "anims": {
+    "idle": {
+     "row": 0,
+     "frames": 1,
+     "fps": 1
+    }
+   },
+   "vis": [
+    0,
+    0,
+    63,
+    43
+   ]
+  },
+  "bg.hill_sky": {
+   "file": "sprites/scene/hill_sky.png",
+   "fw": 320,
+   "fh": 180,
+   "anchor": [
+    0,
+    0
+   ],
+   "anims": {
+    "idle": {
+     "row": 0,
+     "frames": 1,
+     "fps": 1
+    }
+   },
+   "vis": [
+    0,
+    0,
+    319,
+    179
+   ]
+  },
+  "bg.space": {
+   "file": "sprites/scene/space.png",
+   "fw": 320,
+   "fh": 180,
+   "anchor": [
+    0,
+    0
+   ],
+   "anims": {
+    "idle": {
+     "row": 0,
+     "frames": 1,
+     "fps": 1
+    }
+   },
+   "vis": [
+    0,
+    0,
+    319,
+    179
+   ]
+  },
+  "bg.planet_ringed": {
+   "file": "sprites/scene/planet_ringed.png",
+   "fw": 56,
+   "fh": 32,
+   "anchor": [
+    0,
+    0
+   ],
+   "anims": {
+    "idle": {
+     "row": 0,
+     "frames": 1,
+     "fps": 1
+    }
+   },
+   "vis": [
+    2,
+    7,
+    54,
+    26
+   ]
+  },
+  "bg.planet_small": {
+   "file": "sprites/scene/planet_small.png",
+   "fw": 20,
+   "fh": 20,
+   "anchor": [
+    0,
+    0
+   ],
+   "anims": {
+    "idle": {
+     "row": 0,
+     "frames": 1,
+     "fps": 1
+    }
+   },
+   "vis": [
+    3,
+    3,
+    18,
+    18
+   ]
+  },
+  "tile.hill": {
+   "file": "sprites/scene/tile_hill.png",
+   "fw": 32,
+   "fh": 48,
+   "anchor": [
+    0,
+    0
+   ],
+   "anims": {
+    "idle": {
+     "row": 0,
+     "frames": 1,
+     "fps": 1
+    }
+   },
+   "vis": [
+    0,
+    0,
+    31,
+    47
+   ]
+  },
+  "tile.station_wall": {
+   "file": "sprites/scene/tile_station_wall.png",
+   "fw": 32,
+   "fh": 32,
+   "anchor": [
+    0,
+    0
+   ],
+   "anims": {
+    "idle": {
+     "row": 0,
+     "frames": 1,
+     "fps": 1
+    }
+   },
+   "vis": [
+    0,
+    0,
+    31,
+    31
+   ]
+  },
+  "tile.station_floor": {
+   "file": "sprites/scene/tile_station_floor.png",
+   "fw": 32,
+   "fh": 8,
+   "anchor": [
+    0,
+    0
+   ],
+   "anims": {
+    "idle": {
+     "row": 0,
+     "frames": 1,
+     "fps": 1
+    }
+   },
+   "vis": [
+    0,
+    0,
+    31,
+    7
+   ]
+  },
+  "tile.station_hull": {
+   "file": "sprites/scene/tile_station_hull.png",
+   "fw": 32,
+   "fh": 32,
+   "anchor": [
+    0,
+    0
+   ],
+   "anims": {
+    "idle": {
+     "row": 0,
+     "frames": 1,
+     "fps": 1
+    }
+   },
+   "vis": [
+    0,
+    0,
+    31,
+    31
+   ]
+  },
+  "tile.ladder": {
+   "file": "sprites/scene/tile_ladder.png",
+   "fw": 16,
+   "fh": 8,
+   "anchor": [
+    0,
+    0
+   ],
+   "anims": {
+    "idle": {
+     "row": 0,
+     "frames": 1,
+     "fps": 1
+    }
+   },
+   "vis": [
+    2,
+    0,
+    13,
+    7
    ]
   },
   "plant.saltbloom": {

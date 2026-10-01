@@ -548,7 +548,7 @@
   // Flutter kick: both legs pivot at the hip in a smooth scissor motion (feet move most,
   // knees about half), the torso stays steady, the arm only reaches out for the net.
   S.diver = function (p, o) {
-    if (o.anim === 'stand' || o.anim === 'walk' || o.anim === 'jump' || o.anim === 'standnet') return S.diverUpright(p, o);
+    if (o.anim === 'stand' || o.anim === 'walk' || o.anim === 'jump' || o.anim === 'standnet' || o.anim === 'climb') return S.diverUpright(p, o);
     p.oy = p.h / 2 - 12; p.ox = p.w / 2 - 12;   // 28x40 frame: swim art drawn in 24x24 coords, centred on the anchor (14,20)
     const R = ROBO, ph = o.t * Math.PI * 2;
     const swim = o.anim === 'swim';
@@ -591,8 +591,9 @@
   S.diverUpright = function (p, o) {
     p.oy = 0; p.ox = p.w / 2 - 12;
     const R = ROBO;
-    const walk = o.anim === 'walk', jump = o.anim === 'jump', noArm = o.anim === 'standnet';
-    const step = walk ? [0, 1, 0, -1][o.frame] : 0;
+    const climb = o.anim === 'climb';
+    const walk = o.anim === 'walk' || climb, jump = o.anim === 'jump', noArm = o.anim === 'standnet';
+    const step = climb ? [1, -1][o.frame] : walk ? [0, 1, 0, -1][o.frame] : 0;
     const t = 3 + (walk && o.frame % 2 ? 1 : 0) + (jump ? -2 : 0);
     // legs (2px each, 5px long + feet): back leg grey, front leg white, dark knees, cyan thigh light
     if (jump) {
@@ -613,9 +614,16 @@
     p.rect(8, t + 7, 8, 2, R.w);
     p.rect(13, t + 7, 3, 2, R.n); p.set(13, t + 7, R.nl);
     // arms (1px): back arm grey, front arm white; dark elbows + hands; swing while walking
-    const sw = walk ? step : 0;
-    p.rect(7, t + 8, 1, 6, R.g); p.set(7, t + 10, R.k); p.set(7 - Math.max(0, sw), t + 14, R.kd);
-    if (!noArm) { p.rect(16, t + 8, 1, 6, R.w); p.set(16, t + 10, R.k); p.set(16 + Math.max(0, -sw), t + 14, R.k); }
+    const sw = walk && !climb ? step : 0;
+    if (climb) {
+      // reaching up the ladder, hands taking turns
+      const a1 = o.frame ? 2 : 0, a2 = o.frame ? 0 : 2;
+      p.rect(7, t + 2 + a1, 1, 6, R.g); p.set(7, t + 5 + a1, R.k); p.set(7, t + 1 + a1, R.kd);
+      p.rect(16, t + 2 + a2, 1, 6, R.w); p.set(16, t + 5 + a2, R.k); p.set(16, t + 1 + a2, R.k);
+    } else {
+      p.rect(7, t + 8, 1, 6, R.g); p.set(7, t + 10, R.k); p.set(7 - Math.max(0, sw), t + 14, R.kd);
+      if (!noArm) { p.rect(16, t + 8, 1, 6, R.w); p.set(16, t + 10, R.k); p.set(16 + Math.max(0, -sw), t + 14, R.k); }
+    }
     // neck + head: white helmet, navy visor facing right, cyan ear light
     p.rect(11, t + 6, 2, 1, R.k);
     p.rect(10, t, 4, 1, R.w); p.rect(9, t + 1, 6, 4, R.w); p.rect(10, t + 5, 4, 1, R.w);
@@ -1007,6 +1015,185 @@
       p.set(x, y, leaf); p.set(x, y + 1, mul(leaf, 0.8));
       if (r() < 0.35) p.set(x + (r() < 0.5 ? 1 : -1), y - 1, r() < 0.5 ? o.a : hex(o.flower2 || '#fff1a8'));
     }
+  };
+
+  // ---------- scene pieces: the hill, the UFO + beam, the aquarium building in space ----------
+  const BAY = [[0, 8, 2, 10], [12, 4, 14, 6], [3, 11, 1, 9], [15, 7, 13, 5]];
+  const lerpC = (a, b, t) => [a[0] + (b[0] - a[0]) * t, a[1] + (b[1] - a[1]) * t, a[2] + (b[2] - a[2]) * t, 255];
+  // dithered multi-stop gradient colour at t (0..1) for pixel (x, y)
+  const gradAt = (stops, t, x, y) => {
+    const n = stops.length - 1, f = Math.max(0, Math.min(0.9999, t)) * n, i = Math.floor(f), u = f - i;
+    const q = Math.floor(u * 4 + BAY[y & 3][x & 3] / 16) / 4;   // 4 dithered steps between stops
+    return lerpC(stops[i], stops[i + 1], Math.min(1, q));
+  };
+  const hash = (x, y, s) => { let h = (x * 374761393 + y * 668265263 + (s || 0) * 982451653) | 0; h = (h ^ (h >>> 13)) * 1274126177; return ((h ^ (h >>> 16)) >>> 0) / 4294967296; };
+
+  S.signpost = function (p, o) {
+    const W = p.w, H = p.h, wood = hex('#9b6a3e'), dark = hex('#6e4526'), paint = hex('#fff1c4');
+    p.rect(7, 6, 2, H - 6, wood); p.rect(7, 6, 1, H - 6, mul(wood, 1.15));
+    // arrow board pointing left (the way up the hill)
+    p.rect(3, 4, 12, 6, wood); p.tri([0, 7], [3, 3], [3, 11], wood);
+    p.rect(3, 9, 12, 1, dark);
+    p.line(4, 7, 11, 7, paint); p.line(4, 7, 6, 5, paint); p.line(4, 7, 6, 9, paint);
+    p.rect(6, H - 2, 4, 2, mul(wood, 0.8));
+    p.outline();
+    p.set(14, 2, hex('#fff6a0')); p.set(14, 3, hex('#ffd25a'));   // a tiny lantern
+  };
+  S.ufo = function (p, o) {
+    const cx = 32, metal = hex('#c8ced8'), dark = hex('#7a8496'), glass = hex('#9fe6f2');
+    p.ellipse(cx, 12, 11, 8, glass);
+    p.rect(cx - 12, 13, 24, 4, [0, 0, 0, 0]);
+    p.ellipse(cx, 19, 30, 6, metal);
+    p.rect(cx - 30, 19, 60, 1, mul(metal, 0.85));
+    p.ellipse(cx, 22, 18, 3, dark);
+    p.ellipse(cx, 24, 6, 1.6, hex('#bff6ff'));
+    p.shade(0.18); p.outline(0.35);
+    p.set(cx - 5, 7, WHITE); p.set(cx - 4, 6, WHITE); p.set(cx - 6, 9, mul(glass, 1.2));     // dome glint
+    p.set(cx + 2, 10, hex('#7fd0a0')); p.set(cx + 3, 10, hex('#7fd0a0')); p.set(cx + 2, 9, hex('#7fd0a0')); // a little someone inside
+    for (let i = 0; i < 8; i++) {                                                             // chasing rim lights
+      const x = cx - 26 + i * 7.4, on = (i + o.frame) % 4 === 0;
+      p.set(x, 20, on ? hex('#fff3a0') : i % 2 ? hex('#ff9fd0') : hex('#9feff0'));
+      p.set(x + 1, 20, on ? hex('#fff3a0') : mul(i % 2 ? hex('#ff9fd0') : hex('#9feff0'), 0.8));
+    }
+  };
+  S.beam = function (p, o) {
+    const W = p.w, H = p.h;
+    for (let y = 0; y < H; y++) {
+      const half = 6 + (y / H) * (W / 2 - 6);
+      const band = ((y + (3 - o.frame) * 6) % 24) < 3 ? 40 : 0;
+      for (let x = 0; x < W; x++) {
+        const d = Math.abs(x + 0.5 - W / 2) / half;
+        if (d > 1) continue;
+        const a = (1 - d * d) * 120 + band * (1 - d) + (d > 0.82 ? 30 : 0);
+        p.set(x, y, [200 + 55 * (1 - d), 250, 255, Math.min(255, a)]);
+      }
+    }
+    for (let i = 0; i < 9; i++) {                                                             // rising sparkles
+      const sy = Math.floor((hash(i, 1, 7) * H + H - o.frame * 7) % H), sx = Math.round(W / 2 + (hash(i, 2, 7) - 0.5) * (8 + sy / H * 18));
+      p.set(sx, sy, [255, 255, 255, 230]);
+    }
+  };
+  S.beampad = function (p, o) {
+    const W = p.w, H = p.h, cx = W / 2, metal = hex('#8a96a6');
+    p.ellipse(cx, H - 4, W / 2 - 1, 3.6, metal);
+    p.rect(2, H - 4, W - 4, 3, mul(metal, 0.7));
+    p.ellipse(cx, H - 5, W / 2 - 1, 3.2, mul(metal, 1.12));
+    p.outline(0.3);
+    for (let i = 0; i < 12; i++) {                                                            // glowing ring + chase lights
+      const a = i / 12 * Math.PI * 2, on = (i + o.frame * 3) % 12 < 3;
+      p.set(cx + Math.cos(a) * (W / 2 - 5), H - 5 + Math.sin(a) * 1.8, on ? hex('#ffffff') : hex('#5fe0f0'));
+    }
+    p.ellipse(cx, H - 5, 5, 1.2, hex('#bff6ff'));
+    for (let i = 0; i < 4; i++) p.set(4 + i * (W - 9) / 3, H - 2, i % 2 ? hex('#ffd25a') : hex('#2a2a32'));   // hazard dots
+  };
+  S.console = function (p, o) {
+    const W = p.w, H = p.h, body = hex('#5a6a7a');
+    p.rect(6, 12, 8, H - 12, body); p.rect(3, H - 3, 14, 3, mul(body, 0.8));
+    p.rect(1, 1, W - 2, 12, mul(body, 1.1));
+    p.shade(0.2); p.outline(0.3);
+    p.rect(3, 3, W - 6, 8, hex('#0e2a3a'));
+    for (let r = 0; r < 3; r++) {                                                             // scrolling "tank list"
+      const len = 3 + ((r + o.frame) * 5) % 9;
+      p.rect(4, 4 + r * 2 + 1, len, 1, r === o.frame % 3 ? hex('#ffe08a') : hex('#5fe0f0'));
+    }
+    p.set(W - 5, 4, o.frame % 2 ? hex('#7ef0c0') : hex('#2a6a5a'));
+  };
+  S.tankframe = function (p, o) {
+    const W = p.w, H = p.h, m = hex('#5a6a7a'), hl = hex('#8fa2b4'), dk = hex('#33404c');
+    p.rect(0, 0, W, 4, m); p.rect(0, 0, 4, H - 8, m); p.rect(W - 4, 0, 4, H - 8, m);
+    p.rect(0, H - 8, W, 8, dk); p.rect(0, H - 8, W, 1, hl);
+    p.rect(0, 0, W, 1, hl); p.rect(0, 0, 1, H - 8, hl);
+    p.rect(3, 3, W - 6, 1, dk); p.rect(3, 3, 1, H - 11, dk); p.rect(W - 4, 3, 1, H - 11, dk);
+    for (let x = 8; x < W - 8; x += 3) p.set(x, 1, hex('#bff6ff'));                           // lamp strip
+    p.rect(W / 2 - 14, H - 6, 28, 5, hex('#1c2733'));                                       // name plate
+    for (const x of [3, W - 4]) p.set(x, H - 4, hex('#9fe8a0'));
+  };
+  S.hillsky = function (p, o) {
+    const W = p.w, H = p.h, stops = [hex('#2b3466'), hex('#5a4f8a'), hex('#c47f8e'), hex('#f2b48a'), hex('#ffe0a8')];
+    for (let y = 0; y < H; y++) for (let x = 0; x < W; x++) p.set(x, y, gradAt(stops, y / (H * 0.82), x, y));
+    for (let i = 0; i < 70; i++) { const x = Math.floor(hash(i, 3, 1) * W), y = Math.floor(hash(i, 4, 1) * H * 0.45); p.set(x, y, hash(i, 5, 1) < 0.2 ? WHITE : [230, 225, 255, 150 + Math.floor(hash(i, 6, 1) * 100)]); }
+    p.circle(236, 128, 15, hex('#fff1c8')); p.circle(236, 128, 11, hex('#fffbe8'));          // low sun
+    for (let x = 0; x < W; x++) {                                                            // far hills
+      const h1 = 136 + Math.sin(x * 0.021) * 6 + Math.sin(x * 0.07 + 1) * 3, h2 = 146 + Math.sin(x * 0.03 + 2) * 5;
+      for (let y = Math.floor(h1); y < H; y++) p.set(x, y, hex('#8a6f9a'));
+      for (let y = Math.floor(h2); y < H; y++) p.set(x, y, hex('#6d5a84'));
+    }
+    for (let y = 156; y < H; y++) for (let x = 0; x < W; x++) {                              // the sea far below
+      const c = gradAt([hex('#6aa8c8'), hex('#3f7aa0')], (y - 156) / (H - 156), x, y);
+      p.set(x, y, (y % 4 === 1 && Math.sin(x * 0.13 + y) + Math.sin(x * 0.041 - y * 0.5) > 1.75) ? hex('#ffe9c8') : c);
+    }
+  };
+  S.hilltile = function (p, o) {
+    const W = p.w, H = p.h;
+    const g1 = hex('#9ad874'), g2 = hex('#73b552'), g3 = hex('#5a9a44'), d1 = hex('#9a744e'), d2 = hex('#7d5c3c'), d3 = hex('#5f442c');
+    for (let y = 0; y < H; y++) for (let x = 0; x < W; x++) {
+      const n = hash(x, y, 11), edge = 5 + Math.round(hash(x, 0, 12) * 2);
+      let c = y < 1 ? g1 : y < 3 ? g2 : y < edge ? g3 : y < 22 ? d1 : y < 36 ? d2 : d3;
+      if (y >= edge && n < 0.06) c = mul(c, 0.8);                                            // pebbles
+      if (y >= edge && n > 0.97) c = hex('#c9b494');
+      if (y === edge && n < 0.5) c = g3;                                                    // ragged turf edge
+      if (y >= 22 && y < 24 && n < 0.5) c = d1; if (y >= 36 && y < 38 && n < 0.5) c = d2;    // soft strata
+      p.set(x, y, c);
+    }
+  };
+  S.spacebg = function (p, o) {
+    const W = p.w, H = p.h;
+    const per = (x, y, f, s) => Math.sin((x / W) * Math.PI * 2 * f + s) * Math.cos((y / H) * Math.PI * 2 * (f - 1) + s * 1.7);   // tileable waves
+    for (let y = 0; y < H; y++) for (let x = 0; x < W; x++) {
+      let c = gradAt([hex('#0b0f26'), hex('#141a3a'), hex('#0e1230')], ((y / H) + 0.15 * per(x, y, 1, 0.3) + 0.5) % 1, x, y);
+      const neb = per(x, y, 2, 1.1) * 0.6 + per(x, y, 3, 2.3) * 0.4;                           // soft nebula
+      if (neb > 0.35) c = lerpC(c, hex('#3a2a6a'), Math.min(0.5, (neb - 0.35) * 1.4) * ((BAY[y & 3][x & 3] / 16) < 0.6 ? 1 : 0.6));
+      if (neb < -0.55) c = lerpC(c, hex('#1a4a5a'), Math.min(0.4, (-0.55 - neb) * 1.4) * ((BAY[y & 3][x & 3] / 16) < 0.5 ? 1 : 0.5));
+      p.set(x, y, c);
+    }
+    for (let i = 0; i < 160; i++) {
+      const x = Math.floor(hash(i, 1, 21) * W), y = Math.floor(hash(i, 2, 21) * H), b = hash(i, 3, 21);
+      p.set(x, y, b > 0.9 ? WHITE : b > 0.6 ? [200, 215, 255, 255] : [140, 150, 200, 255]);
+      if (b > 0.97) { p.set(x - 1, y, [170, 190, 255, 255]); p.set(x + 1, y, [170, 190, 255, 255]); p.set(x, y - 1, [170, 190, 255, 255]); p.set(x, y + 1, [170, 190, 255, 255]); }
+    }
+  };
+  S.planet = function (p, o) {
+    const W = p.w, H = p.h, cx = W / 2, cy = H / 2, r = Math.min(W, H) * (o.ring ? 0.32 : 0.45);
+    const ring = (front) => { for (let a = 0; a < Math.PI * 2; a += 0.01) { const x = cx + Math.cos(a) * W * 0.47, y = cy + Math.sin(a) * H * 0.16; if ((Math.sin(a) > 0) === front) { p.set(x, y, o.a); p.set(x, y + 1, mul(o.a, 0.8)); } } };
+    if (o.ring) ring(false);
+    for (let y = -r; y <= r; y++) for (let x = -r; x <= r; x++) {
+      const d = Math.hypot(x, y) / r; if (d > 1) continue;
+      let c = o.c;
+      if (o.ring && Math.sin((y / r) * 7) > 0.5) c = mul(c, 0.88);                            // bands
+      if (!o.ring && hash(Math.round(x + 40), Math.round(y + 40), 31) < 0.06) c = mul(c, 0.82);   // craters
+      const lit = (x + y) / r;                                                                // lit from the top-left
+      c = mul(c, lit < -0.6 ? 1.15 : lit > 0.7 ? 0.6 : lit > 0.3 ? 0.8 : 1);
+      p.set(cx + x, cy + y, c);
+    }
+    if (o.ring) ring(true);
+  };
+  S.stationwall = function (p, o) {
+    const W = p.w, H = p.h, a = hex('#2c3e52'), seam = hex('#1f2c3b'), hl = hex('#3b536b');
+    p.rect(0, 0, W, H, a);
+    p.rect(0, 0, W, 1, hl); p.rect(0, 0, 1, H, hl); p.rect(0, H - 1, W, 1, seam); p.rect(W - 1, 0, 1, H, seam);
+    p.rect(0, 15, W, 1, seam); p.rect(0, 16, W, 1, hl);
+    for (const [x, y] of [[3, 3], [W - 4, 3], [3, H - 4], [W - 4, H - 4]]) p.set(x, y, hl);
+    for (let y = 2; y < H - 2; y++) if (hash(7, y, 3) < 0.5) p.set(W / 2, y, mul(a, 0.93));
+  };
+  S.stationfloor = function (p, o) {
+    const W = p.w, H = p.h;
+    p.rect(0, 0, W, H, hex('#4a5866'));
+    p.rect(0, 0, W, 1, hex('#d8e2ea')); p.rect(0, 1, W, 2, hex('#9aa8b4'));
+    for (let x = 1; x < W; x += 4) p.set(x, 2, hex('#6a7886'));
+    p.rect(0, H - 1, W, 1, hex('#2a3440'));
+    for (let x = 0; x < W; x += 8) p.set(x + 4, 5, hex('#ffd25a'));                           // little guide lights
+  };
+  S.stationhull = function (p, o) {
+    const W = p.w, H = p.h, a = hex('#8a96a6');
+    p.rect(0, 0, W, H, a);
+    p.rect(0, 0, W, 1, mul(a, 1.2)); p.rect(0, H - 1, W, 1, mul(a, 0.7)); p.rect(W - 1, 0, 1, H, mul(a, 0.75)); p.rect(0, 0, 1, H, mul(a, 1.1));
+    p.rect(0, 10, W, 1, mul(a, 0.8)); p.rect(0, 21, W, 1, mul(a, 0.8));
+    for (let x = 2; x < W; x += 6) { p.set(x, 2, mul(a, 0.7)); p.set(x, 13, mul(a, 0.7)); p.set(x, 24, mul(a, 0.7)); }
+  };
+  S.laddertile = function (p, o) {
+    const W = p.w, H = p.h, rail = hex('#c8a050'), rung = hex('#e6c070');
+    p.rect(2, 0, 2, H, rail); p.rect(W - 4, 0, 2, H, rail); p.rect(2, 0, 1, H, mul(rail, 1.15));
+    p.rect(4, 3, W - 8, 2, rung); p.rect(4, 5, W - 8, 1, mul(rung, 0.6));
   };
 
   function mkRand(seed) { let s = seed * 9301 + 49297; return () => { s = (s * 9301 + 49297) % 233280; return s / 233280; }; }

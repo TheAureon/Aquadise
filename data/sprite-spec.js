@@ -16,10 +16,17 @@ AQ.data.spriteSpec = {
     decor:    { idle: { row: 0, frames: 1, fps: 1 } },
     player:   { idle: { row: 0, frames: 4, fps: 5 }, swim: { row: 1, frames: 6, fps: 10 }, net: { row: 2, frames: 4, fps: 14 },
                 stand: { row: 3, frames: 2, fps: 2 }, walk: { row: 4, frames: 4, fps: 9 }, jump: { row: 5, frames: 1, fps: 1 },
-                standnet: { row: 6, frames: 1, fps: 1 } },
+                standnet: { row: 6, frames: 1, fps: 1 }, climb: { row: 7, frames: 2, fps: 6 } },
     chest:    { closed: { row: 0, col: 0, frames: 1, fps: 1 }, open: { row: 0, col: 1, frames: 1, fps: 1 } },
-    bait:     { idle: { row: 0, frames: 2, fps: 3 } }
+    bait:     { idle: { row: 0, frames: 2, fps: 3 } },
+    // scene pieces (the hill, the UFO, the aquarium building)
+    prop:     { idle: { row: 0, frames: 1, fps: 1 } },          // static prop standing on the ground
+    propanim: { idle: { row: 0, frames: 4, fps: 6 } },          // animated prop standing on the ground
+    ufo:      { idle: { row: 0, frames: 4, fps: 6 } },
+    beam:     { idle: { row: 0, frames: 4, fps: 8 } },          // drawn stretched to the beam's size
+    still:    { idle: { row: 0, frames: 1, fps: 1 } }           // backdrops and repeating tiles
   },
   // anchor = the pixel inside a frame that sits on the entity's world position
-  anchors: { creature: 'center', plant: 'bottom', decor: 'bottom', player: 'center', chest: 'bottom', bait: 'center' }
+  anchors: { creature: 'center', plant: 'bottom', decor: 'bottom', player: 'center', chest: 'bottom', bait: 'center',
+             prop: 'bottom', propanim: 'bottom', ufo: 'center', beam: 'top', still: 'topleft' }
 };

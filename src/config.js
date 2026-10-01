@@ -118,10 +118,10 @@ AQ.TUNING = {
   },
 
   hill: {                     // the hill scene (its own little area, not on the world map)
-    bottomFlat: 90,           // flat ground at the foot of the hill (px)
-    slopeLength: 320,         // how long the climb is (px)
+    bottomFlat: 70,           // flat ground at the foot of the hill (px)
+    slopeLength: 240,         // how long the climb is (px)
     rise: 92,                 // how high the hilltop is above the foot (px)
-    topWidth: 170,            // width of the flat hilltop (px)
+    topWidth: 150,            // width of the flat hilltop (px)
     ufoHeight: 70             // how high the UFO hovers above the hilltop (px)
   },
 
