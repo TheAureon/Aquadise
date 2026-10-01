@@ -39,17 +39,17 @@ AQ.data.world = {
   // palette: top = surface material (sand/mud/snow), rock = body shades, accent = speckles.
   // water = tint mixed into the water colour, dark = ambient darkness (0..1).
   biomes: [
-    { id: 'lush_cave', name: 'Half-Flooded Lush Cave', rect: [5960, 700, 840, 260],
+    { id: 'lush_cave', name: 'Half-Flooded Lush Cave', short: 'Lush Cave', rect: [5960, 700, 840, 260],
       palette: { top: ['#6fa456', '#4f8a43', '#3d6b37'], rock: ['#5a5560', '#4a4550', '#3b3742'], accent: '#c9e07a' }, water: '#2f8a7a', waterMix: 0.45, dark: 0.45 },
-    { id: 'cave', name: 'Flooded Cave System', rect: [5660, 400, 360, 820],
+    { id: 'cave', name: 'Flooded Cave System', short: 'Cave', rect: [5660, 400, 360, 820],
       palette: { top: ['#56606b', '#4a535d', '#3f4750'], rock: ['#3e444d', '#343941', '#2a2e35'], accent: '#7fb0a8' }, water: '#1c3550', waterMix: 0.5, dark: 0.72 },
-    { id: 'trench', name: 'Deep Trench', rect: [3320, 640, 660, 640],
+    { id: 'trench', name: 'Deep Trench', short: 'Trench', rect: [3320, 640, 660, 640],
       palette: { top: ['#2c3448', '#252c3d', '#1e2433'], rock: ['#1b2130', '#161b27', '#11151f'], accent: '#3c6b7a' }, water: '#050c1c', waterMix: 0.4, dark: 0.74 },
-    { id: 'vents', name: 'Volcanic Vents', rect: [2560, 600, 760, 680],
+    { id: 'vents', name: 'Volcanic Vents', short: 'Vents', rect: [2560, 600, 760, 680],
       palette: { top: ['#4a3f44', '#3d3338', '#33292e'], rock: ['#2f282c', '#272124', '#1f1a1d'], accent: '#ff8a3a' }, water: '#3a2230', waterMix: 0.25, dark: 0.55 },
-    { id: 'open_ocean', name: 'Open Ocean', rect: [2420, 0, 1550, 1280],
+    { id: 'open_ocean', name: 'Open Ocean', short: 'Open Ocean', rect: [2420, 0, 1550, 1280],
       palette: { top: ['#6d7c88', '#5d6b78', '#4f5c68'], rock: ['#46525e', '#3c4652', '#323b46'], accent: '#8da3b0' }, water: '#1f5fa8', waterMix: 0.2, dark: 0 },
-    { id: 'tide_pools', name: 'Tide Pools', rect: [0, 0, 720, 1280],
+    { id: 'tide_pools', name: 'Tide Pools', short: 'Tide Pools', rect: [0, 0, 720, 1280],
       palette: { top: ['#ecd9a0', '#d9c084', '#c4a86c'], rock: ['#8c8178', '#766b63', '#5f564f'], accent: '#6fa35a' }, water: '#58d0cf', waterMix: 0.25, dark: 0,
       props: [
         { type: 'algae', at: 'floor', n: 60, air: true, y: [60, 118] },
@@ -63,15 +63,15 @@ AQ.data.world = {
         { type: 'shell', at: 'floor', n: 18, area: [0, 720], air: true },
         { type: 'pebbles', at: 'floor', n: 26, area: [280, 720] }
       ] },
-    { id: 'coral', name: 'Coral Shelf', rect: [720, 0, 1180, 1280],
+    { id: 'coral', name: 'Coral Shelf', short: 'Coral', rect: [720, 0, 1180, 1280],
       palette: { top: ['#f3e2b6', '#e6cf9a', '#d4b984'], rock: ['#c4a58a', '#a98b72', '#8d725d'], accent: '#ef8aa0' }, water: '#3fc0d8', waterMix: 0.25, dark: 0 },
-    { id: 'ruins', name: 'Sunken Ruins', rect: [1900, 0, 520, 1280],
+    { id: 'ruins', name: 'Sunken Ruins', short: 'Ruins', rect: [1900, 0, 520, 1280],
       palette: { top: ['#a6a283', '#928e70', '#7d7a5f'], rock: ['#6d6b5c', '#5c5a4d', '#4b4a40'], accent: '#a5643a' }, water: '#4a8f8a', waterMix: 0.3, dark: 0.05 },
-    { id: 'kelp', name: 'Kelp Forest', rect: [3970, 0, 930, 1280],
+    { id: 'kelp', name: 'Kelp Forest', short: 'Kelp', rect: [3970, 0, 930, 1280],
       palette: { top: ['#bfae7c', '#a8976a', '#8f8059'], rock: ['#6e705f', '#5c5e4f', '#4a4c40'], accent: '#7a9a3a' }, water: '#2f8a6a', waterMix: 0.3, dark: 0.08 },
-    { id: 'mangrove', name: 'Mangrove Roots', rect: [4900, 0, 800, 1280],
+    { id: 'mangrove', name: 'Mangrove Roots', short: 'Mangrove', rect: [4900, 0, 800, 1280],
       palette: { top: ['#6e5a3c', '#5c4b32', '#4a3c29'], rock: ['#4e4234', '#41372b', '#342c23'], accent: '#7d8f3c' }, water: '#5c7a3a', waterMix: 0.4, dark: 0.12 },
-    { id: 'ice', name: 'Ice Shelf', rect: [5700, 0, 1100, 1280], zones: [{ name: 'Icy', x0: 5700, x1: 6250 }, { name: 'Glaciers', x0: 6250, x1: 6800 }],
+    { id: 'ice', name: 'Ice Shelf', short: 'Ice', rect: [5700, 0, 1100, 1280], zones: [{ name: 'Icy', x0: 5700, x1: 6250 }, { name: 'Glaciers', x0: 6250, x1: 6800 }],
       palette: { top: ['#eef8ff', '#d2ebf7', '#b4d8ea'], rock: ['#5e6976', '#4f5966', '#424a55'], accent: '#9fd3ee' }, water: '#7fc6e6', waterMix: 0.35, dark: 0.05 }
   ],
 

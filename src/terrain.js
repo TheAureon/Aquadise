@@ -421,19 +421,25 @@ AQ.Terrain = (function () {
 
   // Minimap: 1 px per 16 world px
   function buildMinimap(W) {
-    const S = 16, mw = Math.ceil(W.w / S), mh = Math.ceil(W.h / S);
+    const S = 22, mw = Math.ceil(W.w / S), mh = Math.ceil(W.h / S);
     const c = document.createElement('canvas'); c.width = mw; c.height = mh;
     const x = c.getContext('2d'), img = x.createImageData(mw, mh);
     for (let my = 0; my < mh; my++) for (let mx = 0; mx < mw; mx++) {
       const wx = mx * S + S / 2, wy = my * S + S / 2, m = W.at(wx, wy), i = (my * mw + mx) * 4;
       let col;
-      if (m === 1) col = U.scale(hex(W.biomeAt(wx, wy).palette.top[1]), 0.8);
+      if (m === 1) { const d = W.depthDist(wx, wy) / 2; col = d < S ? U.scale(hex(W.biomeAt(wx, wy).palette.top[1]), 0.85) : U.scale([78, 70, 66], 1 - Math.min(0.5, d / 200)); }
       else if (m === 2) col = wy < W.sea ? [150, 210, 230] : [60, 70, 70];
       else col = U.scale(hex(W.biomeAt(wx, wy).water || '#2a7fa8'), 0.55 + 0.45 * (1 - U.clamp((wy - W.sea) / 1200, 0, 1)));
       img.data[i] = col[0]; img.data[i + 1] = col[1]; img.data[i + 2] = col[2]; img.data[i + 3] = 255;
     }
     x.putImageData(img, 0, 0);
-    T.minimap = { canvas: c, scale: S };
+    // label anchor = centroid of each biome's open water
+    const labels = W.biomes.map((b) => {
+      let sx = 0, sy = 0, n = 0;
+      for (let y = Math.max(W.sea, b.rect[1]); y < b.rect[1] + b.rect[3]; y += 8) for (let xx = b.rect[0]; xx < b.rect[0] + b.rect[2]; xx += 8) if (W.water(xx, y) && W.biomeAt(xx, y) === b) { sx += xx; sy += y; n++; }
+      return { b, x: n ? sx / n / S : (b.rect[0] + b.rect[2] / 2) / S, y: n ? sy / n / S : 10 };
+    });
+    T.minimap = { canvas: c, scale: S, labels };
   }
 
   return T;

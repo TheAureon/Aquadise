@@ -34,6 +34,7 @@ AQ.Game = (function () {
     const start = AQ.data.world.playerStart;
     G.player = new AQ.Player(start[0], start[1]);
     if (save) AQ.Save.apply(save, G);
+    G.upgrades = AQ.State.upgrades;
     G.player.speedLevel = G.upgrades.speed;
 
     if (AQ.Creatures) AQ.Creatures.init(G);
@@ -76,7 +77,7 @@ AQ.Game = (function () {
       if (I.wasPressed('KeyM')) G.state = G.state === 'map' ? 'play' : 'map';
       if (I.wasPressed('Tab') && AQ.Aquarium) { AQ.Aquarium.open(G); I.endFrame(); return; }
       if (I.wasPressed('KeyL') && AQ.LogUI) { AQ.LogUI.open(G); I.endFrame(); return; }
-      if (I.wasPressed('Escape') && G.state === 'map') G.state = 'play';
+      if (I.wasPressed('Escape')) { if (G.state === 'map') G.state = 'play'; else { G.state = 'pause'; I.endFrame(); return; } }
 
       G.player.update(dt, AQ.World, I);
       if (AQ.Catching) AQ.Catching.update(dt, G);
@@ -86,15 +87,23 @@ AQ.Game = (function () {
       AQ.FX.update(dt, AQ.World);
       AQ.HUD.update(dt, G);
       if (AQ.Save) AQ.Save.tick(dt, G);
-    } else if (G.state === 'aquarium' && AQ.Aquarium) {
+    } else if (G.state === 'aquarium') {
       AQ.Aquarium.update(dt, G);
+    } else if (G.state === 'log') {
+      AQ.LogUI.update(dt, G);
+    } else if (G.state === 'pause') {
+      AQ.PauseUI.update(dt, G);
     }
     I.endFrame();
   }
 
   function draw() {
     const ctx = AQ.Render.ctx, cam = AQ.Camera;
-    if (G.state === 'aquarium' && AQ.Aquarium) { AQ.Aquarium.draw(ctx, G); return; }
+    if (G.state === 'aquarium' || (G.state === 'log' && AQ.LogUI.from === 'aquarium')) {
+      AQ.Aquarium.draw(ctx, G);
+      if (G.state === 'log') AQ.LogUI.draw(ctx, G);
+      return;
+    }
     AQ.Render.background(cam);
     AQ.Terrain.draw(ctx, cam);
     ctx.save();
@@ -110,7 +119,9 @@ AQ.Game = (function () {
     AQ.Render.surface(cam);
     AQ.Render.lighting(cam, collectLights(), targetDarkness());
     AQ.HUD.draw(ctx, G);
-    if (G.state === 'map' && AQ.MapUI) AQ.MapUI.draw(ctx, G);
+    if (G.state === 'map') AQ.MapUI.draw(ctx, G);
+    if (G.state === 'log') AQ.LogUI.draw(ctx, G);
+    if (G.state === 'pause') AQ.PauseUI.draw(ctx, G);
   }
 
   function targetDarkness() {
