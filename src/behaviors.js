@@ -515,7 +515,7 @@ AQ.Behaviors = (function () {
       const taken = new Set(AQ.Creatures.list.filter((o) => o !== c && o.pool).map((o) => o.pool.id));
       const free = pools.filter((p) => !taken.has(p.id));
       c.pool = (free.length ? R.pick(free) : R.pick(pools));
-      c.x = c.hx = c.pool.x; c.y = c.hy = c.pool.surface + 2;
+      c.x = c.hx = c.pool.x; c.y = c.hy = c.pool.surface + Math.max(2, Math.min(5, Math.round(c.pool.depth / 2)));
     },
     update(c, ctx, dt) {
       c.st -= dt;
@@ -524,7 +524,7 @@ AQ.Behaviors = (function () {
       // darting around inside the pool: the visible "there's one in here" cue
       c.catchable = true;
       c.targetAlpha = 0.55 + Math.sin(c.t * 9) * 0.3;
-      if (!c.dt2 || c.dt2 < 0) { c.dt2 = R.range(0.2, 0.7); c.tx2 = c.pool.x + R.range(-c.pool.w / 2 + 3, c.pool.w / 2 - 3); }
+      if (!c.dt2 || c.dt2 < 0) { c.dt2 = R.range(0.2, 0.7); c.tx2 = c.pool.x + R.range(-c.pool.w / 4, c.pool.w / 4); }
       c.dt2 -= dt;
       c.x += (c.tx2 - c.x) * Math.min(1, dt * 10); c.facing = c.tx2 > c.x ? 1 : -1; c.moving = true;
       if (R.chance(dt * 1.5)) AQ.FX.sparkle(c.x, c.pool.surface, '#e8ffff', 1);

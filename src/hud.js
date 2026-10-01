@@ -70,7 +70,7 @@ AQ.HUD = (function () {
     // help
     if (H.showHelp) {
       const lines = [
-        'MOVE WASD/ARROWS   SNEAK SHIFT',
+        'MOVE WASD/ARROWS   JUMP W/UP ON LAND   SNEAK SHIFT',
         'NET SPACE/CLICK (HOLD TO PRY)   BAIT B/RCLICK',
         'AQUARIUM TAB   LOG L   MAP M   HELP H'
       ];

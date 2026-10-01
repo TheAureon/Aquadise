@@ -14,7 +14,8 @@ AQ.data.spriteSpec = {
     creature: { idle: { row: 0, frames: 4, fps: 5 }, move: { row: 1, frames: 4, fps: 10 } },
     plant:    { idle: { row: 0, frames: 4, fps: 3 } },
     decor:    { idle: { row: 0, frames: 1, fps: 1 } },
-    player:   { idle: { row: 0, frames: 4, fps: 5 }, swim: { row: 1, frames: 6, fps: 12 }, net: { row: 2, frames: 4, fps: 14 } },
+    player:   { idle: { row: 0, frames: 4, fps: 5 }, swim: { row: 1, frames: 6, fps: 12 }, net: { row: 2, frames: 4, fps: 14 },
+                stand: { row: 3, frames: 2, fps: 2 }, walk: { row: 4, frames: 4, fps: 9 }, jump: { row: 5, frames: 1, fps: 1 } },
     chest:    { closed: { row: 0, col: 0, frames: 1, fps: 1 }, open: { row: 0, col: 1, frames: 1, fps: 1 } },
     bait:     { idle: { row: 0, frames: 2, fps: 3 } }
   },

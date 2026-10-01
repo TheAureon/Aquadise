@@ -19,7 +19,8 @@ npx http-server -c-1 .      # or: python3 -m http.server
 
 | action              | keys                                     |
 |---------------------|------------------------------------------|
-| swim                | WASD / arrow keys                        |
+| swim / walk         | WASD / arrow keys                        |
+| jump (on land)      | W / Up                                   |
 | sneak (slow, quiet) | hold Shift                               |
 | net                 | Space / J, or left-click (aims at the mouse) |
 | pry a stuck creature| keep holding the net after the swing     |
@@ -39,6 +40,9 @@ creatures between the tank and storage.
 - **Catching.** Creatures react to how close and how fast you are. Sneak, or drop bait to lure
   them out, then net them. Each species uses a reusable catch behaviour (hides, darts, schools,
   camouflage, timing windows, patrols, needs coaxing, and so on). The log lists a tip for every species.
+- **Tide Pools are dry land** (merged from the Milestone 2 prototype): you walk and jump on the
+  shore and only swim once the water is deep enough to submerge you. Shallow pools are splashed
+  through and deep ones can be swum in. Tap a pool with the net to try for a Glasswinged Minnow.
 - **No fail state.** Hostile creatures only knock you back. Air is unlimited.
 - **Progression** comes only from chests: a bigger net (3 levels) and faster swimming (3 levels).
   Six chests exist at a time, and they despawn and respawn around the world.
@@ -101,4 +105,6 @@ docs/SPRITE_SPEC.md         how to make sprites that drop in cleanly
 - **Getting home:** Tab opens the aquarium from anywhere. Caught creatures go to their tank
   immediately.
 - Plants can decorate any tank. Only creatures are restricted to their own biome.
+- On land, Shift is careful walking (same stealth rule as sneaking underwater), not a sprint.
+  W/Up jumps, because Space is the net.
 - Rare Trenchmaw: each time its slot (re)spawns there's a 45% chance it appears, re-rolled every 60 s.

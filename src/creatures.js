@@ -42,6 +42,7 @@ AQ.Creatures = (function () {
       catchable: true, pryable: false, hidden: false, hostileActive: false, hitCD: 0,
       icon: null, iconT: 0, r: spriteR(def), movement: movementOf(def), harvested: false
     };
+    if (AQ.World.air(x, y)) c.allowAir = true;   // lives on dry land
     c.bhv = AQ.Behaviors[def.catch_behavior] || AQ.Behaviors.easy;
     if (def.catch_behavior === 'clinger' && def.spawn && def.spawn.at === 'ceiling') c.flipY = true;
     if (c.bhv.init) c.bhv.init(c);
@@ -76,11 +77,12 @@ AQ.Creatures = (function () {
   // ---------------------------------------------------------------- placement
   function columnSurfaces(b, x, kind) {
     const W = AQ.World, out = [];
-    const y0 = Math.max(b.rect[1], kind === 'ice_top' ? W.sea - 16 : W.sea), y1 = Math.min(W.h - 1, b.rect[1] + b.rect[3]);
+    const y0 = Math.max(b.rect[1], kind === 'ice_top' ? W.sea - 16 : kind === 'ground' ? 0 : W.sea), y1 = Math.min(W.h - 1, b.rect[1] + b.rect[3]);
     for (let y = y0; y < y1; y++) {
       const here = W.at(x, y);
       if (kind === 'floor' && here === W.WATER && W.solid(x, y + 1) && W.biomeAt(x, y) === b) out.push(y + 1);
       if (kind === 'ceiling' && here === W.WATER && W.solid(x, y - 1) && y > W.sea + 2 && W.biomeAt(x, y) === b) out.push(y - 1);
+      if (kind === 'ground' && here !== W.SOLID && W.solid(x, y + 1) && !W.poolAt(x, y) && W.biomeAt(x, y) === b) out.push(y + 1);
       if (kind === 'ice_top' && here === W.AIR && W.solid(x, y + 1) && y < W.sea && W.biomeAt(x, y) === b) out.push(y + 1);
     }
     return out;
@@ -97,6 +99,15 @@ AQ.Creatures = (function () {
     const plant = def.is_plant;
     for (let tries = 0; tries < 300; tries++) {
       const x = Math.floor(R.range(x0, x1));
+      if (at === 'ground') {
+        // any surface, dry land included (Tide Pools)
+        const list = columnSurfaces(b, x, 'ground').filter(yOK);
+        if (!list.length) continue;
+        const g = R.pick(list);
+        if (plant) return [x, g];
+        if (W.open(x, g - r * 1.2)) return [x, g - r * 0.6];
+        continue;
+      }
       if (at === 'floor' || at === 'reef' || at === 'ceiling' || at === 'ice_top') {
         const list = columnSurfaces(b, x, at === 'reef' ? 'floor' : at).filter(yOK);
         if (!list.length) continue;

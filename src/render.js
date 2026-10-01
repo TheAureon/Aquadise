@@ -112,7 +112,7 @@ AQ.Render = (function () {
     if (seaY < -4 || seaY > cam.h + 4) return;
     for (let x = 0; x < cam.w; x++) {
       const wx = left + x;
-      if (W.solid(wx, W.sea) || W.solid(wx, W.sea - 1)) continue;
+      if (W.solid(wx, W.sea) || W.solid(wx, W.sea - 1) || W.poolAt(wx, W.sea)) continue;
       const o = Math.round(Math.sin(wx * 0.09 + R.t * 2.2) * 0.8 + Math.sin(wx * 0.031 - R.t * 1.3) * 0.7);
       ctx.fillStyle = 'rgba(240,255,255,0.85)'; ctx.fillRect(x, seaY + o - 1, 1, 1);
       ctx.fillStyle = 'rgba(150,225,240,0.6)'; ctx.fillRect(x, seaY + o, 1, 1);

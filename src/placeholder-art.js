@@ -424,6 +424,7 @@
 
   // ---------- player ----------
   S.diver = function (p, o) {
+    if (o.anim === 'stand' || o.anim === 'walk' || o.anim === 'jump') return S.diverUpright(p, o);
     const ph = o.t * Math.PI * 2;
     const kick = o.anim === 'swim' ? Math.round(Math.sin(ph) * 2.5) : Math.round(Math.sin(ph) * 1);
     const bob = o.anim === 'idle' ? Math.round(Math.sin(ph) * 0.6) : 0;
@@ -441,6 +442,32 @@
     } else p.line(15, cy + 1, 17, cy + 3, suitD);
     p.shade();
     p.rect(20, cy - 2, 2, 2, visor); p.set(21, cy - 2, WHITE);
+    p.outline();
+  };
+  // Upright diver for walking on land. Anchor is the frame centre (12,12); feet sit on row 16
+  // (the bottom of the collision box), so the figure stands on the ground line.
+  S.diverUpright = function (p, o) {
+    const suit = hex('#2f8f9d'), suitD = hex('#1f5e70'), fin = hex('#f2c14e'), visor = hex('#ffe26b'), tank = hex('#d9774a'), hood = hex('#20374a');
+    const walk = o.anim === 'walk', jump = o.anim === 'jump';
+    const step = walk ? [0, 1, 0, -1][o.frame] : 0, bob = walk && o.frame % 2 ? -1 : (o.anim === 'stand' && o.frame ? -0 : 0);
+    const top = 1 + bob + (jump ? -1 : 0);
+    // legs
+    if (jump) { p.rect(10, top + 11, 2, 3, suitD); p.rect(13, top + 11, 2, 3, suitD); p.rect(10, top + 14, 4, 1, fin); p.rect(13, top + 13, 4, 1, fin); }
+    else {
+      p.rect(10 + Math.max(0, step), top + 11, 2, 5 - Math.abs(step), suitD);
+      p.rect(13 - Math.max(0, -step), top + 11, 2, 5 - Math.abs(step) + (step ? 0 : 0), suitD);
+      p.rect(10 + Math.max(0, step), 16 - 0, 4, 1, fin);
+      p.rect(13 - Math.max(0, -step), 16, 4, 1, fin);
+    }
+    // tank + torso
+    p.rect(7, top + 5, 3, 6, tank);
+    p.rect(10, top + 5, 5, 7, suit);
+    // arm (swings when walking)
+    p.line(14, top + 6, 15 + (walk ? step : 0), top + 10, suitD);
+    // head
+    p.circle(12.5, top + 2.5, 2.6, hood);
+    p.shade();
+    p.rect(14, top + 1, 1, 2, visor); p.rect(13, top + 2, 1, 1, visor); p.set(14, top + 1, WHITE);
     p.outline();
   };
   S.chest = function (p, o) {

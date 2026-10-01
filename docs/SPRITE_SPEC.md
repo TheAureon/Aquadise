@@ -37,6 +37,7 @@ The player diver is 24 × 24. A creature's class is its `sprite_size` in `data/c
 | plant              | `idle` (sway): 4 @ 3 fps   | —                        | —                      |
 | decoration         | `idle`: 1 frame            | —                        | —                      |
 | player (24×24)     | `idle`: 4 @ 5 fps          | `swim`: 6 @ 12 fps       | `net` swing: 4 @ 14 fps |
+| player, cont.      | row 3 `stand`: 2 @ 2 fps   | row 4 `walk`: 4 @ 9 fps  | row 5 `jump`: 1 frame   |
 | chest (16×16)      | col 0 `closed`, col 1 `open` (one row, 2 frames)        |                        |
 | bait (8×8)         | `idle` glint: 2 @ 3 fps    |                          |                        |
 
@@ -49,6 +50,8 @@ icons), so they need no extra rows.
 
 The anchor is the pixel inside a frame that sits on the entity's world position.
 
+- **Player upright rows (stand/walk/jump):** same centre anchor, but the feet go on row 16
+  (centre + 4, the bottom of the collision box) and the figure is about 16 px tall.
 - **Creatures, player, bait:** the frame centre `(floor(fw/2), floor(fh/2))`. Centre the body in the frame.
 - **Plants, decorations, chests:** bottom-centre `(floor(fw/2), fh-1)`. The bottom row of pixels
   touches the ground, so don't leave empty rows under the base.

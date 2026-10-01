@@ -140,6 +140,14 @@ AQ.World = (function () {
         }
         break;
       }
+      case 'vent': {
+        // smoking crater on top of whatever ground is at x
+        const top = groundTop(Math.round(s.x), W.sea);
+        if (top === null) break;
+        fillPoly([[s.x - 2, top - 1], [s.x + 2, top - 1], [s.x + 1, top + 3], [s.x - 1, top + 3]], 'carve');
+        W.vents.push({ x: s.x, y: top + 1, t: 0 });
+        break;
+      }
       case 'chimney': {
         const hw = s.w / 2, top = s.y - s.h;
         fillPoly(jitterPoly([[s.x - hw - 6, s.y + 4], [s.x - hw * 0.45, top], [s.x + hw * 0.45, top], [s.x + hw + 6, s.y + 4]], 1.5, seed), 'solid');
@@ -150,27 +158,35 @@ AQ.World = (function () {
     }
   }
 
-  // Tide pools: little basins of water carved into rock above the sea surface.
+  // Tide pools: shallow, gentle-walled dips in dry ground, filled with water up to the lower rim
+  // (same shape model as the Milestone 2 prototype: dip = depth * t^2, t = 1 - (dx/r)^2).
   function buildPools(list) {
     W.pools = [];
     list.forEach((p) => {
-      let surf = -Infinity;
-      for (let x = p.x - p.w / 2; x <= p.x + p.w / 2; x++) surf = Math.max(surf, W.floorY[Math.round(x)] || 0);
-      surf = Math.round(surf) + 1;
-      const rx = p.w / 2, d = p.d || 6;
-      for (let y = surf - 12; y <= surf + d; y++) for (let x = Math.floor(p.x - rx - 2); x <= Math.ceil(p.x + rx + 2); x++) {
-        const dx = (x + 0.5 - p.x) / rx, dy = (y + 0.5 - surf) / d;
-        if (y >= surf && dx * dx + dy * dy <= 1) setPx(x, y, 'pool');
-        else if (y < surf && Math.abs(dx) <= 1 && W.at(x, y) === SOLID && y < W.sea) setPx(x, y, 'clear');
+      const r = p.w / 2, d = p.d || 4;
+      const x0 = Math.round(p.x - r), x1 = Math.round(p.x + r);
+      const ground = (x) => { const g = groundTop(x, W.sea - 60); return g === null ? W.floorY[x] : g; };
+      const rimL = ground(x0), rimR = ground(x1);
+      const surface = Math.max(rimL, rimR);               // water fills to the lower rim
+      let bottom = surface;
+      for (let x = x0; x <= x1; x++) {
+        const t = Math.max(0, 1 - Math.pow((x - p.x) / r, 2));
+        if (t <= 0) continue;
+        const g = ground(x), floor = Math.round(Math.max(g, surface) + d * t * t);
+        bottom = Math.max(bottom, floor);
+        for (let y = Math.min(g, surface) - 1; y < floor; y++) setPx(x, y, y >= surface ? 'pool' : 'clear');
       }
-      // raised rims on both sides
-      for (const side of [-1, 1]) for (let k = 0; k < 3; k++) {
-        const x = Math.round(p.x + side * (rx + k));
-        for (let y = surf - 3 + k; y <= surf + 1; y++) setPx(x, y, 'solid');
-      }
-      W.pools.push({ x: p.x, y: surf + 2, w: p.w, surface: surf, id: W.pools.length });
+      W.pools.push({ x: p.x, w: p.w, surface, bottom, depth: bottom - surface, id: W.pools.length });
     });
   }
+  function groundTop(x, fromY) {
+    for (let y = Math.max(0, fromY); y < W.h; y++) if (W.mask[y * W.w + x] === SOLID) return y;
+    return null;
+  }
+  W.poolAt = function (x, y) {
+    for (const p of W.pools || []) if (Math.abs(x - p.x) <= p.w / 2 + 1 && y >= p.surface && y <= p.bottom + 1) return p;
+    return null;
+  };
 
   function distanceTransform() {
     const w = W.w, h = W.h, m = W.mask, d = new Uint8Array(w * h);

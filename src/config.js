@@ -16,6 +16,17 @@ AQ.TUNING = {
     hitbox: { w: 10, h: 8 }
   },
 
+  // On dry land (Tide Pools) the diver walks; it only swims once the water is deep enough to submerge it.
+  walk: {
+    accel: 300,          // px/s^2
+    max: 44,             // walking speed
+    friction: 10,        // how quickly you stop on land
+    sneakMult: 0.45,     // Shift on land = careful walking
+    jump: 112,           // jump velocity (W / Up on land)
+    airControl: 0.6,
+    swimDepth: 7         // water this deep (px) at your chest switches you to swimming
+  },
+
   camera: {
     stiffness: 5.5,      // follow speed (higher = snappier)
     lookahead: 0.45,     // seconds of velocity to lead by

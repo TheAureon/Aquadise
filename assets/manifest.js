@@ -26,6 +26,21 @@ AQ.manifest = {
      "row": 2,
      "frames": 4,
      "fps": 14
+    },
+    "stand": {
+     "row": 3,
+     "frames": 2,
+     "fps": 2
+    },
+    "walk": {
+     "row": 4,
+     "frames": 4,
+     "fps": 9
+    },
+    "jump": {
+     "row": 5,
+     "frames": 1,
+     "fps": 1
     }
    }
   },

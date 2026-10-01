@@ -9,22 +9,24 @@ AQ.data.world = {
   height: 1280,
   seaLevel: 96,
   seed: 7,
-  playerStart: [372, 108],
+  playerStart: [120, 76],
 
   // Seabed profile: [x, y, roughness]. Everything below the line is solid.
   floor: [
-    // Tide pools / shallows: rocky outcrops poking above the waterline, sloping gently down
-    [0, 70, 2], [30, 74, 2], [60, 86, 2], [85, 104, 2], [110, 112, 2], [135, 90, 2], [160, 86, 2], [185, 104, 2],
-    [210, 114, 2], [235, 92, 2], [260, 88, 2], [285, 104, 2], [310, 114, 3], [350, 120, 4], [400, 128, 4],
-    [440, 140, 5], [480, 152, 5], [540, 168, 4], [600, 186, 4], [650, 206, 3], [700, 236, 3],
-    // Coral shelf: long and fairly flat
-    [740, 250, 4], [900, 246, 6], [1050, 252, 6], [1200, 248, 6], [1350, 256, 6], [1500, 252, 6], [1650, 258, 6], [1800, 262, 5],
+    // Tide pools / shallows: mostly DRY walkable ground (above the sea) dotted with small pools,
+    // a small step down, then a gentle slope into the water that ends in a steeper drop.
+    [0, 84, 1.2], [190, 85, 1.2], [205, 89, 1.2], [440, 90, 1.2], [480, 95, 1.5], [540, 104, 2], [610, 118, 2],
+    [670, 136, 2], [720, 160, 2], [760, 196, 3],
+    // Coral shelf: dips in at the start, then long, fairly flat and lumpy with coral
+    [790, 228, 3], [820, 244, 3], [850, 240, 4], [900, 246, 6], [1050, 250, 7], [1200, 247, 7], [1350, 254, 7],
+    [1500, 252, 7], [1650, 258, 7], [1800, 262, 6],
     // Sunken ruins at the shelf edge
     [1900, 266, 3], [2050, 270, 3], [2200, 272, 3], [2380, 276, 3],
     // Steep drop-off
     [2440, 300, 6], [2500, 370, 8], [2560, 450, 8], [2620, 530, 8], [2680, 610, 8], [2730, 690, 6], [2770, 760, 5],
-    // Volcanic vents at the bottom of the slope
-    [2800, 790, 4], [2900, 800, 6], [3000, 795, 6], [3100, 802, 6], [3200, 798, 6], [3290, 806, 4],
+    // Volcanic vents at the bottom of the slope: a row of rounded vent mounds
+    [2800, 800, 2], [2830, 760, 2], [2860, 802, 2], [2905, 748, 2], [2945, 804, 2], [2985, 756, 2], [3025, 800, 2],
+    [3070, 742, 2], [3115, 802, 2], [3155, 762, 2], [3195, 804, 2], [3240, 752, 2], [3290, 806, 2],
     // Deep trench (steep walls)
     [3320, 830, 4], [3335, 900, 6], [3350, 1000, 6], [3370, 1120, 6], [3400, 1200, 5], [3500, 1222, 4], [3650, 1218, 4],
     [3800, 1224, 4], [3850, 1200, 5], [3880, 1100, 6], [3900, 980, 6], [3920, 840, 6], [3940, 700, 6], [3955, 560, 5], [3968, 440, 4],
@@ -82,16 +84,15 @@ AQ.data.world = {
     { id: 'tide_pools', name: 'Tide Pools', short: 'Tide Pools', rect: [0, 0, 720, 1280],
       palette: { top: ['#ecd9a0', '#d9c084', '#c4a86c'], rock: ['#8c8178', '#766b63', '#5f564f'], accent: '#6fa35a' }, water: '#58d0cf', waterMix: 0.25, dark: 0,
       props: [
-        { type: 'algae', at: 'floor', n: 60, air: true, y: [60, 118] },
-        { type: 'rock', at: 'floor', n: 16, area: [290, 720], r: [3, 8], barnacles: true },
-        { type: 'rock', at: 'floor', n: 8, air: true, area: [0, 290], r: [3, 6], barnacles: true },
-        { type: 'seagrass', at: 'floor', n: 46, area: [300, 720] },
-        { type: 'seagrass', at: 'floor', n: 10, area: [80, 300], h: [4, 9] },
-        { type: 'anemone', at: 'floor', n: 14, area: [280, 720] },
-        { type: 'urchin', at: 'floor', n: 9, area: [330, 720] },
-        { type: 'starfish', at: 'floor', n: 12, area: [90, 720], air: true },
-        { type: 'shell', at: 'floor', n: 18, area: [0, 720], air: true },
-        { type: 'pebbles', at: 'floor', n: 26, area: [280, 720] }
+        { type: 'algae', at: 'floor', n: 90, air: true, area: [0, 520] },
+        { type: 'rock', at: 'floor', n: 10, air: true, area: [0, 470], r: [2, 5], barnacles: true },
+        { type: 'shell', at: 'floor', n: 24, air: true, area: [0, 520] },
+        { type: 'starfish', at: 'floor', n: 8, air: true, area: [0, 520] },
+        { type: 'pebbles', at: 'floor', n: 30, air: true, area: [0, 760] },
+        { type: 'rock', at: 'floor', n: 12, area: [470, 760], r: [3, 8], barnacles: true },
+        { type: 'seagrass', at: 'floor', n: 36, area: [470, 760] },
+        { type: 'anemone', at: 'floor', n: 10, area: [480, 760] },
+        { type: 'urchin', at: 'floor', n: 6, area: [520, 760] },
       ] },
     { id: 'coral', name: 'Coral Shelf', short: 'Coral', rect: [720, 0, 1180, 1280],
       palette: { top: ['#f3e2b6', '#e6cf9a', '#d4b984'], rock: ['#c4a58a', '#a98b72', '#8d725d'], accent: '#ef8aa0' }, water: '#3fc0d8', waterMix: 0.25, dark: 0,
@@ -112,6 +113,7 @@ AQ.data.world = {
         { type: 'crate', at: 'floor', n: 5 },
         { type: 'chain', at: 'floor', n: 4 },
         { type: 'anchor', at: 'points', points: [[2392, 276]] },
+        { type: 'flag', at: 'points', points: [[2112, 142]], air: true },
         { type: 'seagrass', at: 'floor', n: 18, colors: ['#6f8a3e', '#5b7333', '#86a04a'] },
         { type: 'rock', at: 'floor', n: 8 }
       ] },
@@ -143,14 +145,14 @@ AQ.data.world = {
   // Terrain shapes, applied in order on top of the floor. ops: solid | carve | pool | air | water
   // shapes: poly{pts} rect{x,y,w,h} circle{x,y,r} tunnel{path:[[x,y,r]], r} spikes{x,y,w,n,h,dir} chimney{x,y,w,h}
   shapes: [
-    // --- Tide pools: boulders with crevices (Knuckle Crab homes) and a small overhang
-    { op: 'solid', shape: 'circle', x: 424, y: 134, r: 11, jitter: 2 },
-    { op: 'carve', shape: 'circle', x: 432, y: 142, r: 4, rx: 5, ry: 3 },
-    { op: 'solid', shape: 'circle', x: 520, y: 162, r: 9, jitter: 2 },
-    { op: 'solid', shape: 'circle', x: 566, y: 172, r: 15, jitter: 3 },
-    { op: 'carve', shape: 'circle', x: 554, y: 182, r: 4, rx: 5, ry: 3 },
-    { op: 'solid', shape: 'poly', pts: [[606, 178], [646, 168], [668, 176], [642, 186]], jitter: 2 },
-    { op: 'carve', shape: 'circle', x: 352, y: 122, r: 4, rx: 4, ry: 3 },
+    // --- Tide pools: a couple of rocks on the dry ground (with a crevice) and boulders on the underwater slope
+    { op: 'solid', shape: 'circle', x: 108, y: 84, r: 4, jitter: 1 },
+    { op: 'solid', shape: 'circle', x: 458, y: 91, r: 5, jitter: 1 },
+    { op: 'carve', shape: 'circle', x: 463, y: 93, r: 2, rx: 2, ry: 2 },
+    { op: 'solid', shape: 'circle', x: 560, y: 108, r: 9, jitter: 2 },
+    { op: 'solid', shape: 'circle', x: 650, y: 132, r: 12, jitter: 3 },
+    { op: 'carve', shape: 'circle', x: 640, y: 141, r: 4, rx: 5, ry: 3 },
+
     // --- Coral shelf: reef bommies (rock heads the coral grows on)
     { op: 'solid', shape: 'circle', x: 900, y: 242, r: 13, jitter: 3 },
     { op: 'solid', shape: 'circle', x: 1180, y: 240, r: 18, jitter: 4 },
@@ -158,27 +160,31 @@ AQ.data.world = {
     { op: 'solid', shape: 'circle', x: 1460, y: 246, r: 12, jitter: 3 },
     { op: 'solid', shape: 'circle', x: 1700, y: 252, r: 16, jitter: 4 },
     { op: 'carve', shape: 'circle', x: 1190, y: 252, r: 5, rx: 7, ry: 4 },
+    { op: 'solid', shape: 'circle', x: 1010, y: 248, r: 9, jitter: 3 },
+    { op: 'solid', shape: 'circle', x: 1320, y: 252, r: 10, jitter: 3 },
+    { op: 'solid', shape: 'circle', x: 1580, y: 254, r: 9, jitter: 3 },
+    { op: 'solid', shape: 'circle', x: 1820, y: 262, r: 11, jitter: 3 },
 
     // --- Sunken ruins: ancient pillars + a wrecked ship you can swim through
     { op: 'solid', shape: 'rect', x: 1930, y: 222, w: 10, h: 48, jitter: 0.6 },
     { op: 'solid', shape: 'rect', x: 1926, y: 218, w: 18, h: 5 },
     { op: 'solid', shape: 'rect', x: 1968, y: 240, w: 10, h: 30, jitter: 0.6 },
-    { op: 'solid', shape: 'poly', mat: 'wood', pts: [[2010, 274], [2028, 228], [2062, 212], [2262, 210], [2302, 222], [2326, 274]], jitter: 1.5 },
-    { op: 'carve', shape: 'poly', pts: [[2040, 266], [2052, 232], [2072, 220], [2254, 218], [2290, 230], [2306, 266]] },
-    { op: 'carve', shape: 'rect', x: 2128, y: 206, w: 30, h: 16 },
-    { op: 'carve', shape: 'circle', x: 2318, y: 250, r: 11 },
-    { op: 'carve', shape: 'circle', x: 2028, y: 252, r: 9 },
-    { op: 'solid', shape: 'rect', mat: 'wood', x: 2060, y: 240, w: 46, h: 3 },
-    { op: 'solid', shape: 'rect', mat: 'wood', x: 2200, y: 244, w: 50, h: 3 },
-    { op: 'solid', shape: 'poly', mat: 'wood', pts: [[2196, 214], [2203, 214], [2232, 128], [2226, 126]] },
+    // the ship (from the sketch): sitting upright on the floor, cabin + mast with a flag, portholes, swim-through hull
+    { op: 'solid', shape: 'poly', mat: 'wood', pts: [[2030, 270], [2018, 238], [2030, 232], [2270, 230], [2300, 236], [2318, 250], [2306, 270]], jitter: 1.2 },
+    { op: 'carve', shape: 'poly', pts: [[2044, 264], [2036, 242], [2264, 238], [2292, 250], [2286, 264]] },
+    { op: 'solid', shape: 'rect', mat: 'wood', x: 2080, y: 206, w: 64, h: 26 },
+    { op: 'carve', shape: 'rect', x: 2086, y: 212, w: 52, h: 20 },
+    { op: 'carve', shape: 'rect', x: 2140, y: 218, w: 6, h: 12 },
+    { op: 'solid', shape: 'rect', mat: 'wood', x: 2108, y: 140, w: 4, h: 68 },
+    { op: 'carve', shape: 'circle', x: 2226, y: 250, r: 4 },
+    { op: 'carve', shape: 'circle', x: 2248, y: 250, r: 4 },
+    { op: 'carve', shape: 'circle', x: 2028, y: 254, r: 7 },
+    { op: 'carve', shape: 'rect', x: 2180, y: 226, w: 26, h: 8 },
     { op: 'solid', shape: 'circle', mat: 'metal', x: 2372, y: 266, r: 10, jitter: 1 },
 
-    // --- Volcanic vents: chimneys (smoke + glow come from their tops)
-    { op: 'solid', shape: 'chimney', mat: 'basalt', x: 2860, y: 800, w: 18, h: 40 },
-    { op: 'solid', shape: 'chimney', mat: 'basalt', x: 2965, y: 802, w: 24, h: 62 },
-    { op: 'solid', shape: 'chimney', mat: 'basalt', x: 3060, y: 800, w: 16, h: 30 },
-    { op: 'solid', shape: 'chimney', mat: 'basalt', x: 3150, y: 804, w: 22, h: 52 },
-    { op: 'solid', shape: 'chimney', mat: 'basalt', x: 3245, y: 802, w: 16, h: 36 },
+    // --- Volcanic vents: smoking craters on top of the mounds (y is found automatically)
+    { shape: 'vent', x: 2830 }, { shape: 'vent', x: 2905 }, { shape: 'vent', x: 2985 }, { shape: 'vent', x: 3070 },
+    { shape: 'vent', x: 3155 }, { shape: 'vent', x: 3240 },
 
     // --- Deep trench: ledges on the walls
     { op: 'solid', shape: 'poly', pts: [[3330, 880], [3380, 900], [3384, 912], [3335, 914]], jitter: 2 },
@@ -211,8 +217,11 @@ AQ.data.world = {
 
   // Tide pools: basins of water carved into rock above the sea (x = centre, w = width, d = depth)
   pools: [
-    { x: 40, w: 14, d: 4 }, { x: 148, w: 18, d: 5 }, { x: 250, w: 18, d: 5 }
+    { x: 30, w: 30, d: 4 }, { x: 78, w: 44, d: 11 }, { x: 132, w: 26, d: 4 }, { x: 176, w: 34, d: 6 },
+    { x: 236, w: 46, d: 12 }, { x: 290, w: 30, d: 5 }, { x: 340, w: 52, d: 10 }, { x: 394, w: 28, d: 4 },
+    { x: 430, w: 30, d: 6 }
   ],
+
 
   // Shape materials (referenced by shapes[].mat). Same format as a biome palette.
   materials: {

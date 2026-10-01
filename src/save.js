@@ -15,7 +15,7 @@ AQ.Save = (function () {
     AQ.State.plants = st.plants || {};
     AQ.State.tanks = st.tanks || {};
     AQ.State.upgrades = Object.assign({ net: 1, speed: 1 }, st.upgrades || {});
-    if (data.player && AQ.World.water(data.player.x, data.player.y)) { game.player.x = data.player.x; game.player.y = data.player.y; }
+    if (data.player && AQ.World.open(data.player.x, data.player.y) && !AQ.World.boxHits(data.player.x, data.player.y, 5, 4)) { game.player.x = data.player.x; game.player.y = data.player.y; }
   };
   S.save = function (game) {
     try {

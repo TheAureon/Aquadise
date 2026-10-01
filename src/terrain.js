@@ -127,7 +127,14 @@ AQ.Terrain = (function () {
         if (ownerAt(W, x, y) !== b) continue;
         if (m !== 1) {
           // open pixels: tide-pool water above the sea, air pockets below it, optional cave back-wall
-          if (m === 0 && y < sea) P.set(x, y, W.air(x, y - 1) ? [214, 248, 250] : W.solid(x, y + 1) ? [52, 150, 170] : [86, 192, 206]);
+          const pool = m === 0 ? W.poolAt(x, y) : null;
+          if (pool || (m === 0 && y < sea)) {
+            // tide-pool water: banded + ordered-dithered by depth below the rim (prototype palette)
+            const k = y - (pool ? pool.surface : y), POOL = [[214, 248, 250], [143, 216, 224], [102, 194, 206], [67, 161, 186], [44, 127, 159]];
+            const pos = k === 0 ? 0 : Math.min(4, 1 + (k - 1) / 3), i = Math.floor(pos);
+            const th = [[0, 0.5], [0.75, 0.25]][y & 1][x & 1];
+            P.set(x, y, POOL[Math.min(4, i + (pos - i > th ? 1 : 0))]);
+          }
           else if (m === 2 && y > sea) {
             const n = U.fbm2(x * 0.05, y * 0.05, seed);
             P.set(x, y, U.scale(pal.air, 0.8 + n * 0.4 + (((x + y) & 1) && n > 0.6 ? 0.08 : 0)));
@@ -336,6 +343,10 @@ AQ.Terrain = (function () {
   PROPS.plank = function (P, x, y, r) {
     const c = C('#7a5432'), d = U.scale(c, 0.7), len = r.int(8, 18), a = r.range(-0.3, 0.3);
     for (let i = 0; i < len; i++) { P.setOpen(x + i * Math.cos(a) - len / 2, y - 1 + i * Math.sin(a), c); P.setOpen(x + i * Math.cos(a) - len / 2, y + i * Math.sin(a), d); }
+  };
+  PROPS.flag = function (P, x, y, r) {
+    const c = C('#d94a3a'), d = U.scale(c, 0.75);
+    for (let j = 0; j < 9; j++) for (let i = 0; i < 12 - j * 1.2; i++) P.set(x + 2 + i, y + j - Math.round(Math.sin(i * 0.5) * 0.8), (i + j) % 5 === 0 ? d : c);
   };
   PROPS.barrel = function (P, x, y, r) {
     const c = C('#8a5b33');
