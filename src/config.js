@@ -63,5 +63,21 @@ AQ.TUNING = {
 
   tank: { capacity: 12, decorCapacity: 40 },
 
+  // Aquarium "vibe" (tank happiness). Each part scores 0..1; the weighted average becomes 0-5 stars.
+  // Raise a weight to make that part matter more. Nothing here can ever hurt a creature.
+  aquarium: {
+    weights: { decor: 1.2, theme: 0.8, plants: 0.8, fed: 0.8, calm: 0.8, space: 0.5, likes: 1.0 },
+    decorVarietyTarget: 6,    // different kinds of decor for a full "variety" score
+    decorAmountTarget: 10,    // total decor pieces for a full "amount" score
+    themeTarget: 4,           // decor pieces matching the tank's biome for a full "theme" score
+    plantTarget: 3,           // plants for a full "plants" score
+    comfortable: 8,           // creatures before the tank starts to feel crowded
+    crowdedFloor: 0.5,        // "space" score when the tank is completely full (never lower)
+    stressPenalty: 0.6,       // how much a fully stressed tank lowers "calm" (gentle on purpose)
+    fedFreshMinutes: 20,      // real minutes a feeding counts as "fed"...
+    fedFadeMinutes: 40,       // ...then fades to hungry over this many minutes (they never starve)
+    recomputeEvery: 0.5       // seconds between vibe updates while watching a tank
+  },
+
   save: { key: 'aquadise.save.v1', autosaveEvery: 10 }
 };
