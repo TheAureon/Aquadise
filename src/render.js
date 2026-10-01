@@ -134,7 +134,7 @@ AQ.Render = (function () {
       if (x < -L.r || y < -L.r || x > cam.w + L.r || y > cam.h + L.r) continue;
       // stepped rings instead of smooth gradients keep it pixel-art
       const flick = L.flicker ? Math.sin(R.t * 3 + L.x) * 1.5 : 0;
-      [[1, 0.35], [0.72, 0.4], [0.45, 0.6]].forEach(([f, a]) => {
+      [[1, 0.18], [0.84, 0.22], [0.68, 0.28], [0.52, 0.36], [0.36, 0.55]].forEach(([f, a]) => {
         l.globalAlpha = a * (L.power || 1);
         l.beginPath(); l.arc(x, y, Math.max(1, Math.round(L.r * f + flick)), 0, Math.PI * 2); l.fill();
       });

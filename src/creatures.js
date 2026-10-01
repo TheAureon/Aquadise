@@ -76,7 +76,7 @@ AQ.Creatures = (function () {
   // ---------------------------------------------------------------- placement
   function columnSurfaces(b, x, kind) {
     const W = AQ.World, out = [];
-    const y0 = Math.max(b.rect[1], kind === 'ice_top' ? W.sea - 60 : W.sea), y1 = Math.min(W.h - 1, b.rect[1] + b.rect[3]);
+    const y0 = Math.max(b.rect[1], kind === 'ice_top' ? W.sea - 16 : W.sea), y1 = Math.min(W.h - 1, b.rect[1] + b.rect[3]);
     for (let y = y0; y < y1; y++) {
       const here = W.at(x, y);
       if (kind === 'floor' && here === W.WATER && W.solid(x, y + 1) && W.biomeAt(x, y) === b) out.push(y + 1);
@@ -102,7 +102,13 @@ AQ.Creatures = (function () {
         if (!list.length) continue;
         const g = R.pick(list);
         if (at === 'ceiling') return [x, g + 1 + r * 0.6];
-        if (at === 'ice_top') return [x, g - r * 0.6];
+        if (at === 'ice_top') {
+          // must be near the edge of the ice so it's reachable from the water
+          let edge = false;
+          for (let dx = -14; dx <= 14 && !edge; dx += 2) edge = W.water(x + dx, W.sea + 3) && !W.solid(x + dx, W.sea - 1);
+          if (!edge) continue;
+          return [x, g - r * 0.6];
+        }
         if (plant) return [x, g];
         if (at === 'reef') { const y = g - R.range(8, 26); if (W.water(x, y) && W.water(x, y - r)) return [x, y]; continue; }
         if (W.water(x, g - r * 1.2)) return [x, g - r * 0.6];

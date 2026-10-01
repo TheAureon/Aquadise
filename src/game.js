@@ -84,6 +84,7 @@ AQ.Game = (function () {
       if (AQ.Creatures) AQ.Creatures.update(dt, G);
       if (AQ.Chests) AQ.Chests.update(dt, G);
       AQ.Camera.update(dt, G.player, AQ.World);
+      AQ.Terrain.update(dt, AQ.Camera);
       AQ.FX.update(dt, AQ.World);
       AQ.HUD.update(dt, G);
       if (AQ.Save) AQ.Save.tick(dt, G);

@@ -21,6 +21,7 @@ AQ.World = (function () {
     W.mask = mask;
     W.mat = new Uint8Array(W.w * W.h);          // material id per pixel (0 = biome default)
     W.materials = ['default'].concat(Object.keys(data.materials || {}));
+    W.vents = [];
     // 1) floor polyline
     const floor = floorProfile(data.floor, data.seed || 1);
     W.floorY = floor;
@@ -143,6 +144,7 @@ AQ.World = (function () {
         const hw = s.w / 2, top = s.y - s.h;
         fillPoly(jitterPoly([[s.x - hw - 6, s.y + 4], [s.x - hw * 0.45, top], [s.x + hw * 0.45, top], [s.x + hw + 6, s.y + 4]], 1.5, seed), 'solid');
         fillPoly([[s.x - 2, top - 1], [s.x + 2, top - 1], [s.x + 1, top + 6], [s.x - 1, top + 6]], 'carve');
+        W.vents.push({ x: s.x, y: top + 2, t: 0 });
         break;
       }
     }

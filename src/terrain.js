@@ -72,7 +72,22 @@ AQ.Terrain = (function () {
       });
       T.chunks.push({ biome: b.id, x: x0, y: y0, w: x1 - x0, h: y1 - y0, canvas: back.toCanvas(), front: front && front.toCanvas() });
     });
+    W.vents.forEach((v) => T.lights.push({ x: v.x, y: v.y - 4, r: 36, color: '#ff8a3a', flicker: true }));
     buildMinimap(W);
+  };
+
+  // Hydrothermal vents puff smoke + bubbles (only near the camera).
+  T.update = function (dt, cam) {
+    const W = AQ.World, R = U.R;
+    for (const v of W.vents) {
+      if (Math.abs(v.x - cam.x) > 260 || Math.abs(v.y - cam.y) > 200) continue;
+      v.t -= dt;
+      if (v.t <= 0) {
+        v.t = R.range(0.08, 0.18);
+        AQ.FX.add({ type: 'puff', x: v.x + R.range(-2, 2), y: v.y, vx: R.range(-4, 4), vy: -R.range(14, 26), life: R.range(1.5, 2.6), color: R.chance(0.3) ? 'rgba(255,150,80,0.35)' : 'rgba(70,60,66,0.55)', r: R.range(1.5, 3.5) });
+        if (R.chance(0.25)) AQ.FX.bubble(v.x + R.range(-3, 3), v.y - 2);
+      }
+    }
   };
 
   function prepPalette(p) {
@@ -276,21 +291,25 @@ AQ.Terrain = (function () {
     }
   };
   PROPS.kelp = function (P, x, y, r, b, pal, s) {
-    const cols = (s.colors || ['#6b8a2c', '#557024', '#87a63a']).map(C), bl = C('#a8a33a');
-    const top = AQ.World.sea + r.range(s.topGap ? s.topGap[0] : 4, s.topGap ? s.topGap[1] : 70);
-    let px = x;
-    const ph = r.range(0, 6);
+    const shade = r.range(0.7, 1.1);
+    const cols = (s.colors || ['#6b8a2c', '#557024', '#87a63a']).map((h) => U.scale(C(h), shade)), bl = U.scale(C('#b5a83a'), shade);
+    const top = AQ.World.sea + r.range(s.topGap ? s.topGap[0] : 4, s.topGap ? s.topGap[1] : 150);
+    const ph = r.range(0, 6), amp = r.range(2, 5), freq = r.range(0.025, 0.05);
+    let px = x, k = 0;
     for (let yy = y; yy > top; yy--) {
-      const sway = Math.sin((y - yy) * 0.045 + ph) * 3;
-      px = x + sway;
-      P.setOpen(px, yy, cols[0], s.alpha); P.setOpen(px + 1, yy, cols[1], s.alpha);
-      if ((y - yy) % 6 === 3 && !s.sparse) {
-        const dir = ((y - yy) / 6) % 2 ? 1 : -1;
-        for (let j = 1; j < 7; j++) P.setOpen(px + dir * j, yy - j * 0.6 + Math.sin(j) * 0.5, j > 4 ? cols[2] : cols[0], s.alpha);
-        P.setOpen(px + dir * 2, yy + 1, bl, s.alpha);
+      px = x + Math.sin((y - yy) * freq + ph) * amp;
+      P.setOpen(px, yy, cols[1], s.alpha); P.setOpen(px + 1, yy, cols[0], s.alpha);
+      if ((y - yy) % 9 === 4 && !s.sparse) {
+        const dir = (k++ % 2) ? 1 : -1, len = r.int(5, 9), droop = r.range(0.2, 0.6);
+        for (let j = 1; j <= len; j++) {
+          const lx = px + dir * j, ly = yy - j * 0.7 + j * j * droop * 0.12;
+          P.setOpen(lx, ly, j > len - 2 ? cols[2] : cols[0], s.alpha);
+          if (j > 1 && j < len - 1) P.setOpen(lx, ly + 1, cols[1], s.alpha);
+        }
+        P.setOpen(px + dir, yy + 1, bl, s.alpha); P.setOpen(px + dir * 2, yy + 1, bl, s.alpha);
       }
     }
-    for (let j = -3; j <= 3; j++) P.setOpen(px + j, top - Math.abs(j) * 0.5, cols[2], s.alpha);
+    for (let j = -4; j <= 4; j++) P.setOpen(px + j, top - Math.abs(j) * 0.6 + (j > 0 ? 1 : 0), cols[2], s.alpha);
   };
   PROPS.mangrove = function (P, x, y, r, b, pal, s, T) {
     const W = AQ.World, sea = W.sea, bark = C('#5b4129'), barkL = C('#7a5a3a'), leaf = [C('#3f7a35'), C('#4f9440'), C('#2f5f2a')];
@@ -304,10 +323,13 @@ AQ.Terrain = (function () {
     for (let k = 0; k < roots; k++) {
       const ex = x + r.range(-34, 34), gy = W.groundBelow(Math.round(ex), sea, 600) || (sea + 200);
       const sx = x + r.range(-2, 2), sy = sea - r.range(4, 14), cx = x + (ex - x) * 0.15, cy = sea + (gy - sea) * 0.15;
-      for (let i = 0; i <= 80; i++) {
-        const t = i / 80, a = (1 - t) * (1 - t), bb = 2 * (1 - t) * t, c2 = t * t;
+      const steps = Math.ceil((Math.abs(ex - sx) + Math.abs(gy - sy)) * 1.6);
+      const thick = r.chance(0.4) ? 3 : 2;
+      for (let i = 0; i <= steps; i++) {
+        const t = i / steps, a = (1 - t) * (1 - t), bb = 2 * (1 - t) * t, c2 = t * t;
         const px = a * sx + bb * cx + c2 * ex, py = a * sy + bb * cy + c2 * gy;
-        P.set(px, py, bark); P.set(px + 1, py, barkL);
+        P.set(px, py, barkL); for (let w = 1; w < thick; w++) P.set(px + w, py, w === thick - 1 ? U.scale(bark, 0.8) : bark);
+        if (i % 37 === 0 && py > sea + 10 && r.chance(0.5)) P.set(px + thick, py, C('#6e8a3a'));
       }
     }
   };
