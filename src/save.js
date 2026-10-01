@@ -17,11 +17,14 @@ AQ.Save = (function () {
     AQ.State.upgrades = Object.assign({ net: 1, speed: 1 }, st.upgrades || {});
     AQ.State.unlocks = st.unlocks || {};      // older saves: nothing unlocked yet, best stars 0
     AQ.State.tankBest = st.tankBest || {};
-    if (data.player && AQ.World.open(data.player.x, data.player.y) && !AQ.World.boxHits(data.player.x, data.player.y, 5, 4)) { game.player.x = data.player.x; game.player.y = data.player.y; }
+    // where you were: scene + spot (older saves have no scene -> the sea world). Validated against
+    // that scene's map at boot (AQ.Scenes.restore), which falls back to a safe spot if needed.
+    game.scene = (data.scene && AQ.Scenes.list[data.scene]) ? data.scene : 'world';
+    if (data.player) { game.player.x = data.player.x; game.player.y = data.player.y; }
   };
   S.save = function (game) {
     try {
-      localStorage.setItem(key(), JSON.stringify({ v: 1, state: AQ.State, player: { x: Math.round(game.player.x), y: Math.round(game.player.y) } }));
+      localStorage.setItem(key(), JSON.stringify({ v: 1, state: AQ.State, scene: game.scene || 'world', player: { x: Math.round(game.player.x), y: Math.round(game.player.y) } }));
       S.isDirty = false;
     } catch (e) { /* storage unavailable: play continues unsaved */ }
   };
@@ -33,6 +36,7 @@ AQ.Save = (function () {
     game.upgrades = AQ.State.upgrades;
     const st = AQ.data.world.playerStart, P = game.player;
     P.x = st[0]; P.y = st[1]; P.vx = P.vy = 0; P.speedLevel = 1;
+    game.scene = 'world'; P.climbing = null;
     if (AQ.Aquarium) { AQ.Aquarium.fish = []; AQ.Aquarium.biome = null; }
     S.save(game);
   };

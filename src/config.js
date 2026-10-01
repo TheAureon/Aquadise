@@ -100,5 +100,39 @@ AQ.TUNING = {
     unlockStars: [2, 3.5, 5]  // tank stars needed for each biome's unlock tiers 1, 2 and 3 (new themed decor)
   },
 
+  // ---- getting to the aquarium building (Tide Pools -> the hill -> the UFO -> the building in space)
+  debug: {
+    tabOpensAquarium: false   // TESTING ONLY: true lets Tab open the tank screen from anywhere (the old shortcut)
+  },
+  interactKeys: ['KeyE'],     // "interact" (beam up/down, open a tank, use the directory)
+
+  transition: {               // the fade-to-black used for every scene change
+    fadeOut: 0.45,            // seconds to fade to black
+    hold: 0.2,                // seconds held on black
+    fadeIn: 0.5               // seconds to fade back in
+  },
+
+  entrance: {
+    triggerX: 12,             // walk left past this x (world px) at the far edge of Tide Pools to go to the hill
+    returnX: 36               // where you reappear in Tide Pools when you walk back down
+  },
+
+  hill: {                     // the hill scene (its own little area, not on the world map)
+    bottomFlat: 90,           // flat ground at the foot of the hill (px)
+    slopeLength: 320,         // how long the climb is (px)
+    rise: 92,                 // how high the hilltop is above the foot (px)
+    topWidth: 170,            // width of the flat hilltop (px)
+    ufoHeight: 70             // how high the UFO hovers above the hilltop (px)
+  },
+
+  beam: {
+    width: 30,                // UFO beam width (px); stand inside it to get the prompt
+    liftSpeed: 46,            // how fast the beam lifts you (px/s)
+    landSpeed: 24,            // how gently it sets you down when you arrive (px/s)
+    glow: 0.55                // beam brightness (0..1)
+  },
+
+  climb: { speed: 42 },       // ladder climbing speed in the aquarium building (px/s)
+
   save: { key: 'aquadise.save.v1', autosaveEvery: 10 }
 };

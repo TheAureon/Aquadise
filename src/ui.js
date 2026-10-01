@@ -17,7 +17,7 @@ AQ.LogUI = (function () {
   L.open = function (game, from) {
     L.from = from || game.state;
     game.state = 'log';
-    const here = from === 'aquarium' ? AQ.Aquarium.biome : from === 'title' ? 'tide_pools' : AQ.World.biomeAt(game.player.x, game.player.y).id;
+    const here = from === 'aquarium' ? AQ.Aquarium.biome : from === 'title' || game.scene !== 'world' ? 'tide_pools' : AQ.World.biomeAt(game.player.x, game.player.y).id;
     L.biomeIdx = Math.max(0, biomes().findIndex((b) => b.id === here));
     L.sel = 0;
   };

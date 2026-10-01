@@ -132,7 +132,7 @@ AQ.Player = (function () {
 AQ.Camera = (function () {
   const U = AQ.U;
   const cam = { x: 0, y: 0, w: 320, h: 180 };
-  cam.snap = function (p) { cam.x = p.x; cam.y = p.y; cam.clamp(); };
+  cam.snap = function (p, world) { cam.x = p.x; cam.y = p.y; cam.clamp(world); };
   cam.update = function (dt, p, world) {
     const C = AQ.TUNING.camera;
     const lx = U.clamp(p.vx * C.lookahead, -C.maxLookahead, C.maxLookahead);

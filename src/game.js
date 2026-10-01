@@ -3,13 +3,16 @@ var AQ = (typeof AQ !== 'undefined') ? AQ : {};
 
 AQ.Game = (function () {
   const G = {
-    state: 'loading',     // loading | play | aquarium | log | map
+    state: 'loading',     // loading | title | play | pause | aquarium | log | map
+    scene: 'world',       // where the player is: world | hill | station  (see src/scenes.js)
     time: 0,
     player: null,
     upgrades: { net: 1, speed: 1 },
     lights: []
   };
   const STEP = 1 / 60;
+  // what the player "presses" while a transition has control
+  const NO_INPUT = { isDown: () => false, wasPressed: () => false, axis: () => ({ x: 0, y: 0 }) };
   let acc = 0, last = 0;
 
   G.boot = async function () {
@@ -29,6 +32,7 @@ AQ.Game = (function () {
     await frame();
     AQ.Terrain.build(AQ.World);
     AQ.Render.buildTintField();
+    for (const id in AQ.Scenes.list) if (AQ.Scenes.list[id].build) AQ.Scenes.list[id].build();
 
     const save = AQ.Save ? AQ.Save.load() : null;
     const start = AQ.data.world.playerStart;
@@ -39,7 +43,7 @@ AQ.Game = (function () {
 
     if (AQ.Creatures) AQ.Creatures.init(G);
     if (AQ.Chests) AQ.Chests.init(G);
-    AQ.Camera.snap(G.player);
+    AQ.Scenes.restore(G, G.scene, G.player.x, G.player.y);
     document.getElementById('loading').style.display = 'none';
     AQ.Title.open(G);
     requestAnimationFrame(loop);
@@ -73,19 +77,15 @@ AQ.Game = (function () {
     AQ.Render.t = G.time;
 
     if (G.state === 'play' || G.state === 'map') {
-      if (I.wasPressed('KeyH')) { AQ.HUD.showHelp = true; AQ.HUD.helpT = AQ.HUD.helpT > 0 ? 0 : 12; }
-      if (I.wasPressed('KeyM')) G.state = G.state === 'map' ? 'play' : 'map';
-      if (I.wasPressed('Tab') && AQ.Aquarium) { AQ.Aquarium.open(G); I.endFrame(); return; }
-      if (I.wasPressed('KeyL') && AQ.LogUI) { AQ.LogUI.open(G); I.endFrame(); return; }
-      if (I.wasPressed('Escape')) { if (G.state === 'map') G.state = 'play'; else { G.state = 'pause'; I.endFrame(); return; } }
-
-      G.player.update(dt, AQ.World, I);
-      if (AQ.Catching) AQ.Catching.update(dt, G);
-      if (AQ.Creatures) AQ.Creatures.update(dt, G);
-      if (AQ.Chests) AQ.Chests.update(dt, G);
-      AQ.Camera.update(dt, G.player, AQ.World);
-      AQ.Terrain.update(dt, AQ.Camera);
-      AQ.FX.update(dt, AQ.World);
+      const frozen = AQ.Transition.blocking(), inWorld = G.scene === 'world';
+      if (!frozen) {
+        if (I.wasPressed('KeyH')) { AQ.HUD.showHelp = true; AQ.HUD.helpT = AQ.HUD.helpT > 0 ? 0 : 12; }
+        if (I.wasPressed('KeyM')) { if (inWorld) G.state = G.state === 'map' ? 'play' : 'map'; else AQ.HUD.toast('The map only shows the sea.', '#cfe8ff'); }
+        if (I.wasPressed('Tab') && AQ.Aquarium && AQ.TUNING.debug.tabOpensAquarium) { AQ.Aquarium.open(G); I.endFrame(); return; }
+        if (I.wasPressed('KeyL') && AQ.LogUI) { AQ.LogUI.open(G); I.endFrame(); return; }
+        if (I.wasPressed('Escape')) { if (G.state === 'map') G.state = 'play'; else { G.state = 'pause'; I.endFrame(); return; } }
+      }
+      AQ.Scenes.cur(G).update(dt, G, frozen ? NO_INPUT : I);
       AQ.HUD.update(dt, G);
       if (AQ.Save) AQ.Save.tick(dt, G);
     } else if (G.state === 'aquarium') {
@@ -97,14 +97,26 @@ AQ.Game = (function () {
     } else if (G.state === 'title') {
       AQ.Title.update(dt, G);
     }
+    AQ.Transition.update(dt);
     I.endFrame();
   }
 
   function draw() {
+    drawScene();
+    AQ.Transition.draw(AQ.Render.ctx);
+  }
+  function drawScene() {
     const ctx = AQ.Render.ctx, cam = AQ.Camera;
     if (G.state === 'aquarium' || (G.state === 'log' && AQ.LogUI.from === 'aquarium')) {
       AQ.Aquarium.draw(ctx, G);
       if (G.state === 'log') AQ.LogUI.draw(ctx, G);
+      return;
+    }
+    const title = G.state === 'title' || (G.state === 'log' && AQ.LogUI.from === 'title');
+    if (!title && G.scene !== 'world') {
+      // side scenes draw themselves; overlays go on top as usual
+      AQ.Scenes.cur(G).draw(ctx, G);
+      drawOverlays(ctx);
       return;
     }
     AQ.Render.background(cam);
@@ -112,8 +124,8 @@ AQ.Game = (function () {
     AQ.Terrain.draw(ctx, cam);
     ctx.save();
     ctx.translate(-cam.left(), -cam.top());
-    const title = G.state === 'title' || (G.state === 'log' && AQ.LogUI.from === 'title');
     if (AQ.Chests) AQ.Chests.draw(ctx, G);
+    if (!title) AQ.Scenes.drawEntranceCue(ctx, G);
     if (AQ.Creatures) AQ.Creatures.drawBack(ctx, G);
     if (!title) {
       G.player.draw(ctx);
@@ -127,6 +139,9 @@ AQ.Game = (function () {
     AQ.Render.lighting(cam, collectLights(), targetDarkness());
     AQ.Terrain.drawGlow(ctx, cam);
     if (title) { if (G.state === 'log') AQ.LogUI.draw(ctx, G); else AQ.Title.draw(ctx, G); return; }
+    drawOverlays(ctx);
+  }
+  function drawOverlays(ctx) {
     AQ.HUD.draw(ctx, G);
     if (G.state === 'map') AQ.MapUI.draw(ctx, G);
     if (G.state === 'log') AQ.LogUI.draw(ctx, G);

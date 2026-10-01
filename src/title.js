@@ -93,7 +93,7 @@ AQ.Title = (function () {
   function start(game) {
     AQ.FX.list.length = 0;
     game.state = 'play';
-    AQ.Camera.snap(game.player);
+    AQ.Camera.snap(game.player, AQ.Scenes.worldOf(game));
     AQ.HUD.helpT = 10; AQ.HUD.bannerT = 0; AQ.HUD.lastZone = '';
   }
 
