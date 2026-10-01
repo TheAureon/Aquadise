@@ -65,9 +65,17 @@ AQ.Game = (function () {
     last = ts;
     acc += dt;
     let n = 0;
-    while (acc >= STEP && n < 6) { update(STEP); acc -= STEP; n++; }
-    if (n === 6) acc = 0;
-    draw();
+    // Safety net: an error in one frame is logged, but never stops the game (or leaves it stuck on
+    // a black transition screen).
+    try {
+      while (acc >= STEP && n < 6) { update(STEP); acc -= STEP; n++; }
+      if (n === 6) acc = 0;
+      draw();
+    } catch (e) {
+      acc = 0;
+      if (!G.errorShown) { G.errorShown = true; console.error('[Aquadise] frame error:', e); }
+      AQ.Input.endFrame();
+    }
     requestAnimationFrame(loop);
   }
 

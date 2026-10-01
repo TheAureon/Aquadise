@@ -81,41 +81,29 @@ AQ.Station = (function () {
   };
 
   // ---------------------------------------------------------------- building bitmap (painted once)
-  function tileData(key) {
-    const s = AQ.Assets.sprites[key];
-    if (!s) return null;
-    const c = document.createElement('canvas'); c.width = s.img.width; c.height = s.img.height;
-    const g = c.getContext('2d'); g.drawImage(s.img, 0, 0);
-    return { w: c.width, h: c.height, d: g.getImageData(0, 0, c.width, c.height).data };
-  }
+  // Only drawImage / patterns are used to paint (no pixel reads), so this works from file:// too.
   function paint() {
     const h = L.hull, T = h.thick;
     canvas = document.createElement('canvas'); canvas.width = L.width; canvas.height = L.height;
-    const g = canvas.getContext('2d'), img = g.createImageData(L.width, L.height), d = img.data;
-    const hull = tileData('tile.station_hull'), wall = tileData('tile.station_wall');
-    const put = (x, y, t, fx, fy, fallback) => {
-      const i = (y * L.width + x) * 4;
-      if (t) { const j = ((fy % t.h) * t.w + (fx % t.w)) * 4; d[i] = t.d[j]; d[i + 1] = t.d[j + 1]; d[i + 2] = t.d[j + 2]; d[i + 3] = 255; }
-      else { d[i] = fallback[0]; d[i + 1] = fallback[1]; d[i + 2] = fallback[2]; d[i + 3] = 255; }
-    };
+    const g = canvas.getContext('2d');
+    const pat = (key, fallback) => { const sp = AQ.Assets.sprites[key]; return sp ? g.createPattern(sp.img, 'repeat') : fallback; };
     const inner = { x0: h.x + T, x1: h.x + h.w - T, y0: h.y + T };
     const corner = 14;   // rounded hull corners
-    for (let y = h.y; y < h.y + h.h; y++) for (let x = h.x; x < h.x + h.w; x++) {
-      const cx = x < h.x + corner ? h.x + corner : x >= h.x + h.w - corner ? h.x + h.w - corner - 1 : x;
-      const cy = y < h.y + corner ? h.y + corner : y >= h.y + h.h - corner ? h.y + h.h - corner - 1 : y;
-      if (Math.hypot(x - cx, y - cy) > corner) continue;
-      const interior = x >= inner.x0 && x < inner.x1 && y >= inner.y0 && y < L.floors[0];
-      if (interior) put(x, y, wall, x - inner.x0, y - inner.y0, [44, 62, 82]);
-      else put(x, y, hull, x, y, [138, 150, 166]);
-    }
-    // portholes in the back wall: transparent so space shows through
+    g.save();
+    g.beginPath();
+    g.moveTo(h.x + corner, h.y); g.lineTo(h.x + h.w - corner, h.y); g.arc(h.x + h.w - corner, h.y + corner, corner, -Math.PI / 2, 0);
+    g.lineTo(h.x + h.w, h.y + h.h - corner); g.arc(h.x + h.w - corner, h.y + h.h - corner, corner, 0, Math.PI / 2);
+    g.lineTo(h.x + corner, h.y + h.h); g.arc(h.x + corner, h.y + h.h - corner, corner, Math.PI / 2, Math.PI);
+    g.lineTo(h.x, h.y + corner); g.arc(h.x + corner, h.y + corner, corner, Math.PI, Math.PI * 1.5);
+    g.closePath(); g.clip();
+    g.fillStyle = pat('tile.station_hull', '#8a96a6'); g.fillRect(h.x, h.y, h.w, h.h);
+    g.fillStyle = pat('tile.station_wall', '#2c3e52'); g.fillRect(inner.x0, inner.y0, inner.x1 - inner.x0, L.floors[0] - inner.y0);
+    g.restore();
+    // portholes in the back wall: cut out so space shows through
     const holes = L.windows.map(([wx, fl]) => ({ x: wx, y: L.floors[fl] - 50, r: 11 }));
-    holes.forEach((w) => {
-      for (let y = w.y - w.r; y <= w.y + w.r; y++) for (let x = w.x - w.r; x <= w.x + w.r; x++) {
-        if (Math.hypot(x - w.x, y - w.y) <= w.r - 0.5) d[(y * L.width + x) * 4 + 3] = 0;
-      }
-    });
-    g.putImageData(img, 0, 0);
+    g.save(); g.globalCompositeOperation = 'destination-out'; g.fillStyle = '#000';
+    holes.forEach((w) => { for (let y = -w.r; y <= w.r; y++) { const half = Math.floor(Math.sqrt(Math.max(0, (w.r - 0.5) ** 2 - y * y))); if (half > 0) g.fillRect(w.x - half, w.y + y, half * 2, 1); } });
+    g.restore();
     holes.forEach((w) => {                                                // brass window rims + glass glint
       for (let a = 0; a < Math.PI * 2; a += 0.04) {
         g.fillStyle = Math.sin(a) < -0.3 ? '#e8c27a' : '#a8844a';

@@ -79,18 +79,17 @@ AQ.Hill = (function () {
   function paint() {
     const tile = AQ.Assets.sprites['tile.hill'];
     canvas = document.createElement('canvas'); canvas.width = G.w; canvas.height = G.h;
-    const g = canvas.getContext('2d'), img = g.createImageData(G.w, G.h), d = img.data;
-    let td = null, tw = 32, th = 48;
-    if (tile) {
-      const tc = document.createElement('canvas'); tw = tile.img.width; th = tile.img.height; tc.width = tw; tc.height = th;
-      const tg = tc.getContext('2d'); tg.drawImage(tile.img, 0, 0); td = tg.getImageData(0, 0, tw, th).data;
+    const g = canvas.getContext('2d');
+    // Columns of the tile image, shifted down to follow the surface. Only drawImage is used (no pixel
+    // reads), so this also works when the game is opened straight from a file (file://).
+    for (let x = 0; x < G.w; x++) {
+      const sy = Math.max(0, G.surface[x]);
+      if (tile) {
+        const img = tile.img, tw = img.width, th = img.height, tx = x % tw;
+        g.drawImage(img, tx, 0, 1, th, x, sy, 1, th);
+        for (let y = sy + th; y < G.h; y += 12) g.drawImage(img, tx, th - 12, 1, 12, x, y, 1, 12);   // deeper soil repeats
+      } else { g.fillStyle = '#78aa50'; g.fillRect(x, sy, 1, G.h - sy); }
     }
-    for (let x = 0; x < G.w; x++) for (let y = Math.max(0, G.surface[x]); y < G.h; y++) {
-      const i = (y * G.w + x) * 4;
-      if (td) { const dep = y - G.surface[x], ty = dep < th ? dep : th - 12 + ((dep - th) % 12), j = (ty * tw + (x % tw)) * 4; d[i] = td[j]; d[i + 1] = td[j + 1]; d[i + 2] = td[j + 2]; d[i + 3] = 255; }
-      else { d[i] = 120; d[i + 1] = 170; d[i + 2] = 80; d[i + 3] = 255; }
-    }
-    g.putImageData(img, 0, 0);
     const r = U.rng(9);
     for (let k = 0; k < 40; k++) {                                     // little flowers + grass tufts
       const x = Math.round(r.range(12, G.w - 6)), y = G.surface[x];
