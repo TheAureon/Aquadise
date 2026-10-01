@@ -76,7 +76,15 @@ AQ.TUNING = {
     stressPenalty: 0.6,       // how much a fully stressed tank lowers "calm" (gentle on purpose)
     fedFreshMinutes: 20,      // real minutes a feeding counts as "fed"...
     fedFadeMinutes: 40,       // ...then fades to hungry over this many minutes (they never starve)
-    recomputeEvery: 0.5       // seconds between vibe updates while watching a tank
+    recomputeEvery: 0.5,      // seconds between vibe updates while watching a tank
+    // creature likes + mood
+    likeRadius: 22,           // px: how close a creature must be to a liked thing to enjoy it
+    visitChance: 0.4,         // chance a creature picks "go visit something I like" as its next activity
+    enjoySeconds: [4, 8],     // how long a visit lasts
+    happyFxEvery: 1.6,        // seconds between little hearts/sparkles while enjoying
+    moodIconEvery: 4,         // seconds between mood icons popping over each creature
+    moodIconShow: 1.4,        // seconds each mood icon stays visible
+    mood: { base: 0.45, fed: 0.2, likePresent: 0.15, nearLike: 0.25, crowded: 0.1, stressedCap: 0.25 }
   },
 
   save: { key: 'aquadise.save.v1', autosaveEvery: 10 }

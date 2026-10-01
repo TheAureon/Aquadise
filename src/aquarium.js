@@ -36,7 +36,43 @@ AQ.Aquarium = (function () {
     AQ.Save && AQ.Save.save(game);
   };
 
-  A.refreshVibe = function () { A.vibe = AQ.Vibe.evaluate(A.biome); A.vibeT = AQ.TUNING.aquarium.recomputeEvery; };
+  A.refreshVibe = function () {
+    A.vibe = AQ.Vibe.evaluate(A.biome); A.vibeT = AQ.TUNING.aquarium.recomputeEvery;
+    A.fish.forEach(updateMood);
+  };
+
+  // ---------------------------------------------------------------- likes + mood
+  // Placed things this creature likes, as spots it can go and hang around.
+  function likedSpots(f) {
+    const likes = f.def.likes || [];
+    if (!likes.length) return [];
+    const tank = AQ.Collection.tank(A.biome), out = [];
+    tank.decor.forEach((d) => {
+      const tags = AQ.Vibe.tagsOf(d), tag = likes.find((l) => tags.indexOf(l) >= 0);
+      if (!tag) return;
+      const e = AQ.Assets.entry((d.type === 'plant' ? 'plant.' : 'decor.') + d.id);
+      const h = e ? e.fh : 10, w = e ? e.fw : 10;
+      const floating = d.y < TANK.sandTop;
+      if (f.loco !== 'swim' && floating) return;            // crawlers can't reach floating things
+      out.push({ d, tag, x: d.x, y: floating ? d.y + 6 : d.y - Math.min(h * 0.6, 40), half: w / 2 });
+    });
+    return out;
+  }
+  const MOODS = [[0.85, 'DELIGHTED', '#ff9fc0'], [0.65, 'HAPPY', '#ffe27a'], [0.45, 'CONTENT', '#bfe8ff'], [0.3, 'UNEASY', '#c8c0d8'], [-1, 'NERVOUS', '#9fd8ff']];
+  function updateMood(f) {
+    const cfg = AQ.TUNING.aquarium, mc = cfg.mood, tank = AQ.Collection.tank(A.biome);
+    const spots = likedSpots(f);
+    f.near = spots.find((s) => Math.abs(s.x - f.x) < cfg.likeRadius + s.half && (f.loco !== 'swim' || Math.abs(s.y - f.y) < cfg.likeRadius + 10)) || null;
+    let m = mc.base + mc.fed * AQ.Vibe.fedLevel(tank);
+    if (!(f.def.likes || []).length || spots.length) m += mc.likePresent;
+    if (f.near) m += mc.nearLike;
+    if (tank.creatures.length > cfg.comfortable) m -= mc.crowded;
+    if (f.stress) m = Math.min(m, mc.stressedCap);
+    f.mood = U.clamp(m, 0, 1);
+    const row = MOODS.find((r) => f.mood >= r[0]);
+    f.moodName = row[1]; f.moodCol = row[2];
+  }
+  A.moodOf = (f) => ({ name: f.moodName, color: f.moodCol, value: f.mood });
 
   A.rebuild = function () {
     const tank = AQ.Collection.tank(A.biome);
@@ -57,6 +93,7 @@ AQ.Aquarium = (function () {
       z: R.range(TANK.sandTop + 2, TANK.bottom), state: 'swim', st: R.range(1, 4), t: R.range(0, 9), stress: false, target: null
     };
     f.foot = AQ.Creatures.footOf(def);
+    f.moodPh = R.range(0, AQ.TUNING.aquarium.moodIconEvery); f.fxT = R.range(0, 1);
     if (loco !== 'swim') f.y = f.z - f.foot;
     return f;
   }
@@ -87,10 +124,19 @@ AQ.Aquarium = (function () {
   }
   function nextState(f) {
     if (f.stress) { f.state = 'hide'; return; }
+    const cfg = AQ.TUNING.aquarium;
+    f.target = null; f.buddy = null; f.spot = null;
+    // sometimes go hang out near something it likes
+    const spots = f.loco === 'still' ? [] : likedSpots(f);
+    if (spots.length && R.chance(cfg.visitChance)) {
+      const s = R.pick(spots);
+      f.spot = s; f.state = 'visit'; f.st = 12;
+      f.spotOff = R.chance(0.5) ? -1 : 1;
+      return;
+    }
     const r = R();
     f.state = r < 0.45 ? 'swim' : r < 0.65 ? 'feed' : r < 0.85 ? 'play' : 'rest';
     f.st = R.range(3, 7);
-    f.target = null; f.buddy = null;
     if (f.state === 'play' && f.loco === 'swim') {
       const others = A.fish.filter((o) => o !== f && o.loco === 'swim');
       f.buddy = others.length && R.chance(0.6) ? R.pick(others) : null;
@@ -108,6 +154,7 @@ AQ.Aquarium = (function () {
       clampFish(f); return;
     }
     if (f.st <= 0) nextState(f);
+    if (f.state !== 'enjoy') f.hop = 0;
     const sp = f.loco === 'still' ? 0 : f.loco === 'crawl' ? 8 : 16;
     switch (f.state) {
       case 'hide': {
@@ -135,6 +182,34 @@ AQ.Aquarium = (function () {
       case 'rest':
         if (f.loco === 'swim') steer(f, f.x + Math.sin(f.t) * 2, f.y + Math.cos(f.t * 0.7), 3, dt, 1);
         break;
+      case 'visit': {
+        // head over to a liked thing, then switch to the happy "enjoy" idle
+        const s = f.spot;
+        if (!s || AQ.Collection.tank(A.biome).decor.indexOf(s.d) < 0) { f.st = 0; break; }
+        const tx = U.clamp(s.x + f.spotOff * (s.half + 3), 16, 304);
+        const got = f.loco === 'swim' ? steer(f, tx, U.clamp(s.y, TANK.waterTop + 8, TANK.sandTop - 4), 20, dt, 3) : walk(f, tx, sp * 1.2, dt);
+        if (got) { f.state = 'enjoy'; f.st = R.range(...AQ.TUNING.aquarium.enjoySeconds); f.loopA = 0; f.fxT = 0.3; updateMood(f); }
+        break;
+      }
+      case 'enjoy': {
+        const s = f.spot;
+        if (!s || AQ.Collection.tank(A.biome).decor.indexOf(s.d) < 0) { f.st = 0; break; }
+        if (f.loco === 'swim') {
+          // lazy figure-eight around the liked thing
+          f.loopA += dt * 1.4;
+          steer(f, s.x + Math.sin(f.loopA) * (s.half + 6), U.clamp(s.y + Math.sin(f.loopA * 2) * 4, TANK.waterTop + 8, TANK.sandTop - 4), 14, dt, 3);
+        } else {
+          // happy little hops, turning to face the liked thing
+          f.hop = Math.max(0, Math.sin(f.t * 7)) * 2 * (Math.sin(f.t * 1.3) > 0 ? 1 : 0);
+          f.facing = s.x > f.x ? 1 : -1;
+        }
+        f.fxT -= dt;
+        if (f.fxT <= 0) {
+          f.fxT = AQ.TUNING.aquarium.happyFxEvery * R.range(0.8, 1.2);
+          if (R.chance(0.5)) heart(f); else AQ.FX.sparkle(f.x, f.y - f.r, '#fff3b0', 3);
+        }
+        break;
+      }
     }
     clampFish(f);
   }
@@ -350,8 +425,8 @@ AQ.Aquarium = (function () {
         // soft shadow on the sand
         g.fillStyle = 'rgba(0,0,0,0.12)'; g.fillRect(Math.round(f.x - f.r * 0.7), Math.round(f.z), Math.round(f.r * 1.4), 1);
         const moving = Math.hypot(f.vx, f.vy) > 5 || f.walking;
-        AQ.Assets.draw(g, f.key, moving ? 'move' : 'idle', f.x + (f.shake && f.stress ? 1 : 0), f.y - (f.peck || 0), { t: f.t, flip: f.facing < 0, alpha: f.stress ? 0.8 : 1 });
-        if (f.stress && Math.floor(A.t * 2 + f.t) % 2 === 0) { g.fillStyle = '#9fd8ff'; g.fillRect(Math.round(f.x + 3), Math.round(f.y - f.r - 4), 1, 2); g.fillRect(Math.round(f.x + 2), Math.round(f.y - f.r - 2), 3, 1); }
+        AQ.Assets.draw(g, f.key, moving ? 'move' : 'idle', f.x + (f.shake && f.stress ? 1 : 0), f.y - (f.peck || 0) - Math.round(f.hop || 0), { t: f.t, flip: f.facing < 0, alpha: f.stress ? 0.8 : 1 });
+        moodIcon(g, f);
         if (f.state === 'rest' && !f.stress && (f.def.category === 'mammal' || f.def.category === 'reptile')) F().draw(g, 'z', f.x + 4, f.y - f.r - 6 - Math.round((A.t * 4) % 4), '#e8f4ff');
       }
     }
@@ -392,11 +467,35 @@ AQ.Aquarium = (function () {
     // hover tooltip on creatures
     if (!A.holding && inTank(m)) {
       const f = A.fish.find((f) => Math.abs(f.x - m.x) < f.r + 2 && Math.abs(f.y - m.y) < f.r + 2);
-      if (f) tip(g, f.def.name + (f.stress ? ' (STRESSED)' : ''), m.x, m.y - 10, f.stress ? '#9fd8ff' : '#fff');
+      if (f) tip(g, `${f.def.name} - ${f.moodName || 'CONTENT'}${f.near ? ' (LOVES THE ' + f.near.tag.replace(/_/g, ' ').toUpperCase() + ')' : ''}`, m.x, m.y - 10, f.moodCol || '#fff');
     }
 
     drawBars(g, tank, b);
   };
+
+  // Glanceable mood: a tiny icon pops over each creature now and then (always while nervous
+  // or enjoying, and always for the creature under the mouse).
+  const ICONS = {
+    DELIGHTED: ['#.#', '###', '.#.'],          // heart
+    HAPPY: ['.#.', '#.#', '.#.'],              // sparkle
+    UNEASY: ['...', '#.#', '...'],             // "..": a little unsure
+    NERVOUS: ['.#.', '.#.', '###']             // sweat drop
+  };
+  function moodIcon(g, f) {
+    if (!f.moodName) return;
+    const cfg = AQ.TUNING.aquarium, m = AQ.Input.mouse;
+    const hovered = Math.abs(f.x - m.x) < f.r + 2 && Math.abs(f.y - m.y) < f.r + 2;
+    const cyc = (A.t + f.moodPh) % cfg.moodIconEvery < cfg.moodIconShow;
+    const always = f.stress || f.state === 'enjoy' || hovered;
+    if (!(cyc || always) || f.moodName === 'CONTENT') return;
+    if (f.stress && Math.floor(A.t * 2 + f.t) % 2) return;          // nervous drop blinks
+    const ic = ICONS[f.moodName]; if (!ic) return;
+    const x = Math.round(f.x + 2), y = Math.round(f.y - f.r - 5 - (f.hop || 0) + (f.moodName === 'DELIGHTED' ? Math.sin(A.t * 3) * 0.6 : 0));
+    g.fillStyle = 'rgba(4,12,24,0.45)';
+    ic.forEach((row, ry) => [...row].forEach((v, rx) => { if (v === '#') g.fillRect(x + rx, y + ry + 1, 1, 1); }));
+    g.fillStyle = f.moodCol;
+    ic.forEach((row, ry) => [...row].forEach((v, rx) => { if (v === '#') g.fillRect(x + rx, y + ry, 1, 1); }));
+  }
 
   // Cached, biome-themed backdrop: dithered water gradient, distant rock silhouettes, themed
   // mid-ground silhouettes and a rippled sand bed with pebbles.
