@@ -17,9 +17,9 @@ AQ.data.world = {
     // a small step down, then a gentle slope into the water that ends in a steeper drop.
     [0, 84, 1.2], [190, 85, 1.2], [205, 89, 1.2], [440, 90, 1.2], [480, 95, 1.5], [540, 104, 2], [610, 118, 2],
     [670, 136, 2], [720, 160, 2], [760, 196, 3],
-    // Coral shelf: dips in at the start, then long, fairly flat and lumpy with coral
-    [790, 228, 3], [820, 244, 3], [850, 240, 4], [900, 246, 6], [1050, 250, 7], [1200, 247, 7], [1350, 254, 7],
-    [1500, 252, 7], [1650, 258, 7], [1800, 262, 6],
+    // Coral shelf: dips in at the start, then long and gently rolling (smooth sand under the coral)
+    [790, 228, 2], [820, 244, 2], [850, 240, 2], [900, 246, 2], [1050, 250, 2], [1200, 247, 2], [1350, 254, 2],
+    [1500, 252, 2], [1650, 258, 2], [1800, 262, 2],
     // Sunken ruins at the shelf edge
     [1900, 266, 3], [2050, 270, 3], [2200, 272, 3], [2380, 276, 3],
     // Steep drop-off
@@ -151,26 +151,6 @@ AQ.data.world = {
   // Terrain shapes, applied in order on top of the floor. ops: solid | carve | pool | air | water
   // shapes: poly{pts} rect{x,y,w,h} circle{x,y,r} tunnel{path:[[x,y,r]], r} spikes{x,y,w,n,h,dir} chimney{x,y,w,h}
   shapes: [
-    // --- Tide pools: a couple of rocks on the dry ground (with a crevice) and boulders on the underwater slope
-    { op: 'solid', shape: 'circle', x: 108, y: 84, r: 4, jitter: 1 },
-    { op: 'solid', shape: 'circle', x: 458, y: 91, r: 5, jitter: 1 },
-    { op: 'carve', shape: 'circle', x: 463, y: 93, r: 2, rx: 2, ry: 2 },
-    { op: 'solid', shape: 'circle', x: 560, y: 108, r: 9, jitter: 2 },
-    { op: 'solid', shape: 'circle', x: 650, y: 132, r: 12, jitter: 3 },
-    { op: 'carve', shape: 'circle', x: 640, y: 141, r: 4, rx: 5, ry: 3 },
-
-    // --- Coral shelf: reef bommies (rock heads the coral grows on)
-    { op: 'solid', shape: 'circle', x: 900, y: 242, r: 13, jitter: 3 },
-    { op: 'solid', shape: 'circle', x: 1180, y: 240, r: 18, jitter: 4 },
-    { op: 'solid', shape: 'circle', x: 1205, y: 246, r: 11, jitter: 3 },
-    { op: 'solid', shape: 'circle', x: 1460, y: 246, r: 12, jitter: 3 },
-    { op: 'solid', shape: 'circle', x: 1700, y: 252, r: 16, jitter: 4 },
-    { op: 'carve', shape: 'circle', x: 1190, y: 252, r: 5, rx: 7, ry: 4 },
-    { op: 'solid', shape: 'circle', x: 1010, y: 248, r: 9, jitter: 3 },
-    { op: 'solid', shape: 'circle', x: 1320, y: 252, r: 10, jitter: 3 },
-    { op: 'solid', shape: 'circle', x: 1580, y: 254, r: 9, jitter: 3 },
-    { op: 'solid', shape: 'circle', x: 1820, y: 262, r: 11, jitter: 3 },
-
     // --- Sunken ruins: ancient pillars + a wrecked ship you can swim through
     { op: 'solid', shape: 'rect', x: 1930, y: 222, w: 10, h: 48, jitter: 0.6 },
     { op: 'solid', shape: 'rect', x: 1926, y: 218, w: 18, h: 5 },
