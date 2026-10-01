@@ -79,6 +79,7 @@ AQ.Scenes = (function () {
       const G = game, P = G.player;
       P.update(dt, AQ.World, input);
       if (AQ.Catching && !AQ.Transition.blocking()) AQ.Catching.update(dt, G);
+      if (AQ.Doors) AQ.Doors.update(dt, G, input);
       if (AQ.Creatures) AQ.Creatures.update(dt, G);
       if (AQ.Chests) AQ.Chests.update(dt, G);
       AQ.Camera.update(dt, P, AQ.World);

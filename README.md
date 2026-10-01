@@ -51,6 +51,8 @@ Click a creature for its info card. Hover the stars for what's helping and what'
 - **Tide Pools are dry land** (merged from the Milestone 2 prototype): you walk and jump on the
   shore and only swim once the water is deep enough to submerge you. Shallow pools are splashed
   through and deep ones can be swum in. Tap a pool with the net to try for a Glasswinged Minnow.
+- **The sunken ship** in the Sunken Ruins has a door at the bow, a cabin door and two hatches.
+  Swim up to one and press **E** to open or close it (doors are listed in `data/world.js` `doors`).
 - **No fail state.** Hostile creatures only knock you back. Air is unlimited.
 - **Progression** comes only from chests: a bigger net (3 levels) and faster swimming (3 levels).
   Six chests exist at a time, and they despawn and respawn around the world.

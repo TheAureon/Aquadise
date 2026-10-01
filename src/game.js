@@ -41,6 +41,7 @@ AQ.Game = (function () {
     G.upgrades = AQ.State.upgrades;
     G.player.speedLevel = G.upgrades.speed;
 
+    if (AQ.Doors) AQ.Doors.init();
     if (AQ.Creatures) AQ.Creatures.init(G);
     if (AQ.Chests) AQ.Chests.init(G);
     AQ.Scenes.restore(G, G.scene, G.player.x, G.player.y);
@@ -134,6 +135,7 @@ AQ.Game = (function () {
     ctx.translate(-cam.left(), -cam.top());
     if (AQ.Chests) AQ.Chests.draw(ctx, G);
     if (!title) AQ.Scenes.drawEntranceCue(ctx, G);
+    if (AQ.Doors) AQ.Doors.draw(ctx);
     if (AQ.Creatures) AQ.Creatures.drawBack(ctx, G);
     if (!title) {
       G.player.draw(ctx);
@@ -146,6 +148,7 @@ AQ.Game = (function () {
     AQ.Render.surface(cam);
     AQ.Render.lighting(cam, collectLights(), targetDarkness());
     AQ.Terrain.drawGlow(ctx, cam);
+    if (!title && AQ.Doors && G.state === 'play') AQ.Doors.drawPrompt(ctx, G);
     if (title) { if (G.state === 'log') AQ.LogUI.draw(ctx, G); else AQ.Title.draw(ctx, G); return; }
     drawOverlays(ctx);
   }

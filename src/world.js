@@ -260,7 +260,7 @@ AQ.World = (function () {
     for (let x = x0; x <= x1; x += 2) { if (W.solid(x, y0) || W.solid(x, y1)) return true; }
     if (W.solid(x1, y0) || W.solid(x1, y1)) return true;
     for (let y = y0; y <= y1; y += 2) { if (W.solid(x0, y) || W.solid(x1, y)) return true; }
-    return false;
+    return !!(AQ.Doors && AQ.Doors.blocks(x0, y0, x1, y1));      // shut doors (the sunken ship)
   };
   // Raycast-ish: is the straight segment clear of solids?
   W.lineClear = function (ax, ay, bx, by) {

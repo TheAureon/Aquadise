@@ -119,6 +119,7 @@ AQ.data.world = {
         { type: 'crate', at: 'floor', n: 3 },
         { type: 'chain', at: 'floor', n: 2 },
         { type: 'anchor', at: 'points', points: [[2392, 276]] },
+        { type: 'mast', at: 'points', points: [[2110, 207]], air: true, h: 68 },
         { type: 'flag', at: 'points', points: [[2112, 142]], air: true },
         { type: 'seagrass', at: 'floor', n: 10, colors: ['#6f8a3e', '#5b7333', '#86a04a'] },
         { type: 'rock', at: 'floor', n: 8 }
@@ -148,6 +149,15 @@ AQ.data.world = {
       ] }
   ],
 
+  // Doors: solid while shut; stand next to one and press interact (E) to open / close it.
+  // vertical doors stand in a doorway (w small, h tall); hatches lie flat (w wide, h small).
+  doors: [
+    { x: 2026, y: 244, w: 4, h: 18, name: 'DOOR' },          // bow door into the ship's hold
+    { x: 2140, y: 213, w: 4, h: 18, name: 'DOOR' },          // cabin door
+    { x: 2180, y: 230, w: 24, h: 4, name: 'HATCH' },         // deck hatch into the hold
+    { x: 2094, y: 232, w: 18, h: 4, name: 'HATCH' }          // floor hatch, cabin -> hold
+  ],
+
   // Terrain shapes, applied in order on top of the floor. ops: solid | carve | pool | air | water
   // shapes: poly{pts} rect{x,y,w,h} circle{x,y,r} tunnel{path:[[x,y,r]], r} spikes{x,y,w,n,h,dir} chimney{x,y,w,h}
   shapes: [
@@ -160,13 +170,12 @@ AQ.data.world = {
     { op: 'carve', shape: 'poly', pts: [[2044, 264], [2036, 242], [2264, 238], [2292, 250], [2286, 264]] },
     { op: 'solid', shape: 'rect', mat: 'wood', x: 2080, y: 206, w: 64, h: 26 },
     { op: 'carve', shape: 'rect', x: 2086, y: 212, w: 52, h: 20 },
-    { op: 'solid', shape: 'rect', mat: 'wood', x: 2108, y: 140, w: 4, h: 68 },
     { op: 'carve', shape: 'circle', x: 2226, y: 250, r: 4 },
     { op: 'carve', shape: 'circle', x: 2248, y: 250, r: 4 },
-    // ways in (all wide enough to swim through): a broken bow, a deck hatch, and the cabin door
-    // with a ladder-well down from the cabin into the hold
-    { op: 'carve', shape: 'tunnel', r: 8, path: [[2000, 255], [2030, 254], [2062, 252]] },
-    { op: 'carve', shape: 'rect', x: 2180, y: 222, w: 24, h: 20 },
+    // doorways (each is closed by a door from `doors` below): bow door, deck hatch, cabin door,
+    // and a floor hatch from the cabin down into the hold
+    { op: 'carve', shape: 'rect', x: 2012, y: 244, w: 40, h: 18 },
+    { op: 'carve', shape: 'rect', x: 2180, y: 224, w: 24, h: 18 },
     { op: 'carve', shape: 'rect', x: 2136, y: 213, w: 16, h: 18 },
     { op: 'carve', shape: 'rect', x: 2094, y: 228, w: 18, h: 14 },
     { op: 'solid', shape: 'circle', mat: 'metal', x: 2372, y: 266, r: 10, jitter: 1 },

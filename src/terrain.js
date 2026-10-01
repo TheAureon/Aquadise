@@ -431,6 +431,15 @@ AQ.Terrain = (function () {
     const c = C('#7a5432'), d = U.scale(c, 0.7), len = r.int(8, 18), a = r.range(-0.3, 0.3);
     for (let i = 0; i < len; i++) { P.setOpen(x + i * Math.cos(a) - len / 2, y - 1 + i * Math.sin(a), c); P.setOpen(x + i * Math.cos(a) - len / 2, y + i * Math.sin(a), d); }
   };
+  // Background mast (scenery only: you swim in front of it). y = its foot, s.h = height.
+  PROPS.mast = function (P, x, y, r, b, pal, s) {
+    const c = C('#7a5636'), hl = U.scale(c, 1.15), dk = U.scale(c, 0.7), h = (s && s.h) || 60;
+    for (let j = 0; j < h; j++) for (let i = 0; i < 4; i++) {
+      const band = j % 10 === 6;
+      P.set(x - 2 + i, y - j, band ? dk : i === 0 ? hl : i === 3 ? dk : c);
+    }
+    for (let i = -1; i < 5; i++) P.set(x - 2 + i, y - h, U.scale(c, 0.9));   // cap
+  };
   PROPS.flag = function (P, x, y, r) {
     const c = C('#d94a3a'), d = U.scale(c, 0.75);
     for (let j = 0; j < 9; j++) for (let i = 0; i < 12 - j * 1.2; i++) P.set(x + 2 + i, y + j - Math.round(Math.sin(i * 0.5) * 0.8), (i + j) % 5 === 0 ? d : c);
