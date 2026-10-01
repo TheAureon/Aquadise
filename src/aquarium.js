@@ -42,19 +42,32 @@ AQ.Aquarium = (function () {
   };
 
   // ---------------------------------------------------------------- likes + mood
+  // Where a placed decor/plant visibly sits: centre x, top y, half width (from the sprite's visible bounds).
+  function geo(d) {
+    const e = AQ.Assets.entry((d.type === 'plant' ? 'plant.' : 'decor.') + d.id);
+    const floating = d.y < TANK.sandTop;
+    if (!e) return { d, cx: d.x, top: d.y - 10, half: 5, h: 10, floating };
+    const v = e.vis || [0, 0, e.fw - 1, e.fh - 1];
+    let off = (v[0] + v[2] + 1) / 2 - e.anchor[0];
+    if (d.flip) off = -off;
+    return { d, cx: d.x + off, top: d.y - e.anchor[1] + v[1], half: (v[2] - v[0] + 1) / 2, h: v[3] - v[1] + 1, floating };
+  }
+  const live = (g) => !!g && AQ.Collection.tank(A.biome).decor.indexOf(g.d) >= 0;
+  // Placed things carrying a tag that this creature can reach (crawlers can't reach floating things).
+  function withTag(tag, f) {
+    return AQ.Collection.tank(A.biome).decor.filter((d) => AQ.Vibe.tagsOf(d).indexOf(tag) >= 0).map(geo).filter((g) => f.loco === 'swim' || !g.floating);
+  }
   // Placed things this creature likes, as spots it can go and hang around.
   function likedSpots(f) {
     const likes = f.def.likes || [];
     if (!likes.length) return [];
-    const tank = AQ.Collection.tank(A.biome), out = [];
-    tank.decor.forEach((d) => {
+    const out = [];
+    AQ.Collection.tank(A.biome).decor.forEach((d) => {
       const tags = AQ.Vibe.tagsOf(d), tag = likes.find((l) => tags.indexOf(l) >= 0);
       if (!tag) return;
-      const e = AQ.Assets.entry((d.type === 'plant' ? 'plant.' : 'decor.') + d.id);
-      const h = e ? e.fh : 10, w = e ? e.fw : 10;
-      const floating = d.y < TANK.sandTop;
-      if (f.loco !== 'swim' && floating) return;            // crawlers can't reach floating things
-      out.push({ d, tag, x: d.x, y: floating ? d.y + 6 : d.y - Math.min(h * 0.6, 40), half: w / 2 });
+      const g = geo(d);
+      if (f.loco !== 'swim' && g.floating) return;
+      out.push(Object.assign(g, { tag, x: g.cx, y: g.floating ? d.y + 6 : d.y - Math.min(g.h * 0.6, 40) }));
     });
     return out;
   }
@@ -93,7 +106,9 @@ AQ.Aquarium = (function () {
       z: R.range(TANK.sandTop + 2, TANK.bottom), state: 'swim', st: R.range(1, 4), t: R.range(0, 9), stress: false, target: null
     };
     f.foot = AQ.Creatures.footOf(def);
-    f.moodPh = R.range(0, AQ.TUNING.aquarium.moodIconEvery); f.fxT = R.range(0, 1);
+    const cfg = AQ.TUNING.aquarium;
+    f.moodPh = R.range(0, cfg.moodIconEvery); f.fxT = R.range(0, 1);
+    f.pace = R.range(cfg.pace[0], cfg.pace[1]); f.bubT = R.range(1, cfg.bubbleEvery); f.lift = 0; f.side = R.chance(0.5) ? 1 : -1;
     if (loco !== 'swim') f.y = f.z - f.foot;
     return f;
   }
@@ -120,80 +135,202 @@ AQ.Aquarium = (function () {
   function clampFish(f) {
     f.x = U.clamp(f.x, TANK.x + 8, TANK.x + TANK.w - 8);
     if (f.loco === 'swim') f.y = U.clamp(f.y, TANK.waterTop + 6, TANK.sandTop - 2);
-    else f.y = f.z - f.foot;
+    else f.y = U.lerp(f.z - f.foot, (f.perchTop || f.z) - f.foot, f.lift || 0);
+  }
+  function pickActivity(f) {
+    const w = AQ.TUNING.aquarium.activity, keys = Object.keys(w);
+    let r = R() * keys.reduce((a, k) => a + w[k], 0);
+    for (const k of keys) { r -= w[k]; if (r <= 0) return k; }
+    return 'swim';
+  }
+  // The first-caught member of a species leads; the others school behind it.
+  function leaderOf(f) {
+    const mates = A.fish.filter((o) => o.def.id === f.def.id && o.loco === 'swim' && !o.stress);
+    if (mates.length < 2) return null;
+    const lead = mates.reduce((a, b) => (a.uid < b.uid ? a : b));
+    if (lead === f) return null;
+    const i = mates.filter((o) => o !== lead).indexOf(f);
+    f.schoolOff = [8 + (i >> 1) * 7 + R.range(0, 3), (i % 2 ? 1 : -1) * (3 + (i >> 1) * 2)];
+    return lead;
   }
   function nextState(f) {
-    if (f.stress) { f.state = 'hide'; return; }
     const cfg = AQ.TUNING.aquarium;
-    f.target = null; f.buddy = null; f.spot = null;
+    f.target = null; f.buddy = null; f.spot = null; f.leader = null; f.perch = null; f.graze = null; f.shelter = null;
+    if (f.stress) {
+      // nervous: duck into a hideout if there is one, otherwise a quiet corner
+      const hs = withTag('hideout', f);
+      f.state = 'hide'; f.st = R.range(4, 8); f.shelter = hs.length ? R.pick(hs) : null;
+      return;
+    }
+    if (f.loco === 'still') { f.state = R.chance(0.3) ? 'sleep' : 'rest'; f.st = R.range(5, 10); return; }
     // sometimes go hang out near something it likes
-    const spots = f.loco === 'still' ? [] : likedSpots(f);
+    const spots = likedSpots(f);
     if (spots.length && R.chance(cfg.visitChance)) {
-      const s = R.pick(spots);
-      f.spot = s; f.state = 'visit'; f.st = 12;
+      f.spot = R.pick(spots); f.state = 'visit'; f.st = 12;
       f.spotOff = R.chance(0.5) ? -1 : 1;
       return;
     }
-    const r = R();
-    f.state = r < 0.45 ? 'swim' : r < 0.65 ? 'feed' : r < 0.85 ? 'play' : 'rest';
+    f.state = pickActivity(f);
     f.st = R.range(3, 7);
-    if (f.state === 'play' && f.loco === 'swim') {
-      const others = A.fish.filter((o) => o !== f && o.loco === 'swim');
-      f.buddy = others.length && R.chance(0.6) ? R.pick(others) : null;
-      f.loopC = [f.x, f.y]; f.loopA = 0;
+    switch (f.state) {
+      case 'swim':
+        if (f.loco === 'swim' && R.chance(cfg.schoolChance)) f.leader = leaderOf(f);
+        break;
+      case 'feed': {
+        const plants = withTag('plant', f);
+        if (plants.length && R.chance(cfg.grazeChance)) { f.graze = R.pick(plants); f.st = R.range(4, 8); }
+        break;
+      }
+      case 'play':
+        if (f.loco === 'swim') {
+          const others = A.fish.filter((o) => o !== f && o.loco === 'swim');
+          f.buddy = others.length && R.chance(0.6) ? R.pick(others) : null;
+          f.loopC = [f.x, f.y]; f.loopA = 0;
+        }
+        break;
+      case 'rest': {
+        const perches = withTag('perch', f).filter((g) => !g.floating && g.half * 2 >= f.r && !A.fish.some((o) => o.perch && o.perch.d === g.d));
+        if (perches.length && R.chance(cfg.perchChance)) { f.perch = R.pick(perches); f.st = R.range(5, 10); }
+        break;
+      }
+      case 'shelter': {
+        const hs = withTag('hideout', f);
+        if (hs.length) f.shelter = R.pick(hs); else f.state = 'drift';
+        break;
+      }
+      case 'sleep': f.st = R.range(cfg.sleepSeconds[0], cfg.sleepSeconds[1]); break;
     }
   }
 
+  // Ease into a resting spot (instead of overshooting and circling like steer would).
+  function settle(f, tx, ty, speed, dt) {
+    if (Math.hypot(tx - f.x, ty - f.y) > 5) { steer(f, tx, ty, speed, dt, 3); return false; }
+    const k = 1 - Math.exp(-3 * dt);
+    f.x += (tx - f.x) * k; f.y += (ty - f.y) * k; f.vx *= 1 - k; f.vy *= 1 - k;
+    return true;
+  }
+  // Tuck in behind a hideout, peeking out now and then.
+  function goShelter(f, s, dt) {
+    const peek = Math.sin(f.t * 0.6 + f.moodPh) * s.half * 0.7;
+    if (f.loco === 'swim') {
+      const ty = U.clamp(s.top + s.h * 0.6, TANK.waterTop + 8, TANK.sandTop - 3);
+      settle(f, s.cx + peek, ty, 22 * f.pace, dt);
+      if (Math.abs(f.x - s.cx) < s.half) { f.zDraw = s.d.y - 0.5; if (Math.abs(f.vx) > 1) f.facing = f.vx > 0 ? 1 : -1; }
+    } else if (f.loco === 'crawl') {
+      walk(f, s.cx + peek, 10 * f.pace, dt);
+      if (Math.abs(f.x - s.cx) < s.half) { f.z += U.clamp(s.d.y - 1 - f.z, -6 * dt, 6 * dt); f.zDraw = s.d.y - 0.5; }
+    }
+  }
+  function eat(f, food) {
+    A.food.splice(A.food.indexOf(food), 1);
+    f.chomp = AQ.TUNING.aquarium.chompSeconds;
+    AQ.FX.sparkle(food.x, food.y, '#d9a066', 3);          // crumbs
+    if (R.chance(0.5)) heart(f);
+    markFed();
+  }
+
   function updateFish(f, dt) {
-    f.t += dt; f.st -= dt;
-    // food overrides everything except stress
+    const cfg = AQ.TUNING.aquarium;
+    f.t += dt; f.st -= dt; f.zDraw = null;
+    if (f.chomp > 0) f.chomp -= dt;
+    // a little breath bubble now and then
+    f.bubT -= dt;
+    if (f.bubT <= 0) {
+      f.bubT = cfg.bubbleEvery * R.range(0.5, 1.5);
+      if (f.state !== 'hide') for (let i = 0, n = R.chance(0.3) ? 2 : 1; i < n; i++) A.bubbles.push({ x: f.x + f.facing * f.r * 0.5, y: f.y - f.r * 0.3 - i * 3, vy: -R.range(12, 18), p: R() * 6 });
+    }
+    // food overrides everything except stress: everyone gathers round
     const food = !f.stress && A.food.length ? A.food.reduce((a, b) => (Math.hypot(a.x - f.x, a.y - f.y) < Math.hypot(b.x - f.x, b.y - f.y) ? a : b)) : null;
-    if (food && (f.loco === 'swim' || food.y > TANK.sandTop - 6)) {
-      const reached = f.loco === 'swim' ? steer(f, food.x, food.y, 34, dt, 4) : walk(f, food.x, 18, dt);
-      if (reached || Math.hypot(food.x - f.x, food.y - f.y) < 5) { A.food.splice(A.food.indexOf(food), 1); heart(f); markFed(); }
+    if (food && f.loco !== 'still') {
+      if (f.state === 'sleep' || f.state === 'rest') { f.state = 'swim'; f.st = 2; f.leader = null; }
+      let got;
+      if (f.loco === 'swim') got = steer(f, food.x, U.clamp(food.y, TANK.waterTop + 4, TANK.sandTop), 34 * f.pace, dt, 4) || Math.hypot(food.x - f.x, food.y - f.y) < 5;
+      else { walk(f, food.x, 18 * f.pace, dt); got = food.y > TANK.sandTop - 6 && Math.abs(food.x - f.x) < 4; }
+      if (got && food.y > TANK.waterTop) eat(f, food);
       clampFish(f); return;
     }
+    if (food && f.loco === 'still' && Math.abs(food.x - f.x) < 8 && food.y > TANK.sandTop - 6) eat(f, food);
     if (f.st <= 0) nextState(f);
     if (f.state !== 'enjoy') f.hop = 0;
-    const sp = f.loco === 'still' ? 0 : f.loco === 'crawl' ? 8 : 16;
+    if (!(f.state === 'rest' && f.perch)) f.lift = Math.max(0, (f.lift || 0) - dt * 3);
+    const sp = (f.loco === 'still' ? 0 : f.loco === 'crawl' ? 8 : 16) * f.pace;
     switch (f.state) {
       case 'hide': {
-        // stressed: cower in a corner/behind decor, shaking, no feeding or play
-        const hx = f.hideX || 18;
-        if (f.loco === 'swim') steer(f, hx, TANK.sandTop - 8, 24, dt, 4); else walk(f, hx, 14, dt);
+        if (live(f.shelter)) goShelter(f, f.shelter, dt);
+        else {
+          // no hideout: cower in a corner
+          const hx = f.hideX || 18;
+          if (f.loco === 'swim') steer(f, hx, TANK.sandTop - 8, 24, dt, 4); else walk(f, hx, 14, dt);
+        }
         f.shake = Math.sin(f.t * 40) > 0 ? 1 : 0;
         break;
       }
       case 'swim':
-        if (f.loco === 'swim') { if (!f.target || steer(f, f.target[0], f.target[1], sp, dt, 2)) f.target = [R.range(20, 300), R.range(32, 118)]; }
-        else if (f.loco === 'crawl') { if (!f.target || walk(f, f.target[0], sp, dt)) f.target = [R.range(20, 300)]; }
+        if (f.loco === 'swim') {
+          const ld = f.leader;
+          if (ld && A.fish.includes(ld) && !ld.stress) steer(f, ld.x - ld.facing * f.schoolOff[0], U.clamp(ld.y + f.schoolOff[1], TANK.waterTop + 8, TANK.sandTop - 4), Math.max(20, Math.hypot(ld.vx, ld.vy) * 1.1), dt, 3);
+          else if (!f.target || steer(f, f.target[0], f.target[1], sp, dt, 2)) f.target = [R.range(20, 300), R.range(32, 118)];
+        } else if (f.loco === 'crawl') { if (!f.target || walk(f, f.target[0], sp, dt)) f.target = [R.range(20, 300)]; }
         break;
       case 'feed':
-        // nibble at the sand / decorations
-        if (f.loco === 'swim') { if (!f.target) f.target = [R.range(24, 296), TANK.sandTop - 4]; if (steer(f, f.target[0], f.target[1], sp, dt, 3)) { f.vy = Math.sin(f.t * 12) * 6; } }
+        if (live(f.graze)) {
+          // graze on a plant: nibble at its leaves, dropping the odd green crumb
+          const g = f.graze;
+          const there = f.loco === 'swim'
+            ? settle(f, g.cx + f.side * (g.half + 2), U.clamp(g.top + g.h * 0.45, TANK.waterTop + 8, TANK.sandTop - 4), sp * 1.2, dt)
+            : walk(f, g.cx + f.side * g.half * 0.6, sp, dt);
+          if (there) {
+            f.facing = g.cx > f.x ? 1 : -1;
+            f.peck = Math.sin(f.t * 10) > 0.6 ? 1 : 0;
+            if (R.chance(dt * 1.2)) AQ.FX.sparkle(f.x + f.facing * f.r * 0.6, f.y, '#9fe08a', 2);
+          }
+        } else if (f.loco === 'swim') { if (!f.target) f.target = [R.range(24, 296), TANK.sandTop - 4]; if (steer(f, f.target[0], f.target[1], sp, dt, 3)) { f.vy = Math.sin(f.t * 12) * 6; } }
         else f.peck = Math.sin(f.t * 10) > 0.6 ? 1 : 0;
         break;
       case 'play':
         if (f.loco === 'swim') {
-          if (f.buddy && A.fish.includes(f.buddy)) steer(f, f.buddy.x - f.buddy.facing * 10, f.buddy.y, 30, dt, 4);
-          else { f.loopA += dt * 2.6; steer(f, f.loopC[0] + Math.cos(f.loopA) * 18, U.clamp(f.loopC[1] + Math.sin(f.loopA) * 12, 34, 116), 34, dt, 6); }
-        } else if (f.loco === 'crawl') { if (!f.target || walk(f, f.target[0], 26, dt)) f.target = [U.clamp(f.x + R.range(-30, 30), 20, 300)]; }
+          if (f.buddy && A.fish.includes(f.buddy)) steer(f, f.buddy.x - f.buddy.facing * 10, f.buddy.y, 30 * f.pace, dt, 4);
+          else { f.loopA += dt * 2.6; steer(f, f.loopC[0] + Math.cos(f.loopA) * 18, U.clamp(f.loopC[1] + Math.sin(f.loopA) * 12, 34, 116), 34 * f.pace, dt, 6); }
+        } else if (f.loco === 'crawl') { if (!f.target || walk(f, f.target[0], 26 * f.pace, dt)) f.target = [U.clamp(f.x + R.range(-30, 30), 20, 300)]; }
         break;
       case 'rest':
-        if (f.loco === 'swim') steer(f, f.x + Math.sin(f.t) * 2, f.y + Math.cos(f.t * 0.7), 3, dt, 1);
+        if (live(f.perch)) {
+          // rest on top of a rock / log
+          const p = f.perch;
+          if (f.loco === 'swim') {
+            if (settle(f, p.cx, p.top - f.foot + 1, Math.max(8, sp), dt)) f.zDraw = p.d.y + 0.5;
+          } else if (f.lift > 0 || walk(f, p.cx, sp, dt)) {
+            f.perchTop = p.top + 1; f.lift = Math.min(1, (f.lift || 0) + dt * 2.5);
+            f.z += U.clamp(p.d.y + 1 - f.z, -6 * dt, 6 * dt); f.zDraw = p.d.y + 0.5;
+          }
+        } else if (f.loco === 'swim') steer(f, f.x + Math.sin(f.t) * 2, f.y + Math.cos(f.t * 0.7), 3, dt, 1);
+        break;
+      case 'shelter':
+        if (live(f.shelter)) goShelter(f, f.shelter, dt); else f.st = 0;
+        break;
+      case 'sleep':
+        // drift down near the sand and doze
+        if (f.loco === 'swim') settle(f, f.x, TANK.sandTop - f.foot - 3, 6, dt);
+        break;
+      case 'drift':
+        if (f.loco === 'swim') {
+          // go limp and let the gentle tank current carry it
+          f.vx += (Math.sin(A.t * 0.25 + f.moodPh) * 6 - f.vx) * dt; f.vy += (Math.sin(f.t * 0.8) * 2 - f.vy) * dt;
+          f.x += f.vx * dt; f.y += f.vy * dt;
+        }
         break;
       case 'visit': {
         // head over to a liked thing, then switch to the happy "enjoy" idle
         const s = f.spot;
-        if (!s || AQ.Collection.tank(A.biome).decor.indexOf(s.d) < 0) { f.st = 0; break; }
+        if (!live(s)) { f.st = 0; break; }
         const tx = U.clamp(s.x + f.spotOff * (s.half + 3), 16, 304);
-        const got = f.loco === 'swim' ? steer(f, tx, U.clamp(s.y, TANK.waterTop + 8, TANK.sandTop - 4), 20, dt, 3) : walk(f, tx, sp * 1.2, dt);
-        if (got) { f.state = 'enjoy'; f.st = R.range(...AQ.TUNING.aquarium.enjoySeconds); f.loopA = 0; f.fxT = 0.3; updateMood(f); }
+        const got = f.loco === 'swim' ? steer(f, tx, U.clamp(s.y, TANK.waterTop + 8, TANK.sandTop - 4), 20 * f.pace, dt, 3) : walk(f, tx, sp * 1.2, dt);
+        if (got) { f.state = 'enjoy'; f.st = R.range(...cfg.enjoySeconds); f.loopA = 0; f.fxT = 0.3; updateMood(f); }
         break;
       }
       case 'enjoy': {
         const s = f.spot;
-        if (!s || AQ.Collection.tank(A.biome).decor.indexOf(s.d) < 0) { f.st = 0; break; }
+        if (!live(s)) { f.st = 0; break; }
         if (f.loco === 'swim') {
           // lazy figure-eight around the liked thing
           f.loopA += dt * 1.4;
@@ -205,7 +342,7 @@ AQ.Aquarium = (function () {
         }
         f.fxT -= dt;
         if (f.fxT <= 0) {
-          f.fxT = AQ.TUNING.aquarium.happyFxEvery * R.range(0.8, 1.2);
+          f.fxT = cfg.happyFxEvery * R.range(0.8, 1.2);
           if (R.chance(0.5)) heart(f); else AQ.FX.sparkle(f.x, f.y - f.r, '#fff3b0', 3);
         }
         break;
@@ -214,6 +351,7 @@ AQ.Aquarium = (function () {
     clampFish(f);
   }
   function walk(f, tx, speed, dt) {
+    if (f.lift > 0.02) { f.lift = Math.max(0, f.lift - dt * 3); return false; }   // hop down off a perch first
     const dx = tx - f.x;
     if (Math.abs(dx) < 2) return true;
     f.x += Math.sign(dx) * speed * dt; f.facing = dx > 0 ? 1 : -1; f.walking = true;
@@ -263,7 +401,8 @@ AQ.Aquarium = (function () {
     const I = AQ.Input, m = I.mouse, tank = AQ.Collection.tank(A.biome);
     A.t += dt;
     A.ui = layout();
-    if (I.wasPressed('Tab') || (I.wasPressed('Escape') && !A.holding)) { A.close(game); return; }
+    if (I.wasPressed('Escape') && A.card && !A.holding) A.card = null;
+    else if (I.wasPressed('Tab') || (I.wasPressed('Escape') && !A.holding)) { A.close(game); return; }
     if (I.wasPressed('KeyL')) { AQ.LogUI.open(game, 'aquarium'); return; }
     if (I.wasPressed('KeyQ', 'ArrowLeft')) switchTank(-1);
     if (I.wasPressed('KeyE', 'ArrowRight')) switchTank(1);
@@ -280,7 +419,10 @@ AQ.Aquarium = (function () {
       else if (inTank(m)) {
         if (A.holding) place(tank, m);
         else {
-          const d = decorAt(tank, m);
+          // click a creature for its info card; click decor to move it
+          const f = fishAt(m);
+          A.card = f ? f.uid : null;
+          const d = !f && decorAt(tank, m);
           if (d) pickUp(tank, d);
         }
       }
@@ -292,10 +434,11 @@ AQ.Aquarium = (function () {
     A.vibeT -= dt;
     if (A.vibeT <= 0) A.refreshVibe();
     for (const f of A.fish) { f.walking = false; updateFish(f, dt); }
+    updateShaker(dt);
     for (let i = A.food.length - 1; i >= 0; i--) {
       const p = A.food[i];
       p.t += dt;
-      if (p.y < TANK.sandTop + 2) p.y += 12 * dt;
+      if (p.y < TANK.sandTop + 2) { p.y += (p.y < TANK.waterTop ? 30 : 12) * dt; p.x += Math.sin(p.t * 3 + p.ph) * 3 * dt; }
       if (p.t > 25) A.food.splice(i, 1);
     }
     // bubbles from bubblers + ambient
@@ -309,11 +452,44 @@ AQ.Aquarium = (function () {
     const list = biomes();
     const i = list.findIndex((b) => b.id === A.biome);
     A.biome = list[(i + dir + list.length) % list.length].id;
-    A.fish = []; A.holding = null; A.rebuild();
+    A.fish = []; A.holding = null; A.shaker = null; A.card = null; A.rebuild();
   }
+  // Feeding: a little shaker tips over the lid and sprinkles pellets as it slides along.
   function feed() {
-    for (let i = 0; i < 6; i++) A.food.push({ x: R.range(30, 290), y: TANK.waterTop + R.range(0, 6), t: 0 });
+    if (A.shaker) return;
+    const L = AQ.TUNING.aquarium;
+    A.shaker = { t: 0, x: R.range(70, 250), dir: R.chance(0.5) ? 1 : -1, dropT: 0.15, left: L.feedPellets };
     AQ.Audio.play('feed');
+  }
+  function updateShaker(dt) {
+    const s = A.shaker; if (!s) return;
+    const L = AQ.TUNING.aquarium, dur = L.feedShakeSeconds;
+    s.t += dt; s.dropT -= dt;
+    s.sx = s.x + s.dir * U.clamp(s.t / dur, 0, 1) * 50;
+    if (s.dropT <= 0 && s.left > 0 && s.t > 0.2) {
+      s.dropT = dur / L.feedPellets; s.left--;
+      A.food.push({ x: s.sx + R.range(-2, 2), y: TANK.waterTop - 2, t: 0, ph: R() * 6 });
+    }
+    if (s.t > dur + 0.5) A.shaker = null;
+  }
+  function drawShaker(g) {
+    const s = A.shaker; if (!s) return;
+    const L = AQ.TUNING.aquarium, k = U.clamp(Math.min(s.t / 0.2, (L.feedShakeSeconds + 0.5 - s.t) / 0.3), 0, 1);
+    const x = Math.round(s.sx - 3 + (s.t < L.feedShakeSeconds && Math.sin(s.t * 40) > 0 ? 1 : 0)), y = Math.round(TANK.y - 8 + k * 6);
+    // tipped-over can: red cap with holes at the bottom, white body with a label
+    g.fillStyle = '#e9f1f4'; g.fillRect(x, y, 7, 6);
+    g.fillStyle = '#ff9a5a'; g.fillRect(x, y + 2, 7, 2);
+    g.fillStyle = '#c24b4b'; g.fillRect(x - 1, y + 6, 9, 2);
+    g.fillStyle = '#2a1a1a'; g.fillRect(x + 1, y + 7, 1, 1); g.fillRect(x + 3, y + 7, 1, 1); g.fillRect(x + 5, y + 7, 1, 1);
+    g.fillStyle = '#ffffff'; g.fillRect(x + 1, y, 1, 6);
+  }
+  function fishAt(m) {
+    let best = null, bd = 1e9;
+    for (const f of A.fish) {
+      const d = Math.hypot(f.x - m.x, f.y - m.y);
+      if (Math.abs(f.x - m.x) < f.r + 2 && Math.abs(f.y - m.y) < f.r + 2 && d < bd) { best = f; bd = d; }
+    }
+    return best;
   }
 
   function clickUI(r, game, tank) {
@@ -414,7 +590,7 @@ AQ.Aquarium = (function () {
     // depth-sorted decor + creatures
     const items = [];
     tank.decor.forEach((d) => items.push({ z: d.y, d }));
-    A.fish.forEach((f) => items.push({ z: f.loco === 'swim' ? f.z : f.z, f }));
+    A.fish.forEach((f) => items.push({ z: f.zDraw != null ? f.zDraw : f.z, f }));
     items.sort((a, b) => a.z - b.z);
     for (const it of items) {
       if (it.d) {
@@ -423,16 +599,17 @@ AQ.Aquarium = (function () {
       } else {
         const f = it.f;
         // soft shadow on the sand
-        g.fillStyle = 'rgba(0,0,0,0.12)'; g.fillRect(Math.round(f.x - f.r * 0.7), Math.round(f.z), Math.round(f.r * 1.4), 1);
-        const moving = Math.hypot(f.vx, f.vy) > 5 || f.walking;
-        AQ.Assets.draw(g, f.key, moving ? 'move' : 'idle', f.x + (f.shake && f.stress ? 1 : 0), f.y - (f.peck || 0) - Math.round(f.hop || 0), { t: f.t, flip: f.facing < 0, alpha: f.stress ? 0.8 : 1 });
+        if (f.zDraw == null) { g.fillStyle = 'rgba(0,0,0,0.12)'; g.fillRect(Math.round(f.x - f.r * 0.7), Math.round(f.z), Math.round(f.r * 1.4), 1); }
+        const moving = Math.hypot(f.vx, f.vy) > 5 || f.walking, asleep = f.state === 'sleep';
+        const chompX = f.chomp > 0 && Math.sin(f.chomp * 40) > 0 ? f.facing : 0;
+        AQ.Assets.draw(g, f.key, moving && !asleep ? 'move' : 'idle', f.x + (f.shake && f.stress ? 1 : 0) + chompX, f.y - (f.peck || 0) - Math.round(f.hop || 0), { t: asleep ? f.t * 0.25 : f.t, flip: f.facing < 0, alpha: f.stress ? 0.8 : 1 });
         moodIcon(g, f);
-        if (f.state === 'rest' && !f.stress && (f.def.category === 'mammal' || f.def.category === 'reptile')) F().draw(g, 'z', f.x + 4, f.y - f.r - 6 - Math.round((A.t * 4) % 4), '#e8f4ff');
+        if (A.card === f.uid) selectMark(g, f);
+        if ((f.state === 'sleep' || (f.state === 'rest' && (f.def.category === 'mammal' || f.def.category === 'reptile'))) && !f.stress) F().draw(g, 'z', f.x + 4, f.y - f.r - 6 - Math.round((A.t * 4) % 4), '#e8f4ff');
       }
     }
     // food
-    g.fillStyle = '#e8873a';
-    A.food.forEach((p) => g.fillRect(Math.round(p.x), Math.round(p.y), 2, 1));
+    A.food.forEach((p) => { g.fillStyle = '#e8873a'; g.fillRect(Math.round(p.x), Math.round(p.y), 2, 1); g.fillStyle = '#ffc07a'; g.fillRect(Math.round(p.x), Math.round(p.y), 1, 1); });
     // bubbles
     g.fillStyle = 'rgba(230,250,255,0.8)';
     A.bubbles.forEach((b) => g.fillRect(Math.round(b.x), Math.round(b.y), 1, 1));
@@ -458,6 +635,7 @@ AQ.Aquarium = (function () {
     g.beginPath(); g.moveTo(TANK.x + 40, TANK.y); g.lineTo(TANK.x + 44, TANK.y); g.lineTo(TANK.x + 14, TANK.y + 40); g.lineTo(TANK.x + 10, TANK.y + 40); g.fill();
     g.restore();
 
+    drawShaker(g);
     // ghost of held item
     const m = AQ.Input.mouse;
     if (A.holding && inTank(m)) {
@@ -466,12 +644,73 @@ AQ.Aquarium = (function () {
     }
     // hover tooltip on creatures
     if (!A.holding && inTank(m)) {
-      const f = A.fish.find((f) => Math.abs(f.x - m.x) < f.r + 2 && Math.abs(f.y - m.y) < f.r + 2);
-      if (f) tip(g, `${f.def.name} - ${f.moodName || 'CONTENT'}${f.near ? ' (LOVES THE ' + f.near.tag.replace(/_/g, ' ').toUpperCase() + ')' : ''}`, m.x, m.y - 10, f.moodCol || '#fff');
+      const f = fishAt(m);
+      if (f && A.card !== f.uid) tip(g, `${f.def.name} - ${f.moodName || 'CONTENT'}${f.near ? ' (LOVES THE ' + f.near.tag.replace(/_/g, ' ').toUpperCase() + ')' : ''}`, m.x, m.y - 10, f.moodCol || '#fff');
     }
 
+    const cf = A.card && A.fish.find((f) => f.uid === A.card);
+    if (cf) drawCard(g, cf); else A.card = null;
     drawBars(g, tank, b);
   };
+
+  // ---------------------------------------------------------------- creature info card
+  function selectMark(g, f) {
+    if (Math.floor(A.t * 3) % 3 === 2) return;
+    const r = Math.round(f.r) + 2, x = Math.round(f.x), y = Math.round(f.y - (f.hop || 0));
+    g.fillStyle = '#ffe9a8';
+    for (const [sx, sy] of [[-1, -1], [1, -1], [-1, 1], [1, 1]]) { g.fillRect(x + sx * r - (sx > 0 ? 1 : 0), y + sy * r - (sy > 0 ? 1 : 0), 1, 1); g.fillRect(x + sx * r - (sx > 0 ? 2 : -1), y + sy * r - (sy > 0 ? 1 : 0), 1, 1); g.fillRect(x + sx * r - (sx > 0 ? 1 : 0), y + sy * r - (sy > 0 ? 2 : -1), 1, 1); }
+  }
+  const TAGWORD = (t) => t.replace(/_/g, ' ').toUpperCase();
+  function activity(f) {
+    const nm = (gm) => (gm && gm.d ? (gm.d.type === 'plant' ? defOf(gm.d.id).name : decorDef(gm.d.id).name).toUpperCase() : '');
+    if (A.food.length && f.loco !== 'still' && !f.stress) return 'GOING FOR FOOD';
+    if (f.chomp > 0) return 'MUNCHING';
+    switch (f.state) {
+      case 'hide': return f.shelter ? 'HIDING IN THE ' + nm(f.shelter) : 'HIDING IN A CORNER';
+      case 'swim': return f.leader ? 'SWIMMING WITH ITS SCHOOL' : f.loco === 'swim' ? 'SWIMMING AROUND' : 'WANDERING';
+      case 'feed': return f.graze ? 'GRAZING ON ' + nm(f.graze) : 'NIBBLING THE SAND';
+      case 'play': return f.buddy ? 'PLAYING WITH ' + f.buddy.def.name.toUpperCase() : 'PLAYING';
+      case 'rest': return f.perch ? 'RESTING ON THE ' + nm(f.perch) : 'RESTING';
+      case 'shelter': return 'NAPPING IN THE ' + nm(f.shelter);
+      case 'sleep': return 'SLEEPING';
+      case 'drift': return 'DRIFTING';
+      case 'visit': return 'OFF TO SEE THE ' + nm(f.spot);
+      case 'enjoy': return 'LOVING THE ' + nm(f.spot);
+    }
+    return '';
+  }
+  function drawCard(g, f) {
+    const W = 136, H = 50, x = f.x < 160 ? TANK.x + TANK.w - W - 6 : TANK.x + 6, y = TANK.waterTop + 4;
+    const tank = AQ.Collection.tank(A.biome), likes = f.def.likes || [];
+    const have = new Set(); tank.decor.forEach((d) => AQ.Vibe.tagsOf(d).forEach((t) => have.add(t)));
+    g.fillStyle = 'rgba(6,18,34,0.92)'; g.fillRect(x, y, W, H);
+    g.fillStyle = '#5fc6d9'; g.fillRect(x, y, W, 1);
+    g.fillStyle = '#132b40'; g.fillRect(x + 3, y + 4, 26, 26);
+    const e = AQ.Assets.entry(f.key);
+    if (e) {
+      const sc = Math.min(1, 22 / Math.max(e.fw, e.fh));
+      g.save(); g.translate(x + 16, y + 17); g.scale(sc, sc);
+      AQ.Assets.draw(g, f.key, 'idle', 0, e.anchor[1] - e.fh / 2, { t: A.t });
+      g.restore();
+    }
+    const tx = x + 33, b = AQ.World.biomeById[f.def.biome];
+    F().draw(g, f.def.name.toUpperCase(), tx, y + 4, '#ffe9a8', { shadow: false });
+    F().draw(g, 'MOOD:', tx, y + 12, '#8fb6cc', { shadow: false });
+    F().draw(g, f.moodName || 'CONTENT', tx + 24, y + 12, f.moodCol || '#bfe8ff', { shadow: false });
+    F().draw(g, 'LIKES:', tx, y + 20, '#8fb6cc', { shadow: false });
+    let lx = tx + 28;
+    if (!likes.length) F().draw(g, 'ANYTHING', lx, y + 20, '#cfe8ff', { shadow: false });
+    likes.forEach((l, i) => {
+      const w = TAGWORD(l) + (i < likes.length - 1 ? ',' : '');
+      F().draw(g, w, lx, y + 20, have.has(l) ? '#8ff0b0' : '#7d8fa0', { shadow: false });
+      lx += F().width(w) + 4;
+    });
+    F().draw(g, 'FROM:', tx, y + 28, '#8fb6cc', { shadow: false });
+    F().draw(g, ((b && b.name) || f.def.biome).toUpperCase(), tx + 24, y + 28, '#cfe8ff', { shadow: false });
+    F().draw(g, activity(f), x + 4, y + 35, '#e8fbff', { shadow: false });
+    const missing = likes.filter((l) => !have.has(l));
+    F().draw(g, missing.length ? 'WOULD LOVE SOME ' + TAGWORD(missing[0]) : (f.stress ? 'A BIGGER CREATURE MAKES IT NERVOUS' : 'HAS EVERYTHING IT LIKES'), x + 4, y + 42, missing.length || f.stress ? '#ffcf8a' : '#8ff0b0', { shadow: false });
+  }
 
   // Glanceable mood: a tiny icon pops over each creature now and then (always while nervous
   // or enjoying, and always for the creature under the mouse).
@@ -617,6 +856,7 @@ AQ.Aquarium = (function () {
       tip(g, A.hover.id === 'fish' ? `${A.hover.name}: CLICK TO MOVE ${A.hover.where === 'tank' ? 'TO STORAGE' : 'INTO TANK'}` : `${A.hover.name}: CLICK, THEN CLICK IN TANK`, A.hover.x + 12, TANK.waterTop + 4, '#fff');
     } else if (A.holding) tip(g, 'CLICK TO PLACE - RIGHT CLICK / ESC TO STOP', 160, TANK.waterTop + 4, '#ffe9a8');
     else if (!tank.creatures.length && !tank.decor.length) tip(g, 'CATCH CREATURES FROM THIS BIOME TO FILL THIS TANK', 160, 70, '#ffffff');
+    else if (inTank(AQ.Input.mouse) && fishAt(AQ.Input.mouse)) { if (!A.card) tip(g, 'CLICK A CREATURE TO LEARN ABOUT IT', 160, TANK.waterTop + 4, '#cfe8ff'); }
     else if (inTank(AQ.Input.mouse) && decorAt(tank, AQ.Input.mouse)) tip(g, 'CLICK: MOVE   RIGHT CLICK: REMOVE', 160, TANK.waterTop + 4, '#cfe8ff');
   }
 

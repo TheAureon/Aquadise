@@ -79,12 +79,23 @@ AQ.TUNING = {
     recomputeEvery: 0.5,      // seconds between vibe updates while watching a tank
     // creature likes + mood
     likeRadius: 22,           // px: how close a creature must be to a liked thing to enjoy it
-    visitChance: 0.4,         // chance a creature picks "go visit something I like" as its next activity
+    visitChance: 0.3,         // chance a creature picks "go visit something I like" as its next activity
     enjoySeconds: [4, 8],     // how long a visit lasts
     happyFxEvery: 1.6,        // seconds between little hearts/sparkles while enjoying
     moodIconEvery: 4,         // seconds between mood icons popping over each creature
     moodIconShow: 1.4,        // seconds each mood icon stays visible
-    mood: { base: 0.45, fed: 0.2, likePresent: 0.15, nearLike: 0.25, crowded: 0.1, stressedCap: 0.25 }
+    mood: { base: 0.45, fed: 0.2, likePresent: 0.15, nearLike: 0.25, crowded: 0.1, stressedCap: 0.25 },
+    // everyday life: relative weights of what a creature does next (bigger = more often)
+    activity: { swim: 30, feed: 18, play: 14, rest: 16, shelter: 8, sleep: 7, drift: 7 },
+    schoolChance: 0.65,       // chance a fish swims with others of its kind instead of alone
+    grazeChance: 0.7,         // chance "feed" means grazing a plant (when the tank has plants)
+    perchChance: 0.7,         // chance "rest" means resting on a rock/log (when there is one)
+    sleepSeconds: [7, 14],
+    bubbleEvery: 7,           // average seconds between a creature's little breath bubbles
+    pace: [0.8, 1.25],        // each creature gets its own speed multiplier in this range
+    feedShakeSeconds: 1.4,    // how long the food shaker sprinkles
+    feedPellets: 8,
+    chompSeconds: 0.45
   },
 
   save: { key: 'aquadise.save.v1', autosaveEvery: 10 }
