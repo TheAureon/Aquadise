@@ -138,6 +138,7 @@ AQ.Game = (function () {
     L.push({ x: p.x, y: p.y, r: 26 });
     for (const l of AQ.Terrain.lights) L.push(l);
     if (AQ.Creatures) AQ.Creatures.lights(L);
+    if (AQ.Chests) AQ.Chests.lights(L);
     return L;
   }
 
