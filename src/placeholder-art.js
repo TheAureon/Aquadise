@@ -435,7 +435,7 @@
   // Flutter kick: both legs pivot at the hip in a smooth scissor motion (feet move most,
   // knees about half), the torso stays steady, the arm only reaches out for the net.
   S.diver = function (p, o) {
-    if (o.anim === 'stand' || o.anim === 'walk' || o.anim === 'jump') return S.diverUpright(p, o);
+    if (o.anim === 'stand' || o.anim === 'walk' || o.anim === 'jump' || o.anim === 'standnet') return S.diverUpright(p, o);
     const R = ROBO, ph = o.t * Math.PI * 2;
     const swim = o.anim === 'swim';
     const amp = swim ? 2.7 : o.anim === 'net' ? 0.6 : 1.2;
@@ -447,10 +447,10 @@
       const footY = hipY + Math.sin(ph + phase + Math.PI / 6) * amp * gain;
       const kneeY = hipY + Math.sin(ph + phase + Math.PI / 6 - 0.9) * amp * gain * 0.5;
       const kx = 5, fx = 2;
-      for (let i = 0; i <= 4; i++) { const t = i / 4, xx = hipX - t * (hipX - kx), yy = hipY + t * (kneeY - hipY); p.set(xx, yy - 0.5, base); p.set(xx, yy + 0.5, base); }
-      for (let i = 1; i <= 3; i++) { const t = i / 3, xx = kx - t * (kx - fx), yy = kneeY + t * (footY - kneeY); p.set(xx, yy, shin); }
-      p.set(kx, kneeY, R.k);
-      p.set(fx - 1, footY, boot); p.set(fx - 2, footY, boot);           // boot / sole
+      for (let i = 0; i <= 4; i++) { const t = i / 4, xx = hipX - t * (hipX - kx), yy = hipY + t * (kneeY - hipY); p.set(xx, yy, base); p.set(xx, yy + 1, base); }
+      for (let i = 1; i <= 3; i++) { const t = i / 3, xx = kx - t * (kx - fx), yy = kneeY + t * (footY - kneeY); p.set(xx, yy, shin); p.set(xx, yy + 1, shin); }
+      p.set(kx, kneeY, R.k); p.set(kx, kneeY + 1, R.k);
+      p.rect(Math.round(fx - 2), Math.round(footY), 2, 2, boot);          // boot
     };
     leg(Math.PI, 0.65, R.gd, R.g, R.k);   // back leg (behind, in shadow, smaller kick)
     // hips + torso: white back, dark segmented chest plate facing down, cyan trim
@@ -468,10 +468,7 @@
     p.rect(19, y, 3, 3, R.n); p.set(20, y, R.nl);
     p.set(18, y + 1, R.c);
     // arm: tucked along the body while swimming, reaching forward during a net swing
-    if (o.anim === 'net') {
-      const ext = [1, 3, 5, 4][o.frame] || 0;
-      p.rect(15, y + 4, 2 + ext, 1, R.g); p.set(16 + ext, y + 4, R.k); p.set(16 + ext, y + 3, R.k);
-    } else p.rect(12, y + 5, 3, 1, R.g);
+    if (o.anim !== 'net') p.rect(12, y + 5, 3, 1, R.g);   // during a swing the game draws the reaching arm
     p.outline(0.28);
   };
 
@@ -502,7 +499,7 @@
     p.rect(14, top + 4, 3, 2, R.n); p.set(14, top + 4, R.nl);
     // arms: back arm grey, front arm white with dark elbow + hand (swings while walking)
     p.rect(8, top + 6, 1, 5, R.g); p.set(8, top + 8, R.k); p.set(8, top + 11, R.kd);
-    p.rect(16 + (walk ? Math.max(0, step) : 0), top + 6, 1, 5, R.w); p.set(16 + (walk ? Math.max(0, step) : 0), top + 8, R.k); p.set(16 + (walk ? Math.max(0, step) : 0), top + 11, R.k);
+    if (o.anim !== 'standnet') p.rect(16 + (walk ? Math.max(0, step) : 0), top + 6, 1, 5, R.w); if (o.anim !== 'standnet') { p.set(16 + (walk ? Math.max(0, step) : 0), top + 8, R.k); p.set(16 + (walk ? Math.max(0, step) : 0), top + 11, R.k); }
     // neck + head with navy visor facing right, cyan ear light
     p.set(12, top + 3, R.k);
     p.rect(10, top, 5, 3, R.w); p.rect(11, top - 1, 3, 1, R.w);

@@ -142,13 +142,15 @@ AQ.PauseUI = (function () {
     P.ui = [
       { id: 'resume', x: 110, y: 60, w: 100, h: 14, label: 'RESUME' },
       { id: 'help', x: 110, y: 80, w: 100, h: 14, label: 'SHOW CONTROLS' },
-      { id: 'reset', x: 110, y: 112, w: 100, h: 14, label: P.confirm > 0 ? 'CLICK AGAIN TO WIPE' : 'RESET SAVE' }
+      { id: 'home', x: 110, y: 100, w: 100, h: 14, label: 'HOME' },
+      { id: 'reset', x: 110, y: 126, w: 100, h: 14, label: P.confirm > 0 ? 'CLICK AGAIN TO WIPE' : 'RESET SAVE' }
     ];
     if (I.wasPressed('Escape')) { game.state = 'play'; return; }
     P.hover = P.ui.find((r) => m.x >= r.x && m.y >= r.y && m.x < r.x + r.w && m.y < r.y + r.h);
     if (m.pressed[0] && P.hover) {
       if (P.hover.id === 'resume') game.state = 'play';
       if (P.hover.id === 'help') { AQ.HUD.helpT = 12; game.state = 'play'; }
+      if (P.hover.id === 'home') { AQ.Save.save(game); AQ.Title.open(game); }
       if (P.hover.id === 'reset') { if (P.confirm > 0) AQ.Save.reset(); else P.confirm = 3; }
     }
   };
@@ -156,7 +158,7 @@ AQ.PauseUI = (function () {
     g.fillStyle = 'rgba(4,12,24,0.75)'; g.fillRect(0, 0, 320, 180);
     F().draw(g, 'PAUSED', 160, 40, '#ffe9a8', { align: 'center' });
     for (const r of P.ui) AQ.Aquarium.button(g, r, P.hover === r);
-    F().draw(g, 'PROGRESS SAVES AUTOMATICALLY', 160, 150, '#8aa4b8', { align: 'center' });
+    F().draw(g, 'PROGRESS SAVES AUTOMATICALLY', 160, 160, '#8aa4b8', { align: 'center' });
   };
   return P;
 })();

@@ -28,7 +28,7 @@ npx http-server -c-1 .      # or: python3 -m http.server
 | aquarium            | Tab                                      |
 | collection log      | L                                        |
 | map                 | M                                        |
-| pause / reset save  | Esc                                      |
+| pause / home / reset | Esc                                     |
 | help overlay        | H                                        |
 
 In the aquarium: **Q/E** switch tanks, **F** feeds. Click a tray item, then click in the tank to
@@ -36,6 +36,9 @@ place it. Click a placed item to move it, and right-click it to remove it. The *
 creatures between the tank and storage.
 
 ## How it plays
+
+- **Title screen (home):** the world drifts by behind the logo. Continue, New Game (asks to
+  confirm when a save exists) or Controls. Esc → Home returns to it from the game.
 
 - **Catching.** Creatures react to how close and how fast you are. Sneak, or drop bait to lure
   them out, then net them. Each species uses a reusable catch behaviour (hides, darts, schools,

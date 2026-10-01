@@ -24,6 +24,16 @@ AQ.Save = (function () {
     } catch (e) { /* storage unavailable: play continues unsaved */ }
   };
   S.dirty = () => { S.isDirty = true; };
+  // Fresh start without reloading the page (title screen > New Game).
+  S.newGame = function (game) {
+    AQ.State.collection = {}; AQ.State.plants = {}; AQ.State.tanks = {};
+    AQ.State.upgrades = { net: 1, speed: 1 };
+    game.upgrades = AQ.State.upgrades;
+    const st = AQ.data.world.playerStart, P = game.player;
+    P.x = st[0]; P.y = st[1]; P.vx = P.vy = 0; P.speedLevel = 1;
+    if (AQ.Aquarium) { AQ.Aquarium.fish = []; AQ.Aquarium.biome = null; }
+    S.save(game);
+  };
   S.tick = function (dt, game) {
     S.t += dt;
     if (S.t >= AQ.TUNING.save.autosaveEvery) { S.t = 0; S.save(game); }

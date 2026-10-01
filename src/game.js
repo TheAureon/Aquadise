@@ -41,7 +41,7 @@ AQ.Game = (function () {
     if (AQ.Chests) AQ.Chests.init(G);
     AQ.Camera.snap(G.player);
     document.getElementById('loading').style.display = 'none';
-    G.state = 'play';
+    AQ.Title.open(G);
     requestAnimationFrame(loop);
   };
 
@@ -94,6 +94,8 @@ AQ.Game = (function () {
       AQ.LogUI.update(dt, G);
     } else if (G.state === 'pause') {
       AQ.PauseUI.update(dt, G);
+    } else if (G.state === 'title') {
+      AQ.Title.update(dt, G);
     }
     I.endFrame();
   }
@@ -109,16 +111,20 @@ AQ.Game = (function () {
     AQ.Terrain.draw(ctx, cam);
     ctx.save();
     ctx.translate(-cam.left(), -cam.top());
+    const title = G.state === 'title';
     if (AQ.Chests) AQ.Chests.draw(ctx, G);
     if (AQ.Creatures) AQ.Creatures.drawBack(ctx, G);
-    G.player.draw(ctx);
-    if (AQ.Catching) AQ.Catching.draw(ctx, G);
-    if (AQ.Creatures) AQ.Creatures.drawFront(ctx, G);
+    if (!title) {
+      G.player.draw(ctx);
+      if (AQ.Catching) AQ.Catching.draw(ctx, G);
+      if (AQ.Creatures) AQ.Creatures.drawFront(ctx, G);
+    }
     AQ.FX.draw(ctx);
     ctx.restore();
     if (AQ.Terrain.drawFront) AQ.Terrain.drawFront(ctx, cam);
     AQ.Render.surface(cam);
     AQ.Render.lighting(cam, collectLights(), targetDarkness());
+    if (title) { AQ.Title.draw(ctx, G); return; }
     AQ.HUD.draw(ctx, G);
     if (G.state === 'map') AQ.MapUI.draw(ctx, G);
     if (G.state === 'log') AQ.LogUI.draw(ctx, G);
@@ -135,8 +141,8 @@ AQ.Game = (function () {
   function collectLights() {
     const p = G.player, L = G.lights;
     L.length = 0;
-    L.push({ x: p.x + p.facing * 6, y: p.y, r: 58 });
-    L.push({ x: p.x, y: p.y, r: 26 });
+    if (G.state === 'title') L.push({ x: AQ.Camera.x, y: AQ.Camera.y, r: 90 });
+    else { L.push({ x: p.x + p.facing * 6, y: p.y, r: 58 }); L.push({ x: p.x, y: p.y, r: 26 }); }
     for (const l of AQ.Terrain.lights) L.push(l);
     if (AQ.Creatures) AQ.Creatures.lights(L);
     if (AQ.Chests) AQ.Chests.lights(L);

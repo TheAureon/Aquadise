@@ -83,7 +83,9 @@ AQ.Player = (function () {
     }
 
     const sp = this.speed();
-    if (this.mode === 'swim') this.anim = AQ.Catching && AQ.Catching.swinging() ? 'net' : sp > 18 ? 'swim' : 'idle';
+    const netOut = AQ.Catching && AQ.Catching.armOut();
+    if (this.mode === 'swim') this.anim = netOut ? 'net' : sp > 18 ? 'swim' : 'idle';
+    else if (netOut) this.anim = 'standnet';
     else if (this.mode === 'walk') this.anim = Math.abs(this.vx) > 6 ? 'walk' : 'stand';
     else this.anim = 'jump';
     this.bubbleT -= dt * (0.6 + sp / 40);

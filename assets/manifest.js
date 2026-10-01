@@ -41,6 +41,11 @@ AQ.manifest = {
      "row": 5,
      "frames": 1,
      "fps": 1
+    },
+    "standnet": {
+     "row": 6,
+     "frames": 1,
+     "fps": 1
     }
    }
   },

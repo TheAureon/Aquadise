@@ -6,6 +6,7 @@ AQ.Catching = (function () {
   const K = { swing: null, bait: null, hold: 0, pryTarget: null };
 
   K.swinging = () => !!K.swing;
+  K.armOut = () => !!(K.swing || K.holdNet);
   const T = () => AQ.TUNING.net;
 
   function aimFrom(game, useMouse) {
@@ -159,11 +160,24 @@ AQ.Catching = (function () {
     if (K.bait) AQ.Assets.draw(g, 'bait', 'idle', K.bait.x, K.bait.y, { t: K.bait.t });
     const net = K.swing ? K.swing.net || netCircle(game, K.swing.aim, -0.8) : K.holdNet;
     if (!net) return;
-    // handle
-    const hx = P.x + P.facing * 5, hy = P.y + 1;
-    const n = 12;
-    g.fillStyle = '#c9a26a';
-    for (let i = 0; i <= n; i++) { const t = i / n; g.fillRect(Math.round(U.lerp(hx, net.x, t * 0.8)), Math.round(U.lerp(hy, net.y, t * 0.8)), 1, 1); }
+    // the robot's arm reaches from the shoulder toward the net (2px white, dark outline, elbow + hand)
+    const swim = P.mode === 'swim';
+    const sx = P.x + P.facing * (swim ? 3 : 4), sy = P.y + (swim ? 0 : -6);
+    let dx = net.x - sx, dy = net.y - sy;
+    const L = Math.hypot(dx, dy) || 1; dx /= L; dy /= L;
+    const reach = Math.min(8, L - 2), hx = sx + dx * reach, hy = sy + dy * reach;
+    const pts = [];
+    for (let t = 0; t <= reach; t += 0.5) pts.push([Math.round(sx + dx * t), Math.round(sy + dy * t)]);
+    g.fillStyle = '#262c37'; pts.forEach(([x, y]) => g.fillRect(x - 1, y - 1, 4, 4));
+    g.fillStyle = '#eef1f7'; pts.forEach(([x, y]) => g.fillRect(x, y, 2, 2));
+    const ex = Math.round(sx + dx * reach * 0.5), ey = Math.round(sy + dy * reach * 0.5);
+    g.fillStyle = '#3b4352'; g.fillRect(ex, ey, 2, 2);                     // elbow joint
+    g.fillStyle = '#3b4352'; g.fillRect(Math.round(hx), Math.round(hy), 2, 2); // hand
+    g.fillStyle = '#6ef0ef'; g.fillRect(Math.round(sx + dx * 2), Math.round(sy + dy * 2), 1, 1);
+    // net handle: thin black string from the hand to the hoop
+    const n = 14, h0x = hx + 1, h0y = hy + 1;
+    g.fillStyle = '#14161c';
+    for (let i = 0; i <= n; i++) { const t = i / n; g.fillRect(Math.round(U.lerp(h0x, net.x, t * 0.85)), Math.round(U.lerp(h0y, net.y, t * 0.85)), 1, 1); }
     // hoop + mesh
     const r = net.r;
     g.fillStyle = 'rgba(235,245,255,0.95)';
