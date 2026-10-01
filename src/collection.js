@@ -5,7 +5,9 @@ AQ.State = {
   collection: {},   // id -> number caught / harvested
   plants: {},       // id -> plants in inventory (usable as decorations)
   tanks: {},        // biomeId -> { creatures: [{uid,id}], storage: [{uid,id}], decor: [{uid,type,id,x,y}] }
-  upgrades: { net: 1, speed: 1 }
+  upgrades: { net: 1, speed: 1 },
+  unlocks: {},      // decorId -> true once unlocked by a tank's happiness
+  tankBest: {}      // biomeId -> best stars that tank has ever reached
 };
 
 AQ.Collection = (function () {

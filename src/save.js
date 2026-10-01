@@ -15,6 +15,8 @@ AQ.Save = (function () {
     AQ.State.plants = st.plants || {};
     AQ.State.tanks = st.tanks || {};
     AQ.State.upgrades = Object.assign({ net: 1, speed: 1 }, st.upgrades || {});
+    AQ.State.unlocks = st.unlocks || {};      // older saves: nothing unlocked yet, best stars 0
+    AQ.State.tankBest = st.tankBest || {};
     if (data.player && AQ.World.open(data.player.x, data.player.y) && !AQ.World.boxHits(data.player.x, data.player.y, 5, 4)) { game.player.x = data.player.x; game.player.y = data.player.y; }
   };
   S.save = function (game) {
@@ -26,7 +28,7 @@ AQ.Save = (function () {
   S.dirty = () => { S.isDirty = true; };
   // Fresh start without reloading the page (title screen > New Game).
   S.newGame = function (game) {
-    AQ.State.collection = {}; AQ.State.plants = {}; AQ.State.tanks = {};
+    AQ.State.collection = {}; AQ.State.plants = {}; AQ.State.tanks = {}; AQ.State.unlocks = {}; AQ.State.tankBest = {};
     AQ.State.upgrades = { net: 1, speed: 1 };
     game.upgrades = AQ.State.upgrades;
     const st = AQ.data.world.playerStart, P = game.player;

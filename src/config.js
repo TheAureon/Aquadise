@@ -96,7 +96,8 @@ AQ.TUNING = {
     feedShakeSeconds: 1.4,    // how long the food shaker sprinkles
     feedPellets: 8,
     chompSeconds: 0.45,
-    undoSteps: 30             // how many decor changes UNDO remembers per tank visit
+    undoSteps: 30,            // how many decor changes UNDO remembers per tank visit
+    unlockStars: [2, 3.5, 5]  // tank stars needed for each biome's unlock tiers 1, 2 and 3 (new themed decor)
   },
 
   save: { key: 'aquadise.save.v1', autosaveEvery: 10 }

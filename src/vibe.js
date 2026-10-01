@@ -101,5 +101,22 @@ AQ.Vibe = (function () {
     return { score, stars, parts, helps, missing, stressed: stressed.size, creatures: n };
   };
 
+  // ---- happiness milestones -> new decor (no currency, no shop)
+  V.unlockStars = (dd) => (dd.unlock.stars != null ? dd.unlock.stars : T().unlockStars[U.clamp((dd.unlock.tier || 1) - 1, 0, T().unlockStars.length - 1)]);
+  V.isUnlocked = (dd) => !dd.unlock || !!(AQ.State.unlocks && AQ.State.unlocks[dd.id]);
+  V.lockedFor = (biomeId) => AQ.data.decorations.filter((d) => d.unlock && d.unlock.biome === biomeId && !V.isUnlocked(d))
+    .sort((a, b) => V.unlockStars(a) - V.unlockStars(b));
+  V.nextUnlock = (biomeId) => { const l = V.lockedFor(biomeId)[0]; return l ? { def: l, stars: V.unlockStars(l) } : null; };
+  // Remember a tank's best stars; returns decor that just got unlocked by it.
+  V.recordBest = function (biomeId, stars) {
+    const st = AQ.State;
+    st.tankBest = st.tankBest || {}; st.unlocks = st.unlocks || {};
+    if (stars > (st.tankBest[biomeId] || 0)) { st.tankBest[biomeId] = stars; AQ.Save && AQ.Save.dirty(); }
+    const best = st.tankBest[biomeId] || 0, fresh = [];
+    V.lockedFor(biomeId).forEach((d) => { if (best >= V.unlockStars(d)) { st.unlocks[d.id] = true; fresh.push(d); } });
+    if (fresh.length) AQ.Save && AQ.Save.dirty();
+    return fresh;
+  };
+
   return V;
 })();

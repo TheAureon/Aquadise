@@ -41,6 +41,7 @@ AQ.Aquarium = (function () {
   A.refreshVibe = function () {
     A.vibe = AQ.Vibe.evaluate(A.biome); A.vibeT = AQ.TUNING.aquarium.recomputeEvery;
     A.fish.forEach(updateMood);
+    AQ.Vibe.recordBest(A.biome, A.vibe.stars).forEach(celebrate);
   };
 
   // ---------------------------------------------------------------- likes + mood
@@ -86,6 +87,15 @@ AQ.Aquarium = (function () {
     f.mood = U.clamp(m, 0, 1);
     const row = MOODS.find((r) => f.mood >= r[0]);
     f.moodName = row[1]; f.moodCol = row[2];
+  }
+  // A tank reached a new happiness milestone: a burst of sparkles and a new decoration.
+  function celebrate(dd) {
+    A.fresh = A.fresh || {}; A.fresh[dd.id] = true;
+    note(`New decoration unlocked: ${dd.name}!`, '#ffe08a', 5);
+    for (let i = 0; i < 9; i++) AQ.FX.sparkle(R.range(30, 290), R.range(40, 110), i % 2 ? '#fff3b0' : '#ffd25a', 6);
+    for (let i = 0; i < 5; i++) AQ.FX.sparkle(88 + i * 8, 6, '#fff3b0', 4);
+    A.tray = 'decor'; A.trayScroll = 0;
+    AQ.Audio.play('unlock');
   }
   A.moodOf = (f) => ({ name: f.moodName, color: f.moodCol, value: f.mood });
 
@@ -388,7 +398,12 @@ AQ.Aquarium = (function () {
     if (A.tray === 'decor') {
       const rank = (d) => (d.biomes && d.biomes.indexOf(A.biome) >= 0 ? 0 : !d.biomes ? 1 : 2);
       AQ.data.decorations.map((d, i) => [d, i]).sort((a, b) => rank(a[0]) - rank(b[0]) || a[1] - b[1])
-        .forEach(([d]) => out.push({ id: 'item', kind: 'decor', ref: d.id, key: 'decor.' + d.id, name: d.name, count: Infinity }));
+        .forEach(([d]) => {
+          // locked pieces: this tank's show as a goal; other biomes' stay hidden until unlocked
+          const locked = !AQ.Vibe.isUnlocked(d);
+          if (locked && d.unlock.biome !== A.biome) return;
+          out.push({ id: 'item', kind: 'decor', ref: d.id, key: 'decor.' + d.id, name: d.name, count: Infinity, locked, need: locked ? AQ.Vibe.unlockStars(d) : 0, fresh: !!(A.fresh && A.fresh[d.id]) });
+        });
       Object.entries(AQ.State.plants).forEach(([id, n]) => { const d = defOf(id); if (d && n > 0) out.push({ id: 'item', kind: 'plant', ref: id, key: 'plant.' + id, name: d.name, count: n }); });
     } else {
       const tank = AQ.Collection.tank(A.biome);
@@ -527,6 +542,8 @@ AQ.Aquarium = (function () {
       case 'tray_left': A.trayScroll -= 3; break;
       case 'tray_right': A.trayScroll += 3; break;
       case 'item':
+        if (r.locked) { note(`Reach ${r.need} stars in this tank to unlock ${r.name}.`, '#ffcf8a'); break; }
+        if (A.fresh) delete A.fresh[r.ref];
         if (tank.decor.length >= AQ.TUNING.tank.decorCapacity) { note('This tank is full of decorations.', '#ffd56b'); break; }
         if (A.holding) cancelHold();
         A.holding = { kind: r.kind, id: r.ref, key: r.key };
@@ -965,10 +982,21 @@ AQ.Aquarium = (function () {
       g.fillRect(x + rx, y + ry, 1, 1);
     }));
   }
+  function lockIcon(g, x, y) {
+    g.fillStyle = '#c8b27a'; g.fillRect(x + 1, y, 4, 1); g.fillRect(x, y + 1, 1, 3); g.fillRect(x + 5, y + 1, 1, 3);
+    g.fillStyle = '#ffd25a'; g.fillRect(x - 1, y + 4, 8, 6);
+    g.fillStyle = '#8a6a2a'; g.fillRect(x + 2, y + 6, 2, 2);
+  }
+  function miniStar(g, x, y) {
+    g.fillStyle = '#ffd25a'; g.fillRect(x + 1, y, 1, 1); g.fillRect(x, y + 1, 3, 1); g.fillRect(x, y + 3, 1, 1); g.fillRect(x + 2, y + 3, 1, 1); g.fillRect(x + 1, y + 2, 1, 1);
+  }
   function drawStars(g, x, y, stars) { for (let i = 0; i < 5; i++) star(g, x + i * 8, y, U.clamp(stars - i, 0, 1)); }
   A.drawStars = drawStars;
   function vibeTooltip(g, v) {
     const lines = v.helps.slice(0, 5).map((t) => ['+ ' + t, '#8ff0b0']).concat(v.missing.slice(0, 5).map((t) => ['- ' + t, '#ffcf8a']));
+    const nx = AQ.Vibe.nextUnlock(A.biome), best = (AQ.State.tankBest || {})[A.biome] || 0;
+    lines.push(nx ? [`NEXT: ${nx.stars} STARS UNLOCKS ${nx.def.name.toUpperCase()}`, '#ffe08a'] : ['ALL OF THIS TANK\'S DECOR IS UNLOCKED!', '#ffe08a']);
+    if (best > v.stars) lines.push([`BEST SO FAR: ${best} STARS`, '#8fb6cc']);
     const w = Math.max(120, ...lines.map((l) => F().width(l[0]))) + 10, h = 14 + lines.length * 7;
     const x = 84, y = 15;
     g.fillStyle = 'rgba(6,18,34,0.94)'; g.fillRect(x, y, w, h);
@@ -1016,6 +1044,13 @@ AQ.Aquarium = (function () {
           g.restore();
         }
         if (r.id === 'item' && r.count !== Infinity) F().draw(g, 'x' + r.count, r.x + r.w - 1, r.y + 23, '#ffe9a8', { align: 'right' });
+        if (r.locked) {
+          g.fillStyle = 'rgba(8,20,34,0.72)'; g.fillRect(r.x, r.y, r.w, r.h);
+          lockIcon(g, r.x + r.w / 2 - 3, r.y + 7);
+          const txt = String(r.need); F().draw(g, txt, r.x + r.w / 2 - 4, r.y + 22, '#ffd25a', { align: 'center', shadow: false });
+          miniStar(g, r.x + r.w / 2 - 3 + Math.ceil(F().width(txt) / 2), r.y + 22);
+        }
+        if (r.fresh && Math.floor(A.t * 3) % 2 === 0) F().draw(g, 'NEW', r.x + r.w / 2, r.y + 1, '#ffe08a', { align: 'center' });
         if (r.id === 'fish') F().draw(g, r.where === 'tank' ? 'IN' : 'OUT', r.x + r.w / 2, r.y + 23, r.where === 'tank' ? '#7ef0c0' : '#a8b8c8', { align: 'center' });
       } else if (r.id !== 'stars') button(g, r, hover);
     }
@@ -1024,7 +1059,8 @@ AQ.Aquarium = (function () {
     if (A.hover && A.hover.id === 'stars' && A.vibe) { vibeTooltip(g, A.vibe); return; }
     // hints
     if (A.hover && (A.hover.id === 'item' || A.hover.id === 'fish')) {
-      tip(g, A.hover.id === 'fish' ? `${A.hover.name}: CLICK TO MOVE ${A.hover.where === 'tank' ? 'TO STORAGE' : 'INTO TANK'}` : `${A.hover.name}: CLICK, THEN CLICK IN TANK`, A.hover.x + 12, TANK.waterTop + 4, '#fff');
+      const hv = A.hover;
+      tip(g, hv.id === 'fish' ? `${hv.name}: CLICK TO MOVE ${hv.where === 'tank' ? 'TO STORAGE' : 'INTO TANK'}` : hv.locked ? `${hv.name}: REACH ${hv.need} STARS IN THIS TANK TO UNLOCK` : `${hv.name}: CLICK, THEN CLICK IN TANK`, hv.x + 12, TANK.waterTop + 4, hv.locked ? '#ffcf8a' : '#fff');
     } else if (A.holding) tip(g, 'CLICK: PLACE   X: FLIP   Z: FRONT/BACK   RIGHT CLICK: STOP', 160, TANK.waterTop + 4, '#ffe9a8');
     else if (!tank.creatures.length && !tank.decor.length) tip(g, 'CATCH CREATURES FROM THIS BIOME TO FILL THIS TANK', 160, 70, '#ffffff');
     else if (inTank(AQ.Input.mouse) && fishAt(AQ.Input.mouse)) { if (!A.card) tip(g, 'CLICK A CREATURE TO LEARN ABOUT IT', 160, TANK.waterTop + 4, '#cfe8ff'); }
@@ -1034,7 +1070,10 @@ AQ.Aquarium = (function () {
     // notices (tank full, cleared, unlocks...)
     (A.notes || []).forEach((n, i) => {
       g.globalAlpha = U.clamp(Math.min(n.t * 4, (n.life - n.t) * 2), 0, 1);
-      tip(g, n.text, 160, TANK.y + TANK.h - 14 - (A.notes.length - 1 - i) * 8, n.color);
+      const w = F().width(n.text) + 10, y = TANK.waterTop + 16 + i * 11;
+      g.fillStyle = 'rgba(6,18,34,0.85)'; g.fillRect(160 - w / 2, y - 3, w, 10);
+      g.fillStyle = n.color; g.fillRect(160 - w / 2, y - 3, w, 1);
+      F().draw(g, n.text, 160, y, n.color, { align: 'center', shadow: false });
       g.globalAlpha = 1;
     });
   }
