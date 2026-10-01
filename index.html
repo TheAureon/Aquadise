@@ -1,0 +1,47 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Aquadise</title>
+  <link rel="stylesheet" href="style.css">
+</head>
+<body>
+  <div id="stage">
+    <canvas id="game" width="320" height="180"></canvas>
+    <div id="ui"></div>
+    <div id="loading"><div class="logo">AQUADISE</div><div id="loading-text">Loading...</div></div>
+  </div>
+
+  <!-- data (edit these to add biomes / creatures / decorations) -->
+  <script src="src/config.js"></script>
+  <script src="data/sprite-spec.js"></script>
+  <script src="data/world.js"></script>
+  <script src="data/creatures.js"></script>
+  <script src="data/decorations.js"></script>
+  <script src="assets/manifest.js"></script>
+
+  <!-- engine -->
+  <script src="src/util.js"></script>
+  <script src="src/placeholder-art.js"></script>
+  <script src="src/input.js"></script>
+  <script src="src/font.js"></script>
+  <script src="src/assets.js"></script>
+  <script src="src/audio.js"></script>
+  <script src="src/world.js"></script>
+  <script src="src/terrain.js"></script>
+  <script src="src/fx.js"></script>
+  <script src="src/render.js"></script>
+  <script src="src/player.js"></script>
+  <script src="src/behaviors.js"></script>
+  <script src="src/creatures.js"></script>
+  <script src="src/catching.js"></script>
+  <script src="src/collection.js"></script>
+  <script src="src/chests.js"></script>
+  <script src="src/save.js"></script>
+  <script src="src/aquarium.js"></script>
+  <script src="src/ui.js"></script>
+  <script src="src/hud.js"></script>
+  <script src="src/game.js"></script>
+</body>
+</html>
