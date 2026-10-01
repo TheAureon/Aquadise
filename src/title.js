@@ -18,7 +18,7 @@ AQ.Title = (function () {
 
   function hasProgress() {
     const S = AQ.State;
-    return Object.keys(S.collection).length > 0 || S.upgrades.net > 1 || S.upgrades.speed > 1;
+    return Object.keys(S.collection).length > 0 || S.upgrades.net > 1 || S.upgrades.speed > 1 || (AQ.Game && AQ.Game.scene && AQ.Game.scene !== 'world');
   }
   function menu() {
     const items = [];

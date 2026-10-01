@@ -17,11 +17,12 @@ AQ.Aquarium = (function () {
   function order(b) { return b.rect[0] + (b.id === 'lush_cave' ? 1 : 0) + (b.id === 'cave' ? -1 : 0); }
 
   // ---------------------------------------------------------------- open / close
-  A.open = function (game, from) {
+  A.open = function (game, from, biome) {
     A.returnTo = from || 'play';
     game.state = 'aquarium';
+    if (biome) { if (A.biome !== biome) A.fish = []; A.biome = biome; }
     if (!A.biome) {
-      const here = AQ.World.biomeAt(game.player.x, game.player.y).id;
+      const here = game.scene === 'world' ? AQ.World.biomeAt(game.player.x, game.player.y).id : 'tide_pools';
       A.biome = here;
     }
     A.prevState = 'play';
@@ -861,6 +862,9 @@ AQ.Aquarium = (function () {
 
   // ---------------------------------------------------------------- overview: every tank at a glance
   const CARD = { w: 76, h: 49, gap: 2, x0: 5, y0: 16 };
+  A.openOverview = () => openOverview();
+  A.backdropOf = (b) => backdrop(b);
+  A.styleOf = styleOf;
   function openOverview() {
     putBack();
     A.view = 'overview'; A.card = null; A.ovT = 0; A.ovHover = null;

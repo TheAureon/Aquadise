@@ -34,7 +34,15 @@ AQ.Scenes = (function () {
     const sc = S.list[id] ? S.list[id] : S.list.world;
     game.scene = sc.id;
     const P = game.player, w = sc.world();
-    const ok = x != null && y != null && (sc.valid ? sc.valid(x, y) : w.standable(x, y));
+    const valid = (vx, vy) => (sc.valid ? sc.valid(vx, vy) : w.standable(vx, vy));
+    let ok = x != null && y != null && valid(x, y);
+    const hb = AQ.TUNING.swim.hitbox;
+    if (!ok && x != null && y != null && !w.boxHits(x, y, hb.w / 2, hb.h / 2)) {
+      // saved mid-jump: lower them onto the ground just below
+      let yy = y;
+      for (let k = 0; k < 600 && yy < w.h && !w.boxHits(x, yy + 1, hb.w / 2, hb.h / 2); k++) yy += 1;
+      if (valid(x, yy)) { y = yy; ok = true; }
+    }
     if (ok) { P.x = x; P.y = y; } else sc.enter(game, 'safe');
     AQ.Camera.snap(P, w);
   };

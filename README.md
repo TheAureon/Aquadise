@@ -25,7 +25,8 @@ npx http-server -c-1 .      # or: python3 -m http.server
 | net                 | left-click (aims at the mouse)           |
 | pry a stuck creature| keep holding left-click after the swing  |
 | drop bait           | B / K, or right-click                    |
-| aquarium            | Tab                                      |
+| interact (beam up/down, open a tank) | E                         |
+| climb a ladder      | W / S (or Up / Down) on a ladder         |
 | collection log      | L                                        |
 | map                 | M                                        |
 | pause / home / reset | Esc                                     |
@@ -52,6 +53,15 @@ Click a creature for its info card. Hover the stars for what's helping and what'
 - **No fail state.** Hostile creatures only knock you back. Air is unlimited.
 - **Progression** comes only from chests: a bigger net (3 levels) and faster swimming (3 levels).
   Six chests exist at a time, and they despawn and respawn around the world.
+- **Getting to the aquarium.** Walk left off the far edge of Tide Pools (by the little signpost)
+  and the screen fades to a separate hill scene. Walk up the hill and stand in the UFO's beam,
+  then press **E**: you're lifted up and arrive in the aquarium building, which floats in space.
+  Inside there's normal gravity. Walk, jump and climb the ladders, and press **E** at a tank to tend
+  it, or at the DIRECTORY console for the overview of every tank. The BEAM PAD on the ground floor
+  (**E**) sends you back to the hilltop; walk down the hill's right edge to return to Tide Pools.
+  The hill and the building are their own scenes and never appear on the world map. The game
+  saves which scene you're in. Caught creatures still go straight to their tank. (The old Tab
+  shortcut is a test-only setting: `AQ.TUNING.debug.tabOpensAquarium`, off by default.)
 - **Aquarium.** One tank per biome, and a creature can only live in its own biome's tank.
   Nothing ever dies and nothing is punished:
   - **Tank vibe (0-5 stars):** decor variety and amount, biome-themed pieces, plants, being fed
@@ -78,6 +88,7 @@ data/world.js         world layout: floor profile, biome rects/palettes/props, t
 data/creatures.js     every creature + plant (behaviour, params, spawn rules, hints)
 data/decorations.js   aquarium decorations (tags, theme biomes, unlock tiers, glow)
 data/aquarium.js      per-biome tank looks (water colours, light, darkness, particles)
+data/scenes.js        layout of the aquarium building (floors, ladders, tank spots, pad, windows)
 data/sprite-spec.js   sprite size classes + animation rows
 assets/manifest.js    sprite list (generated) -> assets/sprites/**.png
 src/config.js         ALL tuning constants (swim speed/accel/drag, camera, net, bait, chests...)
@@ -88,6 +99,11 @@ src/creatures.js      spawning / simulation / drawing of creatures + plants
 src/catching.js       net, pry, bait
 src/aquarium.js       tanks, decorating, creature life + moods, info card, overview, undo
 src/vibe.js           tank happiness (stars), helping/missing reasons, unlock milestones
+src/transition.js     reusable fade-to-black scene transition (AQ.Transition.go)
+src/scenes.js         scene system: world / hill / station, scene switching, save restore, prompts
+src/miniworld.js      small collision maps for side scenes (ladders, one-way platforms)
+src/hill.js           the hill scene with the UFO and its beam
+src/station.js        the aquarium building in space (tanks on the walls, directory, beam pad)
 src/ui.js             collection log, map, pause
 tools/gen-placeholders.js   writes placeholder PNGs + manifest from the data files
 tools/sprites.html          animated preview of every sprite
@@ -126,8 +142,8 @@ docs/SPRITE_SPEC.md         how to make sprites that drop in cleanly
   close. Esc → Reset save wipes it.
 - **Audio:** stubbed. `src/audio.js` has no-op `play()`/`music()` hooks that are already called
   at the right moments.
-- **Getting home:** Tab opens the aquarium from anywhere. Caught creatures go to their tank
-  immediately.
+- **Getting home:** the walk to the hill and the UFO (see above). The title screen's AQUARIUM
+  button still opens the tank screen directly. Caught creatures go to their tank immediately.
 - Plants can decorate any tank. Only creatures are restricted to their own biome.
 - On land, Shift is careful walking (same stealth rule as sneaking underwater), not a sprint.
   Space jumps; the net is left-click only.

@@ -84,3 +84,28 @@ generator (`node tools/gen-placeholders.js`) will then leave that entry and its 
 `--force`, the generator never overwrites an existing PNG.
 
 Preview every sheet, animated, at `tools/sprites.html` (served from a local web server).
+
+## Scene pieces (the hill, the UFO, the aquarium building)
+
+All live in `assets/sprites/scene/`. Replace a PNG with real art of the same size.
+
+| key                  | size     | frames            | anchor        | notes |
+|----------------------|----------|-------------------|---------------|-------|
+| `misc.signpost`      | 16 × 24  | 1                 | bottom-centre | at the edge of Tide Pools, pointing left |
+| `misc.ufo`           | 64 × 32  | 4 @ 6 fps         | centre        | hovers over the hilltop |
+| `misc.beam`          | 32 × 96  | 4 @ 8 fps         | top-centre    | drawn translucent ("lighter" blend), stretched to the beam's width and length |
+| `misc.beampad`       | 40 × 12  | 4 @ 6 fps         | bottom-centre | the beam pad in the building |
+| `misc.console`       | 20 × 28  | 4 @ 6 fps         | bottom-centre | the tank directory |
+| `misc.tank_frame`    | 64 × 44  | 1                 | bottom-centre | keep the window (x 4..59, y 4..35) transparent: the live tank shows through it |
+| `bg.hill_sky`        | 320 × 180| 1                 | top-left      | fixed backdrop behind the hill |
+| `bg.space`           | 320 × 180| 1                 | top-left      | must tile seamlessly (it scrolls slowly) |
+| `bg.planet_ringed`, `bg.planet_small` | 56 × 32, 20 × 20 | 1 | top-left | distant planets |
+| `tile.hill`          | 32 × 48  | 1                 | top-left      | row 0 = the grass surface, lower rows = soil by depth; tiles sideways |
+| `tile.station_wall`, `tile.station_hull` | 32 × 32 | 1 | top-left | tiling wall / outer hull panels |
+| `tile.station_floor` | 32 × 8   | 1                 | top-left      | row 0 is the walking surface |
+| `tile.ladder`        | 16 × 8   | 1                 | top-left      | repeats vertically |
+
+The player sheet also has row 7 `climb` (2 frames @ 6 fps), shown while on a ladder.
+The hill's shape comes from `AQ.TUNING.hill`, and the building's layout from `data/scenes.js`, so the
+art only supplies textures and props.
+
