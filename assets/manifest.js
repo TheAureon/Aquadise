@@ -5,11 +5,11 @@ AQ.manifest = {
  "sprites": {
   "player": {
    "file": "sprites/misc/player.png",
-   "fw": 24,
-   "fh": 32,
+   "fw": 28,
+   "fh": 40,
    "anchor": [
-    12,
-    16
+    14,
+    20
    ],
    "anims": {
     "idle": {
@@ -374,11 +374,11 @@ AQ.manifest = {
   },
   "creature.reef_mimic": {
    "file": "sprites/creatures/reef_mimic.png",
-   "fw": 16,
-   "fh": 16,
+   "fw": 24,
+   "fh": 24,
    "anchor": [
-    8,
-    8
+    12,
+    12
    ],
    "anims": {
     "idle": {
@@ -811,11 +811,11 @@ AQ.manifest = {
   },
   "creature.crimsonback": {
    "file": "sprites/creatures/crimsonback.png",
-   "fw": 16,
-   "fh": 16,
+   "fw": 24,
+   "fh": 24,
    "anchor": [
-    8,
-    8
+    12,
+    12
    ],
    "anims": {
     "idle": {
@@ -895,11 +895,11 @@ AQ.manifest = {
   },
   "creature.chest_octopus": {
    "file": "sprites/creatures/chest_octopus.png",
-   "fw": 16,
-   "fh": 16,
+   "fw": 24,
+   "fh": 24,
    "anchor": [
-    8,
-    8
+    12,
+    12
    ],
    "anims": {
     "idle": {
@@ -1179,11 +1179,11 @@ AQ.manifest = {
   },
   "creature.muckhide_octopus": {
    "file": "sprites/creatures/muckhide_octopus.png",
-   "fw": 16,
-   "fh": 16,
+   "fw": 24,
+   "fh": 24,
    "anchor": [
-    8,
-    8
+    12,
+    12
    ],
    "anims": {
     "idle": {

@@ -33,8 +33,8 @@ AQ.Catching = (function () {
 
   K.update = function (dt, game) {
     const I = AQ.Input, P = game.player;
-    const mousePress = I.mouse.pressed[0], keyPress = I.wasPressed('Space', 'KeyJ');
-    const holding = I.isDown('Space', 'KeyJ') || I.mouse.down[0];
+    const mousePress = I.mouse.pressed[0], keyPress = false;   // the net is left-click only (Space jumps)
+    const holding = I.mouse.down[0];
 
     if ((mousePress || keyPress) && !K.swing) {
       const aim = aimFrom(game, mousePress);
@@ -162,7 +162,7 @@ AQ.Catching = (function () {
     if (!net) return;
     // the robot's arm reaches from the shoulder toward the net (2px white, dark outline, elbow + hand)
     const swim = P.mode === 'swim';
-    const sx = P.x + P.facing * (swim ? 3 : 4), sy = P.y + (swim ? 0 : -6);
+    const sx = P.x + P.facing * (swim ? 4 : 6), sy = P.y + (swim ? 0 : -9);
     let dx = net.x - sx, dy = net.y - sy;
     const L = Math.hypot(dx, dy) || 1; dx /= L; dy /= L;
     const reach = Math.min(8, L - 2), hx = sx + dx * reach, hy = sy + dy * reach;

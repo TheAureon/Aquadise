@@ -24,15 +24,17 @@ AQ.data.world = {
     [1900, 266, 3], [2050, 270, 3], [2200, 272, 3], [2380, 276, 3],
     // Steep drop-off
     [2440, 300, 6], [2500, 370, 8], [2560, 450, 8], [2620, 530, 8], [2680, 610, 8], [2730, 690, 6], [2770, 760, 5],
-    // Volcanic vents at the bottom of the slope: a row of rounded vent mounds
-    [2800, 800, 2], [2830, 760, 2], [2860, 802, 2], [2905, 748, 2], [2945, 804, 2], [2985, 756, 2], [3025, 800, 2],
-    [3070, 742, 2], [3115, 802, 2], [3155, 762, 2], [3195, 804, 2], [3240, 752, 2], [3290, 806, 2],
+    // Volcanic vents at the bottom of the slope: three broad, smoking mounds with open floor between
+    [2800, 804, 2], [2850, 772, 2], [2905, 806, 2], [2985, 806, 3], [3030, 768, 2], [3080, 806, 2],
+    [3165, 806, 3], [3210, 776, 2], [3255, 806, 2], [3290, 806, 2],
     // Deep trench (steep walls)
     [3320, 830, 4], [3335, 900, 6], [3350, 1000, 6], [3370, 1120, 6], [3400, 1200, 5], [3500, 1222, 4], [3650, 1218, 4],
     [3800, 1224, 4], [3850, 1200, 5], [3880, 1100, 6], [3900, 980, 6], [3920, 840, 6], [3940, 700, 6], [3955, 560, 5], [3968, 440, 4],
     // Kelp forest + mangrove roots on the shallower seabed
-    [3990, 388, 3], [4200, 384, 4], [4450, 390, 4], [4700, 384, 4], [4900, 388, 4],
-    [5100, 384, 4], [5300, 390, 5], [5500, 384, 4], [5680, 388, 3],
+    [3990, 388, 3], [4200, 384, 4], [4450, 390, 4], [4700, 384, 4], [4880, 388, 4],
+    // Mangrove: a shallow, muddy flat (real mangroves grow in shallow water)
+    [4930, 320, 4], [4980, 230, 3], [5040, 190, 3], [5200, 194, 3], [5350, 188, 3], [5500, 196, 3], [5600, 190, 3],
+    [5650, 250, 3], [5690, 388, 3],
     // Ice shelf / polar waters
     [5760, 392, 3], [5900, 396, 4], [6100, 392, 4], [6300, 398, 4], [6500, 394, 4], [6700, 396, 4], [6800, 396, 0]
   ],
@@ -42,13 +44,17 @@ AQ.data.world = {
   // water = tint mixed into the water colour, dark = ambient darkness (0..1).
   biomes: [
     { id: 'lush_cave', name: 'Half-Flooded Lush Cave', short: 'Lush Cave', rect: [5960, 700, 840, 260],
-      palette: { top: ['#6fa456', '#4f8a43', '#3d6b37'], rock: ['#5a5560', '#4a4550', '#3b3742'], accent: '#c9e07a', style: 'mossy', backwall: true, air: '#26333a' }, water: '#2f8a7a', waterMix: 0.45, dark: 0.45,
+      palette: { top: ['#6fa456', '#4f8a43', '#3d6b37'], rock: ['#5a5560', '#4a4550', '#3b3742'], accent: '#c9e07a', style: 'mossy', backwall: true, air: '#26333a' }, water: '#2fa08c', waterMix: 0.45, dark: 0.36,
       props: [
-        { type: 'vine', at: 'ceiling', n: 38, air: true },
-        { type: 'glowshroom', at: 'floor', n: 14, air: true },
-        { type: 'fern', at: 'floor', n: 20, airOnly: true },
-        { type: 'seagrass', at: 'floor', n: 20, colors: ['#5fae6e', '#4b9058', '#7ccf86'] },
-        { type: 'stalactite', at: 'ceiling', n: 10, air: true }
+        { type: 'vine', at: 'ceiling', n: 26, air: true },
+        { type: 'glowvine', at: 'ceiling', n: 14, air: true },
+        { type: 'glowshroom', at: 'floor', n: 12, air: true },
+        { type: 'flowerbed', at: 'floor', n: 10, airOnly: true },
+        { type: 'fern', at: 'floor', n: 14, airOnly: true },
+        { type: 'lilypad', at: 'waterline', n: 16 },
+        { type: 'seagrass', at: 'floor', n: 16, colors: ['#5fae6e', '#4b9058', '#7ccf86'] },
+        { type: 'glowshroom', at: 'floor', n: 5 },
+        { type: 'stalactite', at: 'ceiling', n: 6, air: true }
       ] },
     { id: 'cave', name: 'Flooded Cave System', short: 'Cave', rect: [5660, 400, 360, 820],
       palette: { top: ['#56606b', '#4a535d', '#3f4750'], rock: ['#3e444d', '#343941', '#2a2e35'], accent: '#7fb0a8', style: 'strata', backwall: true }, water: '#1c3550', waterMix: 0.5, dark: 0.72,
@@ -70,9 +76,9 @@ AQ.data.world = {
     { id: 'vents', name: 'Volcanic Vents', short: 'Vents', rect: [2560, 600, 760, 680],
       palette: { top: ['#4a3f44', '#3d3338', '#33292e'], rock: ['#2f282c', '#272124', '#1f1a1d'], accent: '#ff8a3a', style: 'strata', embers: true }, water: '#3a2230', waterMix: 0.25, dark: 0.55,
       props: [
-        { type: 'ventcrack', at: 'floor', n: 5, y: [760, 820] },
-        { type: 'tubeworms', at: 'floor', n: 10 },
-        { type: 'rock', at: 'floor', n: 12, color: '#4a3f44' }
+        { type: 'ventcrack', at: 'floor', n: 3, y: [790, 820] },
+        { type: 'tubeworms', at: 'floor', n: 6 },
+        { type: 'rock', at: 'floor', n: 5, color: '#4a3f44' }
       ] },
     { id: 'open_ocean', name: 'Open Ocean', short: 'Open Ocean', rect: [2420, 0, 1550, 1280],
       palette: { top: ['#6d7c88', '#5d6b78', '#4f5c68'], rock: ['#46525e', '#3c4652', '#323b46'], accent: '#8da3b0' }, water: '#1f5fa8', waterMix: 0.2, dark: 0,
@@ -183,8 +189,7 @@ AQ.data.world = {
     { op: 'solid', shape: 'circle', mat: 'metal', x: 2372, y: 266, r: 10, jitter: 1 },
 
     // --- Volcanic vents: smoking craters on top of the mounds (y is found automatically)
-    { shape: 'vent', x: 2830 }, { shape: 'vent', x: 2905 }, { shape: 'vent', x: 2985 }, { shape: 'vent', x: 3070 },
-    { shape: 'vent', x: 3155 }, { shape: 'vent', x: 3240 },
+    { shape: 'vent', x: 2850 }, { shape: 'vent', x: 3030 }, { shape: 'vent', x: 3210 },
 
     // --- Deep trench: ledges on the walls
     { op: 'solid', shape: 'poly', pts: [[3330, 880], [3380, 900], [3384, 912], [3335, 914]], jitter: 2 },
@@ -197,10 +202,9 @@ AQ.data.world = {
     { op: 'solid', shape: 'poly', mat: 'ice', pts: [[6060, 90], [6190, 88], [6196, 108], [6150, 126], [6070, 112]], jitter: 2 },
     { op: 'solid', shape: 'spikes', mat: 'ice', x: 5870, y: 116, w: 100, n: 5, h: [6, 16], base: [2, 4], dir: 'down' },
     { op: 'solid', shape: 'spikes', mat: 'ice', x: 6075, y: 112, w: 100, n: 5, h: [6, 18], base: [2, 4], dir: 'down' },
-    { op: 'solid', shape: 'poly', mat: 'ice', pts: [[6300, 20], [6520, 26], [6514, 140], [6470, 166], [6410, 150], [6330, 170], [6296, 120]], jitter: 3 },
-    { op: 'solid', shape: 'poly', mat: 'ice', pts: [[6600, 14], [6800, 10], [6800, 160], [6720, 150], [6650, 172], [6596, 130]], jitter: 3 },
-    { op: 'solid', shape: 'spikes', mat: 'ice', x: 6310, y: 150, w: 200, n: 7, h: [8, 26], base: [3, 6], dir: 'down' },
-    { op: 'solid', shape: 'spikes', mat: 'ice', x: 6600, y: 150, w: 180, n: 6, h: [8, 24], base: [3, 6], dir: 'down' },
+    // Glaciers: triangular icebergs - pointed peaks above the water, a bigger jagged mass below
+    { op: 'solid', shape: 'poly', mat: 'ice', pts: [[6350, 98], [6382, 54], [6396, 62], [6420, 10], [6444, 50], [6458, 42], [6482, 98], [6512, 150], [6470, 214], [6420, 254], [6372, 214], [6322, 150]], jitter: 1.5 },
+    { op: 'solid', shape: 'poly', mat: 'ice', pts: [[6638, 98], [6666, 62], [6688, 68], [6714, 8], [6740, 58], [6756, 50], [6782, 98], [6800, 140], [6800, 200], [6770, 226], [6716, 264], [6660, 222], [6618, 150]], jitter: 1.5 },
     { op: 'solid', shape: 'spikes', mat: 'ice', x: 6300, y: 398, w: 480, n: 10, h: [14, 40], base: [6, 12], jitter: 1 },
 
     // --- Flooded cave system: a steep passage down from the seabed, branching deeper

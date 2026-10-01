@@ -3,7 +3,8 @@ var AQ = (typeof AQ !== 'undefined') ? AQ : {};
 
 AQ.Title = (function () {
   const U = AQ.U, R = U.R, F = () => AQ.Font;
-  const T = { sel: 0, t: 0, camX: 820, camY: 190, panel: null, confirmNew: 0, items: [], bubbles: [], diverT: 4 };
+  const T = { sel: 0, t: 0, camX: 820, camY: 190, panel: null, confirmNew: 0, items: [], bubbles: [], diverT: 4, seg: 0, fade: 0, mantaT: 6 };
+  const TOUR = [[820, 2300], [3990, 4860], [4950, 5620]];
   // stand-in "player" for creatures while the camera drifts: silent and still
   const ghost = { x: 0, y: 0, vx: 0, vy: 0, facing: 1, sneaking: false, noise: () => 0, knock() {} };
   const SH = 'rgba(4,12,24,0.85)';
@@ -11,7 +12,7 @@ AQ.Title = (function () {
   T.open = function (game) {
     game.state = 'title';
     T.sel = 0; T.panel = null; T.confirmNew = 0;
-    T.camX = U.clamp(game.player.x - 120, 820, AQ.World.w - 400);
+    T.seg = 0; T.camX = TOUR[0][0]; T.fade = 0; T.switched = false;
     AQ.FX.list.length = 0;
   };
 
@@ -26,8 +27,8 @@ AQ.Title = (function () {
     items.push({ id: 'aquarium', label: 'AQUARIUM', icon: 'fish' });
     items.push({ id: 'log', label: 'COLLECTION', icon: 'book' });
     items.push({ id: 'controls', label: 'CONTROLS', icon: 'pad' });
-    const y0 = items.length === 5 ? 70 : 76;
-    return items.map((it, i) => Object.assign(it, { x: 96, y: y0 + i * 16, w: 128, h: 13 }));
+    const y0 = items.length === 5 ? 74 : 80;
+    return items.map((it, i) => Object.assign(it, { x: 108, y: y0 + i * 14, w: 104, h: 11 }));
   }
 
   // ---------------------------------------------------------------- update
@@ -35,9 +36,15 @@ AQ.Title = (function () {
     const I = AQ.Input, m = I.mouse, W = AQ.World;
     T.t += dt;
     T.confirmNew = Math.max(0, T.confirmNew - dt);
-    // slow drift to the right along the world, hugging the water surface / seabed
+    // slow drift through the prettiest stretches (coral + ruins, kelp, mangroves), cross-fading between them
+    const seg = TOUR[T.seg % TOUR.length];
     T.camX += dt * 16;
-    if (T.camX > W.w - 200) T.camX = 820;
+    if (T.camX > seg[1] - 1.5 * 16 && T.fade <= 0) T.fade = 1.6;      // start fading out near the end
+    if (T.fade > 0) {
+      T.fade -= dt;
+      if (T.fade < 0.8 && !T.switched) { T.seg++; T.camX = TOUR[T.seg % TOUR.length][0]; T.camY = W.sea + 90; T.switched = true; }
+      if (T.fade <= 0) { T.fade = 0; T.switched = false; }
+    }
     const floor = W.floorY[Math.round(U.clamp(T.camX, 0, W.w - 1))] || W.sea + 100;
     const want = U.clamp(floor - 60, W.sea + 40, W.sea + 140);
     T.camY += (want - T.camY) * Math.min(1, dt * 0.6);
@@ -156,8 +163,47 @@ AQ.Title = (function () {
     }
   }
 
+  // ---------------------------------------------------------------- background extras
+  // Drawn between the water backdrop and the terrain: a sunburst of light, a distant fish school,
+  // and now and then a big manta ray gliding through the far water.
+  T.drawBack = function (g) {
+    const t = T.t;
+    g.save();
+    for (let i = 0; i < 9; i++) {
+      const a = -0.5 + i * 0.12 + Math.sin(t * 0.2 + i) * 0.02, len = 260, w = 0.035 + (i % 3) * 0.015;
+      g.globalAlpha = 0.045 + 0.02 * Math.sin(t * 0.6 + i * 1.3);
+      g.fillStyle = '#eafcff';
+      g.beginPath(); g.moveTo(160, -30);
+      g.lineTo(160 + Math.sin(a - w) * len, -30 + Math.cos(a - w) * len); g.lineTo(160 + Math.sin(a + w) * len, -30 + Math.cos(a + w) * len);
+      g.fill();
+    }
+    g.restore();
+    // distant school (dark, slow, wavy formation)
+    const sx = ((t * 9) % 420) - 60, sy = 70 + Math.sin(t * 0.3) * 8;
+    g.fillStyle = 'rgba(14,52,82,0.45)';
+    for (let i = 0; i < 22; i++) {
+      const fx = Math.round(sx - (i % 7) * 7 - Math.floor(i / 7) * 3), fy = Math.round(sy + Math.floor(i / 7) * 5 + Math.sin(t * 2 + i) * 1.5);
+      g.fillRect(fx, fy, 3, 1); g.fillRect(fx - 1, fy - 1, 1, 1); g.fillRect(fx - 1, fy + 1, 1, 1);
+    }
+    // manta ray silhouette every ~30s
+    T.mantaT += 1 / 60;
+    const mp = (T.mantaT % 30) / 18;
+    if (mp < 1) {
+      const mx = 360 - mp * 440, my = 52 + Math.sin(mp * 6) * 6, flap = Math.sin(t * 1.6) * 3;
+      g.fillStyle = 'rgba(10,40,66,0.38)';
+      for (let i = -14; i <= 14; i++) { const h = Math.max(1, Math.round(3 - Math.abs(i) / 6)); g.fillRect(Math.round(mx + i), Math.round(my + Math.abs(i) * 0.12 * flap / 3 - h / 2), 1, h); }
+      g.fillRect(Math.round(mx + 14), Math.round(my), 10, 1);    // tail
+    }
+  };
+
   // ---------------------------------------------------------------- draw
   T.draw = function (g) {
+    // bokeh: big soft light dots drifting in front
+    for (let i = 0; i < 10; i++) {
+      const bx = (i * 73 + T.t * (4 + i % 3)) % 340 - 10, by = (i * 41 + Math.sin(T.t * 0.4 + i) * 10) % 170 + 5;
+      g.fillStyle = `rgba(220,250,255,${0.06 + (i % 3) * 0.03})`;
+      g.fillRect(Math.round(bx) - 1, Math.round(by), 3, 1); g.fillRect(Math.round(bx), Math.round(by) - 1, 1, 3);
+    }
     // soft vignette at the top and bottom so text reads over the scene
     for (let i = 0; i < 16; i++) {
       g.fillStyle = `rgba(4,14,28,${(0.45 * (1 - i / 16)).toFixed(3)})`;
@@ -187,8 +233,8 @@ AQ.Title = (function () {
       pill(g, box, 'rgba(6,20,38,0.92)', 'rgba(110,240,239,0.6)');
       F().draw(g, 'CONTROLS', 160, 71, '#6ef0ef', { align: 'center', shadow: false });
       const rows = [
-        ['MOVE / SWIM', 'WASD OR ARROWS'], ['JUMP (ON LAND)', 'W / UP'], ['SNEAK', 'HOLD SHIFT'],
-        ['NET', 'SPACE OR CLICK'], ['PRY', 'HOLD THE NET'], ['BAIT', 'B OR RIGHT CLICK'],
+        ['MOVE / SWIM', 'WASD OR ARROWS'], ['JUMP', 'SPACE'], ['SNEAK', 'HOLD SHIFT'],
+        ['NET', 'LEFT CLICK'], ['PRY', 'HOLD LEFT CLICK'], ['BAIT', 'B OR RIGHT CLICK'],
         ['AQUARIUM / LOG / MAP', 'TAB / L / M'], ['PAUSE', 'ESC']
       ];
       rows.forEach(([a, b], i) => { F().draw(g, a, 50, 82 + i * 9, '#9fd3ee', { shadow: false }); F().draw(g, b, 270, 82 + i * 9, '#ffffff', { align: 'right', shadow: false }); });
@@ -199,12 +245,19 @@ AQ.Title = (function () {
       pill(g, it, on ? 'rgba(14,52,82,0.88)' : 'rgba(8,28,48,0.55)', on ? '#6ef0ef' : null);
       if (!on) { g.fillStyle = 'rgba(180,230,245,0.18)'; g.fillRect(it.x + 1, it.y, it.w - 2, 1); }
       const nudge = on ? Math.round(Math.sin(T.t * 5)) : 0;
-      icon(g, it.icon, it.x + 6 + nudge, it.y + 3, on ? '#6ef0ef' : '#7fb6cc');
-      F().draw(g, it.label, it.x + it.w / 2 + 5, it.y + 4, on ? '#ffffff' : '#c3dfec', { align: 'center', shadow: on ? false : SH });
+      icon(g, it.icon, it.x + 5 + nudge, it.y + 2, on ? '#6ef0ef' : '#7fb6cc');
+      F().draw(g, it.label, it.x + it.w / 2 + 5, it.y + 3, on ? '#ffffff' : '#c3dfec', { align: 'center', shadow: on ? false : SH });
     });
     const c = AQ.Collection.progress();
     F().draw(g, `${c.caught}/${c.total} SPECIES`, 316, 172, '#7fa4ba', { align: 'right', shadow: SH });
     F().draw(g, 'ARROWS + ENTER OR CLICK', 4, 172, '#7fa4ba', { shadow: SH });
+    T.drawFade(g);
+  };
+  // scene cross-fade (dips to a deep-sea blue between tour stops)
+  T.drawFade = function (g) {
+    if (T.fade <= 0) return;
+    const a = T.fade > 0.8 ? (1.6 - T.fade) / 0.8 : T.fade / 0.8;
+    g.fillStyle = `rgba(6,22,40,${Math.min(1, a).toFixed(3)})`; g.fillRect(0, 0, 320, 180);
   };
 
   return T;

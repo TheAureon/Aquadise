@@ -108,6 +108,7 @@ AQ.Game = (function () {
       return;
     }
     AQ.Render.background(cam);
+    if (G.state === 'title') AQ.Title.drawBack(ctx);
     AQ.Terrain.draw(ctx, cam);
     ctx.save();
     ctx.translate(-cam.left(), -cam.top());
@@ -124,6 +125,7 @@ AQ.Game = (function () {
     if (AQ.Terrain.drawFront) AQ.Terrain.drawFront(ctx, cam);
     AQ.Render.surface(cam);
     AQ.Render.lighting(cam, collectLights(), targetDarkness());
+    AQ.Terrain.drawGlow(ctx, cam);
     if (title) { if (G.state === 'log') AQ.LogUI.draw(ctx, G); else AQ.Title.draw(ctx, G); return; }
     AQ.HUD.draw(ctx, G);
     if (G.state === 'map') AQ.MapUI.draw(ctx, G);
@@ -144,6 +146,7 @@ AQ.Game = (function () {
     if (G.state === 'title') L.push({ x: AQ.Camera.x, y: AQ.Camera.y, r: 90 });
     else { L.push({ x: p.x + p.facing * 6, y: p.y, r: 58 }); L.push({ x: p.x, y: p.y, r: 26 }); }
     for (const l of AQ.Terrain.lights) L.push(l);
+    for (const f of AQ.Terrain.fireflies) L.push({ x: f.x, y: f.y, r: 9, color: '#ffe36b', power: 0.5 });
     if (AQ.Creatures) AQ.Creatures.lights(L);
     if (AQ.Chests) AQ.Chests.lights(L);
     return L;

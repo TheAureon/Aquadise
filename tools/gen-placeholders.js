@@ -38,7 +38,7 @@ function add(key, file, kind, size, art) {
   fs.writeFileSync(out, encodePNG(pix.w, pix.h, pix.d));
 }
 
-add('player', 'sprites/misc/player.png', 'player', [24, 32], { shape: 'diver' });
+add('player', 'sprites/misc/player.png', 'player', [28, 40], { shape: 'diver', fit: false });
 add('chest', 'sprites/misc/chest.png', 'chest', 'small', { shape: 'chest' });
 add('bait', 'sprites/misc/bait.png', 'bait', [8, 8], { shape: 'bait' });
 

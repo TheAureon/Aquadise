@@ -67,7 +67,7 @@ AQ.HUD = (function () {
     // help (first moments only, or when H is pressed)
     if (H.showHelp && H.helpT > 0) {
       ctx.globalAlpha = Math.min(1, H.helpT) * 0.9;
-      const lines = ['MOVE WASD  JUMP W  SNEAK SHIFT  NET SPACE (HOLD TO PRY)', 'BAIT B   AQUARIUM TAB   LOG L   MAP M   HELP H'];
+      const lines = ['MOVE WASD  JUMP SPACE  SNEAK SHIFT  NET LEFT CLICK (HOLD TO PRY)', 'BAIT B / RIGHT CLICK   AQUARIUM TAB   LOG L   MAP M   HELP H'];
       lines.forEach((l, i) => F.draw(ctx, l, vw / 2, vh - 15 + i * 7, '#d8f3ff', { align: 'center', shadow: SH }));
       ctx.globalAlpha = 1;
     }

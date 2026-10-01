@@ -78,9 +78,42 @@ AQ.Terrain = (function () {
     buildMinimap(W);
   };
 
+  // Fireflies drifting in the lush cave's air pocket (they glow through the darkness).
+  T.fireflies = [];
+  T.updateFireflies = function (dt, cam) {
+    const W = AQ.World, b = W.biomeById.lush_cave, R = U.R;
+    if (!b) return;
+    const [rx, ry, rw, rh] = b.rect;
+    const near = cam.x > rx - 200 && cam.x < rx + rw + 200 && cam.y > ry - 200 && cam.y < ry + rh + 200;
+    if (!near) { T.fireflies.length = 0; return; }
+    while (T.fireflies.length < 18) {
+      const x = R.range(rx, rx + rw), y = R.range(ry, ry + rh);
+      if (W.air(x, y) && y > W.sea) T.fireflies.push({ x, y, hx: x, hy: y, t: R.range(0, 9), s: R.range(0.6, 1.4) });
+      else if (R.chance(0.02)) break;
+    }
+    for (const f of T.fireflies) {
+      f.t += dt * f.s;
+      f.x = f.hx + Math.sin(f.t * 0.7) * 10 + Math.sin(f.t * 1.9) * 3;
+      f.y = f.hy + Math.cos(f.t * 0.9) * 6;
+    }
+  };
+  T.drawGlow = function (ctx, cam) {
+    const l = cam.left(), tp = cam.top();
+    for (const f of T.fireflies) {
+      const a = 0.55 + Math.sin(f.t * 4) * 0.45;
+      if (a < 0.15) continue;
+      ctx.globalAlpha = a; ctx.fillStyle = '#fff3a0';
+      ctx.fillRect(Math.round(f.x - l), Math.round(f.y - tp), 1, 1);
+      ctx.globalAlpha = a * 0.35; ctx.fillStyle = '#ffe36b';
+      ctx.fillRect(Math.round(f.x - l) - 1, Math.round(f.y - tp), 3, 1); ctx.fillRect(Math.round(f.x - l), Math.round(f.y - tp) - 1, 1, 3);
+    }
+    ctx.globalAlpha = 1;
+  };
+
   // Hydrothermal vents puff smoke + bubbles (only near the camera).
   T.update = function (dt, cam) {
     const W = AQ.World, R = U.R;
+    T.updateFireflies(dt, cam);
     for (const v of W.vents) {
       if (Math.abs(v.x - cam.x) > 260 || Math.abs(v.y - cam.y) > 200) continue;
       v.t -= dt;
@@ -170,7 +203,7 @@ AQ.Terrain = (function () {
           if (mp.style === 'strata' || mp.style === 'ice') dw += Math.sin(y * 0.28 + U.noise1(x * 0.02, seed) * 3) * 2.2;
           const th = BAYER[y & 3][x & 3];
           const band = (lim) => dw + (th - 0.5) * 3 < lim;
-          c = band(7) ? mp.rock[0] : band(16) ? mp.rock[1] : band(30) ? mp.rock[2] : U.scale(mp.rock[2], 0.66);
+          c = band(7) ? mp.rock[0] : band(16) ? mp.rock[1] : band(30) ? mp.rock[2] : U.scale(mp.rock[2], mp.style === 'ice' ? 0.9 : 0.66);
           if (d <= 1) c = W.mask[i + ww] !== 1 ? U.scale(mp.rock[2], 0.82) : U.scale(mp.rock[0], 1.08);
           if (mp.style === 'ice' && ((x * 2 + y) % 13 === 0) && d < 10) c = U.scale(mp.rock[0], 1.12);
           if (mp.style === 'wood' && y % 5 === 0) c = U.scale(mp.rock[2], 0.85);
@@ -201,6 +234,14 @@ AQ.Terrain = (function () {
       (!spec.y || (p[1] >= spec.y[0] && p[1] < spec.y[1])) &&
       (spec.air ? true : spec.airOnly ? W.air(p[0], p[1]) : (W.water(p[0], p[1]) && p[1] >= W.sea));
     if (spec.at === 'points') return spec.points.slice();
+    if (spec.at === 'waterline') {
+      const [rx, ry, rw, rh] = b.rect;
+      for (let i = 0; i < (spec.n || 10) * 40 && out.length < (spec.n || 10); i++) {
+        const x = Math.floor(rng.range(rx, rx + rw));
+        for (let y = Math.max(ry, W.sea + 1); y < ry + rh; y++) if (W.water(x, y) && W.air(x, y - 1) && W.biomeAt(x, y) === b) { out.push([x, y]); break; }
+      }
+      return out;
+    }
     let pool = spec.at === 'ceiling' ? surf.ceilings : surf.floors;
     if (spec.at === 'water') {
       for (let i = 0; i < (spec.n || 10) * 20 && out.length < (spec.n || 10); i++) {
@@ -322,27 +363,69 @@ AQ.Terrain = (function () {
     }
     for (let j = -4; j <= 4; j++) P.setOpen(px + j, top - Math.abs(j) * 0.6 + (j > 0 ? 1 : 0), cols[2], s.alpha);
   };
+  // Mangrove (like the real thing): a short trunk standing on a cage of arching prop roots that
+  // reach out and down into the mud, a dense rounded crown of small leaves, and pencil-like
+  // breathing roots (pneumatophores) poking up from the mud around it.
   PROPS.mangrove = function (P, x, y, r, b, pal, s, T) {
-    const W = AQ.World, sea = W.sea, bark = C('#5b4129'), barkL = C('#7a5a3a'), leaf = [C('#3f7a35'), C('#4f9440'), C('#2f5f2a')];
-    const trunkTop = sea - r.range(38, 52);
-    for (let yy = sea - 6; yy > trunkTop; yy--) { P.set(x, yy, bark); P.set(x + 1, yy, barkL); P.set(x - 1, yy, bark); }
-    for (let k = 0; k < 7; k++) {
-      const cx = x + r.range(-18, 18), cy = trunkTop + r.range(-14, 4), rr = r.range(7, 13);
-      P.ellipse(cx, cy, rr, rr * 0.7, (dx, dy) => leaf[dy < -0.3 ? 1 : dy > 0.4 ? 2 : (U.hash2(Math.round(cx + dx * 9), Math.round(cy + dy * 9), 3) < 0.2 ? 1 : 0)]);
-    }
-    const roots = r.int(4, 7);
-    for (let k = 0; k < roots; k++) {
-      const ex = x + r.range(-34, 34), gy = W.groundBelow(Math.round(ex), sea, 600) || (sea + 200);
-      const sx = x + r.range(-2, 2), sy = sea - r.range(4, 14), cx = x + (ex - x) * 0.15, cy = sea + (gy - sea) * 0.15;
-      const steps = Math.ceil((Math.abs(ex - sx) + Math.abs(gy - sy)) * 1.6);
-      const thick = r.chance(0.4) ? 3 : 2;
+    const W = AQ.World, sea = W.sea;
+    const bark = C('#6b4b2f'), barkL = C('#8a6644'), barkD = C('#4a3220');
+    const leaf = [C('#2f6b2c'), C('#3f8236'), C('#58a046'), C('#24522a')];
+    const ground = (gx) => W.groundBelow(Math.round(gx), sea - 4, 300) || (sea + 90);
+    const base = sea - r.range(10, 16);                 // where the trunk splits into roots
+    const top = sea - r.range(44, 54);
+    // prop roots: arcs from the trunk out and down into the mud, front and back
+    const nRoots = r.int(9, 13);
+    for (let k = 0; k < nRoots; k++) {
+      const side = k % 2 ? 1 : -1, reach = r.range(8, 38), ex = x + side * reach, gy = ground(ex);
+      const sy = base + r.range(-6, 6), sx = x + side * r.range(0, 2);
+      const cx = x + side * reach * r.range(0.45, 0.7), cy = sy - r.range(6, 16);   // arch up, then down
+      const steps = Math.ceil((reach + (gy - sy)) * 1.6);
+      const col = k % 3 === 0 ? barkD : bark;
       for (let i = 0; i <= steps; i++) {
         const t = i / steps, a = (1 - t) * (1 - t), bb = 2 * (1 - t) * t, c2 = t * t;
         const px = a * sx + bb * cx + c2 * ex, py = a * sy + bb * cy + c2 * gy;
-        P.set(px, py, barkL); for (let w = 1; w < thick; w++) P.set(px + w, py, w === thick - 1 ? U.scale(bark, 0.8) : bark);
-        if (i % 37 === 0 && py > sea + 10 && r.chance(0.5)) P.set(px + thick, py, C('#6e8a3a'));
+        P.set(px, py, col); P.set(px, py + 1, t < 0.5 ? barkL : col);
       }
     }
+    // trunk
+    for (let yy = base + 4; yy > top; yy--) { P.set(x - 1, yy, barkD); P.set(x, yy, bark); P.set(x + 1, yy, barkL); P.set(x + 2, yy, bark); }
+    for (let k = 0; k < 3; k++) { const dir = k - 1; for (let i = 0; i < 10; i++) P.set(x + dir * i * 0.9, top + 6 - i * 0.6, bark); }
+    // crown: many small leaf clusters, darker underneath, a few light highlights on top
+    const cw = r.range(26, 34);
+    for (let k = 0; k < 60; k++) {
+      const ang = r.range(Math.PI, Math.PI * 2), rad = Math.sqrt(r()) ;
+      const lx = x + Math.cos(ang) * cw * rad, ly = top - 2 + Math.sin(ang) * 16 * rad + 6;
+      const rr = r.range(2.5, 4.5);
+      P.ellipse(lx, ly, rr, rr * 0.75, (dx, dy) => leaf[dy > 0.35 ? 3 : dy < -0.4 ? 2 : (U.hash2(Math.round(lx + dx * 9), Math.round(ly + dy * 9), 5) < 0.3 ? 1 : 0)]);
+    }
+    for (let k = 0; k < 14; k++) P.set(x + r.range(-cw * 0.8, cw * 0.8), top - 14 + r.range(0, 8), leaf[2]);
+    // pneumatophores on the mud
+    for (let k = 0; k < 10; k++) {
+      const px = x + r.range(-44, 44), gy = ground(px), h = r.int(3, 7);
+      if (gy > sea + 120) continue;
+      for (let j = 1; j <= h; j++) P.setOpen(px, gy - j, j === h ? barkL : barkD);
+    }
+  };
+  PROPS.lilypad = function (P, x, y, r) {
+    const c = C(r.pick(['#4f9a48', '#5fae52', '#468a40'])), d = U.scale(c, 0.75), w = r.int(3, 5);
+    for (let i = -w; i <= w; i++) P.set(x + i, y - 1, Math.abs(i) === w ? d : c);
+    P.set(x + 1, y - 1, d);                                   // the notch
+    if (r.chance(0.35)) { const f = C(r.pick(['#ffb3d1', '#ffffff', '#f2d16b'])); P.set(x - 1, y - 2, f); P.set(x, y - 3, f); P.set(x + 1, y - 2, f); P.set(x, y - 2, C('#f2d16b')); }
+  };
+  PROPS.flowerbed = function (P, x, y, r) {
+    const cols = ['#ff9fc8', '#c9a2ff', '#ffd27a', '#9ff0d0'].map(C);
+    for (let k = 0; k < r.int(4, 7); k++) {
+      const fx = x + r.int(-5, 5), h = r.int(1, 4), c = r.pick(cols);
+      for (let j = 0; j < h; j++) P.setOpen(fx, y - j, C('#4f9440'));
+      P.setOpen(fx, y - h, c); P.setOpen(fx - 1, y - h, U.scale(c, 0.85)); P.setOpen(fx + 1, y - h, U.scale(c, 0.85)); P.setOpen(fx, y - h - 1, U.scale(c, 1.15));
+    }
+  };
+  PROPS.glowvine = function (P, x, y, r, b, pal, s, T) {
+    const len = r.range(10, 30), cols = [C('#4f9440'), C('#6fb556')], bulb = C(r.pick(['#a8ffe0', '#ffe9a0', '#d9b8ff']));
+    for (let j = 0; j < len; j++) P.setOpen(x + Math.sin(j * 0.3) * 1.2, y + j, cols[j % 4 === 0 ? 1 : 0]);
+    const ex = x + Math.sin(len * 0.3) * 1.2, ey = y + len;
+    P.setOpen(ex, ey, bulb); P.setOpen(ex - 1, ey + 1, bulb); P.setOpen(ex + 1, ey + 1, bulb); P.setOpen(ex, ey + 1, U.scale(bulb, 1.2)); P.setOpen(ex, ey + 2, bulb);
+    T.lights.push({ x: ex, y: ey + 1, r: 14, color: U.css(bulb), power: 0.6 });
   };
   PROPS.plank = function (P, x, y, r) {
     const c = C('#7a5432'), d = U.scale(c, 0.7), len = r.int(8, 18), a = r.range(-0.3, 0.3);

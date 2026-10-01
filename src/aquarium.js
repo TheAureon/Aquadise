@@ -303,29 +303,29 @@ AQ.Aquarium = (function () {
     const b = AQ.World.biomeById[A.biome], tank = AQ.Collection.tank(A.biome);
     const pal = b.palette, water = U.hex(b.water || '#3497bd');
     g.fillStyle = '#0b1a2c'; g.fillRect(0, 0, 320, 180);
-    // back wall water
-    for (let y = TANK.y; y < TANK.y + TANK.h; y += 4) {
-      const t = (y - TANK.y) / TANK.h;
-      g.fillStyle = U.css(U.mix(U.mix([110, 205, 220], water, 0.45), U.mix([30, 80, 120], water, 0.4), t));
-      g.fillRect(TANK.x, y, TANK.w, 4);
+    g.drawImage(backdrop(b), TANK.x, TANK.y);
+    // light shafts from the lid, gently swaying
+    g.save();
+    for (let i = 0; i < 6; i++) {
+      const x = 22 + i * 52 + Math.sin(A.t * 0.35 + i * 1.7) * 8, w = 8 + (i % 3) * 5;
+      g.globalAlpha = 0.05 + 0.025 * Math.sin(A.t * 0.8 + i);
+      g.fillStyle = '#ffffff';
+      g.beginPath(); g.moveTo(x, TANK.waterTop); g.lineTo(x + w, TANK.waterTop); g.lineTo(x + w + 26, TANK.sandTop + 6); g.lineTo(x + 18, TANK.sandTop + 6); g.fill();
     }
-    // light rays
-    g.save(); g.globalAlpha = 0.07; g.fillStyle = '#ffffff';
-    for (let i = 0; i < 5; i++) { const x = 30 + i * 64 + Math.sin(A.t * 0.4 + i) * 6; g.beginPath(); g.moveTo(x, TANK.waterTop); g.lineTo(x + 12, TANK.waterTop); g.lineTo(x + 40, TANK.sandTop); g.lineTo(x + 20, TANK.sandTop); g.fill(); }
     g.restore();
-    // sand
-    const top = pal.top.map(U.hex);
-    for (let x = TANK.x; x < TANK.x + TANK.w; x++) {
-      const sy = TANK.sandTop + Math.round(Math.sin(x * 0.05) * 1.5 + Math.sin(x * 0.13) * 0.8);
-      for (let y = sy; y <= TANK.bottom; y++) {
-        const k = y - sy, h = U.hash2(x, y, 3);
-        g.fillStyle = U.css(k === 0 ? U.scale(top[0], 1.08) : top[(k + (h < 0.3 ? 1 : 0)) % 3 === 0 && k > 4 ? 2 : h < 0.15 ? 2 : k < 5 ? 0 : 1]);
-        g.fillRect(x, y, 1, 1);
-      }
+    // caustics: shifting light ripples on the sand
+    g.fillStyle = 'rgba(255,255,240,0.22)';
+    for (let x = TANK.x; x < TANK.x + TANK.w; x += 1) for (let k = 0; k < 9; k++) {
+      const y = TANK.sandTop + 1 + k * 2 + (x & 1);
+      if (Math.sin(x * 0.31 + A.t * 1.6 + k * 0.9) + Math.sin(x * 0.13 - A.t * 1.1 + k * 1.7) > 1.45) g.fillRect(x, y, 1, 1);
     }
-    // water surface
-    for (let x = TANK.x; x < TANK.x + TANK.w; x++) { g.fillStyle = 'rgba(235,255,255,0.7)'; g.fillRect(x, TANK.waterTop + Math.round(Math.sin(x * 0.12 + A.t * 2) * 0.7), 1, 1); }
-    g.fillStyle = 'rgba(200,240,255,0.15)'; g.fillRect(TANK.x, TANK.y, TANK.w, TANK.waterTop - TANK.y);
+    // water surface: bright wavy line + soft reflection band
+    for (let x = TANK.x; x < TANK.x + TANK.w; x++) {
+      const yy = TANK.waterTop + Math.round(Math.sin(x * 0.12 + A.t * 2) * 0.7);
+      g.fillStyle = 'rgba(240,255,255,0.8)'; g.fillRect(x, yy, 1, 1);
+      if (Math.sin(x * 0.07 - A.t) > 0.6) { g.fillStyle = 'rgba(240,255,255,0.25)'; g.fillRect(x, yy + 2, 1, 1); }
+    }
+    g.fillStyle = 'rgba(210,245,255,0.18)'; g.fillRect(TANK.x, TANK.y, TANK.w, TANK.waterTop - TANK.y);
 
     // depth-sorted decor + creatures
     const items = [];
@@ -353,11 +353,25 @@ AQ.Aquarium = (function () {
     g.fillStyle = 'rgba(230,250,255,0.8)';
     A.bubbles.forEach((b) => g.fillRect(Math.round(b.x), Math.round(b.y), 1, 1));
     AQ.FX.draw(g);
-    // glass frame
-    g.fillStyle = '#2b3f55'; g.fillRect(TANK.x - 2, TANK.y - 2, TANK.w + 4, 2); g.fillRect(TANK.x - 2, TANK.y + TANK.h, TANK.w + 4, 2);
-    g.fillRect(TANK.x - 2, TANK.y, 2, TANK.h); g.fillRect(TANK.x + TANK.w, TANK.y, 2, TANK.h);
-    g.save(); g.globalAlpha = 0.06; g.fillStyle = '#fff';
+    // drifting motes
+    for (let i = 0; i < 26; i++) {
+      const x = TANK.x + ((i * 53 + A.t * (3 + (i % 4))) % TANK.w), y = TANK.waterTop + 6 + ((i * 37 + Math.sin(A.t * 0.5 + i) * 6) % (TANK.sandTop - TANK.waterTop - 8));
+      g.fillStyle = `rgba(230,250,255,${0.18 + (i % 3) * 0.08})`; g.fillRect(Math.round(x), Math.round(y), 1, 1);
+    }
+    // soft vignette in the tank corners
+    for (let i = 0; i < 6; i++) {
+      g.fillStyle = `rgba(4,16,30,${(0.12 - i * 0.018).toFixed(3)})`;
+      g.fillRect(TANK.x + i, TANK.y, 1, TANK.h); g.fillRect(TANK.x + TANK.w - 1 - i, TANK.y, 1, TANK.h);
+    }
+    // glass frame: dark metal rim with a highlight, lid with a lamp strip
+    g.fillStyle = '#1c2c3d'; g.fillRect(TANK.x - 3, TANK.y - 3, TANK.w + 6, 3); g.fillRect(TANK.x - 3, TANK.y + TANK.h, TANK.w + 6, 3);
+    g.fillRect(TANK.x - 3, TANK.y, 3, TANK.h); g.fillRect(TANK.x + TANK.w, TANK.y, 3, TANK.h);
+    g.fillStyle = '#4a6a86'; g.fillRect(TANK.x - 3, TANK.y - 3, TANK.w + 6, 1); g.fillRect(TANK.x - 3, TANK.y, 1, TANK.h);
+    g.fillStyle = '#9feff0'; for (let x = TANK.x + 20; x < TANK.x + TANK.w - 20; x += 2) g.fillRect(x, TANK.y - 1, 1, 1);   // lamp LEDs
+    for (const rx of [TANK.x - 2, TANK.x + TANK.w + 1]) for (const ry of [TANK.y + 4, TANK.y + TANK.h - 5]) { g.fillStyle = '#7f9ab2'; g.fillRect(rx, ry, 1, 1); }
+    g.save(); g.globalAlpha = 0.07; g.fillStyle = '#fff';
     g.beginPath(); g.moveTo(TANK.x + 20, TANK.y); g.lineTo(TANK.x + 34, TANK.y); g.lineTo(TANK.x + 4, TANK.y + 40); g.lineTo(TANK.x, TANK.y + 40); g.fill();
+    g.beginPath(); g.moveTo(TANK.x + 40, TANK.y); g.lineTo(TANK.x + 44, TANK.y); g.lineTo(TANK.x + 14, TANK.y + 40); g.lineTo(TANK.x + 10, TANK.y + 40); g.fill();
     g.restore();
 
     // ghost of held item
@@ -374,6 +388,54 @@ AQ.Aquarium = (function () {
 
     drawBars(g, tank, b);
   };
+
+  // Cached, biome-themed backdrop: dithered water gradient, distant rock silhouettes, themed
+  // mid-ground silhouettes and a rippled sand bed with pebbles.
+  const backdrops = {};
+  const BAYER = [[0, 8, 2, 10], [12, 4, 14, 6], [3, 11, 1, 9], [15, 7, 13, 5]].map((r) => r.map((v) => v / 16));
+  function backdrop(b) {
+    if (backdrops[b.id]) return backdrops[b.id];
+    const W = TANK.w, H = TANK.h, c = document.createElement('canvas'); c.width = W; c.height = H;
+    const g = c.getContext('2d'), img = g.createImageData(W, H), d = img.data;
+    const water = U.hex(b.water || '#3497bd'), top = U.mix([150, 225, 235], water, 0.35), deep = U.mix([26, 70, 110], water, 0.45);
+    const pal = b.palette, sand = pal.top.map(U.hex), rock = U.mix(U.hex(pal.rock[1]), deep, 0.55), rockFar = U.mix(rock, deep, 0.5);
+    const seed = b.index * 31 + 7, theme = b.id;
+    const sandY = (x) => TANK.sandTop - TANK.y + Math.round(Math.sin(x * 0.05) * 1.5 + Math.sin(x * 0.13) * 0.8);
+    const farH = (x) => 34 + Math.sin(x * 0.021 + seed) * 10 + Math.sin(x * 0.07 + seed * 2) * 5;
+    const midH = (x) => 20 + Math.sin(x * 0.04 + seed * 3) * 7 + U.noise1(x * 0.08, seed) * 6;
+    const set = (x, y, col, a = 255) => { const i = (y * W + x) * 4; const k = a / 255; d[i] = d[i] * (1 - k) + col[0] * k; d[i + 1] = d[i + 1] * (1 - k) + col[1] * k; d[i + 2] = d[i + 2] * (1 - k) + col[2] * k; d[i + 3] = 255; };
+    for (let y = 0; y < H; y++) for (let x = 0; x < W; x++) {
+      // 8-band gradient with ordered dithering between bands
+      const t = y / H * 16, band = Math.floor(t + (t % 1 > BAYER[y & 3][x & 3] ? 1 : 0)) / 16;
+      set(x, y, U.mix(top, deep, band));
+      const sy = sandY(x);
+      if (y < sy && y > sy - farH(x)) set(x, y, rockFar, 110);
+      if (y < sy && y > sy - midH(x)) set(x, y, rock, 120);
+      if (y >= sy) {
+        const k = y - sy, h = U.hash2(x, y, 3);
+        let col = k === 0 ? U.scale(sand[0], 1.08) : k < 4 ? sand[0] : k < 9 ? sand[1] : sand[2];
+        if (Math.sin(x * 0.45 + y * 1.3 + Math.sin(x * 0.05) * 3) > 0.85 && k > 1) col = U.scale(col, 0.9);   // ripples
+        if (h < 0.025) col = U.scale(sand[2], 0.8); else if (h < 0.04) col = [236, 228, 214];                   // pebbles / shell bits
+        set(x, y, col);
+      }
+    }
+    // themed mid-ground silhouettes
+    const sil = U.mix(rock, deep, 0.2), r = U.rng(seed);
+    const stroke = (x0, y0, x1, y1, a) => { const n = Math.ceil(Math.hypot(x1 - x0, y1 - y0)); for (let i = 0; i <= n; i++) { const x = Math.round(x0 + (x1 - x0) * i / n), y = Math.round(y0 + (y1 - y0) * i / n); if (x >= 0 && y >= 0 && x < W && y < H) set(x, y, sil, a); } };
+    for (let k = 0; k < 14; k++) {
+      const x = r.range(6, W - 6), base = sandY(Math.round(x));
+      if (theme === 'kelp' || theme === 'lush_cave' || theme === 'tide_pools') { for (let y = base; y > base - r.range(40, 95); y--) set(Math.round(x + Math.sin(y * 0.08 + k) * 2), y, sil, 90); }
+      else if (theme === 'coral') { const R = r.range(6, 13); for (let a = Math.PI; a < Math.PI * 2; a += 0.12) stroke(x, base, x + Math.cos(a) * R, base + Math.sin(a) * R * 1.2, 80); }
+      else if (theme === 'ice') { const h = r.range(14, 40); for (let y = 0; y < h; y++) { const w = (1 - y / h) * 5; for (let i = -w; i <= w; i++) set(Math.round(x + i), base - y, [205, 235, 248], 70); } }
+      else if (theme === 'vents') { const h = r.range(12, 30); for (let y = 0; y < h; y++) { const w = 2 + (1 - y / h) * 4; for (let i = -w; i <= w; i++) set(Math.round(x + i), base - y, sil, 100); } }
+      else if (theme === 'mangrove') { const reach = r.range(10, 24); stroke(x, base - 60, x - reach, base, 90); stroke(x, base - 60, x + reach, base, 90); stroke(x, base - 60, x, base - 100, 90); }
+      else if (theme === 'ruins') { const h = r.range(14, 34); for (let y = 0; y < h; y++) for (let i = -2; i <= 2; i++) set(Math.round(x + i), base - y, sil, 90); }
+      else { const h = r.range(8, 24); for (let y = 0; y < h; y++) set(Math.round(x), base - y, sil, 80); }
+    }
+    g.putImageData(img, 0, 0);
+    backdrops[b.id] = c;
+    return c;
+  }
 
   // Lightweight hint text: no box, just a soft shadow so it doesn't cover the tank.
   function tip(g, text, x, y, col) {

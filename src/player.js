@@ -42,7 +42,7 @@ AQ.Player = (function () {
     const submerged = world.water(this.x, this.y - (Wk.swimDepth - hb.h / 2)) || (world.water(this.x, this.y) && !grounded);
     this.mode = submerged ? 'swim' : grounded ? 'walk' : 'air';
     this.inAir = !world.water(this.x, this.y);
-    const jumpKey = this.stun <= 0 && input.wasPressed('KeyW', 'ArrowUp');
+    const jumpKey = this.stun <= 0 && input.wasPressed('Space', 'KeyW', 'ArrowUp');
 
     if (this.mode === 'swim') {
       const accel = T.accel * mult * (this.sneaking ? 0.6 : 1);
@@ -53,7 +53,7 @@ AQ.Player = (function () {
       // gentle surface buoyancy so the diver bobs instead of jittering at the waterline
       if (nearSurface && !hasInput) this.vy += 30 * dt;
       // hop out of a pool / onto the shore when there's ground beside you
-      if (nearSurface && ax.y < 0 && (world.solid(this.x + 10 * (ax.x || this.facing), this.y - 2) || world.solid(this.x + 10 * (ax.x || this.facing), this.y + 2))) {
+      if (nearSurface && (ax.y < 0 || input.isDown('Space')) && (world.solid(this.x + 10 * (ax.x || this.facing), this.y - 2) || world.solid(this.x + 10 * (ax.x || this.facing), this.y + 2))) {
         this.vy = -Wk.jump * 0.85; this.vx += (ax.x || this.facing) * 20;
       }
       const max = this.maxSpeed(), sp = Math.hypot(this.vx, this.vy);
@@ -73,7 +73,12 @@ AQ.Player = (function () {
       }
     }
 
-    if (ax.x) this.facing = ax.x > 0 ? 1 : -1;
+    // face the way you're actually moving (input only decides when nearly still); a net swing keeps its aim
+    const netOut = AQ.Catching && AQ.Catching.armOut();
+    if (!netOut) {
+      if (Math.abs(this.vx) > 8) this.facing = this.vx > 0 ? 1 : -1;
+      else if (ax.x) this.facing = ax.x > 0 ? 1 : -1;
+    }
     if (hasInput) { this.aimX = ax.x; this.aimY = this.mode === 'swim' ? ax.y : 0; }
 
     this.move(world, this.vx * dt, this.vy * dt);
@@ -83,7 +88,6 @@ AQ.Player = (function () {
     }
 
     const sp = this.speed();
-    const netOut = AQ.Catching && AQ.Catching.armOut();
     if (this.mode === 'swim') this.anim = netOut ? 'net' : sp > 18 ? 'swim' : 'idle';
     else if (netOut) this.anim = 'standnet';
     else if (this.mode === 'walk') this.anim = Math.abs(this.vx) > 6 ? 'walk' : 'stand';

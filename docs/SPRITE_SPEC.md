@@ -11,7 +11,8 @@ it shows up in game with no code changes.
 - **Everything faces RIGHT.** The engine mirrors sprites for left-facing movement.
 - Transparent background (RGBA PNG), no anti-aliasing or soft edges. Hard pixels only.
 - Draw at 1:1. Don't upscale. The game renders at 320×180 and scales up with nearest-neighbour.
-- Keep a 1 px transparent margin inside each frame so outlines aren't clipped.
+- Keep a 1 px transparent margin inside each frame so outlines aren't clipped. (The placeholder
+  generator now enforces this: it measures all frames and shifts or slightly shrinks the art to fit.)
 - A dark 1 px outline and top-light / bottom-shadow shading match the placeholders and terrain.
 
 ## Size classes (frame size in px)
@@ -27,7 +28,7 @@ it shows up in game with no code changes.
 | `wide`      | 32 × 16 | eels, snakes, weed mat, driftwood                           |
 | `widelarge` | 48 × 24 | dwarf croc                                                  |
 
-The player diver frame is 24 × 32 (anchor 12,16), which leaves headroom for the upright pose. A creature's class is its `sprite_size` in `data/creatures.js`.
+The player diver frame is 28 × 40 (anchor 14,20). The swimming and upright poses are the same size (about 22 px). A creature's class is its `sprite_size` in `data/creatures.js`.
 
 ## Animations (rows)
 
@@ -36,7 +37,7 @@ The player diver frame is 24 × 32 (anchor 12,16), which leaves headroom for the
 | creature           | `idle`: 4 frames @ 5 fps   | `move`: 4 frames @ 10 fps | —                      |
 | plant              | `idle` (sway): 4 @ 3 fps   | —                        | —                      |
 | decoration         | `idle`: 1 frame            | —                        | —                      |
-| player (24×32)     | `idle`: 4 @ 5 fps          | `swim`: 6 @ 12 fps       | `net` swing: 4 @ 14 fps |
+| player (28×40)     | `idle`: 4 @ 5 fps          | `swim`: 6 @ 12 fps       | `net` swing: 4 @ 14 fps |
 | player, cont.      | row 3 `stand`: 2 @ 2 fps   | row 4 `walk`: 4 @ 9 fps  | row 5 `jump`: 1 frame   |
 | chest (16×16)      | col 0 `closed`, col 1 `open` (one row, 2 frames)        |                        |
 | bait (8×8)         | `idle` glint: 2 @ 3 fps    |                          |                        |
@@ -50,9 +51,9 @@ icons), so they need no extra rows.
 
 The anchor is the pixel inside a frame that sits on the entity's world position.
 
-- **Player:** anchor (12,16). Swimming poses are centred on it. In the upright rows
-  (stand/walk/jump/standnet), the feet go on row 20 (anchor + 4, the bottom of the collision box)
-  and the figure is about 18 px tall. `standnet` is the upright pose without the front arm, because
+- **Player:** anchor (14,20). Swimming poses are centred on it (about 22 px long). In the
+  upright rows (stand/walk/jump/standnet), the feet go on row 24 (anchor + 4, the bottom of the
+  collision box) and the figure is about 22 px tall, matching the swimming size. `standnet` is the upright pose without the front arm, because
   the game draws the reaching arm during a net swing.
 - **Creatures, player, bait:** the frame centre `(floor(fw/2), floor(fh/2))`. Centre the body in the frame.
 - **Plants, decorations, chests:** bottom-centre `(floor(fw/2), fh-1)`. The bottom row of pixels

@@ -20,10 +20,10 @@ npx http-server -c-1 .      # or: python3 -m http.server
 | action              | keys                                     |
 |---------------------|------------------------------------------|
 | swim / walk         | WASD / arrow keys                        |
-| jump (on land)      | W / Up                                   |
+| jump (on land)      | Space (or W / Up)                        |
 | sneak (slow, quiet) | hold Shift                               |
-| net                 | Space / J, or left-click (aims at the mouse) |
-| pry a stuck creature| keep holding the net after the swing     |
+| net                 | left-click (aims at the mouse)           |
+| pry a stuck creature| keep holding left-click after the swing  |
 | drop bait           | B / K, or right-click                    |
 | aquarium            | Tab                                      |
 | collection log      | L                                        |
@@ -109,5 +109,5 @@ docs/SPRITE_SPEC.md         how to make sprites that drop in cleanly
   immediately.
 - Plants can decorate any tank. Only creatures are restricted to their own biome.
 - On land, Shift is careful walking (same stealth rule as sneaking underwater), not a sprint.
-  W/Up jumps, because Space is the net.
+  Space jumps; the net is left-click only.
 - Rare Trenchmaw: each time its slot (re)spawns there's a 45% chance it appears, re-rolled every 60 s.

@@ -4,13 +4,22 @@
   const PH = {};
 
   // ---------- pixel buffer ----------
-  function Pix(w, h) { this.w = w; this.h = h; this.d = new Uint8ClampedArray(w * h * 4); }
-  Pix.prototype.get = function (x, y) { if (x < 0 || y < 0 || x >= this.w || y >= this.h) return null; const i = (y * this.w + x) * 4; return [this.d[i], this.d[i + 1], this.d[i + 2], this.d[i + 3]]; };
-  Pix.prototype.a = function (x, y) { if (x < 0 || y < 0 || x >= this.w || y >= this.h) return 0; return this.d[(y * this.w + x) * 4 + 3]; };
+  // w/h = the drawing size shapes see; `pad` adds a hidden margin around it so nothing drawn
+  // slightly outside the frame is lost (buildSheet then fits the result back into the frame).
+  function Pix(w, h, pad = 0) {
+    this.w = w; this.h = h; this.pad = pad; this.bw = w + pad * 2; this.bh = h + pad * 2;
+    this.d = new Uint8ClampedArray(this.bw * this.bh * 4);
+  }
+  Pix.prototype.idx = function (x, y) {
+    x = Math.round(x) + this.pad; y = Math.round(y) + this.pad;
+    return (x < 0 || y < 0 || x >= this.bw || y >= this.bh) ? -1 : (y * this.bw + x) * 4;
+  };
+  Pix.prototype.get = function (x, y) { const i = this.idx(x, y); return i < 0 ? null : [this.d[i], this.d[i + 1], this.d[i + 2], this.d[i + 3]]; };
+  Pix.prototype.a = function (x, y) { const i = this.idx(x, y); return i < 0 ? 0 : this.d[i + 3]; };
   Pix.prototype.set = function (x, y, c) {
-    x = Math.round(x); y = Math.round(y + (this.oy || 0));   // oy: vertical drawing offset
-    if (x < 0 || y < 0 || x >= this.w || y >= this.h || !c) return;
-    const i = (y * this.w + x) * 4;
+    if (!c) return;
+    const i = this.idx(x + (this.ox || 0), y + (this.oy || 0));   // ox/oy: drawing offsets
+    if (i < 0) return;
     this.d[i] = c[0]; this.d[i + 1] = c[1]; this.d[i + 2] = c[2]; this.d[i + 3] = c[3] === undefined ? 255 : c[3];
   };
   Pix.prototype.ellipse = function (cx, cy, rx, ry, c) {
@@ -45,12 +54,12 @@
       if (!(neg && pos)) this.set(x, y, col);
     }
   };
-  // Light top edges, darken bottom edges -> instant pixel-art volume.
+  // Light top edges, darken bottom edges -> instant pixel-art volume. (Works on the padded buffer.)
   Pix.prototype.shade = function (amt = 0.22) {
-    const src = new Uint8ClampedArray(this.d);
-    const A = (x, y) => (x < 0 || y < 0 || x >= this.w || y >= this.h) ? 0 : src[(y * this.w + x) * 4 + 3];
-    for (let y = 0; y < this.h; y++) for (let x = 0; x < this.w; x++) {
-      const i = (y * this.w + x) * 4;
+    const src = new Uint8ClampedArray(this.d), W = this.bw, H = this.bh;
+    const A = (x, y) => (x < 0 || y < 0 || x >= W || y >= H) ? 0 : src[(y * W + x) * 4 + 3];
+    for (let y = 0; y < H; y++) for (let x = 0; x < W; x++) {
+      const i = (y * W + x) * 4;
       if (!src[i + 3]) continue;
       let f = 1;
       if (!A(x, y - 1)) f = 1 + amt; else if (!A(x, y + 1)) f = 1 - amt; else if (!A(x, y + 2)) f = 1 - amt * 0.5;
@@ -58,9 +67,9 @@
     }
   };
   Pix.prototype.outline = function (f = 0.35) {
-    const src = new Uint8ClampedArray(this.d);
-    const at = (x, y) => (x < 0 || y < 0 || x >= this.w || y >= this.h) ? -1 : (y * this.w + x) * 4;
-    for (let y = 0; y < this.h; y++) for (let x = 0; x < this.w; x++) {
+    const src = new Uint8ClampedArray(this.d), W = this.bw, H = this.bh;
+    const at = (x, y) => (x < 0 || y < 0 || x >= W || y >= H) ? -1 : (y * W + x) * 4;
+    for (let y = 0; y < H; y++) for (let x = 0; x < W; x++) {
       const i = at(x, y);
       if (src[i + 3]) continue;
       let n = -1;
@@ -68,10 +77,15 @@
       if (n >= 0) { this.d[i] = src[n] * f; this.d[i + 1] = src[n + 1] * f; this.d[i + 2] = src[n + 2] * f + 8; this.d[i + 3] = 255; }
     }
   };
-  Pix.prototype.blit = function (src, ox, oy) {
-    for (let y = 0; y < src.h; y++) for (let x = 0; x < src.w; x++) {
-      const i = (y * src.w + x) * 4;
-      if (src.d[i + 3]) this.set(ox + x, oy + y, [src.d[i], src.d[i + 1], src.d[i + 2], src.d[i + 3]]);
+  // Copies src's buffer region (sx,sy,w,h) into this pix at (dx,dy) (both in raw buffer coords).
+  Pix.prototype.copyFrom = function (src, sx, sy, w, h, dx, dy) {
+    for (let y = 0; y < h; y++) for (let x = 0; x < w; x++) {
+      const X = sx + x, Y = sy + y;
+      if (X < 0 || Y < 0 || X >= src.bw || Y >= src.bh) continue;
+      const i = (Y * src.bw + X) * 4;
+      if (!src.d[i + 3]) continue;
+      const j = ((dy + y) * this.bw + (dx + x)) * 4;
+      this.d[j] = src.d[i]; this.d[j + 1] = src.d[i + 1]; this.d[j + 2] = src.d[i + 2]; this.d[j + 3] = src.d[i + 3];
     }
   };
   PH.Pix = Pix;
@@ -110,7 +124,8 @@
     if (o.fan) { p.tri([cx - 2, cy + 1], [cx - 7, cy + h * 0.9 + wig], [cx + 2, cy + h * 0.7], o.a); p.tri([cx - 4, cy - h / 2], [cx + 4, cy - h / 2], [cx - 2, cy - h * 1.2], o.a); }
     p.shade();
     if (o.wing) { p.line(cx - 1, cy, cx - 6, cy - h * 0.8 - wig, alpha(WHITE, 200)); p.line(cx, cy, cx - 5, cy - h * 0.7 - wig, alpha(WHITE, 160)); }
-    if (!o.eyeless) eye(p, Math.round(cx + len * 0.27), Math.round(cy - h * 0.12), W >= 20);
+    if (o.blackEye) { const ex = Math.round(cx + len * 0.27), ey = Math.round(cy - h * 0.12); p.rect(ex, ey, W >= 20 ? 2 : 1, W >= 20 ? 2 : 1, BLACK); }
+    else if (!o.eyeless) eye(p, Math.round(cx + len * 0.27), Math.round(cy - h * 0.12), W >= 20);
     p.outline();
     if (o.lure) {
       const lx = cx + len * 0.32, ly = cy - h / 2;
@@ -229,20 +244,118 @@
     if (o.ghost) for (let i = 0; i < p.d.length; i += 4) if (p.d[i + 3]) p.d[i + 3] = 200;
   };
 
+  // Octopus (like the reference photos): round mantle on top, big ringed eyes at its base, and
+  // eight thick arms spreading out to both sides and curling up at the tips, with pale suckers.
   S.octopus = function (p, o) {
     const W = p.w, H = p.h, ph = o.t * Math.PI * 2;
-    const hx = W / 2, hy = H * 0.38;
-    for (let k = 0; k < 5; k++) {
-      const bx = hx - W * 0.2 + k * W * 0.1;
-      for (let i = 0; i < 9; i++) {
-        const u = i / 9;
-        p.circle(bx + Math.sin(u * 4 + ph + k) * W * 0.06 * u + (k - 2) * u * W * 0.06, hy + H * 0.12 + u * H * 0.4, 1.2 * (1 - u * 0.6), o.c);
+    const bx = W * 0.5, by = H * 0.52;                 // where the arms meet
+    const sucker = mix(o.a, WHITE, 0.35);
+    // 4 arms per side: start angle below horizontal, then walk outward along a path whose heading
+    // bends upward more and more -> tips curl back up like the photo.
+    const arms = [];
+    for (const side of [-1, 1]) [[1.4, 0.75, 1.3], [0.95, 0.9, 1.5], [0.5, 1.0, 1.7], [0.08, 1.0, 1.9]].forEach(([a0, len, curl], k) => arms.push({ side, a0, len, curl, k, back: k === 0 || k === 2 }));
+    arms.sort((p1, p2) => (p2.back ? 1 : 0) - (p1.back ? 1 : 0));   // back arms first
+    for (const A of arms) {
+      const col = A.back ? mul(o.c, 0.72) : o.c;
+      const L = W * 0.5 * A.len, N = 28, ds = L / N;
+      let x = bx + A.side * (0.5 + A.k * 1.1), y = by - 1 + A.k * 0.4;
+      let head = A.a0 + Math.sin(ph + A.k + (A.side > 0 ? 0 : 2)) * (o.moving ? 0.22 : 0.1);
+      for (let i = 0; i <= N; i++) {
+        const u = i / N;
+        p.set(x, y, col);
+        if (u < 0.65) p.set(x, y + 1, col);                                   // 2px thick near the body
+        if (!A.back && i > 4 && i % 3 === 0 && u < 0.8) p.set(x, y + (u < 0.65 ? 2 : 1), sucker);   // suckers underneath
+        head -= A.curl * u * u * 0.22;                                        // tip curls back up
+        x += A.side * Math.cos(head) * ds; y += Math.sin(head) * ds;
       }
     }
-    p.ellipse(hx, hy, W * 0.24, H * 0.24, o.c);
-    p.shade();
-    for (let i = 0; i < 4; i++) p.set(hx - W * 0.1 + i * 3, hy - H * 0.12 + (i % 2), mul(o.a, 1));
-    eye(p, Math.round(hx + W * 0.06), Math.round(hy + 1), false); eye(p, Math.round(hx - W * 0.08), Math.round(hy + 1), false);
+    // mantle (head) with speckles
+    p.ellipse(W * 0.5, H * 0.28, W * 0.18, H * 0.22, o.c);
+    p.ellipse(W * 0.5, H * 0.43, W * 0.13, H * 0.09, o.c);
+    p.shade(0.2);
+    for (let i = 0; i < 9; i++) { const x = W * 0.36 + ((i * 37) % 10) / 10 * W * 0.28, y = H * 0.14 + ((i * 53) % 10) / 10 * H * 0.26; if (p.a(Math.round(x), Math.round(y))) p.set(x, y, mix(o.c, WHITE, 0.4)); }
+    // eyes: orange rim, dark pupil
+    const eyeC = hex('#f2a23a');
+    for (const ex of [W * 0.41, W * 0.59]) { p.circle(ex, H * 0.44, 1.4, eyeC); p.set(ex, H * 0.44, BLACK); }
+    p.outline();
+  };
+
+  // Axolotl (blocky, friendly): square head with feathery gill fronds, small dark eyes, stubby
+  // legs and a long finned tail.
+  S.axolotl = function (p, o) {
+    const W = p.w, H = p.h, ph = o.t * Math.PI * 2;
+    const wig = Math.sin(ph) * (o.moving ? 1.6 : 0.8);
+    const gillC = o.a, gillD = mul(o.a, 0.75), fin = mix(o.c, WHITE, 0.35);
+    // tail with top/bottom fin, wiggling
+    for (let i = 0; i <= 12; i++) {
+      const u = i / 12, x = W * 0.36 - u * W * 0.32, y = H * 0.58 + Math.sin(u * 3 + ph) * wig * u;
+      const th = H * 0.1 * (1 - u * 0.7);
+      p.rect(Math.round(x), Math.round(y - th), 1, Math.round(th * 2), o.c);
+      p.set(x, y - th - 1, fin); p.set(x, y + th, fin);
+    }
+    // legs
+    const step = o.moving ? Math.round(Math.sin(ph * 2)) : 0;
+    p.rect(Math.round(W * 0.38) + step, Math.round(H * 0.68), 2, 2, mul(o.c, 0.85));
+    p.rect(Math.round(W * 0.62) - step, Math.round(H * 0.68), 2, 2, mul(o.c, 0.85));
+    // body + head blocks
+    p.rect(Math.round(W * 0.34), Math.round(H * 0.47), Math.round(W * 0.34), Math.round(H * 0.22), o.c);
+    p.rect(Math.round(W * 0.6), Math.round(H * 0.36), Math.round(W * 0.32), Math.round(H * 0.32), o.c);
+    p.shade(0.15);
+    // gill fronds: three on the back of the head, each with little side feathers
+    const gx = W * 0.62, gy = H * 0.38;
+    [[-0.3, 0.32], [-0.9, 0.36], [-1.5, 0.3]].forEach(([ang, len], k) => {
+      const L = H * len, a = ang - Math.PI / 2 + Math.sin(ph + k) * 0.08;
+      for (let i = 0; i <= 5; i++) {
+        const u = i / 5, x = gx + Math.cos(a) * L * u + (k === 2 ? 0 : 0), y = gy + k * 1.5 + Math.sin(a) * L * u;
+        p.set(x, y, gillC);
+        if (i > 1 && i % 2 === 0) { p.set(x - 1, y - 1, gillD); p.set(x + 1, y - 1, gillD); }
+      }
+    });
+    // face: small dark eye, blush, smile
+    const ex = Math.round(W * 0.8), ey = Math.round(H * 0.46);
+    p.rect(ex, ey, 2, 2, BLACK);
+    p.set(ex + 2, ey + 3, mix(o.a, o.c, 0.4));
+    p.rect(Math.round(W * 0.78), Math.round(H * 0.6), 3, 1, mul(o.c, 0.75));
+    p.outline(0.5);
+  };
+
+  // Crocodile: long low body, long flat snout with teeth, raised eye knob, ridged back + tail,
+  // splayed legs, pale belly, darker cross bands.
+  S.croc = function (p, o) {
+    const W = p.w, H = p.h, ph = o.t * Math.PI * 2;
+    const sway = Math.sin(ph) * (o.moving ? 1.5 : 0.6), step = o.moving ? Math.round(Math.sin(ph * 2)) : 0;
+    const cy = H * 0.6, dark = mul(o.c, 0.72), belly = o.a, teeth = hex('#f2efe0');
+    // tail (thick -> thin) with ridge scutes
+    for (let i = 0; i <= 18; i++) {
+      const u = i / 18, x = W * 0.3 - u * W * 0.28, y = cy + Math.sin(u * 3 + ph) * sway * u;
+      const th = H * 0.13 * (1 - u * 0.8) + 0.5;
+      p.ellipse(x, y, 1.2, th, i % 4 < 2 ? o.c : dark);
+      if (i % 2 === 0) p.set(x, y - th - 1, dark);
+    }
+    // legs (splayed, with toes)
+    for (const [lx, sgn] of [[0.36, 1], [0.6, -1]]) {
+      const x = W * lx + step * sgn;
+      p.rect(Math.round(x), Math.round(cy + H * 0.08), 2, Math.round(H * 0.16), dark);
+      p.rect(Math.round(x) - 1, Math.round(cy + H * 0.23), 4, 1, dark);
+    }
+    // body
+    p.ellipse(W * 0.47, cy, W * 0.2, H * 0.16, o.c);
+    p.ellipse(W * 0.47, cy + H * 0.08, W * 0.17, H * 0.07, belly);
+    for (let i = -3; i <= 3; i++) p.line(W * 0.47 + i * W * 0.05, cy - H * 0.14, W * 0.47 + i * W * 0.05, cy + H * 0.02, dark);
+    // head + long flat snout
+    p.ellipse(W * 0.69, cy - H * 0.02, W * 0.06, H * 0.12, o.c);
+    for (let x = W * 0.7; x < W * 0.97; x++) {
+      const u = (x - W * 0.7) / (W * 0.27), top = cy - H * 0.09 + u * H * 0.04, bot = cy + H * 0.06 - u * H * 0.01;
+      for (let y = top; y <= bot; y++) p.set(x, y, y > cy ? mul(o.c, 0.9) : o.c);
+    }
+    p.shade(0.18);
+    // jaw line + teeth, nostril, eye knob
+    for (let x = W * 0.72; x < W * 0.96; x++) { p.set(x, cy, mul(o.c, 0.5)); if (Math.round(x) % 3 === 0) p.set(x, cy - 1, teeth); }
+    p.set(W * 0.95, cy - H * 0.08, mul(o.c, 0.5));
+    p.ellipse(W * 0.7, cy - H * 0.13, 2, 1.6, o.c);
+    p.set(W * 0.71, cy - H * 0.14, hex('#e8d03a')); p.set(W * 0.72, cy - H * 0.14, BLACK);
+    // back scutes
+    for (let i = -4; i <= 3; i++) p.set(W * 0.47 + i * W * 0.045, cy - H * 0.16 - 1, i % 2 ? dark : mix(o.c, WHITE, 0.2));
     p.outline();
   };
 
@@ -436,7 +549,7 @@
   // knees about half), the torso stays steady, the arm only reaches out for the net.
   S.diver = function (p, o) {
     if (o.anim === 'stand' || o.anim === 'walk' || o.anim === 'jump' || o.anim === 'standnet') return S.diverUpright(p, o);
-    p.oy = p.h - 24 - 4;   // 24x32 frame: art drawn in 24x24 coordinates, centred on the anchor (12,16)
+    p.oy = p.h / 2 - 12; p.ox = p.w / 2 - 12;   // 28x40 frame: swim art drawn in 24x24 coords, centred on the anchor (14,20)
     const R = ROBO, ph = o.t * Math.PI * 2;
     const swim = o.anim === 'swim';
     const amp = swim ? 2.7 : o.anim === 'net' ? 0.6 : 1.2;
@@ -447,7 +560,7 @@
     const leg = (phase, gain, base, shin, boot) => {
       const footY = hipY + Math.sin(ph + phase + Math.PI / 6) * amp * gain;
       const kneeY = hipY + Math.sin(ph + phase + Math.PI / 6 - 0.9) * amp * gain * 0.5;
-      const kx = 5, fx = 2;
+      const kx = 4, fx = 1;           // legs reach 1px further back than before
       for (let i = 0; i <= 4; i++) { const t = i / 4, xx = hipX - t * (hipX - kx), yy = hipY + t * (kneeY - hipY); p.set(xx, yy, base); p.set(xx, yy + 1, base); }
       for (let i = 1; i <= 3; i++) { const t = i / 3, xx = kx - t * (kx - fx), yy = kneeY + t * (footY - kneeY); p.set(xx, yy, shin); p.set(xx, yy + 1, shin); }
       p.set(kx, kneeY, R.k); p.set(kx, kneeY + 1, R.k);
@@ -473,40 +586,41 @@
     p.outline(0.28);
   };
 
-  // Upright pose for walking on land. Anchor = (12,12); feet sit on row 16.
+  // Upright pose for walking on land, the same size as the swimming pose (~22px head to toe).
+  // Anchor = (14,20) in the 28x40 frame; feet stand on row 24 (= the bottom of the collision box).
   S.diverUpright = function (p, o) {
-    p.oy = p.h - 24 - 4;   // headroom above the head in the 24x32 frame
+    p.oy = 0; p.ox = p.w / 2 - 12;
     const R = ROBO;
-    const walk = o.anim === 'walk', jump = o.anim === 'jump';
+    const walk = o.anim === 'walk', jump = o.anim === 'jump', noArm = o.anim === 'standnet';
     const step = walk ? [0, 1, 0, -1][o.frame] : 0;
-    const top = (walk && o.frame % 2 ? 1 : 0) + (jump ? -1 : 0) + (o.anim === 'stand' && o.frame ? 0 : 0);
-    // legs: back leg grey, front leg white, dark knees, cyan thigh stripe
+    const t = 3 + (walk && o.frame % 2 ? 1 : 0) + (jump ? -2 : 0);
+    // legs (2px each, 5px long + feet): back leg grey, front leg white, dark knees, cyan thigh light
     if (jump) {
-      p.rect(10, top + 12, 2, 3, R.g); p.set(10, top + 13, R.k);
-      p.rect(13, top + 12, 2, 3, R.w); p.set(14, top + 13, R.k); p.rect(12, top + 15, 4, 1, R.g); p.rect(9, top + 15, 3, 1, R.gd);
+      p.rect(9, t + 16, 2, 3, R.g); p.set(9, t + 17, R.k); p.set(10, t + 17, R.k); p.rect(7, t + 19, 4, 2, R.gd);
+      p.rect(13, t + 16, 2, 3, R.w); p.set(13, t + 17, R.k); p.set(14, t + 17, R.k); p.rect(13, t + 19, 4, 2, R.g);
     } else {
-      const bx = 10 - step, fx = 13 + step;
-      p.rect(bx, top + 12, 2, 16 - (top + 12), R.g); p.set(bx, top + 14, R.k); p.set(bx + 1, top + 14, R.k);
-      p.rect(fx, top + 12, 2, 16 - (top + 12), R.w); p.set(fx, top + 14, R.k); p.set(fx + 1, top + 14, R.k);
-      p.set(fx + 1, top + 12, R.c);
-      p.rect(bx - 1, 16, 3, 1, R.gd); p.rect(fx, 16, 3, 1, R.g);   // feet
+      const bx = 9 - step, fx = 13 + step, feet = 24;
+      p.rect(bx, t + 16, 2, feet - (t + 16), R.g); p.rect(bx, t + 18, 2, 1, R.k);
+      p.rect(fx, t + 16, 2, feet - (t + 16), R.w); p.rect(fx, t + 18, 2, 1, R.k); p.set(fx + 1, t + 16, R.c);
+      p.rect(bx - 1, feet, 3, 1, R.gd); p.rect(fx, feet, 3, 1, R.g);
     }
     // hips + dark waist band
-    p.rect(10, top + 11, 5, 1, R.w); p.rect(10, top + 10, 5, 1, R.k);
-    // torso: dark chest plate with cyan trim
-    p.rect(10, top + 6, 5, 4, R.k); p.set(12, top + 7, R.kd); p.set(12, top + 9, R.kd);
-    p.rect(9, top + 6, 1, 4, R.c); p.rect(15, top + 6, 1, 4, R.c);
+    p.rect(9, t + 15, 7, 1, R.w); p.rect(9, t + 14, 7, 1, R.k);
+    // torso: dark segmented chest plate with cyan trim
+    p.rect(9, t + 9, 7, 5, R.k); p.set(12, t + 10, R.kd); p.set(12, t + 12, R.kd); p.set(11, t + 11, R.kd); p.set(13, t + 11, R.kd);
+    p.rect(8, t + 9, 1, 5, R.c); p.rect(16, t + 9, 1, 5, R.c);
     // broad white shoulders + navy pad on the front shoulder
-    p.rect(8, top + 5, 9, 1, R.w); p.rect(9, top + 4, 7, 1, R.w);
-    p.rect(14, top + 4, 3, 2, R.n); p.set(14, top + 4, R.nl);
-    // arms: back arm grey, front arm white with dark elbow + hand (swings while walking)
-    p.rect(8, top + 6, 1, 5, R.g); p.set(8, top + 8, R.k); p.set(8, top + 11, R.kd);
-    if (o.anim !== 'standnet') p.rect(16 + (walk ? Math.max(0, step) : 0), top + 6, 1, 5, R.w); if (o.anim !== 'standnet') { p.set(16 + (walk ? Math.max(0, step) : 0), top + 8, R.k); p.set(16 + (walk ? Math.max(0, step) : 0), top + 11, R.k); }
-    // neck + head with navy visor facing right, cyan ear light
-    p.set(12, top + 3, R.k);
-    p.rect(10, top, 5, 3, R.w); p.rect(11, top - 1, 3, 1, R.w);
-    p.rect(13, top, 2, 3, R.n); p.set(14, top, R.nl); p.set(15, top + 1, R.n);
-    p.set(11, top + 1, R.c);
+    p.rect(7, t + 7, 11, 2, R.w);
+    p.rect(15, t + 7, 3, 2, R.n); p.set(15, t + 7, R.nl);
+    // arms (2px): back arm grey, front arm white; dark elbows + hands; swing while walking
+    const sw = walk ? step : 0;
+    p.rect(5, t + 8, 2, 6, R.g); p.rect(5, t + 10, 2, 1, R.k); p.rect(5 - Math.max(0, sw), t + 14, 2, 1, R.kd);
+    if (!noArm) { p.rect(18, t + 8, 2, 6, R.w); p.rect(18, t + 10, 2, 1, R.k); p.rect(18 + Math.max(0, -sw), t + 14, 2, 1, R.k); }
+    // neck + head: white helmet, big navy visor facing right, cyan ear light
+    p.rect(11, t + 6, 3, 1, R.k);
+    p.rect(10, t, 5, 1, R.w); p.rect(9, t + 1, 7, 4, R.w); p.rect(10, t + 5, 5, 1, R.w);
+    p.rect(13, t + 1, 3, 4, R.n); p.set(14, t + 1, R.nl); p.set(13, t + 1, R.nl);
+    p.set(10, t + 3, R.c);
     p.outline(0.28);
   };
 
@@ -617,24 +731,55 @@
 
   // ---------- sheet builder ----------
   // entry: { fw, fh, anims: { name: {row, col?, frames, fps} }, art: { shape, color, accent, ...opts } }
+  // Renders every frame with a hidden margin, measures the union of all frames, and fits it into
+  // the frame: one constant shift for the whole sheet (so animation never jitters); if it still
+  // doesn't fit, the drawing area is shrunk a little and it's redrawn. No more cut-off sprites.
   PH.buildSheet = function (entry) {
-    const anims = entry.anims;
+    const anims = entry.anims, fw = entry.fw, fh = entry.fh;
     let cols = 1, rows = 1;
     for (const k in anims) { const a = anims[k]; cols = Math.max(cols, (a.col || 0) + a.frames); rows = Math.max(rows, a.row + 1); }
-    const sheet = new Pix(cols * entry.fw, rows * entry.fh);
     const art = entry.art || {};
     const fn = S[art.shape] || S.fish;
-    for (const k in anims) {
-      const a = anims[k];
-      for (let f = 0; f < a.frames; f++) {
-        const p = new Pix(entry.fw, entry.fh);
-        const opts = Object.assign({}, art, {
-          c: hex(art.color), a: hex(art.accent || art.color), glow: art.glow ? hex(art.glow) : undefined,
-          t: f / a.frames, frame: f, anim: k, moving: k === 'move' || k === 'swim'
-        });
-        fn(p, opts);
-        sheet.blit(p, ((a.col || 0) + f) * entry.fw, a.row * entry.fh);
+    const bottomAnchored = entry.anchor && entry.anchor[1] === fh - 1;
+    const M = 8;
+    const render = (k) => {
+      const frames = [];
+      let x0 = Infinity, y0 = Infinity, x1 = -Infinity, y1 = -Infinity;
+      for (const name in anims) {
+        const a = anims[name];
+        for (let f = 0; f < a.frames; f++) {
+          const vw = fw - k, vh = fh - (bottomAnchored ? Math.round(k / 2) : k);
+          const p = new Pix(vw, vh, M);
+          const opts = Object.assign({}, art, {
+            c: hex(art.color), a: hex(art.accent || art.color), glow: art.glow ? hex(art.glow) : undefined,
+            t: f / a.frames, frame: f, anim: name, moving: name === 'move' || name === 'swim'
+          });
+          fn(p, opts);
+          // offset of the frame's origin inside this padded buffer (drawing area centred / bottom-aligned)
+          const fx0 = M - Math.floor((fw - vw) / 2), fy0 = M - (bottomAnchored ? fh - vh : Math.floor((fh - vh) / 2));
+          for (let y = 0; y < p.bh; y++) for (let x = 0; x < p.bw; x++) if (p.d[(y * p.bw + x) * 4 + 3]) {
+            x0 = Math.min(x0, x - fx0); x1 = Math.max(x1, x - fx0); y0 = Math.min(y0, y - fy0); y1 = Math.max(y1, y - fy0);
+          }
+          frames.push({ p, a, f, fx0, fy0 });
+        }
       }
+      return { frames, x0, y0, x1, y1 };
+    };
+    let r = render(0);
+    if (art.fit !== false) {
+      // keep a 1px clear margin (except under bottom-anchored art, whose base sits on the last row)
+      const tooBig = (q) => q.x1 - q.x0 + 1 > fw - 2 || q.y1 - q.y0 + 1 > fh - (bottomAnchored ? 1 : 2);
+      for (let k = 2; k <= Math.floor(Math.min(fw, fh) / 2) && tooBig(r); k += 2) r = render(k);
+    }
+    // constant shift that brings the union inside the frame (bottom-anchored art keeps its base)
+    let sx = 0, sy = 0;
+    if (art.fit !== false) {
+      if (r.x0 < 1) sx = 1 - r.x0; else if (r.x1 > fw - 2) sx = fw - 2 - r.x1;
+      if (r.y0 < 1) sy = 1 - r.y0; else if (r.y1 > fh - 2 && !bottomAnchored) sy = fh - 2 - r.y1;
+    }
+    const sheet = new Pix(cols * fw, rows * fh);
+    for (const { p, a, f, fx0, fy0 } of r.frames) {
+      sheet.copyFrom(p, fx0 - sx, fy0 - sy, fw, fh, ((a.col || 0) + f) * fw, a.row * fh);
     }
     return sheet;
   };
