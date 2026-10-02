@@ -3,7 +3,7 @@ var AQ = (typeof AQ !== 'undefined') ? AQ : {};
 
 AQ.Game = (function () {
   const G = {
-    state: 'loading',     // loading | title | play | pause | aquarium | log | map
+    state: 'loading',     // loading | title | play | pause | aquarium | log | map | soundtest
     scene: 'world',       // where the player is: world | hill | station  (see src/scenes.js)
     time: 0,
     player: null,
@@ -20,6 +20,7 @@ AQ.Game = (function () {
     canvas.width = AQ.TUNING.view.w; canvas.height = AQ.TUNING.view.h;
     AQ.Camera.w = canvas.width; AQ.Camera.h = canvas.height;
     AQ.Input.attach(canvas);
+    AQ.Audio.attach();                          // sound starts on the first click / key press
     AQ.Render.init(canvas);
     fit(); window.addEventListener('resize', fit);
 
@@ -108,7 +109,10 @@ AQ.Game = (function () {
       AQ.PauseUI.update(dt, G);
     } else if (G.state === 'title') {
       AQ.Title.update(dt, G);
+    } else if (G.state === 'soundtest') {
+      AQ.SoundTest.update(dt, G);
     }
+    if (AQ.SoundDirector) AQ.SoundDirector.update(dt, G);
     AQ.Transition.update(dt);
     if (AQ.Breeding && G.state !== 'loading') AQ.Breeding.update(dt);   // tanks live on wherever you are
     I.endFrame();
@@ -120,6 +124,7 @@ AQ.Game = (function () {
   }
   function drawScene() {
     const ctx = AQ.Render.ctx, cam = AQ.Camera;
+    if (G.state === 'soundtest') { AQ.SoundTest.draw(ctx); return; }
     if (G.state === 'aquarium' || (G.state === 'log' && AQ.LogUI.from === 'aquarium')) {
       AQ.Aquarium.draw(ctx, G);
       if (G.state === 'log') AQ.LogUI.draw(ctx, G);

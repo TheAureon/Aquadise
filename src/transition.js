@@ -12,6 +12,7 @@ AQ.Transition = (function () {
     if (T.active) return false;
     const c = AQ.TUNING.transition;
     T.active = true; T.phase = 'out'; T.t = 0; T.mid = mid; T.done = opts.done;
+    if (AQ.Audio) AQ.Audio.play('transition');
     T.dOut = opts.out != null ? opts.out : c.fadeOut;
     T.dHold = opts.hold != null ? opts.hold : c.hold;
     T.dIn = opts.in != null ? opts.in : c.fadeIn;

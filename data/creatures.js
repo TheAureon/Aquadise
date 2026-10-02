@@ -25,6 +25,8 @@
 //   spawn                                { n, at: floor|water|surface|wall|ceiling|pool|ice_top|reef, area:[x0,x1], y:[y0,y1] }
 //   light                                { r, color } emits light in dark biomes
 //   tank                                 tank idle locomotion: swim | crawl | still (default from category)
+//   voice                                optional: its own little sound id (src/sfx.js); otherwise one per category
+//                                        (AQ.data.creatureVoices in data/music.js)
 //   hint                                 shown in the collection log
 //   likes                                aquarium: decor/plant tags it enjoys being near (see data/decorations.js)
 //   tags                                 plants only: what the plant counts as when placed in a tank
@@ -309,7 +311,7 @@ AQ.data.creatures = [
     spawn: { n: 3, at: 'water' }, hint: 'Pale pink with feathery gills. Barely reacts to you at all.' },
 
   // ---- Day & night update: nine new creatures (night-only, depth-gated, and the new behaviours)
-  { id: 'auroravein_squid', likes: ['ice', 'light'], name: 'Auroravein Squid', biome: 'ice', category: 'cephalopod', catch_behavior: 'drift', active: 'night',
+  { id: 'auroravein_squid', voice: 'glow_chime', likes: ['ice', 'light'], name: 'Auroravein Squid', biome: 'ice', category: 'cephalopod', catch_behavior: 'drift', active: 'night',
     params: { speed: 6, alpha: 0.95 },
     sprite_size: 'medium', color: '#cfe6dc', accent: '#c9a8ff', art: { shape: 'squid', veins: true }, light: { r: 30, color: '#b8ffd8' },
     spawn: { n: 2, at: 'water', y: [150, 360] }, hint: 'Pale green-violet veins pulse with light. Drifts slowly under the ice on calm nights.' },
@@ -321,7 +323,7 @@ AQ.data.creatures = [
     params: { range: 72, calmTime: 0.9, approach: 26, wanderR: 50 },
     sprite_size: 'medium', color: '#e8a04a', accent: '#ff7f9a', art: { shape: 'seahorse' },
     spawn: { n: 2, at: 'water', y: [170, 360] }, hint: 'A seahorse that dances your moves back at you, mirrored. Hold still and it drifts in close.' },
-  { id: 'candlepolyp', tags: ['coral', 'light'], name: 'Candlepolyp', biome: 'coral', category: 'plant', is_plant: true, catch_behavior: 'plant', bloom: 'night',
+  { id: 'candlepolyp', voice: 'glow_chime', tags: ['coral', 'light'], name: 'Candlepolyp', biome: 'coral', category: 'plant', is_plant: true, catch_behavior: 'plant', bloom: 'night',
     params: {},
     sprite_size: 'medium', color: '#6a4a6a', accent: '#ffd98a', art: { shape: 'candlepolyp' }, light: { r: 22, color: '#ffd98a' },
     spawn: { n: 5, at: 'floor' }, hint: 'Closed tight by day. At night its tips open like little candles - harvest it then.' },
@@ -329,7 +331,7 @@ AQ.data.creatures = [
     params: { leapEvery: [2.5, 4.5], leap: 125, speed: 24, depth: 14, wanderR: 100 },
     sprite_size: 'small', color: '#5fa8e8', accent: '#e8f4ff', art: { shape: 'flyfish' },
     spawn: { n: 3, at: 'surface' }, hint: 'Skims under the surface and leaps out in an arc. Too quick underwater - net it mid-leap.' },
-  { id: 'sail_turtle', likes: ['rock', 'arch'], name: 'Sail Turtle', biome: 'open_ocean', category: 'reptile', catch_behavior: 'patrol', requires_depth: 2,
+  { id: 'sail_turtle', voice: 'turtle_note', likes: ['rock', 'arch'], name: 'Sail Turtle', biome: 'open_ocean', category: 'reptile', catch_behavior: 'patrol', requires_depth: 2,
     params: { speed: 10, noticeR: 56, stillNoise: 0.12, span: 40 },
     sprite_size: 'widelarge', color: '#6a9a7a', accent: '#c8a060', art: { shape: 'turtle', sail: true },
     spawn: { n: 1, at: 'water', area: [2436, 2550], y: [1290, 1328] }, hint: 'A gentle giant that sails slowly around the bottom of the Blue Hole. Wait still on its path.' },
@@ -337,11 +339,11 @@ AQ.data.creatures = [
     params: { alertR: 40, relaxTime: 2.5, withdraw: true },
     sprite_size: 'wide', color: '#5a5a6a', accent: '#8f98b8', art: { shape: 'turtle', dome: true },
     spawn: { n: 1, at: 'floor', area: [3600, 3712], y: [1380, 1410] }, hint: 'Lives at the very bottom of the trench. Pulls into its shell if you rush it - wait until it relaxes.' },
-  { id: 'bellcrab', likes: ['metal', 'treasure'], name: 'Bellcrab', biome: 'ruins', category: 'crustacean', catch_behavior: 'wary',
+  { id: 'bellcrab', voice: 'bell_tiny', likes: ['metal', 'treasure'], name: 'Bellcrab', biome: 'ruins', category: 'crustacean', catch_behavior: 'wary',
     params: { reaction: 'hide', pry: true, alertR: 46, speed: 6, wanderR: 28 },
     sprite_size: 'small', color: '#c8a060', accent: '#d8c090', art: { shape: 'crab', bell: true },
     spawn: { n: 2, at: 'floor' }, hint: 'Its shell has a little bell-shaped hollow. Sneak up; if it hides, hold the net to pry it out.' },
-  { id: 'firefly_frog', likes: ['roots', 'plant'], name: 'Firefly Frog', biome: 'mangrove', category: 'amphibian', catch_behavior: 'lure', active: 'night',
+  { id: 'firefly_frog', voice: 'glow_chime', likes: ['roots', 'plant'], name: 'Firefly Frog', biome: 'mangrove', category: 'amphibian', catch_behavior: 'lure', active: 'night',
     params: { decoyDist: 11, decoyColor: '#f0ff8a', alpha: 0.55, glow: 28 },
     sprite_size: 'small', color: '#4a6a3a', accent: '#e8ff7a', art: { shape: 'frog', glow: true }, light: { r: 12, color: '#e8ff8a' },
     spawn: { n: 2, at: 'floor' }, hint: 'Glows at night. Its bright "firefly" is a decoy on a stalk - net the dim frog sitting just beside it.' }

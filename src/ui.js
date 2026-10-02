@@ -15,6 +15,7 @@ AQ.LogUI = (function () {
   const entries = (b) => AQ.data.creatures.filter((d) => d.biome === b.id);
 
   L.open = function (game, from) {
+    AQ.Audio.play('log_open');
     L.from = from || game.state;
     game.state = 'log';
     const here = from === 'aquarium' ? AQ.Aquarium.biome : from === 'title' || game.scene !== 'world' ? 'tide_pools' : AQ.World.biomeAt(game.player.x, game.player.y).id;
@@ -22,6 +23,7 @@ AQ.LogUI = (function () {
     L.sel = 0;
   };
   L.close = function (game) {
+    AQ.Audio.play('log_close');
     if (L.from === 'title') { AQ.Title.open(game); return; }
     game.state = L.from === 'aquarium' ? 'aquarium' : 'play';
   };
@@ -164,25 +166,32 @@ AQ.PauseUI = (function () {
   const P = { ui: [], confirm: 0 };
   P.update = function (dt, game) {
     const I = AQ.Input, m = I.mouse;
+    if (P.panel === 'sound') { AQ.SoundUI.update(game, () => { P.panel = null; }, () => AQ.SoundTest.open(game, 'pause')); return; }
     P.confirm = Math.max(0, P.confirm - dt);
     P.ui = [
-      { id: 'resume', x: 110, y: 60, w: 100, h: 14, label: 'RESUME' },
-      { id: 'help', x: 110, y: 80, w: 100, h: 14, label: 'SHOW CONTROLS' },
-      { id: 'home', x: 110, y: 100, w: 100, h: 14, label: 'HOME' },
-      { id: 'reset', x: 110, y: 126, w: 100, h: 14, label: P.confirm > 0 ? 'CLICK AGAIN TO WIPE' : 'RESET SAVE' }
+      { id: 'resume', x: 110, y: 54, w: 100, h: 14, label: 'RESUME' },
+      { id: 'help', x: 110, y: 72, w: 100, h: 14, label: 'SHOW CONTROLS' },
+      { id: 'sound', x: 110, y: 90, w: 100, h: 14, label: 'SOUND' },
+      { id: 'home', x: 110, y: 108, w: 100, h: 14, label: 'HOME' },
+      { id: 'reset', x: 110, y: 132, w: 100, h: 14, label: P.confirm > 0 ? 'CLICK AGAIN TO WIPE' : 'RESET SAVE' }
     ];
     if (I.wasPressed('Escape')) { game.state = 'play'; return; }
+    const prev = P.hover;
     P.hover = P.ui.find((r) => m.x >= r.x && m.y >= r.y && m.x < r.x + r.w && m.y < r.y + r.h);
+    if (P.hover && P.hover !== prev && (!prev || prev.id !== P.hover.id)) AQ.Audio.play('menu_move');
     if (m.pressed[0] && P.hover) {
+      AQ.Audio.play('menu_select');
       if (P.hover.id === 'resume') game.state = 'play';
       if (P.hover.id === 'help') { AQ.HUD.helpT = 12; game.state = 'play'; }
+      if (P.hover.id === 'sound') { P.panel = 'sound'; AQ.SoundUI.open(); }
       if (P.hover.id === 'home') { AQ.Save.save(game); AQ.Title.open(game); }
       if (P.hover.id === 'reset') { if (P.confirm > 0) AQ.Save.reset(); else P.confirm = 3; }
     }
   };
   P.draw = function (g) {
     g.fillStyle = 'rgba(4,12,24,0.75)'; g.fillRect(0, 0, 320, 180);
-    F().draw(g, 'PAUSED', 160, 40, '#ffe9a8', { align: 'center' });
+    if (P.panel === 'sound') { AQ.SoundUI.draw(g); return; }
+    F().draw(g, 'PAUSED', 160, 38, '#ffe9a8', { align: 'center' });
     for (const r of P.ui) AQ.Aquarium.button(g, r, P.hover === r);
     F().draw(g, 'PROGRESS SAVES AUTOMATICALLY', 160, 160, '#8aa4b8', { align: 'center' });
   };

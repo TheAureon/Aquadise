@@ -160,7 +160,7 @@ AQ.Catching = (function () {
     AQ.FX.sparkle(c.x, c.y, '#fff7c2', 12);
     AQ.FX.text(c.x, c.y - 8, pried ? 'PRIED!' : 'GOT IT!', '#ffe36b');
     AQ.HUD.toast(`Caught ${c.def.name}!${isNew ? '  NEW!' : ''}`, isNew ? '#ffe36b' : '#ffffff', 3);
-    AQ.Audio.play('catch');
+    AQ.Audio.play('catch', { rare: !!c.def.rare });
   }
 
   K.draw = function (g, game) {

@@ -27,7 +27,8 @@ AQ.Title = (function () {
     items.push({ id: 'aquarium', label: 'AQUARIUM', icon: 'fish' });
     items.push({ id: 'log', label: 'COLLECTION', icon: 'book' });
     items.push({ id: 'controls', label: 'CONTROLS', icon: 'pad' });
-    const y0 = items.length === 5 ? 74 : 80;
+    items.push({ id: 'sound', label: 'SOUND', icon: 'note' });
+    const y0 = 80 - (items.length - 4) * 6;
     return items.map((it, i) => Object.assign(it, { x: 108, y: y0 + i * 14, w: 104, h: 11 }));
   }
 
@@ -64,15 +65,21 @@ AQ.Title = (function () {
     if (T.diverT < 16 && R.chance(dt * 3)) T.bubbles.push({ x: diverX() + 6, y: diverY() - 3, v: R.range(8, 14), r: 1, p: R() * 6 });
 
     T.items = menu();
+    if (T.panel === 'sound') {
+      AQ.SoundUI.update(game, () => { T.panel = null; }, () => AQ.SoundTest.open(game, 'title'));
+      return;
+    }
     if (T.panel) {
-      if (I.rawPressed('Escape', 'Enter', 'Space') || m.pressed[0]) T.panel = null;
+      if (I.rawPressed('Escape', 'Enter', 'Space') || m.pressed[0]) { T.panel = null; AQ.Audio.play('menu_select'); }
       return;
     }
     if (T.sel >= T.items.length) T.sel = 0;
+    const was = T.sel;
     if (I.rawPressed('ArrowUp', 'KeyW')) T.sel = (T.sel + T.items.length - 1) % T.items.length;
     if (I.rawPressed('ArrowDown', 'KeyS')) T.sel = (T.sel + 1) % T.items.length;
     const hover = T.items.findIndex((r) => m.x >= r.x && m.y >= r.y && m.x < r.x + r.w && m.y < r.y + r.h);
     if (hover >= 0 && (m.pressed[0] || m.x !== T.lastMX || m.y !== T.lastMY)) T.sel = hover;
+    if (T.sel !== was) AQ.Audio.play('menu_move');
     T.lastMX = m.x; T.lastMY = m.y;
     if (I.rawPressed('Enter', 'Space') || (m.pressed[0] && hover >= 0)) choose(T.items[T.sel], game);
   };
@@ -81,6 +88,7 @@ AQ.Title = (function () {
 
   function choose(it, game) {
     if (!it) return;
+    AQ.Audio.play('menu_select');
     if (it.id === 'continue') start(game);
     else if (it.id === 'new') {
       if (hasProgress() && T.confirmNew <= 0) { T.confirmNew = 3; return; }
@@ -89,6 +97,7 @@ AQ.Title = (function () {
     } else if (it.id === 'aquarium') { AQ.Aquarium.open(game, 'title'); }
     else if (it.id === 'log') { AQ.LogUI.open(game, 'title'); }
     else if (it.id === 'controls') T.panel = 'controls';
+    else if (it.id === 'sound') { T.panel = 'sound'; AQ.SoundUI.open(); }
   }
   function start(game) {
     AQ.FX.list.length = 0;
@@ -145,7 +154,8 @@ AQ.Title = (function () {
     plus: ['...#...', '...#...', '...#...', '#######', '...#...', '...#...', '...#...'],
     fish: ['.......', '..###.#', '.#####.', '##.####', '.#####.', '..###.#', '.......'],
     book: ['.##.##.', '#..#..#', '#..#..#', '#..#..#', '#..#..#', '.##.##.', '...#...'],
-    pad:  ['.......', '.#####.', '#.#...#', '###.#.#', '#.#...#', '.#####.', '.......']
+    pad:  ['.......', '.#####.', '#.#...#', '###.#.#', '#.#...#', '.#####.', '.......'],
+    note: ['...####', '...#..#', '...#..#', '...#..#', '.###.##', '####.##', '.##....']
   };
   function icon(g, name, x, y, col) {
     g.fillStyle = col;
@@ -228,14 +238,15 @@ AQ.Title = (function () {
       g.fillRect(x, y, 1, 1);
     }
 
+    if (T.panel === 'sound') { AQ.SoundUI.draw(g); return; }
     if (T.panel === 'controls') {
-      const box = { x: 40, y: 66, w: 240, h: 92 };
+      const box = { x: 40, y: 66, w: 240, h: 100 };
       pill(g, box, 'rgba(6,20,38,0.92)', 'rgba(110,240,239,0.6)');
       F().draw(g, 'CONTROLS', 160, 71, '#6ef0ef', { align: 'center', shadow: false });
       const rows = [
         ['MOVE / SWIM', 'WASD OR ARROWS'], ['JUMP', 'SPACE'], ['SNEAK', 'HOLD SHIFT'],
         ['NET', 'LEFT CLICK'], ['PRY', 'HOLD LEFT CLICK'], ['BAIT', 'B OR RIGHT CLICK'],
-        ['AQUARIUM / LOG / MAP', 'TAB / L / M'], ['PAUSE', 'ESC']
+        ['AQUARIUM / LOG / MAP', 'TAB / L / M'], ['PAUSE', 'ESC'], ['MUTE SOUND', AQ.TUNING.audio.muteKey.replace('Key', '')]
       ];
       rows.forEach(([a, b], i) => { F().draw(g, a, 50, 82 + i * 9, '#9fd3ee', { shadow: false }); F().draw(g, b, 270, 82 + i * 9, '#ffffff', { align: 'right', shadow: false }); });
       return;

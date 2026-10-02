@@ -39,7 +39,9 @@ AQ.Aquarium = (function () {
   };
 
   A.refreshVibe = function () {
-    A.vibe = AQ.Vibe.evaluate(A.biome); A.vibeT = AQ.TUNING.aquarium.recomputeEvery;
+    const before = A.vibe && A.vibeOf === A.biome ? A.vibe.stars : null;
+    A.vibe = AQ.Vibe.evaluate(A.biome); A.vibeOf = A.biome;
+    if (before != null && Math.floor(A.vibe.stars) > Math.floor(before)) AQ.Audio.play('star');   // a whole new star A.vibeT = AQ.TUNING.aquarium.recomputeEvery;
     A.fish.forEach(updateMood);
     A.fish.forEach(setAge);
     A.courtPair = new Set(AQ.Breeding.courting(AQ.Collection.tank(A.biome)) || []);
@@ -98,6 +100,8 @@ AQ.Aquarium = (function () {
     for (let i = 0; i < 5; i++) AQ.FX.sparkle(88 + i * 8, 6, '#fff3b0', 4);
     A.tray = 'decor'; A.trayScroll = 0;
     AQ.Audio.play('unlock');
+    AQ.Audio.play('fanfare', { delay: 0.6 });
+    if (AQ.Music) AQ.Music.stinger('reward');
   }
   A.moodOf = (f) => ({ name: f.moodName, color: f.moodCol, value: f.mood });
 
@@ -290,7 +294,7 @@ AQ.Aquarium = (function () {
         if (f.loco === 'swim') steer(f, A.courtC[0] + Math.cos(ang) * 16, A.courtC[1] + Math.sin(ang * 2) * 6, (Math.hypot(f.x - A.courtC[0], f.y - A.courtC[1]) > 30 ? 30 : 18) * f.pace, dt, 3);
         else { walk(f, A.courtC[0] + (first ? -6 : 6), 8, dt); if (Math.abs(f.x - A.courtC[0]) < 9) { f.facing = first ? 1 : -1; f.hop = Math.max(0, Math.sin(f.t * 6)) * 1.5; } }
         f.fxT -= dt;
-        if (first && f.fxT <= 0) { f.fxT = 1.3; AQ.FX.text((f.x + mate.x) / 2, Math.min(f.y, mate.y) - Math.max(f.r, mate.r) - 3, '♥', '#ff9fc0'); }
+        if (first && f.fxT <= 0) { f.fxT = 1.3; AQ.FX.text((f.x + mate.x) / 2, Math.min(f.y, mate.y) - Math.max(f.r, mate.r) - 3, '♥', '#ff9fc0'); AQ.Audio.play('court'); }
         clampFish(f); return;
       }
     }
@@ -403,7 +407,7 @@ AQ.Aquarium = (function () {
     return false;
   }
   function markFed() { AQ.Collection.tank(A.biome).lastFed = Date.now(); AQ.Save && AQ.Save.dirty(); }
-  function heart(f) { AQ.FX.text(f.x, f.y - f.r - 3, '♥', '#ff9fc0'); }
+  function heart(f) { AQ.FX.text(f.x, f.y - f.r - 3, '♥', '#ff9fc0'); AQ.Audio.play('hearts', { vol: 0.7 }); }
 
   // ---------------------------------------------------------------- UI layout + input
   function layout() {
@@ -628,6 +632,7 @@ AQ.Aquarium = (function () {
     if (h.fromTank) { tank.decor.splice(Math.min(h.index, tank.decor.length), 0, item); pushUndo({ t: 'move', uid: item.uid, prev: h.orig }); }
     else { tank.decor.push(item); pushUndo({ t: 'add', uid: item.uid }); }
     AQ.FX.puff(m.x, y - 2, 'rgba(240,230,200,0.6)', 4);
+    AQ.Audio.play('place');
     // keep holding base decor for quick multi-placement; plants need stock
     if (h.fromTank || (h.kind === 'plant' && !(AQ.State.plants[h.id] > 0))) A.holding = null;
     AQ.Save && AQ.Save.dirty();
@@ -666,17 +671,19 @@ AQ.Aquarium = (function () {
     items.forEach((d) => { if (d.type === 'plant') AQ.State.plants[d.id] = (AQ.State.plants[d.id] || 0) + 1; AQ.FX.puff(d.x, d.y - 3, 'rgba(240,230,200,0.6)', 3); });
     tank.decor.length = 0;
     A.clearArm = 0;
+    AQ.Audio.play('clear');
     pushUndo({ t: 'clear', items });
     note('Tank cleared. Plants went back to your stock. (UNDO to restore)', '#cfe8ff');
     AQ.Save && AQ.Save.dirty();
   }
   // X: flip the held piece, or the placed piece under the mouse
   function flipIt(tank) {
-    if (A.holding) { A.holding.flip = !A.holding.flip; return; }
+    if (A.holding) { A.holding.flip = !A.holding.flip; AQ.Audio.play('flip'); return; }
     const d = inTank(AQ.Input.mouse) && decorAt(tank, AQ.Input.mouse);
     if (!d) return;
     pushUndo({ t: 'edit', uid: d.uid, flip: d.flip, layer: d.layer });
     if (d.flip) delete d.flip; else d.flip = true;
+    AQ.Audio.play('flip');
     AQ.Save && AQ.Save.dirty();
   }
   // Z: middle -> front -> back -> middle
@@ -698,6 +705,7 @@ AQ.Aquarium = (function () {
     if (A.holding) { const h = A.holding; A.holding = null; if (h.fromTank) { tank.decor.splice(Math.min(h.index, tank.decor.length), 0, h.orig); return; } }
     const a = A.undo.pop();
     if (!a) { note('Nothing to undo.', '#cfe8ff'); return; }
+    AQ.Audio.play('undo');
     const find = (uid) => tank.decor.find((d) => d.uid === uid);
     const takePlant = (d) => { if (d.type !== 'plant') return true; if (!(AQ.State.plants[d.id] > 0)) return false; AQ.State.plants[d.id]--; return true; };
     if (a.t === 'add') {

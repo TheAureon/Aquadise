@@ -6,6 +6,7 @@ AQ.HUD = (function () {
 
   H.toast = function (text, color = '#ffffff', time = 2.6) {
     H.toasts.push({ text, color, t: 0, life: time });
+    AQ.Audio.play('toast');
     if (H.toasts.length > 3) H.toasts.shift();
   };
 
@@ -92,7 +93,7 @@ AQ.HUD = (function () {
     // help (first moments only, or when H is pressed)
     if (H.showHelp && H.helpT > 0) {
       ctx.globalAlpha = Math.min(1, H.helpT) * 0.9;
-      const lines = ['MOVE WASD  JUMP SPACE  SNEAK SHIFT  NET LEFT CLICK (HOLD TO PRY)', 'BAIT B / RIGHT CLICK   INTERACT E   LOG L   MAP M   HELP H'];
+      const lines = ['MOVE WASD  JUMP SPACE  SNEAK SHIFT  NET LEFT CLICK (HOLD TO PRY)', 'BAIT B / RIGHT CLICK   INTERACT E   LOG L   MAP M   HELP H   MUTE O'];
       lines.forEach((l, i) => F.draw(ctx, l, vw / 2, vh - 15 + i * 7, '#d8f3ff', { align: 'center', shadow: SH }));
       ctx.globalAlpha = 1;
     }

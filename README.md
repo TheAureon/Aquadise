@@ -32,6 +32,7 @@ npx http-server -c-1 .      # or: python3 -m http.server
 | map                 | M                                        |
 | pause / home / reset | Esc                                     |
 | help overlay        | H                                        |
+| mute / unmute sound | O (anywhere)                             |
 
 In the aquarium: **Q/E** switch tanks, **F** feeds, **T** (or TANKS) shows every tank at a glance.
 Click a tray item, then click in the tank to place it. Click a placed item to move it, and right-click
@@ -116,6 +117,32 @@ Click a creature for its info card. Hover the stars for what's helping and what'
     that biome. There is no currency or shop.
   - **Overview (TANKS):** stars, species count and who's nervous or hungry, for every tank.
 
+## Sound and music
+
+Everything you hear is generated in code: soft effects, a quiet ambience bed for each place, and
+gentle generative music. Sound starts on your first click or key press (browsers don't allow it
+before that), and pauses while the tab is hidden.
+
+- **Settings:** title screen → SOUND, or Esc → SOUND. MUSIC and EFFECTS volume, MUTE, and the
+  SOUND TEST. They're saved with the game (New Game keeps them). **O** mutes or unmutes anywhere.
+- **Sound test:** SOUND → SOUND TEST lists every effect, ambience bed and music piece (day and
+  night versions, plus the reward phrase). Click one to hear it. Beds and music loop until clicked
+  again. Each entry shows its id.
+- **Feel:** effects and ambience are muffled while you're underwater and open up on land (hill,
+  shore, station). Places crossfade into each other, and the log, map and pause menu duck the
+  music to about half.
+- **Music:** each place has its own key, tempo, instruments and short tune (`data/music.js`).
+  One shared motif comes back everywhere, voiced by each place's lead instrument. Phrases are
+  sparse, with long rests. At night the sea pieces play slower, quieter and darker.
+- **Creature sounds:** rare and quiet. One nearby creature makes a little sound every so often,
+  by category, or its own `voice:` in `data/creatures.js`.
+- **Real recordings later:** map an id to a file in `AQ.data.audioFiles` (`data/music.js`).
+  Effects use their id, beds use `amb:<place>`, and music uses `music:<piece>`.
+- **Tuning** (`AQ.TUNING.audio` in `src/config.js`): `master` (overall volume), `musicPace`
+  (tempo), `musicRest` (silence between phrases), `creatureVoiceEvery` (seconds between creature
+  sounds), plus the default volumes, ambience level, crossfade time, menu duck, underwater muffle
+  and the mute key.
+
 ## Project layout
 
 ```
@@ -141,6 +168,13 @@ src/miniworld.js      small collision maps for side scenes (ladders, one-way pla
 src/hill.js           the hill scene with the UFO and its beam
 src/station.js        the aquarium building in space (tanks on the walls, directory, beam pad)
 src/ui.js             collection log, map, pause
+src/audio.js          audio engine: mixer, voice limit, underwater filter, settings, file mapping
+src/sfx.js            every sound effect recipe (registered by id)
+src/ambience.js       the looping place sounds + their crossfading director
+src/music.js          generative music engine + director (pieces in data/music.js)
+src/sounddirector.js  per-frame sound hooks: steps, splashes, beam, chimes, creature voices
+src/soundtest.js      SOUND settings panel and the SOUND TEST screen
+data/music.js         music pieces, scales, motif, creature voice map, audio file mapping
 tools/gen-placeholders.js   writes placeholder PNGs + manifest from the data files
 tools/sprites.html          animated preview of every sprite
 docs/SPRITE_SPEC.md         how to make sprites that drop in cleanly
@@ -176,8 +210,7 @@ docs/SPRITE_SPEC.md         how to make sprites that drop in cleanly
   the FISH tray). Up to 40 decorations per tank.
 - **Saving:** automatic to `localStorage` every 10 s, when leaving the aquarium, and on page
   close. Esc → Reset save wipes it.
-- **Audio:** stubbed. `src/audio.js` has no-op `play()`/`music()` hooks that are already called
-  at the right moments.
+- **Audio:** all made in code with the Web Audio API (no audio files). See *Sound and music* below.
 - **Getting home:** the walk to the hill and the UFO (see above). The title screen's AQUARIUM
   button still opens the tank screen directly. Caught creatures go to their tank immediately.
 - Plants can decorate any tank. Only creatures are restricted to their own biome.

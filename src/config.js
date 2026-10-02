@@ -189,5 +189,26 @@ AQ.TUNING = {
     zoomMargin: 10            // space (px) kept around the building when zoomed out
   },       // ladder climbing speed in the aquarium building (px/s)
 
+  // ---- sound and music (all made in code; see src/audio.js, src/sfx.js, src/ambience.js, src/music.js)
+  audio: {
+    master: 0.8,              // overall loudness of everything (0..1)
+    musicVolume: 0.6,         // default MUSIC slider for a new save (0..1; players change it in SOUND)
+    sfxVolume: 0.8,           // default EFFECTS slider for a new save (0..1)
+    ambienceLevel: 0.5,       // place sounds (waves, drips, wind...) relative to the effects slider
+    maxVoices: 14,            // most effects allowed to ring at once (extra ones are skipped)
+    underwaterCutoff: 900,    // how muffled effects + ambience are underwater (Hz; lower = more muffled)
+    musicPace: 1,             // music tempo multiplier (0.8 = slower, 1.2 = quicker)
+    musicRest: 1,             // silence between music phrases multiplier (2 = twice as much quiet)
+    nightPace: 0.8,           // night versions of the sea music play this much slower...
+    nightVolume: 0.7,         // ...and this much quieter
+    crossfadeSeconds: 3,      // how long music + ambience take to blend into the next place
+    menuDuck: 0.5,            // music level while the log, map or pause menu is open
+    lookahead: 0.3,           // seconds of music notes scheduled ahead (keeps timing steady, cheap)
+    creatureVoiceEvery: 9,    // average seconds between little creature sounds (higher = rarer)
+    creatureVoiceRange: 120,  // only creatures this close (px) make sounds
+    stepEvery: 9,             // px walked between footsteps
+    muteKey: 'KeyO'           // quick mute / unmute, anywhere
+  },
+
   save: { key: 'aquadise.save.v1', autosaveEvery: 10 }
 };
