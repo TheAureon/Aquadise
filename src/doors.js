@@ -1,11 +1,11 @@
 // Doors in the sea world (the sunken ship's door + hatches). Listed in data/world.js `doors`.
-// A shut door is solid for the player; stand next to it and press interact (E) to open or close it.
+// A shut door is solid; it swings open on its own when you swim up, and shuts after you've passed.
 // Vertical doors (taller than wide) swing toward you; hatches (wider than tall) flip up on a hinge.
 var AQ = (typeof AQ !== 'undefined') ? AQ : {};
 
 AQ.Doors = (function () {
   const U = AQ.U, D = { list: [] };
-  const REACH = 16;     // how close (px) you need to be to use a door
+  const REACH = 18;     // how close (px) you get before a door opens
   const SPEED = 4;      // opens in ~0.25 s
 
   D.init = function () {
@@ -19,27 +19,17 @@ AQ.Doors = (function () {
     for (const d of D.list) if (shut(d) && x1 >= d.x && x0 < d.x + d.w && y1 >= d.y && y0 < d.y + d.h) return true;
     return false;
   };
-  function nearest(P) {
-    let best = null, bd = REACH;
+  // Doors open by themselves as you swim up, and close again once you've moved on.
+  D.update = function (dt, game) {
+    const P = game.player, hb = AQ.TUNING.swim.hitbox;
     for (const d of D.list) {
       const dx = Math.max(d.x - P.x, 0, P.x - (d.x + d.w)), dy = Math.max(d.y - P.y, 0, P.y - (d.y + d.h));
       const dist = Math.hypot(dx, dy);
-      if (dist < bd) { bd = dist; best = d; }
+      const inside = P.x + hb.w / 2 >= d.x && P.x - hb.w / 2 < d.x + d.w && P.y + hb.h / 2 >= d.y && P.y - hb.h / 2 < d.y + d.h;
+      if (dist < REACH) { if (!d.want) AQ.Audio.play('door'); d.want = 1; }
+      else if (dist > REACH + 10 && !inside) d.want = 0;          // a little gap so it doesn't flap
+      d.open = U.approach(d.open, d.want, dt * SPEED);
     }
-    return best;
-  }
-  D.update = function (dt, game, input) {
-    const P = game.player, hb = AQ.TUNING.swim.hitbox;
-    const d = nearest(P);
-    if (d && input.wasPressed(...AQ.TUNING.interactKeys)) {
-      if (d.want) {
-        // don't shut it on yourself
-        const inside = P.x + hb.w / 2 >= d.x && P.x - hb.w / 2 < d.x + d.w && P.y + hb.h / 2 >= d.y && P.y - hb.h / 2 < d.y + d.h;
-        if (!inside) d.want = 0;
-      } else d.want = 1;
-      AQ.Audio.play('door');
-    }
-    for (const k of D.list) k.open = U.approach(k.open, k.want, dt * SPEED);
   };
 
   // world-space drawing (wooden door / hatch with a brass handle)
@@ -63,13 +53,6 @@ AQ.Doors = (function () {
         else ctx.fillRect(d.x, d.y + d.h - tall, 1, tall);
       }
     }
-  };
-  // screen-space "E: OPEN DOOR" prompt
-  D.drawPrompt = function (ctx, game) {
-    const P = game.player, d = nearest(P);
-    if (!d || AQ.Transition.active) return;
-    const cam = AQ.Camera;
-    AQ.Scenes.prompt(ctx, P.x - cam.left(), P.y - cam.top() - 22, `${d.want ? 'CLOSE' : 'OPEN'} ${d.name || 'DOOR'}`);
   };
   return D;
 })();

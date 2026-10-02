@@ -149,7 +149,7 @@ AQ.data.world = {
       ] }
   ],
 
-  // Doors: solid while shut; stand next to one and press interact (E) to open / close it.
+  // Doors: solid while shut; they open by themselves when you swim up and close after you pass.
   // vertical doors stand in a doorway (w small, h tall); hatches lie flat (w wide, h small).
   doors: [
     { x: 2026, y: 244, w: 4, h: 18, name: 'DOOR' },          // bow door into the ship's hold
@@ -159,12 +159,14 @@ AQ.data.world = {
   ],
 
   // Terrain shapes, applied in order on top of the floor. ops: solid | carve | pool | air | water
+  // back: true -> scenery only (painted, but not a wall)
   // shapes: poly{pts} rect{x,y,w,h} circle{x,y,r} tunnel{path:[[x,y,r]], r} spikes{x,y,w,n,h,dir} chimney{x,y,w,h}
   shapes: [
     // --- Sunken ruins: ancient pillars + a wrecked ship you can swim through
-    { op: 'solid', shape: 'rect', x: 1930, y: 222, w: 10, h: 48, jitter: 0.6 },
-    { op: 'solid', shape: 'rect', x: 1926, y: 218, w: 18, h: 5 },
-    { op: 'solid', shape: 'rect', x: 1968, y: 240, w: 10, h: 30, jitter: 0.6 },
+    // (back: true = painted like terrain but only scenery: you swim in front of it)
+    { op: 'solid', shape: 'rect', x: 1930, y: 222, w: 10, h: 48, jitter: 0.6, back: true },
+    { op: 'solid', shape: 'rect', x: 1926, y: 218, w: 18, h: 5, back: true },
+    { op: 'solid', shape: 'rect', x: 1968, y: 240, w: 10, h: 30, jitter: 0.6, back: true },
     // the ship (from the sketch): sitting upright on the floor, cabin + mast with a flag, portholes, swim-through hull
     { op: 'solid', shape: 'poly', mat: 'wood', pts: [[2030, 270], [2018, 238], [2030, 232], [2270, 230], [2300, 236], [2318, 250], [2306, 270]], jitter: 1.2 },
     { op: 'carve', shape: 'poly', pts: [[2044, 264], [2036, 242], [2264, 238], [2292, 250], [2286, 264]] },
@@ -178,7 +180,7 @@ AQ.data.world = {
     { op: 'carve', shape: 'rect', x: 2180, y: 224, w: 24, h: 18 },
     { op: 'carve', shape: 'rect', x: 2136, y: 213, w: 16, h: 18 },
     { op: 'carve', shape: 'rect', x: 2094, y: 228, w: 18, h: 14 },
-    { op: 'solid', shape: 'circle', mat: 'metal', x: 2372, y: 266, r: 10, jitter: 1 },
+    { op: 'solid', shape: 'circle', mat: 'metal', x: 2372, y: 266, r: 10, jitter: 1, back: true },
 
     // --- Volcanic vents: smoking craters on top of the mounds (y is found automatically)
     { shape: 'vent', x: 2850 }, { shape: 'vent', x: 3030 }, { shape: 'vent', x: 3210 },

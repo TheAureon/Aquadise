@@ -31,6 +31,7 @@ AQ.Game = (function () {
     setLoading('Painting terrain...');
     await frame();
     AQ.Terrain.build(AQ.World);
+    AQ.World.releaseBackShapes();               // scenery-only shapes stop being walls once painted
     AQ.Render.buildTintField();
     for (const id in AQ.Scenes.list) if (AQ.Scenes.list[id].build) AQ.Scenes.list[id].build();
 
@@ -148,7 +149,6 @@ AQ.Game = (function () {
     AQ.Render.surface(cam);
     AQ.Render.lighting(cam, collectLights(), targetDarkness());
     AQ.Terrain.drawGlow(ctx, cam);
-    if (!title && AQ.Doors && G.state === 'play') AQ.Doors.drawPrompt(ctx, G);
     if (title) { if (G.state === 'log') AQ.LogUI.draw(ctx, G); else AQ.Title.draw(ctx, G); return; }
     drawOverlays(ctx);
   }

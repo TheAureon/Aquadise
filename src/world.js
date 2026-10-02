@@ -30,8 +30,9 @@ AQ.World = (function () {
       for (let y = 0; y < W.h; y++) mask[y * W.w + x] = y >= fy ? SOLID : (y < W.sea ? AIR : WATER);
     }
     // 2) shapes in order
-    (data.shapes || []).forEach((s, i) => { curMat = s.mat ? W.materials.indexOf(s.mat) : 0; applyShape(s, (data.seed || 1) + i * 31); });
-    curMat = 0;
+    W.backPx = [];                               // [index, value-before] for scenery-only shapes
+    (data.shapes || []).forEach((s, i) => { curMat = s.mat ? W.materials.indexOf(s.mat) : 0; curBack = !!s.back; applyShape(s, (data.seed || 1) + i * 31); });
+    curMat = 0; curBack = false;
     buildPools(data.pools || []);
     // 3) distance-to-open transform (used for terrain shading & spawning)
     W.dist = distanceTransform();
@@ -52,10 +53,11 @@ AQ.World = (function () {
     return out;
   }
 
-  let curMat = 0;
+  let curMat = 0, curBack = false;
   function setPx(x, y, op) {
     if (x < 0 || y < 0 || x >= W.w || y >= W.h) return;
     const i = y * W.w + x, m = W.mask[i];
+    if (curBack && op === 'solid' && m !== SOLID) W.backPx.push(i, m);
     switch (op) {
       case 'solid': W.mask[i] = SOLID; W.mat[i] = curMat; break;
       case 'carve': W.mask[i] = y < W.sea ? AIR : WATER; break;
@@ -220,6 +222,14 @@ AQ.World = (function () {
       W.biomeGrid[gy * gw + gx] = idx;
     }
   }
+
+  // Scenery-only shapes (back: true) are solid while the terrain is painted, then handed back to
+  // the water/air they replaced, so nothing collides with them. Called once after Terrain.build.
+  W.releaseBackShapes = function () {
+    const b = W.backPx || [];
+    for (let k = b.length - 2; k >= 0; k -= 2) W.mask[b[k]] = b[k + 1];
+    W.backPx = [];
+  };
 
   // ---------- queries ----------
   W.at = function (x, y) {
