@@ -56,14 +56,14 @@ Click a creature for its info card. Hover the stars for what's helping and what'
   They open by themselves as you swim up and close behind you (listed in `data/world.js` `doors`).
 - **Upgrades from chests:** NET, SPD, LAMP (wider light in dark places) and DEEP (how deep you can
   dive before the water gets heavy: you slow down, the view softens and you drift back up, never
-  any damage). Limits are in `upgrades.depthLimitY`; level 0 reaches everything except the open
-  ocean's Blue Hole basin (level 2) and the trench's deepest slot (level 3).
+  any damage). Limits are in `upgrades.depthLimitY`; level 0 reaches everything except the trench's
+  deep bowl, which each level lets you sink a little further into (level 3 reaches the bottom).
 - **New catch behaviours:** `mirror` (copies your swimming mirrored; hold still and it drifts in),
   `lure` (a glowing decoy on a stalk; net the dim creature beside it, not the light) and `midair`
   (leaps out of the water; only nettable in the air). See the header of data/creatures.js.
 - **Nine new creatures (70 in all):** Auroravein Squid (ice, night), Moonshell Crab (tide pools,
   night), Ribbonmane (kelp, mirror), Candlepolyp (coral plant, blooms at night), Skyleap Flyfish
-  (open ocean, mid-air), Sail Turtle (Blue Hole, depth 2), Pressure Tortoise (trench slot, depth 3),
+  (open ocean, mid-air), Sail Turtle (open ocean), Pressure Tortoise (bottom of the trench bowl, depth 3),
   Bellcrab (ruins) and Firefly Frog (mangrove, night, lure). Existing creatures have no new gates.
 - **No fail state.** Hostile creatures only knock you back. Air is unlimited.
 - **Progression** comes only from chests: a bigger net (3 levels) and faster swimming (3 levels).

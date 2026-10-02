@@ -68,10 +68,10 @@ AQ.data.world = {
     { id: 'trench', name: 'Deep Trench', short: 'Trench', rect: [3320, 640, 660, 800],
       palette: { top: ['#2c3448', '#252c3d', '#1e2433'], rock: ['#1b2130', '#161b27', '#11151f'], accent: '#3c6b7a', style: 'strata' }, water: '#050c1c', waterMix: 0.4, dark: 0.74,
       props: [
-        { type: 'spire', at: 'floor', n: 10, y: [1150, 1260] },
-        { type: 'bones', at: 'floor', n: 3, y: [1150, 1260] },
-        { type: 'rock', at: 'floor', n: 14 },
-        { type: 'tubeworms', at: 'floor', n: 6 }
+        { type: 'spire', at: 'floor', n: 10, y: [1150, 1214] },
+        { type: 'bones', at: 'floor', n: 3, y: [1150, 1214] },
+        { type: 'rock', at: 'floor', n: 14, y: [0, 1214] },
+        { type: 'tubeworms', at: 'floor', n: 6, y: [1150, 1214] }
       ] },
     { id: 'vents', name: 'Volcanic Vents', short: 'Vents', rect: [2560, 600, 760, 840],
       palette: { top: ['#4a3f44', '#3d3338', '#33292e'], rock: ['#2f282c', '#272124', '#1f1a1d'], accent: '#ff8a3a', style: 'strata', embers: true }, water: '#3a2230', waterMix: 0.25, dark: 0.55,
@@ -183,18 +183,8 @@ AQ.data.world = {
     { op: 'solid', shape: 'circle', mat: 'metal', x: 2372, y: 266, r: 10, jitter: 1, back: true },
 
     // --- Deep places past the gentle depth limits (see AQ.TUNING.upgrades.depthLimitY):
-    // the open ocean's Blue Hole (a winding shaft below the drop-off that opens into a round bowl, DEPTH 2) ...
-    // A broad funnel: wide where it opens in the drop-off, narrowing as it winds down, then
-    // widening again into a round bowl at the bottom.
-    { op: 'carve', shape: 'tunnel', r: 40, jitter: 0.2, path: [[2470, 330, 62], [2492, 480, 46], [2522, 640, 36], [2536, 800, 32], [2516, 960, 36], [2486, 1120, 34], [2496, 1250, 42]] },
-    { op: 'carve', shape: 'tunnel', r: 20, jitter: 0.3, path: [[2540, 700, 16], [2552, 728, 22], [2546, 756, 14]] },     // little side pockets
-    { op: 'carve', shape: 'tunnel', r: 20, jitter: 0.3, path: [[2490, 1020, 14], [2462, 1046, 22], [2470, 1074, 14]] },
-    { op: 'carve', shape: 'tunnel', r: 40, jitter: 0.15, path: [[2436, 1300, 24], [2462, 1298, 38], [2492, 1294, 44], [2522, 1298, 38], [2548, 1300, 24]] },
-    // ... and the trench's deepest slot (DEPTH 3): a funnel in the trench floor down into a bowl
-    // A wide, smooth bowl sunk into the trench floor: broad at the top, sloping down on both sides.
-    { op: 'carve', shape: 'tunnel', r: 30, jitter: 0.15, path: [[3540, 1222, 24], [3600, 1240, 34], [3654, 1250, 40], [3708, 1240, 34], [3770, 1222, 24]] },
-    { op: 'carve', shape: 'tunnel', r: 34, jitter: 0.15, path: [[3584, 1300, 26], [3620, 1318, 36], [3654, 1324, 40], [3690, 1318, 36], [3724, 1300, 26]] },
-    { op: 'carve', shape: 'tunnel', r: 28, jitter: 0.15, path: [[3618, 1372, 18], [3640, 1382, 26], [3654, 1384, 28], [3668, 1382, 26], [3690, 1372, 18]] },
+    // The trench's deepest place (DEPTH 3): one wide, smooth bowl sunk into the trench floor.
+    { op: 'carve', shape: 'poly', jitter: 0.5, pts: [[3530,1196], [3536,1212], [3537,1243], [3540,1270], [3545,1295], [3552,1317], [3560,1337], [3571,1355], [3582,1371], [3595,1384], [3609,1395], [3623,1402], [3639,1406], [3654,1408], [3669,1406], [3685,1402], [3699,1395], [3713,1384], [3726,1371], [3737,1355], [3748,1337], [3756,1317], [3763,1295], [3768,1270], [3771,1243], [3772,1212], [3778,1196]] },
 
     // --- Volcanic vents: smoking craters on top of the mounds (y is found automatically)
     { shape: 'vent', x: 2850 }, { shape: 'vent', x: 3030 }, { shape: 'vent', x: 3210 },
