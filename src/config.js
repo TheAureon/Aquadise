@@ -115,7 +115,7 @@ AQ.TUNING = {
     unlockStars: [2, 3.5, 5]  // tank stars needed for each biome's unlock tiers 1, 2 and 3 (new themed decor)
   },
 
-  // ---- day and night (the sea world only; the hill and the space aquarium don't follow it)
+  // ---- day and night (one clock for the whole game: the sea and the hill's sky follow it; it keeps running in the station)
   clock: {
     dayMinutes: 6,            // real minutes for one full day + night
     startHour: 5,             // a new game (and an older save) starts here: the beginning of the day (dawn)

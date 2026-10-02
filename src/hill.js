@@ -103,6 +103,39 @@ AQ.Hill = (function () {
     for (let x = G.beamX - 9; x <= G.beamX + 9; x++) { const y = G.surface[x]; g.fillStyle = (x + y) % 2 ? '#b4e08a' : '#a6d47c'; g.fillRect(x, y, 1, 1); }
   }
 
+  // The hill's sky follows the same clock as the sea: blue by day, a starry navy at night, and the
+  // painted sunset backdrop (bg.hill_sky) fading in at dawn and dusk. Distant hills + sea below.
+  const HILLS_DAY = [[124, 157, 190], [104, 140, 176]], HILLS_NIGHT = [[40, 46, 84], [30, 34, 66]];
+  const SEA_DAY = [79, 169, 201], SEA_NIGHT = [26, 45, 85];
+  const mixRGB = (a, b, k) => `rgb(${a.map((v, i) => Math.round(v + (b[i] - v) * k)).join(',')})`;
+  function drawSky(ctx, t) {
+    const R = AQ.Render, sky = R.skyCols(), d = AQ.Clock.daylight(), tw = AQ.Clock.twilight(), h = AQ.Clock.hour();
+    for (let y = 0; y < 150; y += 2) { ctx.fillStyle = U.css(U.mix(sky[0], sky[1], y / 150)); ctx.fillRect(0, y, 320, 2); }
+    if (d < 0.95) {                                            // stars
+      for (let i = 0; i < 46; i++) {
+        ctx.globalAlpha = (1 - d) * (0.45 + 0.4 * Math.sin(t * (1 + (i % 3)) + i));
+        ctx.fillStyle = i % 5 ? '#e8f0ff' : '#fff6d0'; ctx.fillRect((i * 97 + 13) % 320, (i * 53) % 120, 1, 1);
+      }
+      ctx.globalAlpha = 1;
+    }
+    // the sun crosses the sky by day, the moon by night
+    const c = AQ.TUNING.clock, sunUp = (h - c.dawnHour) / (c.duskHour + c.duskHours - c.dawnHour);
+    const moonUp = (((h - (c.duskHour + c.duskHours)) % 24) + 24) % 24 / (24 - (c.duskHour + c.duskHours - c.dawnHour));
+    const body = (u, r, col) => { if (u < 0 || u > 1 || tw > 0.7) return; ctx.globalAlpha = 1 - tw / 0.7; const x = 20 + u * 280, y = 140 - Math.sin(u * Math.PI) * 110; ctx.fillStyle = col; ctx.beginPath(); ctx.arc(Math.round(x), Math.round(y), r, 0, Math.PI * 2); ctx.fill(); ctx.globalAlpha = 1; };
+    body(sunUp, 9, '#fff2c0'); body(moonUp, 6, '#e8eeff');
+    const k = 1 - d;
+    ctx.fillStyle = mixRGB(HILLS_DAY[0], HILLS_NIGHT[0], k);
+    for (let x = 0; x < 320; x++) { const y = 134 - Math.sin(x * 0.02 + 1) * 6 - Math.sin(x * 0.051) * 3; ctx.fillRect(x, Math.round(y), 1, 152 - Math.round(y)); }
+    ctx.fillStyle = mixRGB(HILLS_DAY[1], HILLS_NIGHT[1], k);
+    for (let x = 0; x < 320; x++) { const y = 142 - Math.sin(x * 0.033 + 4) * 5; ctx.fillRect(x, Math.round(y), 1, 152 - Math.round(y)); }
+    ctx.fillStyle = mixRGB(SEA_DAY, SEA_NIGHT, k); ctx.fillRect(0, 152, 320, 28);
+    ctx.fillStyle = `rgba(255,255,255,${(0.35 * d + 0.1).toFixed(2)})`;
+    for (let i = 0; i < 12; i++) ctx.fillRect(((i * 61 + Math.floor(t * 4)) % 330) - 5, 156 + (i * 7) % 20, 4, 1);
+    // the painted sunset fades in over everything at dawn and dusk
+    const art = AQ.Assets.sprites['bg.hill_sky'];
+    if (art && tw > 0.02) { ctx.globalAlpha = Math.min(1, tw * 1.3); ctx.drawImage(art.img, 0, 0); ctx.globalAlpha = 1; }
+  }
+
   H.drawBeam = function (ctx, x, y0, y1, alpha) {
     const s = AQ.Assets.sprites['misc.beam'], B = AQ.TUNING.beam;
     if (!s) return;
@@ -117,21 +150,25 @@ AQ.Hill = (function () {
   H.draw = function (ctx, game) {
     if (!canvas) paint();
     const cam = AQ.Camera, left = cam.left(), top = cam.top(), t = AQ.Render.t, B = AQ.TUNING.beam;
-    const sky = AQ.Assets.sprites['bg.hill_sky'];
-    if (sky) ctx.drawImage(sky.img, 0, 0); else { ctx.fillStyle = '#5a4f8a'; ctx.fillRect(0, 0, 320, 180); }
+    drawSky(ctx, t);
     ctx.drawImage(canvas, -left, -top);
     ctx.save(); ctx.translate(-left, -top);
     AQ.Assets.draw(ctx, 'misc.signpost', 'idle', G.w - 30, G.surface[G.w - 30] + 1, { flip: true });   // points back to Tide Pools
+    game.player.draw(ctx);
+    ctx.restore();
+    // night falls on the hill too (the beam and the UFO's lights stay bright, drawn after this)
+    const night = 1 - AQ.Clock.daylight();
+    if (night > 0.02) { ctx.fillStyle = `rgba(10,16,40,${(night * 0.45).toFixed(3)})`; ctx.fillRect(0, 0, 320, 180); }
+    ctx.save(); ctx.translate(-left, -top);
     // UFO + beam
     const uy = G.ufoY + Math.sin(t * 1.2) * 2;
     const pulse = B.glow * (0.85 + 0.15 * Math.sin(t * 3));
     H.drawBeam(ctx, G.beamX, uy + 6, G.top + 2, pulse);
     ctx.save(); ctx.globalCompositeOperation = 'lighter'; ctx.globalAlpha = pulse * 0.5;      // soft pool of light on the grass
-    ctx.fillStyle = '#9feff0'; ctx.beginPath(); ctx.ellipse(G.beamX, G.top + 1, B.width / 2 + 3, 3, 0, 0, Math.PI * 2); ctx.fill(); ctx.restore();
+    ctx.fillStyle = '#c8c0ff'; ctx.beginPath(); ctx.ellipse(G.beamX, G.top + 1, B.width / 2 + 3, 3, 0, 0, Math.PI * 2); ctx.fill(); ctx.restore();
     ctx.fillStyle = '#e8fbff';
     for (const m of H.motes) { ctx.globalAlpha = Math.sin(m.t / m.life * Math.PI) * 0.8; ctx.fillRect(Math.round(m.x), Math.round(m.y), 1, 1); }
     ctx.globalAlpha = 1;
-    game.player.draw(ctx);
     AQ.Assets.draw(ctx, 'misc.ufo', 'idle', G.beamX, uy, { t });
     AQ.FX.draw(ctx);
     ctx.restore();

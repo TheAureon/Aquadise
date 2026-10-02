@@ -89,9 +89,9 @@ AQ.Game = (function () {
 
     if (G.state === 'play' || G.state === 'map') {
       const frozen = AQ.Transition.blocking(), inWorld = G.scene === 'world';
-      if (inWorld) AQ.Clock.update(dt);            // the sea's day/night clock (the hill + space aquarium don't follow it)
+      AQ.Clock.update(dt);                         // one day/night clock for everywhere (the sea, the hill, the station)
       if (!frozen) {
-        if (AQ.TUNING.debug.timeSkip && inWorld && I.wasPressed(AQ.TUNING.debug.timeSkipKey)) { AQ.Clock.set(AQ.Clock.hour() + AQ.TUNING.clock.skipHours); AQ.HUD.toast(`Time skip: ${AQ.HUD.clockText()}`, '#cfe8ff'); }
+        if (AQ.TUNING.debug.timeSkip && I.wasPressed(AQ.TUNING.debug.timeSkipKey)) { AQ.Clock.set(AQ.Clock.hour() + AQ.TUNING.clock.skipHours); AQ.HUD.toast(`Time skip: ${AQ.HUD.clockText()}`, '#cfe8ff'); }
         if (I.wasPressed('KeyH')) { AQ.HUD.showHelp = true; AQ.HUD.helpT = AQ.HUD.helpT > 0 ? 0 : 12; }
         if (I.wasPressed('KeyM')) { if (inWorld) G.state = G.state === 'map' ? 'play' : 'map'; else AQ.HUD.toast('The map only shows the sea.', '#cfe8ff'); }
         if (I.wasPressed('Tab') && AQ.Aquarium && AQ.TUNING.debug.tabOpensAquarium) { AQ.Aquarium.open(G); I.endFrame(); return; }
@@ -102,6 +102,7 @@ AQ.Game = (function () {
       AQ.HUD.update(dt, G);
       if (AQ.Save) AQ.Save.tick(dt, G);
     } else if (G.state === 'aquarium') {
+      AQ.Clock.update(dt);                         // time keeps passing while you tend a tank
       AQ.Aquarium.update(dt, G);
     } else if (G.state === 'log') {
       AQ.LogUI.update(dt, G);

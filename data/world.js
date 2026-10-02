@@ -33,8 +33,8 @@ AQ.data.world = {
     // Kelp forest + mangrove roots on the shallower seabed
     [3990, 388, 3], [4200, 384, 4], [4450, 390, 4], [4700, 384, 4], [4880, 388, 4],
     // Mangrove: a shallow, muddy flat (real mangroves grow in shallow water)
-    [4930, 320, 4], [4980, 230, 3], [5040, 190, 3], [5200, 194, 3], [5350, 188, 3], [5500, 196, 3], [5600, 190, 3],
-    [5650, 250, 3], [5690, 388, 3],
+    [4930, 350, 4], [4980, 300, 3], [5040, 278, 3], [5200, 282, 3], [5350, 276, 3], [5500, 284, 3], [5600, 278, 3],
+    [5650, 320, 3], [5690, 388, 3],
     // Ice shelf / polar waters
     [5760, 392, 3], [5900, 396, 4], [6100, 392, 4], [6300, 398, 4], [6500, 394, 4], [6700, 396, 4], [6800, 396, 0]
   ],
@@ -183,12 +183,12 @@ AQ.data.world = {
     { op: 'solid', shape: 'circle', mat: 'metal', x: 2372, y: 266, r: 10, jitter: 1, back: true },
 
     // --- Deep places past the gentle depth limits (see AQ.TUNING.upgrades.depthLimitY):
-    // the open ocean's Blue Hole (a shaft below the drop-off into a basin, DEPTH 2) ...
-    { op: 'carve', shape: 'tunnel', r: 16, jitter: 0.25, path: [[2492, 380], [2486, 700], [2494, 1000], [2488, 1270]] },
-    { op: 'carve', shape: 'poly', jitter: 2, pts: [[2432, 1272], [2552, 1268], [2556, 1338], [2430, 1342]] },
-    // ... and the trench's deepest slot (DEPTH 3)
-    { op: 'carve', shape: 'tunnel', r: 15, jitter: 0.25, path: [[3652, 1212], [3646, 1300], [3654, 1376]] },
-    { op: 'carve', shape: 'poly', jitter: 1.5, pts: [[3598, 1372], [3712, 1370], [3716, 1406], [3594, 1408]] },
+    // the open ocean's Blue Hole (a winding shaft below the drop-off that opens into a round bowl, DEPTH 2) ...
+    { op: 'carve', shape: 'tunnel', r: 16, jitter: 0.35, path: [[2492, 380, 20], [2480, 560, 14], [2500, 760, 17], [2484, 960, 13], [2498, 1140, 16], [2490, 1250, 22]] },
+    { op: 'carve', shape: 'tunnel', r: 26, jitter: 0.3, path: [[2448, 1302, 16], [2470, 1300, 26], [2494, 1296, 32], [2520, 1300, 26], [2540, 1304, 16]] },
+    // ... and the trench's deepest slot (DEPTH 3): a funnel in the trench floor down into a bowl
+    { op: 'carve', shape: 'tunnel', r: 15, jitter: 0.3, path: [[3652, 1206, 28], [3648, 1250, 17], [3652, 1310, 14], [3654, 1356, 20]] },
+    { op: 'carve', shape: 'tunnel', r: 20, jitter: 0.3, path: [[3606, 1386, 13], [3628, 1386, 20], [3654, 1384, 25], [3680, 1386, 20], [3702, 1388, 13]] },
 
     // --- Volcanic vents: smoking craters on top of the mounds (y is found automatically)
     { shape: 'vent', x: 2850 }, { shape: 'vent', x: 3030 }, { shape: 'vent', x: 3210 },

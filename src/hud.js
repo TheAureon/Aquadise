@@ -74,7 +74,7 @@ AQ.HUD = (function () {
       ctx.globalAlpha = 1;
     }
     // the time of day (sea only): sun, sunrise/sunset or moon
-    if (game.scene === 'world') drawClockIcon(ctx, vw - 12, 12);
+    if (game.scene !== 'station') drawClockIcon(ctx, vw - 12, 12);   // (the station floats in space: no sun there)
     // collection progress (top-right)
     if (AQ.Collection) {
       const c = AQ.Collection.progress();

@@ -1,6 +1,6 @@
 // The day/night clock. One calm, short day (AQ.TUNING.clock.dayMinutes real minutes), saved with the
-// game. 0..24 "hours"; dawn and dusk fade smoothly. Only the sea world follows it: the hill and the
-// aquarium building (in space) look the same at any hour.
+// game. 0..24 "hours"; dawn and dusk fade smoothly. One clock for the whole game: it keeps running on
+// the hill (whose sky follows it too) and in the aquarium building.
 //   AQ.Clock.hour()      0..24
 //   AQ.Clock.daylight()  1 = full day ... 0 = deep night (smooth through dawn and dusk)
 //   AQ.Clock.phase()     'dawn' | 'day' | 'dusk' | 'night'

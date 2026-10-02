@@ -1120,38 +1120,54 @@
     p.outline();
     p.set(14, 2, hex('#fff6a0')); p.set(14, 3, hex('#ffd25a'));   // a tiny lantern
   };
+  // A subtle saucer: a thin, flat dark-navy disc with a soft light edge on top and a glowing ring of
+  // pale lavender light underneath (no dome, no coloured bulbs).
   S.ufo = function (p, o) {
-    const cx = 32, metal = hex('#c8ced8'), dark = hex('#7a8496'), glass = hex('#9fe6f2');
-    p.ellipse(cx, 12, 11, 8, glass);
-    p.rect(cx - 12, 13, 24, 4, [0, 0, 0, 0]);
-    p.ellipse(cx, 19, 30, 6, metal);
-    p.rect(cx - 30, 19, 60, 1, mul(metal, 0.85));
-    p.ellipse(cx, 22, 18, 3, dark);
-    p.ellipse(cx, 24, 6, 1.6, hex('#bff6ff'));
-    p.shade(0.18); p.outline(0.35);
-    p.set(cx - 5, 7, WHITE); p.set(cx - 4, 6, WHITE); p.set(cx - 6, 9, mul(glass, 1.2));     // dome glint
-    p.set(cx + 2, 10, hex('#7fd0a0')); p.set(cx + 3, 10, hex('#7fd0a0')); p.set(cx + 2, 9, hex('#7fd0a0')); // a little someone inside
-    for (let i = 0; i < 8; i++) {                                                             // chasing rim lights
-      const x = cx - 26 + i * 7.4, on = (i + o.frame) % 4 === 0;
-      p.set(x, 20, on ? hex('#fff3a0') : i % 2 ? hex('#ff9fd0') : hex('#9feff0'));
-      p.set(x + 1, 20, on ? hex('#fff3a0') : mul(i % 2 ? hex('#ff9fd0') : hex('#9feff0'), 0.8));
+    const cx = 32, cy = 14, rx = 29, ry = 4.2;
+    const top = hex('#24408a'), mid = hex('#132658'), bot = hex('#0a1636'), edge = hex('#8eaef0');
+    for (let y = -5; y <= 5; y++) for (let x = -30; x <= 30; x++) {
+      const e = (x * x) / (rx * rx) + (y * y) / (ry * ry);
+      if (e > 1) continue;
+      const t = (y + ry) / (2 * ry);
+      p.set(cx + x, cy + y, t < 0.35 ? lerpC(top, mid, t / 0.35) : lerpC(mid, bot, (t - 0.35) / 0.65));
+    }
+    // the light edge along the top of the rim, brightest in the middle
+    for (let x = -27; x <= 27; x++) {
+      const y = Math.round(cy - ry * Math.sqrt(Math.max(0, 1 - (x * x) / (rx * rx))));
+      p.set(cx + x, y, lerpC(edge, top, Math.abs(x) / 30));
+    }
+    // glowing ring underneath (slowly breathing)
+    const glow = 0.85 + 0.15 * Math.sin(o.frame / 4 * Math.PI * 2);
+    const rr = 17, rry = 2.4, gy = cy + 3;
+    for (let y = -4; y <= 4; y++) for (let x = -22; x <= 22; x++) {
+      const e = Math.sqrt((x * x) / (rr * rr) + (y * y) / (rry * rry));
+      const ring = Math.max(0, 1 - Math.abs(e - 1) * 2.2), inner = e < 1 ? 0.35 : 0;
+      const a = Math.min(1, ring + inner) * glow;
+      if (a < 0.08) continue;
+      const c = ring > 0.6 ? [244, 240, 255] : ring > 0.25 ? [196, 186, 255] : [170, 168, 240];
+      p.set(cx + x, gy + y, [c[0], c[1], c[2], Math.round(a * 255)]);
     }
   };
+  // The beam: a soft lavender cone that widens downward, with faint brighter blue edges, fading out
+  // towards the ground. Drawn additively, stretched to the beam's size.
   S.beam = function (p, o) {
     const W = p.w, H = p.h;
     for (let y = 0; y < H; y++) {
-      const half = 6 + (y / H) * (W / 2 - 6);
-      const band = ((y + (3 - o.frame) * 6) % 24) < 3 ? 40 : 0;
+      const v = y / H, half = 7 + v * (W / 2 - 7.5);
+      const fade = (1 - v * 0.55) * Math.min(1, (H - y) / (H * 0.3));
+      const ripple = 1 + 0.08 * Math.sin((y + o.frame * 6) * 0.26);
       for (let x = 0; x < W; x++) {
         const d = Math.abs(x + 0.5 - W / 2) / half;
         if (d > 1) continue;
-        const a = (1 - d * d) * 120 + band * (1 - d) + (d > 0.82 ? 30 : 0);
-        p.set(x, y, [200 + 55 * (1 - d), 250, 255, Math.min(255, a)]);
+        const core = (1 - d * d) * 80, rim = d > 0.78 ? (1 - Math.abs(d - 0.9) / 0.12) * 90 : 0;
+        const a = Math.max(0, (core + Math.max(0, rim)) * fade * ripple);
+        const c = d > 0.75 ? [150, 178, 255] : [220, 206, 255];
+        if (a >= 4) p.set(x, y, [c[0], c[1], c[2], Math.min(255, Math.round(a))]);
       }
     }
-    for (let i = 0; i < 9; i++) {                                                             // rising sparkles
-      const sy = Math.floor((hash(i, 1, 7) * H + H - o.frame * 7) % H), sx = Math.round(W / 2 + (hash(i, 2, 7) - 0.5) * (8 + sy / H * 18));
-      p.set(sx, sy, [255, 255, 255, 230]);
+    for (let i = 0; i < 4; i++) {                                                             // a few slow motes
+      const sy = Math.floor((hash(i, 1, 7) * H + H - o.frame * 5) % H), sx = Math.round(W / 2 + (hash(i, 2, 7) - 0.5) * (8 + sy / H * 16));
+      p.set(sx, sy, [240, 236, 255, 140]);
     }
   };
   S.beampad = function (p, o) {

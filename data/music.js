@@ -29,7 +29,7 @@ AQ.data.music = {
 
   pieces: {
     title:      { label: 'TITLE',       root: 60, scale: 'major',      bpm: 70,  lead: 'piano',   pad: 'warm',  bass: true, melody: [4, 2, 1, 2, 0, -1, 0], chords: [0, 5, 3, 4], rest: [3, 6] },
-    hill:       { label: 'HILL',        root: 62, scale: 'mixolydian', bpm: 76,  lead: 'guitar',  pad: 'warm',  bass: true, bounce: true, melody: [0, 2, 4, 5, 4, 2], chords: [0, 3, 6, 0], rest: [4, 7] },
+    hill:       { label: 'HILL',        root: 62, scale: 'mixolydian', bpm: 76,  lead: 'guitar',  pad: 'warm',  bass: true, bounce: true, melody: [0, 2, 4, 5, 4, 2], chords: [0, 3, 6, 0], rest: [4, 7], night: true },
     station:    { label: 'STATION',     root: 64, scale: 'lydian',     bpm: 84,  lead: 'chip',    pad: 'glass', arp: 'chip', arpDensity: 0.7, melody: [0, 4, 3, 7, 6, 4], chords: [0, 1, 0, 4], rest: [3, 6] },
     aquarium:   { label: 'AQUARIUM',    root: 65, scale: 'lydian',     bpm: 72,  lead: 'bell',    pad: 'glass', arp: 'chip', arpDensity: 0.35, melody: [4, 3, 1, 0, 1, 4], chords: [0, 1, 3, 4], rest: [4, 7] },
     tide_pools: { label: 'TIDE POOLS',  root: 67, scale: 'majPent',    bpm: 100, lead: 'marimba', bass: true, bounce: true, melody: [0, 1, 2, 4, 3, 2, 0], chords: [0, 3, 1, 4], rest: [3, 6], night: true },
@@ -68,7 +68,7 @@ AQ.data.creatureVoices = {
 AQ.data.audioFiles = {
   // footsteps on the sand (tide pool shore) and on the hill's grass: single steps cut from recordings
   step_sand: { files: [1, 2, 3, 4, 5, 6].map((i) => `assets/audio/sand-step-${i}.mp3`), vol: 0.13, vary: 0.06 },
-  step_grass: { files: [1, 2, 3, 4, 5, 6].map((i) => `assets/audio/grass-step-${i}.mp3`), vol: 0.4, vary: 0.06 },
+  step_grass: { files: [1, 2, 3, 4, 5, 6].map((i) => `assets/audio/grass-step-${i}.mp3`), vol: 0.13, vary: 0.06 },
   // going into and climbing out of the water (two different moments of the same recording)
   splash_in: { files: ['assets/audio/water-in.mp3'], vol: 0.4, vary: 0.04 },
   splash_out: { files: ['assets/audio/water-out.mp3'], vol: 0.4, vary: 0.04 }

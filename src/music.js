@@ -10,7 +10,7 @@ var AQ = (typeof AQ !== 'undefined') ? AQ : {};
 AQ.Music = (function () {
   const A = AQ.Audio, H = A.H;
   const M = { current: null, fading: [], test: null };
-  const LEVEL = 0.3;               // music sits underneath the effects (the MUSIC slider scales this)
+  const LEVEL = 0.24;               // music sits underneath the effects (the MUSIC slider scales this)
   const cfg = () => AQ.TUNING.audio;
   const D = () => AQ.data.music;
   const R = Math.random;
@@ -35,55 +35,56 @@ AQ.Music = (function () {
     parts.forEach((o) => { o.connect(node); o.start(t); o.stop(t + len + 0.1); });
     return g;
   }
+  // Everything is kept soft: rounded attacks (no clicky starts), dark filters, quiet overtones.
   const I = {
     piano(c, d, t, f, v, len) {
       const L = Math.min(2.6, 0.8 + len);
-      const g = voice(c, d, t, L, [osc(c, 'triangle', f), osc(c, 'sine', f * 2, 3), osc(c, 'sine', f, -4)], lp(c, Math.min(3200, f * 6)));
-      return env(c, g, t, 0.006, v * 0.5, 0.02, L);
+      const g = voice(c, d, t, L, [osc(c, 'triangle', f), osc(c, 'sine', f * 2, 3), osc(c, 'sine', f, -4)], lp(c, Math.min(1800, f * 4)));
+      return env(c, g, t, 0.02, v * 0.42, 0.02, L);
     },
     bell(c, d, t, f, v) {
-      const g = voice(c, d, t, 2.4, [osc(c, 'sine', f), osc(c, 'sine', f * 2.76), osc(c, 'sine', f * 5.4)]);
-      return env(c, g, t, 0.004, v * 0.3, 0, 2.3);
+      const g = voice(c, d, t, 2.4, [osc(c, 'sine', f), osc(c, 'sine', f * 2.76)], lp(c, 2600));
+      return env(c, g, t, 0.015, v * 0.24, 0, 2.3);
     },
     harp(c, d, t, f, v) {
-      const g = voice(c, d, t, 1.8, [osc(c, 'triangle', f), osc(c, 'sine', f * 2)], lp(c, 2600));
-      return env(c, g, t, 0.004, v * 0.45, 0, 1.7);
+      const g = voice(c, d, t, 1.8, [osc(c, 'triangle', f), osc(c, 'sine', f * 2)], lp(c, 1600));
+      return env(c, g, t, 0.015, v * 0.38, 0, 1.7);
     },
     marimba(c, d, t, f, v) {
-      const g = voice(c, d, t, 0.6, [osc(c, 'sine', f)]);
+      const g = voice(c, d, t, 0.7, [osc(c, 'sine', f)]);
       const g2 = voice(c, d, t, 0.15, [osc(c, 'sine', f * 4)]);
-      env(c, g2, t, 0.002, v * 0.12, 0, 0.12);
-      return env(c, g, t, 0.003, v * 0.6, 0, 0.55);
+      env(c, g2, t, 0.01, v * 0.05, 0, 0.12);
+      return env(c, g, t, 0.012, v * 0.5, 0, 0.65);
     },
     guitar(c, d, t, f, v) {
-      // plucked: bright at first, the filter closes quickly (a soft nylon-ish tone)
-      const fl = lp(c, 3200, 1.2);
-      fl.frequency.setValueAtTime(3200, t); fl.frequency.exponentialRampToValueAtTime(500, t + 0.35);
-      const g = voice(c, d, t, 1.3, [osc(c, 'sawtooth', f), osc(c, 'triangle', f, 5)], fl);
-      return env(c, g, t, 0.003, v * 0.3, 0, 1.2);
+      // plucked: a little brighter at first, the filter closes quickly (a soft nylon-ish tone)
+      const fl = lp(c, 1800, 0.8);
+      fl.frequency.setValueAtTime(1800, t); fl.frequency.exponentialRampToValueAtTime(420, t + 0.3);
+      const g = voice(c, d, t, 1.3, [osc(c, 'triangle', f), osc(c, 'sawtooth', f, 5)], fl);
+      return env(c, g, t, 0.012, v * 0.24, 0, 1.2);
     },
     chip(c, d, t, f, v, len) {
       const L = Math.min(0.5, len * 0.8 + 0.08);
-      const g = voice(c, d, t, L, [osc(c, 'square', f)], lp(c, 2200));
-      return env(c, g, t, 0.005, v * 0.11, L * 0.3, L * 0.7);
+      const g = voice(c, d, t, L, [osc(c, 'square', f)], lp(c, 1200));
+      return env(c, g, t, 0.02, v * 0.08, L * 0.3, L * 0.7);
     },
     drone(c, d, t, f, v, len) {
       const L = Math.max(2, len);
-      const g = voice(c, d, t, L + 2, [osc(c, 'sine', f), osc(c, 'sine', f * 1.5, 4), osc(c, 'triangle', f / 2)], lp(c, 500));
-      return env(c, g, t, 0.8, v * 0.35, L * 0.4, 1.6);
+      const g = voice(c, d, t, L + 2, [osc(c, 'sine', f), osc(c, 'sine', f * 1.5, 4), osc(c, 'triangle', f / 2)], lp(c, 420));
+      return env(c, g, t, 1.0, v * 0.3, L * 0.4, 1.8);
     },
     bass(c, d, t, f, v, len) {
       const L = Math.max(0.6, len);
-      const g = voice(c, d, t, L + 1, [osc(c, 'sine', f), osc(c, 'triangle', f, 3)], lp(c, 380));
-      return env(c, g, t, 0.03, v * 0.5, L * 0.5, 0.8);
+      const g = voice(c, d, t, L + 1, [osc(c, 'sine', f), osc(c, 'triangle', f, 3)], lp(c, 300));
+      return env(c, g, t, 0.06, v * 0.42, L * 0.5, 0.9);
     },
     warm(c, d, t, f, v, len) {          // pad: two slightly detuned saws through a dark filter
-      const g = voice(c, d, t, len + 3, [osc(c, 'sawtooth', f, -7), osc(c, 'sawtooth', f, 7)], lp(c, 650));
-      return env(c, g, t, 1.8, v * 0.11, Math.max(0, len - 1.8), 2.6);
+      const g = voice(c, d, t, len + 3, [osc(c, 'sawtooth', f, -7), osc(c, 'sawtooth', f, 7)], lp(c, 520));
+      return env(c, g, t, 1.8, v * 0.065, Math.max(0, len - 1.8), 2.6);
     },
     glass(c, d, t, f, v, len) {         // pad: glassy sines with a slow shimmer
-      const g = voice(c, d, t, len + 3, [osc(c, 'sine', f), osc(c, 'sine', f * 2, 6), osc(c, 'triangle', f * 3, -6)], lp(c, 2400));
-      return env(c, g, t, 1.8, v * 0.11, Math.max(0, len - 1.8), 2.6);
+      const g = voice(c, d, t, len + 3, [osc(c, 'sine', f), osc(c, 'sine', f * 2, 6), osc(c, 'triangle', f * 3, -6)], lp(c, 1700));
+      return env(c, g, t, 1.8, v * 0.075, Math.max(0, len - 1.8), 2.6);
     }
   };
   M.instruments = I;
@@ -252,8 +253,8 @@ AQ.Music = (function () {
     const from = st === 'log' ? AQ.LogUI.from : st;
     if (from === 'title' || st === 'title') return 'title';
     if (st === 'aquarium' || from === 'aquarium') return 'aquarium';
-    if (game.scene === 'hill') return 'hill';
     if (game.scene === 'station') return 'station';
+    if (game.scene === 'hill') return 'hill' + (AQ.Clock.isNight() ? ':night' : '');
     const P = game.player, b = AQ.World.biomeAt(P.x, P.y);
     const id = b && D().pieces[b.id] ? b.id : 'tide_pools';
     return id + (D().pieces[id].night && AQ.Clock.isNight() ? ':night' : '');

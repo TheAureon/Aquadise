@@ -68,11 +68,11 @@ AQ.SoundDirector = (function () {
     } else S.stationMode = null;
 
     // ---- the sea's clock: soft chimes as dusk and dawn begin
-    if (game.scene === 'world') {
+    if (game.scene !== 'station') {
       const ph = AQ.Clock.phase();
       if (S.phase && ph !== S.phase) { if (ph === 'dusk') A.play('dusk_chime'); else if (ph === 'dawn') A.play('dawn_chime'); }
       S.phase = ph;
-      creatureVoices(dt, P);
+      if (game.scene === 'world') creatureVoices(dt, P);
     }
   };
 

@@ -376,7 +376,8 @@ AQ.Terrain = (function () {
     // prop roots: arcs from the trunk out and down into the mud, front and back
     const nRoots = r.int(9, 13);
     for (let k = 0; k < nRoots; k++) {
-      const side = k % 2 ? 1 : -1, reach = r.range(8, 38), ex = x + side * reach, gy = ground(ex);
+      // deeper mud -> the roots splay wider (a tall cage of roots instead of thin strings)
+      const side = k % 2 ? 1 : -1, depth = Math.max(0, (ground(x) - sea) - 90), reach = r.range(8, 38) + depth * r.range(0.25, 0.5), ex = x + side * reach, gy = ground(ex);
       const sy = base + r.range(-6, 6), sx = x + side * r.range(0, 2);
       const cx = x + side * reach * r.range(0.45, 0.7), cy = sy - r.range(6, 16);   // arch up, then down
       const steps = Math.ceil((reach + (gy - sy)) * 1.6);
@@ -385,6 +386,8 @@ AQ.Terrain = (function () {
         const t = i / steps, a = (1 - t) * (1 - t), bb = 2 * (1 - t) * t, c2 = t * t;
         const px = a * sx + bb * cx + c2 * ex, py = a * sy + bb * cy + c2 * gy;
         P.set(px, py, col); P.set(px, py + 1, t < 0.5 ? barkL : col);
+        if (depth > 0 && t > 0.35) P.set(px + side, py, t > 0.75 ? barkD : col);       // thicker lower down
+        if (depth > 0 && t > 0.8) P.set(px - side, py, barkD);
       }
     }
     // trunk
