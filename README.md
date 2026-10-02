@@ -53,6 +53,10 @@ Click a creature for its info card. Hover the stars for what's helping and what'
   through and deep ones can be swum in. Tap a pool with the net to try for a Glasswinged Minnow.
 - **The sunken ship** in the Sunken Ruins has a door at the bow, a cabin door and two hatches.
   They open by themselves as you swim up and close behind you (listed in `data/world.js` `doors`).
+- **Upgrades from chests:** NET, SPD, LAMP (wider light in dark places) and DEEP (how deep you can
+  dive before the water gets heavy: you slow down, the view softens and you drift back up, never
+  any damage). Limits are in `upgrades.depthLimitY`; level 0 reaches everything except the open
+  ocean's Blue Hole basin (level 2) and the trench's deepest slot (level 3).
 - **No fail state.** Hostile creatures only knock you back. Air is unlimited.
 - **Progression** comes only from chests: a bigger net (3 levels) and faster swimming (3 levels).
   Six chests exist at a time, and they despawn and respawn around the world.

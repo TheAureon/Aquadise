@@ -152,6 +152,16 @@ AQ.Render = (function () {
     R.ctx.fillStyle = g; R.ctx.fillRect(0, 0, cam.w, Math.min(cam.h, y1));
   };
 
+  // heavy deep water: the view softens toward a hazy blue (strength 0..1), with a soft vignette
+  R.heavyHaze = function (k) {
+    if (k <= 0.01) return;
+    const c = R.ctx, a = k * AQ.TUNING.upgrades.heavyHaze;
+    c.fillStyle = `rgba(40,70,110,${(a * 0.6).toFixed(3)})`; c.fillRect(0, 0, 320, 180);
+    const g = c.createRadialGradient(160, 90, 40, 160, 90, 190);
+    g.addColorStop(0, 'rgba(10,20,40,0)'); g.addColorStop(1, `rgba(10,20,40,${a.toFixed(3)})`);
+    c.fillStyle = g; c.fillRect(0, 0, 320, 180);
+  };
+
   // lights: [{x, y, r, color?}] in world coords
   R.lighting = function (cam, lights, target) {
     R.darkness += (target - R.darkness) * 0.04;

@@ -14,13 +14,14 @@ AQ.Save = (function () {
     AQ.State.collection = st.collection || {};
     AQ.State.plants = st.plants || {};
     AQ.State.tanks = st.tanks || {};
-    AQ.State.upgrades = Object.assign({ net: 1, speed: 1 }, st.upgrades || {});
+    AQ.State.upgrades = Object.assign({ net: 1, speed: 1, lantern: 0, depth: 0 }, st.upgrades || {});   // older saves: new upgrades at 0
     AQ.State.unlocks = st.unlocks || {};      // older saves: nothing unlocked yet, best stars 0
     AQ.State.tankBest = st.tankBest || {};
     AQ.State.settings = st.settings || {};   // player options (e.g. the building's zoomed-out view)
     // predators moved out of the biome tanks into their own tanks (4th floor): move any old ones over
     if (AQ.Tanks) AQ.Tanks.migrate();
     AQ.State.log = st.log || {};
+    AQ.State.flags = st.flags || {};
     AQ.State.clock = st.clock && typeof st.clock.hour === 'number' ? st.clock : { hour: AQ.TUNING.clock.startHour };   // older saves: start of the day
     if (AQ.Sex) AQ.Sex.migrate();              // older saves: give caught creatures a sex, fill ♂/♀ log slots
     // where you were: scene + spot (older saves have no scene -> the sea world). Validated against
@@ -37,8 +38,8 @@ AQ.Save = (function () {
   S.dirty = () => { S.isDirty = true; };
   // Fresh start without reloading the page (title screen > New Game).
   S.newGame = function (game) {
-    AQ.State.collection = {}; AQ.State.plants = {}; AQ.State.tanks = {}; AQ.State.unlocks = {}; AQ.State.tankBest = {}; AQ.State.settings = {}; AQ.State.log = {}; AQ.State.clock = { hour: AQ.TUNING.clock.startHour };
-    AQ.State.upgrades = { net: 1, speed: 1 };
+    AQ.State.collection = {}; AQ.State.plants = {}; AQ.State.tanks = {}; AQ.State.unlocks = {}; AQ.State.tankBest = {}; AQ.State.settings = {}; AQ.State.log = {}; AQ.State.flags = {}; AQ.State.clock = { hour: AQ.TUNING.clock.startHour };
+    AQ.State.upgrades = { net: 1, speed: 1, lantern: 0, depth: 0 };
     game.upgrades = AQ.State.upgrades;
     const st = AQ.data.world.playerStart, P = game.player;
     P.x = st[0]; P.y = st[1]; P.vx = P.vy = 0; P.speedLevel = 1;

@@ -5,12 +5,13 @@ AQ.State = {
   collection: {},   // id -> number caught / harvested
   plants: {},       // id -> plants in inventory (usable as decorations)
   tanks: {},        // tankId (biome id or predator tank id) -> { creatures: [{uid,id}], storage: [{uid,id}], decor: [{uid,type,id,x,y}] }
-  upgrades: { net: 1, speed: 1 },
+  upgrades: { net: 1, speed: 1, lantern: 0, depth: 0 },
   unlocks: {},      // decorId -> true once unlocked by a tank's happiness
   tankBest: {},     // biomeId -> best stars that tank has ever reached
   settings: {},     // player options (e.g. stationZoomOut)
   log: {},          // species id -> { m: true, f: true } sexes caught (plants: none)
-  clock: null       // { hour } of the day/night clock (null -> starts at AQ.TUNING.clock.startHour)
+  clock: null,      // { hour } of the day/night clock (null -> starts at AQ.TUNING.clock.startHour)
+  flags: {}         // one-time things already shown (e.g. heavyWater toast)
 };
 
 AQ.Collection = (function () {

@@ -56,14 +56,20 @@ AQ.HUD = (function () {
     // upgrades as quiet pips (top-left)
     const up = game.upgrades;
     if (up) {
+      // one row per upgrade: label + pips (lit = your level)
+      const rows = [
+        ['NET', up.net, AQ.TUNING.net.maxLevel, '#ffd56b'], ['SPD', up.speed, AQ.TUNING.speedMaxLevel, '#7ef0c0'],
+        ['LAMP', up.lantern || 0, AQ.TUNING.upgrades.lanternMax, '#ffe9a8'], ['DEEP', up.depth || 0, AQ.TUNING.upgrades.depthMax, '#9fd8ff']
+      ];
       ctx.globalAlpha = 0.85;
-      F.draw(ctx, 'NET', 4, 4, '#cfeaf5', { shadow: SH });
-      F.draw(ctx, 'SPD', 4, 11, '#cfeaf5', { shadow: SH });
-      for (let i = 0; i < 3; i++) {
-        ctx.fillStyle = SH; ctx.fillRect(20 + i * 5, 6, 4, 3); ctx.fillRect(20 + i * 5, 13, 4, 3);
-        ctx.fillStyle = i < up.net ? '#ffd56b' : 'rgba(255,255,255,0.22)'; ctx.fillRect(19 + i * 5, 5, 4, 3);
-        ctx.fillStyle = i < up.speed ? '#7ef0c0' : 'rgba(255,255,255,0.22)'; ctx.fillRect(19 + i * 5, 12, 4, 3);
-      }
+      rows.forEach(([label, lvl, max, col], r) => {
+        const y = 4 + r * 7;
+        F.draw(ctx, label, 4, y, '#cfeaf5', { shadow: SH });
+        for (let i = 0; i < max; i++) {
+          ctx.fillStyle = SH; ctx.fillRect(24 + i * 5, y + 2, 4, 3);
+          ctx.fillStyle = i < lvl ? col : 'rgba(255,255,255,0.22)'; ctx.fillRect(23 + i * 5, y + 1, 4, 3);
+        }
+      });
       ctx.globalAlpha = 1;
     }
     // the time of day (sea only): sun, sunrise/sunset or moon
@@ -75,7 +81,7 @@ AQ.HUD = (function () {
       F.draw(ctx, `${c.discovered}/${c.total}`, vw - 4, 4, '#ffe9a8', { align: 'right', shadow: SH });
       ctx.globalAlpha = 1;
     }
-    if (game.player.sneaking) { ctx.globalAlpha = 0.8; F.draw(ctx, 'SNEAKING', 4, 19, '#9fe8ff', { shadow: SH }); ctx.globalAlpha = 1; }
+    if (game.player.sneaking) { ctx.globalAlpha = 0.8; F.draw(ctx, 'SNEAKING', 4, 34, '#9fe8ff', { shadow: SH }); ctx.globalAlpha = 1; }
     // toasts: at most two, newest at the bottom
     const shown = H.toasts.slice(-2);
     shown.forEach((t, i) => {

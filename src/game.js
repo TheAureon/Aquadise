@@ -7,7 +7,7 @@ AQ.Game = (function () {
     scene: 'world',       // where the player is: world | hill | station  (see src/scenes.js)
     time: 0,
     player: null,
-    upgrades: { net: 1, speed: 1 },
+    upgrades: { net: 1, speed: 1, lantern: 0, depth: 0 },
     lights: []
   };
   const STEP = 1 / 60;
@@ -152,6 +152,7 @@ AQ.Game = (function () {
     AQ.Render.surface(cam);
     AQ.Render.lighting(cam, collectLights(), targetDarkness());
     AQ.Render.twilightTint(cam);
+    AQ.Render.heavyHaze(G.player.heavy || 0);
     AQ.Terrain.drawGlow(ctx, cam);
     if (title) { if (G.state === 'log') AQ.LogUI.draw(ctx, G); else AQ.Title.draw(ctx, G); return; }
     drawOverlays(ctx);
@@ -176,7 +177,10 @@ AQ.Game = (function () {
     const p = G.player, L = G.lights;
     L.length = 0;
     if (G.state === 'title') L.push({ x: AQ.Camera.x, y: AQ.Camera.y, r: 90 });
-    else { L.push({ x: p.x + p.facing * 6, y: p.y, r: 58 }); L.push({ x: p.x, y: p.y, r: 26 }); }
+    else {
+      const extra = AQ.TUNING.upgrades.lanternRadius[G.upgrades.lantern || 0] || 0;   // the LANTERN upgrade
+      L.push({ x: p.x + p.facing * 6, y: p.y, r: 58 + extra }); L.push({ x: p.x, y: p.y, r: 26 + extra * 0.5 });
+    }
     for (const l of AQ.Terrain.lights) L.push(l);
     for (const f of AQ.Terrain.fireflies) L.push({ x: f.x, y: f.y, r: 9, color: '#ffe36b', power: 0.5 });
     if (AQ.Creatures) AQ.Creatures.lights(L);

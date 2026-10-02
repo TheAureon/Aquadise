@@ -32,9 +32,11 @@ AQ.Chests = (function () {
     const up = game.upgrades, opts = [];
     if (up.net < AQ.TUNING.net.maxLevel) opts.push('net');
     if (up.speed < AQ.TUNING.speedMaxLevel) opts.push('speed');
+    if ((up.lantern || 0) < AQ.TUNING.upgrades.lanternMax) opts.push('lantern');
+    if ((up.depth || 0) < AQ.TUNING.upgrades.depthMax) opts.push('depth');
     if (!opts.length) return null;
     const pick = R.pick(opts);
-    up[pick]++;
+    up[pick] = (up[pick] || 0) + 1;
     if (pick === 'speed') game.player.speedLevel = up.speed;
     AQ.Save && AQ.Save.dirty();
     return pick;
@@ -54,7 +56,9 @@ AQ.Chests = (function () {
           AQ.Audio.play('chest');
           if (what === 'net') AQ.HUD.toast(`BIGGER NET! (LV ${game.upgrades.net})`, '#ffe36b', 3.5);
           else if (what === 'speed') AQ.HUD.toast(`SWIM SPEED UP! (LV ${game.upgrades.speed})`, '#7ef0c0', 3.5);
-          else AQ.HUD.toast('Empty... your gear is already the best.', '#cfe8ff');
+          else if (what === 'lantern') AQ.HUD.toast(`BRIGHTER LANTERN! (LV ${game.upgrades.lantern})`, '#ffe9a8', 3.5);
+          else if (what === 'depth') AQ.HUD.toast(`DEEPER DIVES! (DEPTH LV ${game.upgrades.depth})`, '#9fd8ff', 3.5);
+          else AQ.HUD.toast('Empty... all four upgrades are already the best.', '#cfe8ff');
         } else if (c.t > c.life) { AQ.FX.puff(c.x, c.y - 4, 'rgba(220,210,180,0.6)', 8); remove(i); }
       } else if (c.t > 2.5) remove(i);
     }

@@ -15,7 +15,7 @@ AQ.Player = (function () {
 
   Player.prototype.maxSpeed = function () {
     const T = AQ.TUNING.swim;
-    return T.maxSpeed * (1 + (this.speedLevel - 1) * T.boostPerLevel) * (this.sneaking ? T.sneakMult : 1);
+    return T.maxSpeed * (1 + (this.speedLevel - 1) * T.boostPerLevel) * (this.sneaking ? T.sneakMult : 1) * (this.heavy > 0 ? U.lerp(1, AQ.TUNING.upgrades.heavySlow, this.heavy) : 1);
   };
   Player.prototype.baseMax = function () { return AQ.TUNING.swim.maxSpeed; };
   // 0..~1.4 "how loud/fast" the player is, relative to base max speed. Creatures read this.
@@ -49,6 +49,7 @@ AQ.Player = (function () {
     // ladders (only side scenes have them): up/down on a ladder climbs, Space hops off
     if (world.ladderAt && this.stun <= 0 && this.climbStep(dt, world, input, ax, grounded)) return;
 
+    this.deepWater(dt, world);
     if (this.mode === 'swim') {
       const accel = T.accel * mult * (this.sneaking ? 0.6 : 1);
       if (hasInput) { this.vx += ax.x * accel * dt; this.vy += ax.y * accel * dt; }
@@ -101,6 +102,23 @@ AQ.Player = (function () {
     if (this.bubbleT <= 0 && this.mode === 'swim') {
       this.bubbleT = U.R.range(0.6, 1.6);
       AQ.FX && AQ.FX.bubble(this.x + this.facing * 7, this.y - 3);
+    }
+  };
+
+  // DEPTH upgrade: past the limit for your level the water gets heavy. You slow down, the view
+  // softens and you're gently nudged back up. Never any damage. (Only in the sea world.)
+  Player.prototype.deepWater = function (dt, world) {
+    const U2 = AQ.TUNING.upgrades, lvl = (AQ.Game.upgrades && AQ.Game.upgrades.depth) || 0, lim = U2.depthLimitY[Math.min(lvl, U2.depthLimitY.length - 1)];
+    const past = world === AQ.World && lim != null && world.water(this.x, this.y) ? this.y - lim : 0;
+    const target = past > 0 ? U.clamp(0.35 + past / 30, 0, 1) : 0;
+    this.heavy = U.approach(this.heavy || 0, target, dt * 2);
+    if (past > 0) {
+      this.vy -= (U2.heavyPush + past * 6) * dt;
+      if (!AQ.State.flags || !AQ.State.flags.heavyWater) {
+        AQ.State.flags = AQ.State.flags || {}; AQ.State.flags.heavyWater = true;
+        AQ.HUD.toast('The water is too heavy. A depth upgrade might help.', '#9fd8ff', 4);
+        AQ.Save && AQ.Save.dirty();
+      }
     }
   };
 

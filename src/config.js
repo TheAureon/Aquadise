@@ -44,6 +44,20 @@ AQ.TUNING = {
 
   speedMaxLevel: 3,
 
+  // Chest upgrades beyond NET and SPD. Both start at level 0 (also for older saves).
+  upgrades: {
+    lanternMax: 3,
+    lanternRadius: [0, 16, 32, 50],   // extra light radius (px) around you in dark places, per lantern level
+    depthMax: 3,
+    // Below this world y the water gets heavy, per depth level 0..3 (null = no limit). The sea surface
+    // is y 96. Level 0 (1250) reaches everything from before this update (the trench floor is ~1224);
+    // level 2 opens the open ocean's Blue Hole basin (~1280-1340); level 3 the trench's deepest slot (~1405).
+    depthLimitY: [1250, 1275, 1350, null],
+    heavySlow: 0.55,          // swim speed multiplier while in heavy water
+    heavyPush: 140,           // gentle upward nudge (px/s^2), growing a little the deeper past the limit you are
+    heavyHaze: 0.35           // how much the screen softens (0..1)
+  },
+
   bait: { lifetime: 22, sinkSpeed: 7, lureRadius: 95 },
 
   stealth: {
