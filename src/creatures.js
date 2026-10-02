@@ -226,6 +226,7 @@ AQ.Creatures = (function () {
       if (c.p.home && AQ.Assets.has(c.p.home)) AQ.Assets.draw(g, c.p.home, 'idle', c.hx, c.hy + c.foot);
       if (c.alpha < 0.02) continue;
       AQ.Assets.draw(g, c.key || c.def.spriteKey, c.moving ? 'move' : 'idle', c.x, c.y, { t: c.t, flip: c.facing < 0, flipY: c.flipY, alpha: Math.min(1, c.alpha) });
+      if (c.bhv.draw) c.bhv.draw(g, c);          // extras (e.g. a lure's glowing decoy)
     }
   };
   C.drawFront = function (g) {
@@ -249,6 +250,7 @@ AQ.Creatures = (function () {
   C.lights = function (L) {
     const cam = AQ.Camera, l = cam.left() - 60, t = cam.top() - 60;
     for (const c of C.list) {
+      if (c.decoy && c.x > l && c.x < l + cam.w + 120 && c.y > t && c.y < t + cam.h + 120) L.push({ x: c.decoy.x, y: c.decoy.y, r: c.p.glow || 26, color: c.p.decoyColor || '#d8ff8a', power: c.decoy.a * Math.max(0.5, c.alpha) });
       const lt = c.def.light;
       if (!lt || c.harvested || c.x < l || c.x > l + cam.w + 120 || c.y < t || c.y > t + cam.h + 120) continue;
       if (lt.pulse && !c.glow) continue;

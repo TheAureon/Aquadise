@@ -10,6 +10,12 @@
 //   rare                                 0..1 chance the spawn slot is occupied on each (re)spawn
 //   predator                             lives in a predator tank (data/aquarium.js predatorTanks)
 //   sexes                                optional: 'none' = no ♂/♀ (e.g. hermaphrodites). Default: male + female
+//   mirror      (new) copies your swimming mirrored while you're near; hold still and it drifts in -> net it
+//               params: range, calmTime, approach, mirror, wanderR
+//   lure        (new) a glowing decoy bobs on a stalk; the real creature waits dim beside it (the decoy
+//               can't be netted and flickers when you're close). params: decoyDist, decoyColor, alpha, glow
+//   midair      (new) cruises under the surface and leaps out every few seconds; only nettable in the air
+//               params: leapEvery [min,max], leap, speed, depth, wanderR
 //   active                               optional 'night' | 'day': only out at those hours (default: always)
 //   eggs                                 optional true/false: lays eggs when breeding (default: all but mammals)
 //   sprite_size                          size class from data/sprite-spec.js

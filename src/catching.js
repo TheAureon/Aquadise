@@ -110,13 +110,20 @@ AQ.Catching = (function () {
         }
         continue;
       }
-      if (Math.hypot(cx - net.x, cy - net.y) > net.r + c.r * 0.8) continue;
+      const onBody = Math.hypot(cx - net.x, cy - net.y) <= net.r + c.r * 0.8;
+      // a lure's glowing decoy: netting it only makes it puff and flicker
+      if (!onBody && c.decoy && c.bhv.decoyHit && Math.hypot(c.decoy.x - net.x, c.decoy.y - net.y) <= net.r + 3) {
+        s.hits.add(c); c.bhv.decoyHit(c);
+        if (!s.msg) { s.msg = true; AQ.HUD.toast(c.bhv.missText, '#cfe8ff'); }
+        continue;
+      }
+      if (!onBody) continue;
       s.hits.add(c);
       if (c.def.is_plant) { harvest(game, c); continue; }
       if (c.catchable) tryCatch(game, c);
       else if (!s.msg) {
         s.msg = true;
-        AQ.HUD.toast(c.hidden ? (c.pryable ? 'It\'s wedged in! Hold the net to pry.' : 'It\'s hiding out of reach.') : 'It slipped away!', '#cfe8ff');
+        AQ.HUD.toast(c.hidden ? (c.pryable ? 'It\'s wedged in! Hold the net to pry.' : 'It\'s hiding out of reach.') : (c.bhv.missText && !c.decoy) ? c.bhv.missText : 'It slipped away!', '#cfe8ff');
         AQ.FX.puff(cx, cy, 'rgba(255,255,255,0.5)', 3);
       }
     }
