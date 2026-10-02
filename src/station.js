@@ -195,7 +195,7 @@ AQ.Station = (function () {
     // its creatures, drifting about
     tank.creatures.slice(0, 7).forEach((e, k) => {
       const def = AQ.Creatures.defs[e.id], juv = AQ.Breeding.isJuvenile(e);
-      const key = !def ? 'creature.' + e.id : juv && AQ.Assets.has('creature.' + e.id + '.baby') ? 'creature.' + e.id + '.baby' : AQ.Sex.spriteKey(def, e.sex), en = AQ.Assets.entry(key);
+      const key = !def ? 'creature.' + e.id : juv && AQ.Sex.babyKey(def, e.variant) ? AQ.Sex.babyKey(def, e.variant) : AQ.Sex.spriteKey(def, e.sex, e.variant), en = AQ.Assets.entry(key);
       if (!en || !def) return;
       const sc = Math.min(0.6, 11 / Math.max(en.fw, en.fh));
       const u = String(e.uid), seed = (u.charCodeAt(0) + u.charCodeAt(u.length - 1) * 7 + k * 13) % 100;

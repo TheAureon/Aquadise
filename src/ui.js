@@ -74,7 +74,8 @@ AQ.LogUI = (function () {
     g.fillStyle = 'rgba(5,14,26,0.94)'; g.fillRect(0, 0, 320, 180);
     F().draw(g, 'COLLECTION LOG', 8, 5, '#ffe9a8');
     const bred = AQ.data.creatures.filter((d) => ((AQ.State.log || {})[d.id] || {}).bred).length;
-    F().draw(g, `DISCOVERED ${prog.discovered}/${prog.total}  COMPLETE ${prog.complete}/${prog.total}${bred ? '  BRED ' + bred : ''}`, 74, 5, '#9fd3ee');
+    const rare = AQ.data.creatures.filter((d) => ((AQ.State.log || {})[d.id] || {}).variant).length;
+    F().draw(g, `DISCOVERED ${prog.discovered}/${prog.total}  COMPLETE ${prog.complete}/${prog.total}${bred ? '  BRED ' + bred : ''}${rare ? '  RARE ' + rare : ''}`, 74, 5, '#9fd3ee');
     const got = list.filter((d) => AQ.Collection.has(d.id)).length, done = list.filter((d) => AQ.Sex.complete(d)).length;
     F().draw(g, `${b.name} ${got}/${list.length}`, 85, 18, done === list.length ? '#7ef0c0' : '#e8fbff', { align: 'center' });
     for (const r of L.ui) {
@@ -97,6 +98,11 @@ AQ.LogUI = (function () {
         F().draw(g, '♂', r.x + 3, r.y + 36, L.m ? AQ.Sex.COLOR.m : '#2c4a5e', { shadow: false });
         F().draw(g, '♀', r.x + 8, r.y + 36, L.f ? AQ.Sex.COLOR.f : '#2c4a5e', { shadow: false });
       }
+      // rare colour variant slot (bred babies only): a small star, lit once you've bred one
+      if (!d.is_plant) {
+        const L = (AQ.State.log || {})[d.id] || {};
+        F().draw(g, '✦', r.x + (AQ.Sex.has(d) ? 15 : 3), r.y + 36, L.variant ? '#ffd25a' : '#2c4a5e', { shadow: false });
+      }
       if (AQ.Sex.complete(d)) { g.fillStyle = '#7ef0c0'; g.fillRect(r.x + r.w - 4, r.y + 2, 2, 2); }
       if (((AQ.State.log || {})[d.id] || {}).bred) F().draw(g, '♥', r.x + 3, r.y + 3, '#ff9fc0', { shadow: false });   // bred in a tank
       if (d.draft && !AQ.Sex.has(d)) F().draw(g, 'D', r.x + 3, r.y + 36, '#8aa4b8');
@@ -113,7 +119,7 @@ AQ.LogUI = (function () {
       F().draw(g, tags, 310, 130, '#9fd3ee', { align: 'right' });
       if (has && AQ.Sex.has(d)) {
         const L = (AQ.State.log || {})[d.id] || {};
-        const txt = (AQ.Sex.complete(d) ? 'COMPLETE: BOTH ♂ AND ♀ CAUGHT' : `STILL TO FIND: ${L.m ? 'A FEMALE ♀' : 'A MALE ♂'}`) + (L.bred ? '   ♥ BRED IN YOUR AQUARIUM' : '');
+        const txt = (AQ.Sex.complete(d) ? 'COMPLETE: BOTH ♂ AND ♀ CAUGHT' : `STILL TO FIND: ${L.m ? 'A FEMALE ♀' : 'A MALE ♂'}`) + (L.bred ? '   ♥ BRED' : '') + (L.variant ? '   ✦ RARE COLOR BRED' : '');
         F().draw(g, txt, 10, 164, AQ.Sex.complete(d) ? '#7ef0c0' : '#ffcf8a');
       }
       wrap('Tip: ' + (d.active === 'night' ? 'Comes out at night. ' : d.bloom === 'night' ? 'Opens at night. ' : d.active === 'day' ? 'Only out by day. ' : '') + (d.requires_depth ? `Lives deep: needs the depth upgrade (level ${d.requires_depth}). ` : '') + (d.hint || ''), 75).slice(0, has && AQ.Sex.has(d) ? 3 : 4).forEach((l, i) => F().draw(g, l, 10, 140 + i * 8, '#d8eef8'));

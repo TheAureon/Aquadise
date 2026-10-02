@@ -173,6 +173,7 @@ AQ.TUNING = {
     eggMinutes: 4,            // real minutes from egg to baby (egg-laying species)
     cooldownMinutes: 20,      // real minutes a tank rests after a new arrival
     growMinutes: 30,          // real minutes for a baby to grow up
+    variantChance: 0.04,      // chance a newborn is a rare colour variant (bred babies only, never wild)
     checkSeconds: 5           // how often all tanks are checked (cheap; runs anywhere in the game)
   },
 

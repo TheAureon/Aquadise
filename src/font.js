@@ -27,6 +27,7 @@ AQ.Font = (function () {
     '♥': ['...', '#.#', '###', '.#.', '...'], // heart
     '♂': ['..###', '...##', '###.#', '#.#..', '###..'], // male (5 wide)
     '♀': ['.###.', '.#.#.', '.###.', '..#..', '.###.'], // female (5 wide)
+    '✦': ['..#..', '.###.', '#####', '.###.', '..#..'], // rare colour variant (5 wide)
     ' ': ['...', '...', '...', '...', '...']
   };
   // most glyphs are 3 wide; a few (♂ ♀) are wider - each glyph advances by its own width + 1

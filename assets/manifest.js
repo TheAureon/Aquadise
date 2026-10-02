@@ -490,6 +490,87 @@ AQ.manifest = {
     9
    ]
   },
+  "creature.drift_snail.v": {
+   "file": "sprites/creatures/drift_snail_v.png",
+   "fw": 12,
+   "fh": 12,
+   "anchor": [
+    6,
+    6
+   ],
+   "anims": {
+    "idle": {
+     "row": 0,
+     "frames": 4,
+     "fps": 5
+    },
+    "move": {
+     "row": 1,
+     "frames": 4,
+     "fps": 10
+    }
+   },
+   "vis": [
+    1,
+    3,
+    10,
+    9
+   ]
+  },
+  "creature.drift_snail.v.m": {
+   "file": "sprites/creatures/drift_snail_v_m.png",
+   "fw": 12,
+   "fh": 12,
+   "anchor": [
+    6,
+    6
+   ],
+   "anims": {
+    "idle": {
+     "row": 0,
+     "frames": 4,
+     "fps": 5
+    },
+    "move": {
+     "row": 1,
+     "frames": 4,
+     "fps": 10
+    }
+   },
+   "vis": [
+    1,
+    3,
+    10,
+    9
+   ]
+  },
+  "creature.drift_snail.baby.v": {
+   "file": "sprites/creatures/drift_snail_baby_v.png",
+   "fw": 12,
+   "fh": 12,
+   "anchor": [
+    6,
+    6
+   ],
+   "anims": {
+    "idle": {
+     "row": 0,
+     "frames": 4,
+     "fps": 5
+    },
+    "move": {
+     "row": 1,
+     "frames": 4,
+     "fps": 10
+    }
+   },
+   "vis": [
+    1,
+    3,
+    10,
+    9
+   ]
+  },
   "creature.drift_snail.baby": {
    "file": "sprites/creatures/drift_snail_baby.png",
    "fw": 12,
@@ -568,6 +649,87 @@ AQ.manifest = {
     2,
     4,
     14,
+    12
+   ]
+  },
+  "creature.knuckle_crab.v": {
+   "file": "sprites/creatures/knuckle_crab_v.png",
+   "fw": 16,
+   "fh": 16,
+   "anchor": [
+    8,
+    8
+   ],
+   "anims": {
+    "idle": {
+     "row": 0,
+     "frames": 4,
+     "fps": 5
+    },
+    "move": {
+     "row": 1,
+     "frames": 4,
+     "fps": 10
+    }
+   },
+   "vis": [
+    2,
+    4,
+    14,
+    12
+   ]
+  },
+  "creature.knuckle_crab.v.m": {
+   "file": "sprites/creatures/knuckle_crab_v_m.png",
+   "fw": 16,
+   "fh": 16,
+   "anchor": [
+    8,
+    8
+   ],
+   "anims": {
+    "idle": {
+     "row": 0,
+     "frames": 4,
+     "fps": 5
+    },
+    "move": {
+     "row": 1,
+     "frames": 4,
+     "fps": 10
+    }
+   },
+   "vis": [
+    2,
+    4,
+    14,
+    12
+   ]
+  },
+  "creature.knuckle_crab.baby.v": {
+   "file": "sprites/creatures/knuckle_crab_baby_v.png",
+   "fw": 16,
+   "fh": 16,
+   "anchor": [
+    8,
+    8
+   ],
+   "anims": {
+    "idle": {
+     "row": 0,
+     "frames": 4,
+     "fps": 5
+    },
+    "move": {
+     "row": 1,
+     "frames": 4,
+     "fps": 10
+    }
+   },
+   "vis": [
+    2,
+    4,
+    13,
     12
    ]
   },
@@ -652,6 +814,87 @@ AQ.manifest = {
     10
    ]
   },
+  "creature.glasswinged_minnow.v": {
+   "file": "sprites/creatures/glasswinged_minnow_v.png",
+   "fw": 12,
+   "fh": 12,
+   "anchor": [
+    6,
+    6
+   ],
+   "anims": {
+    "idle": {
+     "row": 0,
+     "frames": 4,
+     "fps": 5
+    },
+    "move": {
+     "row": 1,
+     "frames": 4,
+     "fps": 10
+    }
+   },
+   "vis": [
+    1,
+    1,
+    10,
+    10
+   ]
+  },
+  "creature.glasswinged_minnow.v.m": {
+   "file": "sprites/creatures/glasswinged_minnow_v_m.png",
+   "fw": 12,
+   "fh": 12,
+   "anchor": [
+    6,
+    6
+   ],
+   "anims": {
+    "idle": {
+     "row": 0,
+     "frames": 4,
+     "fps": 5
+    },
+    "move": {
+     "row": 1,
+     "frames": 4,
+     "fps": 10
+    }
+   },
+   "vis": [
+    1,
+    1,
+    10,
+    10
+   ]
+  },
+  "creature.glasswinged_minnow.baby.v": {
+   "file": "sprites/creatures/glasswinged_minnow_baby_v.png",
+   "fw": 12,
+   "fh": 12,
+   "anchor": [
+    6,
+    6
+   ],
+   "anims": {
+    "idle": {
+     "row": 0,
+     "frames": 4,
+     "fps": 5
+    },
+    "move": {
+     "row": 1,
+     "frames": 4,
+     "fps": 10
+    }
+   },
+   "vis": [
+    1,
+    2,
+    10,
+    9
+   ]
+  },
   "creature.glasswinged_minnow.baby": {
    "file": "sprites/creatures/glasswinged_minnow_baby.png",
    "fw": 12,
@@ -731,6 +974,87 @@ AQ.manifest = {
     3,
     14,
     13
+   ]
+  },
+  "creature.puddlejack.v": {
+   "file": "sprites/creatures/puddlejack_v.png",
+   "fw": 16,
+   "fh": 16,
+   "anchor": [
+    8,
+    8
+   ],
+   "anims": {
+    "idle": {
+     "row": 0,
+     "frames": 4,
+     "fps": 5
+    },
+    "move": {
+     "row": 1,
+     "frames": 4,
+     "fps": 10
+    }
+   },
+   "vis": [
+    1,
+    3,
+    14,
+    13
+   ]
+  },
+  "creature.puddlejack.v.m": {
+   "file": "sprites/creatures/puddlejack_v_m.png",
+   "fw": 16,
+   "fh": 16,
+   "anchor": [
+    8,
+    8
+   ],
+   "anims": {
+    "idle": {
+     "row": 0,
+     "frames": 4,
+     "fps": 5
+    },
+    "move": {
+     "row": 1,
+     "frames": 4,
+     "fps": 10
+    }
+   },
+   "vis": [
+    1,
+    3,
+    14,
+    13
+   ]
+  },
+  "creature.puddlejack.baby.v": {
+   "file": "sprites/creatures/puddlejack_baby_v.png",
+   "fw": 16,
+   "fh": 16,
+   "anchor": [
+    8,
+    8
+   ],
+   "anims": {
+    "idle": {
+     "row": 0,
+     "frames": 4,
+     "fps": 5
+    },
+    "move": {
+     "row": 1,
+     "frames": 4,
+     "fps": 10
+    }
+   },
+   "vis": [
+    1,
+    3,
+    13,
+    12
    ]
   },
   "creature.puddlejack.baby": {
@@ -814,6 +1138,87 @@ AQ.manifest = {
     13
    ]
   },
+  "creature.bladefin_perch.v": {
+   "file": "sprites/creatures/bladefin_perch_v.png",
+   "fw": 16,
+   "fh": 16,
+   "anchor": [
+    8,
+    8
+   ],
+   "anims": {
+    "idle": {
+     "row": 0,
+     "frames": 4,
+     "fps": 5
+    },
+    "move": {
+     "row": 1,
+     "frames": 4,
+     "fps": 10
+    }
+   },
+   "vis": [
+    2,
+    2,
+    14,
+    13
+   ]
+  },
+  "creature.bladefin_perch.v.m": {
+   "file": "sprites/creatures/bladefin_perch_v_m.png",
+   "fw": 16,
+   "fh": 16,
+   "anchor": [
+    8,
+    8
+   ],
+   "anims": {
+    "idle": {
+     "row": 0,
+     "frames": 4,
+     "fps": 5
+    },
+    "move": {
+     "row": 1,
+     "frames": 4,
+     "fps": 10
+    }
+   },
+   "vis": [
+    2,
+    2,
+    14,
+    13
+   ]
+  },
+  "creature.bladefin_perch.baby.v": {
+   "file": "sprites/creatures/bladefin_perch_baby_v.png",
+   "fw": 16,
+   "fh": 16,
+   "anchor": [
+    8,
+    8
+   ],
+   "anims": {
+    "idle": {
+     "row": 0,
+     "frames": 4,
+     "fps": 5
+    },
+    "move": {
+     "row": 1,
+     "frames": 4,
+     "fps": 10
+    }
+   },
+   "vis": [
+    4,
+    4,
+    11,
+    12
+   ]
+  },
   "creature.bladefin_perch.baby": {
    "file": "sprites/creatures/bladefin_perch_baby.png",
    "fw": 16,
@@ -893,6 +1298,87 @@ AQ.manifest = {
     7,
     22,
     18
+   ]
+  },
+  "creature.kelp_otter.v": {
+   "file": "sprites/creatures/kelp_otter_v.png",
+   "fw": 24,
+   "fh": 24,
+   "anchor": [
+    12,
+    12
+   ],
+   "anims": {
+    "idle": {
+     "row": 0,
+     "frames": 4,
+     "fps": 5
+    },
+    "move": {
+     "row": 1,
+     "frames": 4,
+     "fps": 10
+    }
+   },
+   "vis": [
+    1,
+    7,
+    22,
+    18
+   ]
+  },
+  "creature.kelp_otter.v.m": {
+   "file": "sprites/creatures/kelp_otter_v_m.png",
+   "fw": 24,
+   "fh": 24,
+   "anchor": [
+    12,
+    12
+   ],
+   "anims": {
+    "idle": {
+     "row": 0,
+     "frames": 4,
+     "fps": 5
+    },
+    "move": {
+     "row": 1,
+     "frames": 4,
+     "fps": 10
+    }
+   },
+   "vis": [
+    1,
+    7,
+    22,
+    18
+   ]
+  },
+  "creature.kelp_otter.baby.v": {
+   "file": "sprites/creatures/kelp_otter_baby_v.png",
+   "fw": 24,
+   "fh": 24,
+   "anchor": [
+    12,
+    12
+   ],
+   "anims": {
+    "idle": {
+     "row": 0,
+     "frames": 4,
+     "fps": 5
+    },
+    "move": {
+     "row": 1,
+     "frames": 4,
+     "fps": 10
+    }
+   },
+   "vis": [
+    5,
+    9,
+    19,
+    16
    ]
   },
   "creature.kelp_otter.baby": {
@@ -976,6 +1462,87 @@ AQ.manifest = {
     11
    ]
   },
+  "creature.frond_squid.v": {
+   "file": "sprites/creatures/frond_squid_v.png",
+   "fw": 16,
+   "fh": 16,
+   "anchor": [
+    8,
+    8
+   ],
+   "anims": {
+    "idle": {
+     "row": 0,
+     "frames": 4,
+     "fps": 5
+    },
+    "move": {
+     "row": 1,
+     "frames": 4,
+     "fps": 10
+    }
+   },
+   "vis": [
+    1,
+    5,
+    14,
+    11
+   ]
+  },
+  "creature.frond_squid.v.m": {
+   "file": "sprites/creatures/frond_squid_v_m.png",
+   "fw": 16,
+   "fh": 16,
+   "anchor": [
+    8,
+    8
+   ],
+   "anims": {
+    "idle": {
+     "row": 0,
+     "frames": 4,
+     "fps": 5
+    },
+    "move": {
+     "row": 1,
+     "frames": 4,
+     "fps": 10
+    }
+   },
+   "vis": [
+    1,
+    5,
+    14,
+    11
+   ]
+  },
+  "creature.frond_squid.baby.v": {
+   "file": "sprites/creatures/frond_squid_baby_v.png",
+   "fw": 16,
+   "fh": 16,
+   "anchor": [
+    8,
+    8
+   ],
+   "anims": {
+    "idle": {
+     "row": 0,
+     "frames": 4,
+     "fps": 5
+    },
+    "move": {
+     "row": 1,
+     "frames": 4,
+     "fps": 10
+    }
+   },
+   "vis": [
+    3,
+    5,
+    12,
+    10
+   ]
+  },
   "creature.frond_squid.baby": {
    "file": "sprites/creatures/frond_squid_baby.png",
    "fw": 16,
@@ -1057,6 +1624,87 @@ AQ.manifest = {
     12
    ]
   },
+  "creature.coilback_newt.v": {
+   "file": "sprites/creatures/coilback_newt_v.png",
+   "fw": 16,
+   "fh": 16,
+   "anchor": [
+    8,
+    8
+   ],
+   "anims": {
+    "idle": {
+     "row": 0,
+     "frames": 4,
+     "fps": 5
+    },
+    "move": {
+     "row": 1,
+     "frames": 4,
+     "fps": 10
+    }
+   },
+   "vis": [
+    1,
+    5,
+    14,
+    12
+   ]
+  },
+  "creature.coilback_newt.v.m": {
+   "file": "sprites/creatures/coilback_newt_v_m.png",
+   "fw": 16,
+   "fh": 16,
+   "anchor": [
+    8,
+    8
+   ],
+   "anims": {
+    "idle": {
+     "row": 0,
+     "frames": 4,
+     "fps": 5
+    },
+    "move": {
+     "row": 1,
+     "frames": 4,
+     "fps": 10
+    }
+   },
+   "vis": [
+    1,
+    5,
+    14,
+    12
+   ]
+  },
+  "creature.coilback_newt.baby.v": {
+   "file": "sprites/creatures/coilback_newt_baby_v.png",
+   "fw": 16,
+   "fh": 16,
+   "anchor": [
+    8,
+    8
+   ],
+   "anims": {
+    "idle": {
+     "row": 0,
+     "frames": 4,
+     "fps": 5
+    },
+    "move": {
+     "row": 1,
+     "frames": 4,
+     "fps": 10
+    }
+   },
+   "vis": [
+    1,
+    5,
+    12,
+    12
+   ]
+  },
   "creature.coilback_newt.baby": {
    "file": "sprites/creatures/coilback_newt_baby.png",
    "fw": 16,
@@ -1135,6 +1783,87 @@ AQ.manifest = {
     1,
     5,
     14,
+    12
+   ]
+  },
+  "creature.sandveil_skink.v": {
+   "file": "sprites/creatures/sandveil_skink_v.png",
+   "fw": 16,
+   "fh": 16,
+   "anchor": [
+    8,
+    8
+   ],
+   "anims": {
+    "idle": {
+     "row": 0,
+     "frames": 4,
+     "fps": 5
+    },
+    "move": {
+     "row": 1,
+     "frames": 4,
+     "fps": 10
+    }
+   },
+   "vis": [
+    1,
+    5,
+    14,
+    12
+   ]
+  },
+  "creature.sandveil_skink.v.m": {
+   "file": "sprites/creatures/sandveil_skink_v_m.png",
+   "fw": 16,
+   "fh": 16,
+   "anchor": [
+    8,
+    8
+   ],
+   "anims": {
+    "idle": {
+     "row": 0,
+     "frames": 4,
+     "fps": 5
+    },
+    "move": {
+     "row": 1,
+     "frames": 4,
+     "fps": 10
+    }
+   },
+   "vis": [
+    1,
+    5,
+    14,
+    12
+   ]
+  },
+  "creature.sandveil_skink.baby.v": {
+   "file": "sprites/creatures/sandveil_skink_baby_v.png",
+   "fw": 16,
+   "fh": 16,
+   "anchor": [
+    8,
+    8
+   ],
+   "anims": {
+    "idle": {
+     "row": 0,
+     "frames": 4,
+     "fps": 5
+    },
+    "move": {
+     "row": 1,
+     "frames": 4,
+     "fps": 10
+    }
+   },
+   "vis": [
+    1,
+    5,
+    12,
     12
    ]
   },
@@ -1241,6 +1970,87 @@ AQ.manifest = {
     14
    ]
   },
+  "creature.fanray_damsel.v": {
+   "file": "sprites/creatures/fanray_damsel_v.png",
+   "fw": 16,
+   "fh": 16,
+   "anchor": [
+    8,
+    8
+   ],
+   "anims": {
+    "idle": {
+     "row": 0,
+     "frames": 4,
+     "fps": 5
+    },
+    "move": {
+     "row": 1,
+     "frames": 4,
+     "fps": 10
+    }
+   },
+   "vis": [
+    2,
+    1,
+    13,
+    14
+   ]
+  },
+  "creature.fanray_damsel.v.m": {
+   "file": "sprites/creatures/fanray_damsel_v_m.png",
+   "fw": 16,
+   "fh": 16,
+   "anchor": [
+    8,
+    8
+   ],
+   "anims": {
+    "idle": {
+     "row": 0,
+     "frames": 4,
+     "fps": 5
+    },
+    "move": {
+     "row": 1,
+     "frames": 4,
+     "fps": 10
+    }
+   },
+   "vis": [
+    2,
+    1,
+    13,
+    14
+   ]
+  },
+  "creature.fanray_damsel.baby.v": {
+   "file": "sprites/creatures/fanray_damsel_baby_v.png",
+   "fw": 16,
+   "fh": 16,
+   "anchor": [
+    8,
+    8
+   ],
+   "anims": {
+    "idle": {
+     "row": 0,
+     "frames": 4,
+     "fps": 5
+    },
+    "move": {
+     "row": 1,
+     "frames": 4,
+     "fps": 10
+    }
+   },
+   "vis": [
+    1,
+    3,
+    11,
+    14
+   ]
+  },
   "creature.fanray_damsel.baby": {
    "file": "sprites/creatures/fanray_damsel_baby.png",
    "fw": 16,
@@ -1297,6 +2107,87 @@ AQ.manifest = {
   },
   "creature.coral_whelk": {
    "file": "sprites/creatures/coral_whelk.png",
+   "fw": 12,
+   "fh": 12,
+   "anchor": [
+    6,
+    6
+   ],
+   "anims": {
+    "idle": {
+     "row": 0,
+     "frames": 4,
+     "fps": 5
+    },
+    "move": {
+     "row": 1,
+     "frames": 4,
+     "fps": 10
+    }
+   },
+   "vis": [
+    1,
+    3,
+    10,
+    9
+   ]
+  },
+  "creature.coral_whelk.v": {
+   "file": "sprites/creatures/coral_whelk_v.png",
+   "fw": 12,
+   "fh": 12,
+   "anchor": [
+    6,
+    6
+   ],
+   "anims": {
+    "idle": {
+     "row": 0,
+     "frames": 4,
+     "fps": 5
+    },
+    "move": {
+     "row": 1,
+     "frames": 4,
+     "fps": 10
+    }
+   },
+   "vis": [
+    1,
+    3,
+    10,
+    9
+   ]
+  },
+  "creature.coral_whelk.v.m": {
+   "file": "sprites/creatures/coral_whelk_v_m.png",
+   "fw": 12,
+   "fh": 12,
+   "anchor": [
+    6,
+    6
+   ],
+   "anims": {
+    "idle": {
+     "row": 0,
+     "frames": 4,
+     "fps": 5
+    },
+    "move": {
+     "row": 1,
+     "frames": 4,
+     "fps": 10
+    }
+   },
+   "vis": [
+    1,
+    3,
+    10,
+    9
+   ]
+  },
+  "creature.coral_whelk.baby.v": {
+   "file": "sprites/creatures/coral_whelk_baby_v.png",
    "fw": 12,
    "fh": 12,
    "anchor": [
@@ -1403,6 +2294,87 @@ AQ.manifest = {
     14
    ]
   },
+  "creature.pincer_hermit.v": {
+   "file": "sprites/creatures/pincer_hermit_v.png",
+   "fw": 16,
+   "fh": 16,
+   "anchor": [
+    8,
+    8
+   ],
+   "anims": {
+    "idle": {
+     "row": 0,
+     "frames": 4,
+     "fps": 5
+    },
+    "move": {
+     "row": 1,
+     "frames": 4,
+     "fps": 10
+    }
+   },
+   "vis": [
+    2,
+    3,
+    14,
+    14
+   ]
+  },
+  "creature.pincer_hermit.v.m": {
+   "file": "sprites/creatures/pincer_hermit_v_m.png",
+   "fw": 16,
+   "fh": 16,
+   "anchor": [
+    8,
+    8
+   ],
+   "anims": {
+    "idle": {
+     "row": 0,
+     "frames": 4,
+     "fps": 5
+    },
+    "move": {
+     "row": 1,
+     "frames": 4,
+     "fps": 10
+    }
+   },
+   "vis": [
+    2,
+    3,
+    14,
+    14
+   ]
+  },
+  "creature.pincer_hermit.baby.v": {
+   "file": "sprites/creatures/pincer_hermit_baby_v.png",
+   "fw": 16,
+   "fh": 16,
+   "anchor": [
+    8,
+    8
+   ],
+   "anims": {
+    "idle": {
+     "row": 0,
+     "frames": 4,
+     "fps": 5
+    },
+    "move": {
+     "row": 1,
+     "frames": 4,
+     "fps": 10
+    }
+   },
+   "vis": [
+    4,
+    5,
+    12,
+    13
+   ]
+  },
   "creature.pincer_hermit.baby": {
    "file": "sprites/creatures/pincer_hermit_baby.png",
    "fw": 16,
@@ -1480,6 +2452,87 @@ AQ.manifest = {
    "vis": [
     2,
     4,
+    22,
+    18
+   ]
+  },
+  "creature.reef_mimic.v": {
+   "file": "sprites/creatures/reef_mimic_v.png",
+   "fw": 24,
+   "fh": 24,
+   "anchor": [
+    12,
+    12
+   ],
+   "anims": {
+    "idle": {
+     "row": 0,
+     "frames": 4,
+     "fps": 5
+    },
+    "move": {
+     "row": 1,
+     "frames": 4,
+     "fps": 10
+    }
+   },
+   "vis": [
+    2,
+    4,
+    22,
+    18
+   ]
+  },
+  "creature.reef_mimic.v.m": {
+   "file": "sprites/creatures/reef_mimic_v_m.png",
+   "fw": 24,
+   "fh": 24,
+   "anchor": [
+    12,
+    12
+   ],
+   "anims": {
+    "idle": {
+     "row": 0,
+     "frames": 4,
+     "fps": 5
+    },
+    "move": {
+     "row": 1,
+     "frames": 4,
+     "fps": 10
+    }
+   },
+   "vis": [
+    2,
+    4,
+    22,
+    18
+   ]
+  },
+  "creature.reef_mimic.baby.v": {
+   "file": "sprites/creatures/reef_mimic_baby_v.png",
+   "fw": 24,
+   "fh": 24,
+   "anchor": [
+    12,
+    12
+   ],
+   "anims": {
+    "idle": {
+     "row": 0,
+     "frames": 4,
+     "fps": 5
+    },
+    "move": {
+     "row": 1,
+     "frames": 4,
+     "fps": 10
+    }
+   },
+   "vis": [
+    2,
+    5,
     22,
     18
    ]
@@ -1587,6 +2640,87 @@ AQ.manifest = {
     18
    ]
   },
+  "creature.ridgeback_basker.v": {
+   "file": "sprites/creatures/ridgeback_basker_v.png",
+   "fw": 24,
+   "fh": 24,
+   "anchor": [
+    12,
+    12
+   ],
+   "anims": {
+    "idle": {
+     "row": 0,
+     "frames": 4,
+     "fps": 5
+    },
+    "move": {
+     "row": 1,
+     "frames": 4,
+     "fps": 10
+    }
+   },
+   "vis": [
+    1,
+    9,
+    22,
+    18
+   ]
+  },
+  "creature.ridgeback_basker.v.m": {
+   "file": "sprites/creatures/ridgeback_basker_v_m.png",
+   "fw": 24,
+   "fh": 24,
+   "anchor": [
+    12,
+    12
+   ],
+   "anims": {
+    "idle": {
+     "row": 0,
+     "frames": 4,
+     "fps": 5
+    },
+    "move": {
+     "row": 1,
+     "frames": 4,
+     "fps": 10
+    }
+   },
+   "vis": [
+    1,
+    9,
+    22,
+    18
+   ]
+  },
+  "creature.ridgeback_basker.baby.v": {
+   "file": "sprites/creatures/ridgeback_basker_baby_v.png",
+   "fw": 24,
+   "fh": 24,
+   "anchor": [
+    12,
+    12
+   ],
+   "anims": {
+    "idle": {
+     "row": 0,
+     "frames": 4,
+     "fps": 5
+    },
+    "move": {
+     "row": 1,
+     "frames": 4,
+     "fps": 10
+    }
+   },
+   "vis": [
+    3,
+    9,
+    17,
+    16
+   ]
+  },
   "creature.ridgeback_basker.baby": {
    "file": "sprites/creatures/ridgeback_basker_baby.png",
    "fw": 24,
@@ -1666,6 +2800,87 @@ AQ.manifest = {
     3,
     29,
     12
+   ]
+  },
+  "creature.coral_viper.v": {
+   "file": "sprites/creatures/coral_viper_v.png",
+   "fw": 32,
+   "fh": 16,
+   "anchor": [
+    16,
+    8
+   ],
+   "anims": {
+    "idle": {
+     "row": 0,
+     "frames": 4,
+     "fps": 5
+    },
+    "move": {
+     "row": 1,
+     "frames": 4,
+     "fps": 10
+    }
+   },
+   "vis": [
+    1,
+    3,
+    29,
+    12
+   ]
+  },
+  "creature.coral_viper.v.m": {
+   "file": "sprites/creatures/coral_viper_v_m.png",
+   "fw": 32,
+   "fh": 16,
+   "anchor": [
+    16,
+    8
+   ],
+   "anims": {
+    "idle": {
+     "row": 0,
+     "frames": 4,
+     "fps": 5
+    },
+    "move": {
+     "row": 1,
+     "frames": 4,
+     "fps": 10
+    }
+   },
+   "vis": [
+    1,
+    3,
+    29,
+    12
+   ]
+  },
+  "creature.coral_viper.baby.v": {
+   "file": "sprites/creatures/coral_viper_baby_v.png",
+   "fw": 32,
+   "fh": 16,
+   "anchor": [
+    16,
+    8
+   ],
+   "anims": {
+    "idle": {
+     "row": 0,
+     "frames": 4,
+     "fps": 5
+    },
+    "move": {
+     "row": 1,
+     "frames": 4,
+     "fps": 10
+    }
+   },
+   "vis": [
+    3,
+    4,
+    27,
+    11
    ]
   },
   "creature.coral_viper.baby": {
@@ -1771,6 +2986,87 @@ AQ.manifest = {
     19
    ]
   },
+  "creature.lanternjaw.v": {
+   "file": "sprites/creatures/lanternjaw_v.png",
+   "fw": 24,
+   "fh": 24,
+   "anchor": [
+    12,
+    12
+   ],
+   "anims": {
+    "idle": {
+     "row": 0,
+     "frames": 4,
+     "fps": 5
+    },
+    "move": {
+     "row": 1,
+     "frames": 4,
+     "fps": 10
+    }
+   },
+   "vis": [
+    2,
+    2,
+    22,
+    19
+   ]
+  },
+  "creature.lanternjaw.v.m": {
+   "file": "sprites/creatures/lanternjaw_v_m.png",
+   "fw": 24,
+   "fh": 24,
+   "anchor": [
+    12,
+    12
+   ],
+   "anims": {
+    "idle": {
+     "row": 0,
+     "frames": 4,
+     "fps": 5
+    },
+    "move": {
+     "row": 1,
+     "frames": 4,
+     "fps": 10
+    }
+   },
+   "vis": [
+    2,
+    2,
+    22,
+    19
+   ]
+  },
+  "creature.lanternjaw.baby.v": {
+   "file": "sprites/creatures/lanternjaw_baby_v.png",
+   "fw": 24,
+   "fh": 24,
+   "anchor": [
+    12,
+    12
+   ],
+   "anims": {
+    "idle": {
+     "row": 0,
+     "frames": 4,
+     "fps": 5
+    },
+    "move": {
+     "row": 1,
+     "frames": 4,
+     "fps": 10
+    }
+   },
+   "vis": [
+    6,
+    6,
+    18,
+    18
+   ]
+  },
   "creature.lanternjaw.baby": {
    "file": "sprites/creatures/lanternjaw_baby.png",
    "fw": 24,
@@ -1850,6 +3146,87 @@ AQ.manifest = {
     6,
     14,
     13
+   ]
+  },
+  "creature.vent_shell.v": {
+   "file": "sprites/creatures/vent_shell_v.png",
+   "fw": 16,
+   "fh": 16,
+   "anchor": [
+    8,
+    8
+   ],
+   "anims": {
+    "idle": {
+     "row": 0,
+     "frames": 4,
+     "fps": 5
+    },
+    "move": {
+     "row": 1,
+     "frames": 4,
+     "fps": 10
+    }
+   },
+   "vis": [
+    2,
+    6,
+    14,
+    13
+   ]
+  },
+  "creature.vent_shell.v.m": {
+   "file": "sprites/creatures/vent_shell_v_m.png",
+   "fw": 16,
+   "fh": 16,
+   "anchor": [
+    8,
+    8
+   ],
+   "anims": {
+    "idle": {
+     "row": 0,
+     "frames": 4,
+     "fps": 5
+    },
+    "move": {
+     "row": 1,
+     "frames": 4,
+     "fps": 10
+    }
+   },
+   "vis": [
+    2,
+    6,
+    14,
+    13
+   ]
+  },
+  "creature.vent_shell.baby.v": {
+   "file": "sprites/creatures/vent_shell_baby_v.png",
+   "fw": 16,
+   "fh": 16,
+   "anchor": [
+    8,
+    8
+   ],
+   "anims": {
+    "idle": {
+     "row": 0,
+     "frames": 4,
+     "fps": 5
+    },
+    "move": {
+     "row": 1,
+     "frames": 4,
+     "fps": 10
+    }
+   },
+   "vis": [
+    3,
+    6,
+    14,
+    12
    ]
   },
   "creature.vent_shell.baby": {
@@ -1933,6 +3310,87 @@ AQ.manifest = {
     22
    ]
   },
+  "creature.abyss_drifter.v": {
+   "file": "sprites/creatures/abyss_drifter_v.png",
+   "fw": 24,
+   "fh": 24,
+   "anchor": [
+    12,
+    12
+   ],
+   "anims": {
+    "idle": {
+     "row": 0,
+     "frames": 4,
+     "fps": 5
+    },
+    "move": {
+     "row": 1,
+     "frames": 4,
+     "fps": 10
+    }
+   },
+   "vis": [
+    1,
+    2,
+    22,
+    22
+   ]
+  },
+  "creature.abyss_drifter.v.m": {
+   "file": "sprites/creatures/abyss_drifter_v_m.png",
+   "fw": 24,
+   "fh": 24,
+   "anchor": [
+    12,
+    12
+   ],
+   "anims": {
+    "idle": {
+     "row": 0,
+     "frames": 4,
+     "fps": 5
+    },
+    "move": {
+     "row": 1,
+     "frames": 4,
+     "fps": 10
+    }
+   },
+   "vis": [
+    1,
+    2,
+    22,
+    22
+   ]
+  },
+  "creature.abyss_drifter.baby.v": {
+   "file": "sprites/creatures/abyss_drifter_baby_v.png",
+   "fw": 24,
+   "fh": 24,
+   "anchor": [
+    12,
+    12
+   ],
+   "anims": {
+    "idle": {
+     "row": 0,
+     "frames": 4,
+     "fps": 5
+    },
+    "move": {
+     "row": 1,
+     "frames": 4,
+     "fps": 10
+    }
+   },
+   "vis": [
+    5,
+    7,
+    18,
+    20
+   ]
+  },
   "creature.abyss_drifter.baby": {
    "file": "sprites/creatures/abyss_drifter_baby.png",
    "fw": 24,
@@ -2012,6 +3470,87 @@ AQ.manifest = {
     15,
     43,
     32
+   ]
+  },
+  "creature.trenchmaw.v": {
+   "file": "sprites/creatures/trenchmaw_v.png",
+   "fw": 48,
+   "fh": 48,
+   "anchor": [
+    24,
+    24
+   ],
+   "anims": {
+    "idle": {
+     "row": 0,
+     "frames": 4,
+     "fps": 5
+    },
+    "move": {
+     "row": 1,
+     "frames": 4,
+     "fps": 10
+    }
+   },
+   "vis": [
+    3,
+    15,
+    43,
+    32
+   ]
+  },
+  "creature.trenchmaw.v.m": {
+   "file": "sprites/creatures/trenchmaw_v_m.png",
+   "fw": 48,
+   "fh": 48,
+   "anchor": [
+    24,
+    24
+   ],
+   "anims": {
+    "idle": {
+     "row": 0,
+     "frames": 4,
+     "fps": 5
+    },
+    "move": {
+     "row": 1,
+     "frames": 4,
+     "fps": 10
+    }
+   },
+   "vis": [
+    3,
+    15,
+    43,
+    32
+   ]
+  },
+  "creature.trenchmaw.baby.v": {
+   "file": "sprites/creatures/trenchmaw_baby_v.png",
+   "fw": 48,
+   "fh": 48,
+   "anchor": [
+    24,
+    24
+   ],
+   "anims": {
+    "idle": {
+     "row": 0,
+     "frames": 4,
+     "fps": 5
+    },
+    "move": {
+     "row": 1,
+     "frames": 4,
+     "fps": 10
+    }
+   },
+   "vis": [
+    11,
+    19,
+    35,
+    29
    ]
   },
   "creature.trenchmaw.baby": {
@@ -2117,6 +3656,87 @@ AQ.manifest = {
     13
    ]
   },
+  "creature.blindgill.v": {
+   "file": "sprites/creatures/blindgill_v.png",
+   "fw": 16,
+   "fh": 16,
+   "anchor": [
+    8,
+    8
+   ],
+   "anims": {
+    "idle": {
+     "row": 0,
+     "frames": 4,
+     "fps": 5
+    },
+    "move": {
+     "row": 1,
+     "frames": 4,
+     "fps": 10
+    }
+   },
+   "vis": [
+    2,
+    2,
+    14,
+    13
+   ]
+  },
+  "creature.blindgill.v.m": {
+   "file": "sprites/creatures/blindgill_v_m.png",
+   "fw": 16,
+   "fh": 16,
+   "anchor": [
+    8,
+    8
+   ],
+   "anims": {
+    "idle": {
+     "row": 0,
+     "frames": 4,
+     "fps": 5
+    },
+    "move": {
+     "row": 1,
+     "frames": 4,
+     "fps": 10
+    }
+   },
+   "vis": [
+    2,
+    2,
+    14,
+    13
+   ]
+  },
+  "creature.blindgill.baby.v": {
+   "file": "sprites/creatures/blindgill_baby_v.png",
+   "fw": 16,
+   "fh": 16,
+   "anchor": [
+    8,
+    8
+   ],
+   "anims": {
+    "idle": {
+     "row": 0,
+     "frames": 4,
+     "fps": 5
+    },
+    "move": {
+     "row": 1,
+     "frames": 4,
+     "fps": 10
+    }
+   },
+   "vis": [
+    4,
+    4,
+    11,
+    12
+   ]
+  },
   "creature.blindgill.baby": {
    "file": "sprites/creatures/blindgill_baby.png",
    "fw": 16,
@@ -2195,6 +3815,87 @@ AQ.manifest = {
     1,
     2,
     14,
+    14
+   ]
+  },
+  "creature.cave_newt.v": {
+   "file": "sprites/creatures/cave_newt_v.png",
+   "fw": 16,
+   "fh": 16,
+   "anchor": [
+    8,
+    8
+   ],
+   "anims": {
+    "idle": {
+     "row": 0,
+     "frames": 4,
+     "fps": 5
+    },
+    "move": {
+     "row": 1,
+     "frames": 4,
+     "fps": 10
+    }
+   },
+   "vis": [
+    1,
+    2,
+    14,
+    14
+   ]
+  },
+  "creature.cave_newt.v.m": {
+   "file": "sprites/creatures/cave_newt_v_m.png",
+   "fw": 16,
+   "fh": 16,
+   "anchor": [
+    8,
+    8
+   ],
+   "anims": {
+    "idle": {
+     "row": 0,
+     "frames": 4,
+     "fps": 5
+    },
+    "move": {
+     "row": 1,
+     "frames": 4,
+     "fps": 10
+    }
+   },
+   "vis": [
+    1,
+    2,
+    14,
+    14
+   ]
+  },
+  "creature.cave_newt.baby.v": {
+   "file": "sprites/creatures/cave_newt_baby_v.png",
+   "fw": 16,
+   "fh": 16,
+   "anchor": [
+    8,
+    8
+   ],
+   "anims": {
+    "idle": {
+     "row": 0,
+     "frames": 4,
+     "fps": 5
+    },
+    "move": {
+     "row": 1,
+     "frames": 4,
+     "fps": 10
+    }
+   },
+   "vis": [
+    1,
+    2,
+    12,
     14
    ]
   },
@@ -2279,6 +3980,87 @@ AQ.manifest = {
     14
    ]
   },
+  "creature.stoneshell.v": {
+   "file": "sprites/creatures/stoneshell_v.png",
+   "fw": 16,
+   "fh": 16,
+   "anchor": [
+    8,
+    8
+   ],
+   "anims": {
+    "idle": {
+     "row": 0,
+     "frames": 4,
+     "fps": 5
+    },
+    "move": {
+     "row": 1,
+     "frames": 4,
+     "fps": 10
+    }
+   },
+   "vis": [
+    1,
+    4,
+    14,
+    14
+   ]
+  },
+  "creature.stoneshell.v.m": {
+   "file": "sprites/creatures/stoneshell_v_m.png",
+   "fw": 16,
+   "fh": 16,
+   "anchor": [
+    8,
+    8
+   ],
+   "anims": {
+    "idle": {
+     "row": 0,
+     "frames": 4,
+     "fps": 5
+    },
+    "move": {
+     "row": 1,
+     "frames": 4,
+     "fps": 10
+    }
+   },
+   "vis": [
+    1,
+    4,
+    14,
+    14
+   ]
+  },
+  "creature.stoneshell.baby.v": {
+   "file": "sprites/creatures/stoneshell_baby_v.png",
+   "fw": 16,
+   "fh": 16,
+   "anchor": [
+    8,
+    8
+   ],
+   "anims": {
+    "idle": {
+     "row": 0,
+     "frames": 4,
+     "fps": 5
+    },
+    "move": {
+     "row": 1,
+     "frames": 4,
+     "fps": 10
+    }
+   },
+   "vis": [
+    4,
+    5,
+    14,
+    12
+   ]
+  },
   "creature.stoneshell.baby": {
    "file": "sprites/creatures/stoneshell_baby.png",
    "fw": 16,
@@ -2358,6 +4140,87 @@ AQ.manifest = {
     11,
     30,
     24
+   ]
+  },
+  "creature.cave_crawler.v": {
+   "file": "sprites/creatures/cave_crawler_v.png",
+   "fw": 32,
+   "fh": 32,
+   "anchor": [
+    16,
+    16
+   ],
+   "anims": {
+    "idle": {
+     "row": 0,
+     "frames": 4,
+     "fps": 5
+    },
+    "move": {
+     "row": 1,
+     "frames": 4,
+     "fps": 10
+    }
+   },
+   "vis": [
+    2,
+    11,
+    30,
+    24
+   ]
+  },
+  "creature.cave_crawler.v.m": {
+   "file": "sprites/creatures/cave_crawler_v_m.png",
+   "fw": 32,
+   "fh": 32,
+   "anchor": [
+    16,
+    16
+   ],
+   "anims": {
+    "idle": {
+     "row": 0,
+     "frames": 4,
+     "fps": 5
+    },
+    "move": {
+     "row": 1,
+     "frames": 4,
+     "fps": 10
+    }
+   },
+   "vis": [
+    2,
+    11,
+    30,
+    24
+   ]
+  },
+  "creature.cave_crawler.baby.v": {
+   "file": "sprites/creatures/cave_crawler_baby_v.png",
+   "fw": 32,
+   "fh": 32,
+   "anchor": [
+    16,
+    16
+   ],
+   "anims": {
+    "idle": {
+     "row": 0,
+     "frames": 4,
+     "fps": 5
+    },
+    "move": {
+     "row": 1,
+     "frames": 4,
+     "fps": 10
+    }
+   },
+   "vis": [
+    4,
+    11,
+    28,
+    23
    ]
   },
   "creature.cave_crawler.baby": {
@@ -2463,6 +4326,87 @@ AQ.manifest = {
     18
    ]
   },
+  "creature.driftfin.v": {
+   "file": "sprites/creatures/driftfin_v.png",
+   "fw": 24,
+   "fh": 24,
+   "anchor": [
+    12,
+    12
+   ],
+   "anims": {
+    "idle": {
+     "row": 0,
+     "frames": 4,
+     "fps": 5
+    },
+    "move": {
+     "row": 1,
+     "frames": 4,
+     "fps": 10
+    }
+   },
+   "vis": [
+    1,
+    4,
+    21,
+    18
+   ]
+  },
+  "creature.driftfin.v.m": {
+   "file": "sprites/creatures/driftfin_v_m.png",
+   "fw": 24,
+   "fh": 24,
+   "anchor": [
+    12,
+    12
+   ],
+   "anims": {
+    "idle": {
+     "row": 0,
+     "frames": 4,
+     "fps": 5
+    },
+    "move": {
+     "row": 1,
+     "frames": 4,
+     "fps": 10
+    }
+   },
+   "vis": [
+    1,
+    4,
+    21,
+    18
+   ]
+  },
+  "creature.driftfin.baby.v": {
+   "file": "sprites/creatures/driftfin_baby_v.png",
+   "fw": 24,
+   "fh": 24,
+   "anchor": [
+    12,
+    12
+   ],
+   "anims": {
+    "idle": {
+     "row": 0,
+     "frames": 4,
+     "fps": 5
+    },
+    "move": {
+     "row": 1,
+     "frames": 4,
+     "fps": 10
+    }
+   },
+   "vis": [
+    5,
+    6,
+    18,
+    18
+   ]
+  },
   "creature.driftfin.baby": {
    "file": "sprites/creatures/driftfin_baby.png",
    "fw": 24,
@@ -2542,6 +4486,87 @@ AQ.manifest = {
     7,
     30,
     23
+   ]
+  },
+  "creature.blue_runner.v": {
+   "file": "sprites/creatures/blue_runner_v.png",
+   "fw": 32,
+   "fh": 32,
+   "anchor": [
+    16,
+    16
+   ],
+   "anims": {
+    "idle": {
+     "row": 0,
+     "frames": 4,
+     "fps": 5
+    },
+    "move": {
+     "row": 1,
+     "frames": 4,
+     "fps": 10
+    }
+   },
+   "vis": [
+    1,
+    7,
+    30,
+    23
+   ]
+  },
+  "creature.blue_runner.v.m": {
+   "file": "sprites/creatures/blue_runner_v_m.png",
+   "fw": 32,
+   "fh": 32,
+   "anchor": [
+    16,
+    16
+   ],
+   "anims": {
+    "idle": {
+     "row": 0,
+     "frames": 4,
+     "fps": 5
+    },
+    "move": {
+     "row": 1,
+     "frames": 4,
+     "fps": 10
+    }
+   },
+   "vis": [
+    1,
+    7,
+    30,
+    23
+   ]
+  },
+  "creature.blue_runner.baby.v": {
+   "file": "sprites/creatures/blue_runner_baby_v.png",
+   "fw": 32,
+   "fh": 32,
+   "anchor": [
+    16,
+    16
+   ],
+   "anims": {
+    "idle": {
+     "row": 0,
+     "frames": 4,
+     "fps": 5
+    },
+    "move": {
+     "row": 1,
+     "frames": 4,
+     "fps": 10
+    }
+   },
+   "vis": [
+    7,
+    10,
+    27,
+    21
    ]
   },
   "creature.blue_runner.baby": {
@@ -2625,6 +4650,87 @@ AQ.manifest = {
     14
    ]
   },
+  "creature.open_drifter.v": {
+   "file": "sprites/creatures/open_drifter_v.png",
+   "fw": 16,
+   "fh": 16,
+   "anchor": [
+    8,
+    8
+   ],
+   "anims": {
+    "idle": {
+     "row": 0,
+     "frames": 4,
+     "fps": 5
+    },
+    "move": {
+     "row": 1,
+     "frames": 4,
+     "fps": 10
+    }
+   },
+   "vis": [
+    1,
+    1,
+    14,
+    14
+   ]
+  },
+  "creature.open_drifter.v.m": {
+   "file": "sprites/creatures/open_drifter_v_m.png",
+   "fw": 16,
+   "fh": 16,
+   "anchor": [
+    8,
+    8
+   ],
+   "anims": {
+    "idle": {
+     "row": 0,
+     "frames": 4,
+     "fps": 5
+    },
+    "move": {
+     "row": 1,
+     "frames": 4,
+     "fps": 10
+    }
+   },
+   "vis": [
+    1,
+    1,
+    14,
+    14
+   ]
+  },
+  "creature.open_drifter.baby.v": {
+   "file": "sprites/creatures/open_drifter_baby_v.png",
+   "fw": 16,
+   "fh": 16,
+   "anchor": [
+    8,
+    8
+   ],
+   "anims": {
+    "idle": {
+     "row": 0,
+     "frames": 4,
+     "fps": 5
+    },
+    "move": {
+     "row": 1,
+     "frames": 4,
+     "fps": 10
+    }
+   },
+   "vis": [
+    3,
+    3,
+    13,
+    14
+   ]
+  },
   "creature.open_drifter.baby": {
    "file": "sprites/creatures/open_drifter_baby.png",
    "fw": 16,
@@ -2704,6 +4810,87 @@ AQ.manifest = {
     7,
     29,
     25
+   ]
+  },
+  "creature.longneck_sea_lizard.v": {
+   "file": "sprites/creatures/longneck_sea_lizard_v.png",
+   "fw": 32,
+   "fh": 32,
+   "anchor": [
+    16,
+    16
+   ],
+   "anims": {
+    "idle": {
+     "row": 0,
+     "frames": 4,
+     "fps": 5
+    },
+    "move": {
+     "row": 1,
+     "frames": 4,
+     "fps": 10
+    }
+   },
+   "vis": [
+    1,
+    7,
+    29,
+    25
+   ]
+  },
+  "creature.longneck_sea_lizard.v.m": {
+   "file": "sprites/creatures/longneck_sea_lizard_v_m.png",
+   "fw": 32,
+   "fh": 32,
+   "anchor": [
+    16,
+    16
+   ],
+   "anims": {
+    "idle": {
+     "row": 0,
+     "frames": 4,
+     "fps": 5
+    },
+    "move": {
+     "row": 1,
+     "frames": 4,
+     "fps": 10
+    }
+   },
+   "vis": [
+    1,
+    7,
+    29,
+    25
+   ]
+  },
+  "creature.longneck_sea_lizard.baby.v": {
+   "file": "sprites/creatures/longneck_sea_lizard_baby_v.png",
+   "fw": 32,
+   "fh": 32,
+   "anchor": [
+    16,
+    16
+   ],
+   "anims": {
+    "idle": {
+     "row": 0,
+     "frames": 4,
+     "fps": 5
+    },
+    "move": {
+     "row": 1,
+     "frames": 4,
+     "fps": 10
+    }
+   },
+   "vis": [
+    4,
+    9,
+    25,
+    23
    ]
   },
   "creature.longneck_sea_lizard.baby": {
@@ -2809,6 +4996,87 @@ AQ.manifest = {
     34
    ]
   },
+  "creature.reeftooth.v": {
+   "file": "sprites/creatures/reeftooth_v.png",
+   "fw": 48,
+   "fh": 48,
+   "anchor": [
+    24,
+    24
+   ],
+   "anims": {
+    "idle": {
+     "row": 0,
+     "frames": 4,
+     "fps": 5
+    },
+    "move": {
+     "row": 1,
+     "frames": 4,
+     "fps": 10
+    }
+   },
+   "vis": [
+    1,
+    8,
+    45,
+    34
+   ]
+  },
+  "creature.reeftooth.v.m": {
+   "file": "sprites/creatures/reeftooth_v_m.png",
+   "fw": 48,
+   "fh": 48,
+   "anchor": [
+    24,
+    24
+   ],
+   "anims": {
+    "idle": {
+     "row": 0,
+     "frames": 4,
+     "fps": 5
+    },
+    "move": {
+     "row": 1,
+     "frames": 4,
+     "fps": 10
+    }
+   },
+   "vis": [
+    1,
+    8,
+    45,
+    34
+   ]
+  },
+  "creature.reeftooth.baby.v": {
+   "file": "sprites/creatures/reeftooth_baby_v.png",
+   "fw": 48,
+   "fh": 48,
+   "anchor": [
+    24,
+    24
+   ],
+   "anims": {
+    "idle": {
+     "row": 0,
+     "frames": 4,
+     "fps": 5
+    },
+    "move": {
+     "row": 1,
+     "frames": 4,
+     "fps": 10
+    }
+   },
+   "vis": [
+    8,
+    13,
+    38,
+    31
+   ]
+  },
   "creature.reeftooth.baby": {
    "file": "sprites/creatures/reeftooth_baby.png",
    "fw": 48,
@@ -2887,6 +5155,87 @@ AQ.manifest = {
     1,
     3,
     14,
+    14
+   ]
+  },
+  "creature.wandershell_nautilus.v": {
+   "file": "sprites/creatures/wandershell_nautilus_v.png",
+   "fw": 16,
+   "fh": 16,
+   "anchor": [
+    8,
+    8
+   ],
+   "anims": {
+    "idle": {
+     "row": 0,
+     "frames": 4,
+     "fps": 5
+    },
+    "move": {
+     "row": 1,
+     "frames": 4,
+     "fps": 10
+    }
+   },
+   "vis": [
+    1,
+    3,
+    14,
+    14
+   ]
+  },
+  "creature.wandershell_nautilus.v.m": {
+   "file": "sprites/creatures/wandershell_nautilus_v_m.png",
+   "fw": 16,
+   "fh": 16,
+   "anchor": [
+    8,
+    8
+   ],
+   "anims": {
+    "idle": {
+     "row": 0,
+     "frames": 4,
+     "fps": 5
+    },
+    "move": {
+     "row": 1,
+     "frames": 4,
+     "fps": 10
+    }
+   },
+   "vis": [
+    1,
+    3,
+    14,
+    14
+   ]
+  },
+  "creature.wandershell_nautilus.baby.v": {
+   "file": "sprites/creatures/wandershell_nautilus_baby_v.png",
+   "fw": 16,
+   "fh": 16,
+   "anchor": [
+    8,
+    8
+   ],
+   "anims": {
+    "idle": {
+     "row": 0,
+     "frames": 4,
+     "fps": 5
+    },
+    "move": {
+     "row": 1,
+     "frames": 4,
+     "fps": 10
+    }
+   },
+   "vis": [
+    3,
+    4,
+    13,
     14
    ]
   },
@@ -2971,6 +5320,87 @@ AQ.manifest = {
     18
    ]
   },
+  "creature.crimsonback.v": {
+   "file": "sprites/creatures/crimsonback_v.png",
+   "fw": 24,
+   "fh": 24,
+   "anchor": [
+    12,
+    12
+   ],
+   "anims": {
+    "idle": {
+     "row": 0,
+     "frames": 4,
+     "fps": 5
+    },
+    "move": {
+     "row": 1,
+     "frames": 4,
+     "fps": 10
+    }
+   },
+   "vis": [
+    1,
+    4,
+    21,
+    18
+   ]
+  },
+  "creature.crimsonback.v.m": {
+   "file": "sprites/creatures/crimsonback_v_m.png",
+   "fw": 24,
+   "fh": 24,
+   "anchor": [
+    12,
+    12
+   ],
+   "anims": {
+    "idle": {
+     "row": 0,
+     "frames": 4,
+     "fps": 5
+    },
+    "move": {
+     "row": 1,
+     "frames": 4,
+     "fps": 10
+    }
+   },
+   "vis": [
+    1,
+    4,
+    21,
+    18
+   ]
+  },
+  "creature.crimsonback.baby.v": {
+   "file": "sprites/creatures/crimsonback_baby_v.png",
+   "fw": 24,
+   "fh": 24,
+   "anchor": [
+    12,
+    12
+   ],
+   "anims": {
+    "idle": {
+     "row": 0,
+     "frames": 4,
+     "fps": 5
+    },
+    "move": {
+     "row": 1,
+     "frames": 4,
+     "fps": 10
+    }
+   },
+   "vis": [
+    5,
+    6,
+    18,
+    18
+   ]
+  },
   "creature.crimsonback.baby": {
    "file": "sprites/creatures/crimsonback_baby.png",
    "fw": 24,
@@ -3050,6 +5480,87 @@ AQ.manifest = {
     4,
     21,
     19
+   ]
+  },
+  "creature.ironfin.v": {
+   "file": "sprites/creatures/ironfin_v.png",
+   "fw": 24,
+   "fh": 24,
+   "anchor": [
+    12,
+    12
+   ],
+   "anims": {
+    "idle": {
+     "row": 0,
+     "frames": 4,
+     "fps": 5
+    },
+    "move": {
+     "row": 1,
+     "frames": 4,
+     "fps": 10
+    }
+   },
+   "vis": [
+    1,
+    4,
+    21,
+    19
+   ]
+  },
+  "creature.ironfin.v.m": {
+   "file": "sprites/creatures/ironfin_v_m.png",
+   "fw": 24,
+   "fh": 24,
+   "anchor": [
+    12,
+    12
+   ],
+   "anims": {
+    "idle": {
+     "row": 0,
+     "frames": 4,
+     "fps": 5
+    },
+    "move": {
+     "row": 1,
+     "frames": 4,
+     "fps": 10
+    }
+   },
+   "vis": [
+    1,
+    4,
+    21,
+    19
+   ]
+  },
+  "creature.ironfin.baby.v": {
+   "file": "sprites/creatures/ironfin_baby_v.png",
+   "fw": 24,
+   "fh": 24,
+   "anchor": [
+    12,
+    12
+   ],
+   "anims": {
+    "idle": {
+     "row": 0,
+     "frames": 4,
+     "fps": 5
+    },
+    "move": {
+     "row": 1,
+     "frames": 4,
+     "fps": 10
+    }
+   },
+   "vis": [
+    5,
+    7,
+    18,
+    17
    ]
   },
   "creature.ironfin.baby": {
@@ -3133,6 +5644,87 @@ AQ.manifest = {
     13
    ]
   },
+  "creature.porthole_darter.v": {
+   "file": "sprites/creatures/porthole_darter_v.png",
+   "fw": 16,
+   "fh": 16,
+   "anchor": [
+    8,
+    8
+   ],
+   "anims": {
+    "idle": {
+     "row": 0,
+     "frames": 4,
+     "fps": 5
+    },
+    "move": {
+     "row": 1,
+     "frames": 4,
+     "fps": 10
+    }
+   },
+   "vis": [
+    2,
+    2,
+    14,
+    13
+   ]
+  },
+  "creature.porthole_darter.v.m": {
+   "file": "sprites/creatures/porthole_darter_v_m.png",
+   "fw": 16,
+   "fh": 16,
+   "anchor": [
+    8,
+    8
+   ],
+   "anims": {
+    "idle": {
+     "row": 0,
+     "frames": 4,
+     "fps": 5
+    },
+    "move": {
+     "row": 1,
+     "frames": 4,
+     "fps": 10
+    }
+   },
+   "vis": [
+    2,
+    2,
+    14,
+    13
+   ]
+  },
+  "creature.porthole_darter.baby.v": {
+   "file": "sprites/creatures/porthole_darter_baby_v.png",
+   "fw": 16,
+   "fh": 16,
+   "anchor": [
+    8,
+    8
+   ],
+   "anims": {
+    "idle": {
+     "row": 0,
+     "frames": 4,
+     "fps": 5
+    },
+    "move": {
+     "row": 1,
+     "frames": 4,
+     "fps": 10
+    }
+   },
+   "vis": [
+    4,
+    4,
+    11,
+    12
+   ]
+  },
   "creature.porthole_darter.baby": {
    "file": "sprites/creatures/porthole_darter_baby.png",
    "fw": 16,
@@ -3214,6 +5806,87 @@ AQ.manifest = {
     12
    ]
   },
+  "creature.rustclaw.v": {
+   "file": "sprites/creatures/rustclaw_v.png",
+   "fw": 16,
+   "fh": 16,
+   "anchor": [
+    8,
+    8
+   ],
+   "anims": {
+    "idle": {
+     "row": 0,
+     "frames": 4,
+     "fps": 5
+    },
+    "move": {
+     "row": 1,
+     "frames": 4,
+     "fps": 10
+    }
+   },
+   "vis": [
+    2,
+    4,
+    14,
+    12
+   ]
+  },
+  "creature.rustclaw.v.m": {
+   "file": "sprites/creatures/rustclaw_v_m.png",
+   "fw": 16,
+   "fh": 16,
+   "anchor": [
+    8,
+    8
+   ],
+   "anims": {
+    "idle": {
+     "row": 0,
+     "frames": 4,
+     "fps": 5
+    },
+    "move": {
+     "row": 1,
+     "frames": 4,
+     "fps": 10
+    }
+   },
+   "vis": [
+    2,
+    4,
+    14,
+    12
+   ]
+  },
+  "creature.rustclaw.baby.v": {
+   "file": "sprites/creatures/rustclaw_baby_v.png",
+   "fw": 16,
+   "fh": 16,
+   "anchor": [
+    8,
+    8
+   ],
+   "anims": {
+    "idle": {
+     "row": 0,
+     "frames": 4,
+     "fps": 5
+    },
+    "move": {
+     "row": 1,
+     "frames": 4,
+     "fps": 10
+    }
+   },
+   "vis": [
+    2,
+    4,
+    13,
+    12
+   ]
+  },
   "creature.rustclaw.baby": {
    "file": "sprites/creatures/rustclaw_baby.png",
    "fw": 16,
@@ -3291,6 +5964,87 @@ AQ.manifest = {
    "vis": [
     2,
     4,
+    22,
+    18
+   ]
+  },
+  "creature.chest_octopus.v": {
+   "file": "sprites/creatures/chest_octopus_v.png",
+   "fw": 24,
+   "fh": 24,
+   "anchor": [
+    12,
+    12
+   ],
+   "anims": {
+    "idle": {
+     "row": 0,
+     "frames": 4,
+     "fps": 5
+    },
+    "move": {
+     "row": 1,
+     "frames": 4,
+     "fps": 10
+    }
+   },
+   "vis": [
+    2,
+    4,
+    22,
+    18
+   ]
+  },
+  "creature.chest_octopus.v.m": {
+   "file": "sprites/creatures/chest_octopus_v_m.png",
+   "fw": 24,
+   "fh": 24,
+   "anchor": [
+    12,
+    12
+   ],
+   "anims": {
+    "idle": {
+     "row": 0,
+     "frames": 4,
+     "fps": 5
+    },
+    "move": {
+     "row": 1,
+     "frames": 4,
+     "fps": 10
+    }
+   },
+   "vis": [
+    2,
+    4,
+    22,
+    18
+   ]
+  },
+  "creature.chest_octopus.baby.v": {
+   "file": "sprites/creatures/chest_octopus_baby_v.png",
+   "fw": 24,
+   "fh": 24,
+   "anchor": [
+    12,
+    12
+   ],
+   "anims": {
+    "idle": {
+     "row": 0,
+     "frames": 4,
+     "fps": 5
+    },
+    "move": {
+     "row": 1,
+     "frames": 4,
+     "fps": 10
+    }
+   },
+   "vis": [
+    2,
+    5,
     22,
     18
    ]
@@ -3376,6 +6130,87 @@ AQ.manifest = {
     12
    ]
   },
+  "creature.wreck_eel.v": {
+   "file": "sprites/creatures/wreck_eel_v.png",
+   "fw": 32,
+   "fh": 16,
+   "anchor": [
+    16,
+    8
+   ],
+   "anims": {
+    "idle": {
+     "row": 0,
+     "frames": 4,
+     "fps": 5
+    },
+    "move": {
+     "row": 1,
+     "frames": 4,
+     "fps": 10
+    }
+   },
+   "vis": [
+    1,
+    3,
+    29,
+    12
+   ]
+  },
+  "creature.wreck_eel.v.m": {
+   "file": "sprites/creatures/wreck_eel_v_m.png",
+   "fw": 32,
+   "fh": 16,
+   "anchor": [
+    16,
+    8
+   ],
+   "anims": {
+    "idle": {
+     "row": 0,
+     "frames": 4,
+     "fps": 5
+    },
+    "move": {
+     "row": 1,
+     "frames": 4,
+     "fps": 10
+    }
+   },
+   "vis": [
+    1,
+    3,
+    29,
+    12
+   ]
+  },
+  "creature.wreck_eel.baby.v": {
+   "file": "sprites/creatures/wreck_eel_baby_v.png",
+   "fw": 32,
+   "fh": 16,
+   "anchor": [
+    16,
+    8
+   ],
+   "anims": {
+    "idle": {
+     "row": 0,
+     "frames": 4,
+     "fps": 5
+    },
+    "move": {
+     "row": 1,
+     "frames": 4,
+     "fps": 10
+    }
+   },
+   "vis": [
+    3,
+    4,
+    27,
+    11
+   ]
+  },
   "creature.wreck_eel.baby": {
    "file": "sprites/creatures/wreck_eel_baby.png",
    "fw": 32,
@@ -3457,6 +6292,60 @@ AQ.manifest = {
     10
    ]
   },
+  "creature.barnacle_crawler.v": {
+   "file": "sprites/creatures/barnacle_crawler_v.png",
+   "fw": 12,
+   "fh": 12,
+   "anchor": [
+    6,
+    6
+   ],
+   "anims": {
+    "idle": {
+     "row": 0,
+     "frames": 4,
+     "fps": 5
+    },
+    "move": {
+     "row": 1,
+     "frames": 4,
+     "fps": 10
+    }
+   },
+   "vis": [
+    1,
+    4,
+    10,
+    10
+   ]
+  },
+  "creature.barnacle_crawler.baby.v": {
+   "file": "sprites/creatures/barnacle_crawler_baby_v.png",
+   "fw": 12,
+   "fh": 12,
+   "anchor": [
+    6,
+    6
+   ],
+   "anims": {
+    "idle": {
+     "row": 0,
+     "frames": 4,
+     "fps": 5
+    },
+    "move": {
+     "row": 1,
+     "frames": 4,
+     "fps": 10
+    }
+   },
+   "vis": [
+    2,
+    4,
+    9,
+    10
+   ]
+  },
   "creature.barnacle_crawler.baby": {
    "file": "sprites/creatures/barnacle_crawler_baby.png",
    "fw": 12,
@@ -3531,6 +6420,87 @@ AQ.manifest = {
     2,
     9,
     10
+   ]
+  },
+  "creature.ember_goby.v": {
+   "file": "sprites/creatures/ember_goby_v.png",
+   "fw": 12,
+   "fh": 12,
+   "anchor": [
+    6,
+    6
+   ],
+   "anims": {
+    "idle": {
+     "row": 0,
+     "frames": 4,
+     "fps": 5
+    },
+    "move": {
+     "row": 1,
+     "frames": 4,
+     "fps": 10
+    }
+   },
+   "vis": [
+    2,
+    2,
+    9,
+    10
+   ]
+  },
+  "creature.ember_goby.v.m": {
+   "file": "sprites/creatures/ember_goby_v_m.png",
+   "fw": 12,
+   "fh": 12,
+   "anchor": [
+    6,
+    6
+   ],
+   "anims": {
+    "idle": {
+     "row": 0,
+     "frames": 4,
+     "fps": 5
+    },
+    "move": {
+     "row": 1,
+     "frames": 4,
+     "fps": 10
+    }
+   },
+   "vis": [
+    2,
+    2,
+    9,
+    10
+   ]
+  },
+  "creature.ember_goby.baby.v": {
+   "file": "sprites/creatures/ember_goby_baby_v.png",
+   "fw": 12,
+   "fh": 12,
+   "anchor": [
+    6,
+    6
+   ],
+   "anims": {
+    "idle": {
+     "row": 0,
+     "frames": 4,
+     "fps": 5
+    },
+    "move": {
+     "row": 1,
+     "frames": 4,
+     "fps": 10
+    }
+   },
+   "vis": [
+    3,
+    3,
+    9,
+    9
    ]
   },
   "creature.ember_goby.baby": {
@@ -3611,6 +6581,87 @@ AQ.manifest = {
     2,
     4,
     14,
+    12
+   ]
+  },
+  "creature.sulfur_crab.v": {
+   "file": "sprites/creatures/sulfur_crab_v.png",
+   "fw": 16,
+   "fh": 16,
+   "anchor": [
+    8,
+    8
+   ],
+   "anims": {
+    "idle": {
+     "row": 0,
+     "frames": 4,
+     "fps": 5
+    },
+    "move": {
+     "row": 1,
+     "frames": 4,
+     "fps": 10
+    }
+   },
+   "vis": [
+    2,
+    4,
+    14,
+    12
+   ]
+  },
+  "creature.sulfur_crab.v.m": {
+   "file": "sprites/creatures/sulfur_crab_v_m.png",
+   "fw": 16,
+   "fh": 16,
+   "anchor": [
+    8,
+    8
+   ],
+   "anims": {
+    "idle": {
+     "row": 0,
+     "frames": 4,
+     "fps": 5
+    },
+    "move": {
+     "row": 1,
+     "frames": 4,
+     "fps": 10
+    }
+   },
+   "vis": [
+    2,
+    4,
+    14,
+    12
+   ]
+  },
+  "creature.sulfur_crab.baby.v": {
+   "file": "sprites/creatures/sulfur_crab_baby_v.png",
+   "fw": 16,
+   "fh": 16,
+   "anchor": [
+    8,
+    8
+   ],
+   "anims": {
+    "idle": {
+     "row": 0,
+     "frames": 4,
+     "fps": 5
+    },
+    "move": {
+     "row": 1,
+     "frames": 4,
+     "fps": 10
+    }
+   },
+   "vis": [
+    2,
+    4,
+    13,
     12
    ]
   },
@@ -3695,6 +6746,87 @@ AQ.manifest = {
     10
    ]
   },
+  "creature.vent_limpet.v": {
+   "file": "sprites/creatures/vent_limpet_v.png",
+   "fw": 12,
+   "fh": 12,
+   "anchor": [
+    6,
+    6
+   ],
+   "anims": {
+    "idle": {
+     "row": 0,
+     "frames": 4,
+     "fps": 5
+    },
+    "move": {
+     "row": 1,
+     "frames": 4,
+     "fps": 10
+    }
+   },
+   "vis": [
+    1,
+    4,
+    10,
+    10
+   ]
+  },
+  "creature.vent_limpet.v.m": {
+   "file": "sprites/creatures/vent_limpet_v_m.png",
+   "fw": 12,
+   "fh": 12,
+   "anchor": [
+    6,
+    6
+   ],
+   "anims": {
+    "idle": {
+     "row": 0,
+     "frames": 4,
+     "fps": 5
+    },
+    "move": {
+     "row": 1,
+     "frames": 4,
+     "fps": 10
+    }
+   },
+   "vis": [
+    1,
+    4,
+    10,
+    10
+   ]
+  },
+  "creature.vent_limpet.baby.v": {
+   "file": "sprites/creatures/vent_limpet_baby_v.png",
+   "fw": 12,
+   "fh": 12,
+   "anchor": [
+    6,
+    6
+   ],
+   "anims": {
+    "idle": {
+     "row": 0,
+     "frames": 4,
+     "fps": 5
+    },
+    "move": {
+     "row": 1,
+     "frames": 4,
+     "fps": 10
+    }
+   },
+   "vis": [
+    2,
+    5,
+    10,
+    10
+   ]
+  },
   "creature.vent_limpet.baby": {
    "file": "sprites/creatures/vent_limpet_baby.png",
    "fw": 12,
@@ -3774,6 +6906,87 @@ AQ.manifest = {
     7,
     22,
     19
+   ]
+  },
+  "creature.vent_salamander.v": {
+   "file": "sprites/creatures/vent_salamander_v.png",
+   "fw": 24,
+   "fh": 24,
+   "anchor": [
+    12,
+    12
+   ],
+   "anims": {
+    "idle": {
+     "row": 0,
+     "frames": 4,
+     "fps": 5
+    },
+    "move": {
+     "row": 1,
+     "frames": 4,
+     "fps": 10
+    }
+   },
+   "vis": [
+    1,
+    7,
+    22,
+    19
+   ]
+  },
+  "creature.vent_salamander.v.m": {
+   "file": "sprites/creatures/vent_salamander_v_m.png",
+   "fw": 24,
+   "fh": 24,
+   "anchor": [
+    12,
+    12
+   ],
+   "anims": {
+    "idle": {
+     "row": 0,
+     "frames": 4,
+     "fps": 5
+    },
+    "move": {
+     "row": 1,
+     "frames": 4,
+     "fps": 10
+    }
+   },
+   "vis": [
+    1,
+    7,
+    22,
+    19
+   ]
+  },
+  "creature.vent_salamander.baby.v": {
+   "file": "sprites/creatures/vent_salamander_baby_v.png",
+   "fw": 24,
+   "fh": 24,
+   "anchor": [
+    12,
+    12
+   ],
+   "anims": {
+    "idle": {
+     "row": 0,
+     "frames": 4,
+     "fps": 5
+    },
+    "move": {
+     "row": 1,
+     "frames": 4,
+     "fps": 10
+    }
+   },
+   "vis": [
+    3,
+    6,
+    17,
+    18
    ]
   },
   "creature.vent_salamander.baby": {
@@ -3879,6 +7092,87 @@ AQ.manifest = {
     13
    ]
   },
+  "creature.rootback_mudskipper.v": {
+   "file": "sprites/creatures/rootback_mudskipper_v.png",
+   "fw": 16,
+   "fh": 16,
+   "anchor": [
+    8,
+    8
+   ],
+   "anims": {
+    "idle": {
+     "row": 0,
+     "frames": 4,
+     "fps": 5
+    },
+    "move": {
+     "row": 1,
+     "frames": 4,
+     "fps": 10
+    }
+   },
+   "vis": [
+    2,
+    2,
+    14,
+    13
+   ]
+  },
+  "creature.rootback_mudskipper.v.m": {
+   "file": "sprites/creatures/rootback_mudskipper_v_m.png",
+   "fw": 16,
+   "fh": 16,
+   "anchor": [
+    8,
+    8
+   ],
+   "anims": {
+    "idle": {
+     "row": 0,
+     "frames": 4,
+     "fps": 5
+    },
+    "move": {
+     "row": 1,
+     "frames": 4,
+     "fps": 10
+    }
+   },
+   "vis": [
+    2,
+    2,
+    14,
+    13
+   ]
+  },
+  "creature.rootback_mudskipper.baby.v": {
+   "file": "sprites/creatures/rootback_mudskipper_baby_v.png",
+   "fw": 16,
+   "fh": 16,
+   "anchor": [
+    8,
+    8
+   ],
+   "anims": {
+    "idle": {
+     "row": 0,
+     "frames": 4,
+     "fps": 5
+    },
+    "move": {
+     "row": 1,
+     "frames": 4,
+     "fps": 10
+    }
+   },
+   "vis": [
+    4,
+    4,
+    11,
+    12
+   ]
+  },
   "creature.rootback_mudskipper.baby": {
    "file": "sprites/creatures/rootback_mudskipper_baby.png",
    "fw": 16,
@@ -3957,6 +7251,87 @@ AQ.manifest = {
     2,
     4,
     14,
+    12
+   ]
+  },
+  "creature.mangrove_fiddler.v": {
+   "file": "sprites/creatures/mangrove_fiddler_v.png",
+   "fw": 16,
+   "fh": 16,
+   "anchor": [
+    8,
+    8
+   ],
+   "anims": {
+    "idle": {
+     "row": 0,
+     "frames": 4,
+     "fps": 5
+    },
+    "move": {
+     "row": 1,
+     "frames": 4,
+     "fps": 10
+    }
+   },
+   "vis": [
+    2,
+    4,
+    14,
+    12
+   ]
+  },
+  "creature.mangrove_fiddler.v.m": {
+   "file": "sprites/creatures/mangrove_fiddler_v_m.png",
+   "fw": 16,
+   "fh": 16,
+   "anchor": [
+    8,
+    8
+   ],
+   "anims": {
+    "idle": {
+     "row": 0,
+     "frames": 4,
+     "fps": 5
+    },
+    "move": {
+     "row": 1,
+     "frames": 4,
+     "fps": 10
+    }
+   },
+   "vis": [
+    2,
+    4,
+    14,
+    12
+   ]
+  },
+  "creature.mangrove_fiddler.baby.v": {
+   "file": "sprites/creatures/mangrove_fiddler_baby_v.png",
+   "fw": 16,
+   "fh": 16,
+   "anchor": [
+    8,
+    8
+   ],
+   "anims": {
+    "idle": {
+     "row": 0,
+     "frames": 4,
+     "fps": 5
+    },
+    "move": {
+     "row": 1,
+     "frames": 4,
+     "fps": 10
+    }
+   },
+   "vis": [
+    2,
+    4,
+    13,
     12
    ]
   },
@@ -4041,6 +7416,87 @@ AQ.manifest = {
     11
    ]
   },
+  "creature.rootcoil_snake.v": {
+   "file": "sprites/creatures/rootcoil_snake_v.png",
+   "fw": 32,
+   "fh": 16,
+   "anchor": [
+    16,
+    8
+   ],
+   "anims": {
+    "idle": {
+     "row": 0,
+     "frames": 4,
+     "fps": 5
+    },
+    "move": {
+     "row": 1,
+     "frames": 4,
+     "fps": 10
+    }
+   },
+   "vis": [
+    1,
+    4,
+    29,
+    11
+   ]
+  },
+  "creature.rootcoil_snake.v.m": {
+   "file": "sprites/creatures/rootcoil_snake_v_m.png",
+   "fw": 32,
+   "fh": 16,
+   "anchor": [
+    16,
+    8
+   ],
+   "anims": {
+    "idle": {
+     "row": 0,
+     "frames": 4,
+     "fps": 5
+    },
+    "move": {
+     "row": 1,
+     "frames": 4,
+     "fps": 10
+    }
+   },
+   "vis": [
+    1,
+    4,
+    29,
+    11
+   ]
+  },
+  "creature.rootcoil_snake.baby.v": {
+   "file": "sprites/creatures/rootcoil_snake_baby_v.png",
+   "fw": 32,
+   "fh": 16,
+   "anchor": [
+    16,
+    8
+   ],
+   "anims": {
+    "idle": {
+     "row": 0,
+     "frames": 4,
+     "fps": 5
+    },
+    "move": {
+     "row": 1,
+     "frames": 4,
+     "fps": 10
+    }
+   },
+   "vis": [
+    3,
+    4,
+    27,
+    11
+   ]
+  },
   "creature.rootcoil_snake.baby": {
    "file": "sprites/creatures/rootcoil_snake_baby.png",
    "fw": 32,
@@ -4120,6 +7576,87 @@ AQ.manifest = {
     9,
     45,
     20
+   ]
+  },
+  "creature.dwarf_croc.v": {
+   "file": "sprites/creatures/dwarf_croc_v.png",
+   "fw": 48,
+   "fh": 24,
+   "anchor": [
+    24,
+    12
+   ],
+   "anims": {
+    "idle": {
+     "row": 0,
+     "frames": 4,
+     "fps": 5
+    },
+    "move": {
+     "row": 1,
+     "frames": 4,
+     "fps": 10
+    }
+   },
+   "vis": [
+    1,
+    9,
+    45,
+    20
+   ]
+  },
+  "creature.dwarf_croc.v.m": {
+   "file": "sprites/creatures/dwarf_croc_v_m.png",
+   "fw": 48,
+   "fh": 24,
+   "anchor": [
+    24,
+    12
+   ],
+   "anims": {
+    "idle": {
+     "row": 0,
+     "frames": 4,
+     "fps": 5
+    },
+    "move": {
+     "row": 1,
+     "frames": 4,
+     "fps": 10
+    }
+   },
+   "vis": [
+    1,
+    9,
+    45,
+    20
+   ]
+  },
+  "creature.dwarf_croc.baby.v": {
+   "file": "sprites/creatures/dwarf_croc_baby_v.png",
+   "fw": 48,
+   "fh": 24,
+   "anchor": [
+    24,
+    12
+   ],
+   "anims": {
+    "idle": {
+     "row": 0,
+     "frames": 4,
+     "fps": 5
+    },
+    "move": {
+     "row": 1,
+     "frames": 4,
+     "fps": 10
+    }
+   },
+   "vis": [
+    4,
+    9,
+    43,
+    18
    ]
   },
   "creature.dwarf_croc.baby": {
@@ -4203,6 +7740,87 @@ AQ.manifest = {
     18
    ]
   },
+  "creature.bankside_monitor.v": {
+   "file": "sprites/creatures/bankside_monitor_v.png",
+   "fw": 24,
+   "fh": 24,
+   "anchor": [
+    12,
+    12
+   ],
+   "anims": {
+    "idle": {
+     "row": 0,
+     "frames": 4,
+     "fps": 5
+    },
+    "move": {
+     "row": 1,
+     "frames": 4,
+     "fps": 10
+    }
+   },
+   "vis": [
+    1,
+    9,
+    22,
+    18
+   ]
+  },
+  "creature.bankside_monitor.v.m": {
+   "file": "sprites/creatures/bankside_monitor_v_m.png",
+   "fw": 24,
+   "fh": 24,
+   "anchor": [
+    12,
+    12
+   ],
+   "anims": {
+    "idle": {
+     "row": 0,
+     "frames": 4,
+     "fps": 5
+    },
+    "move": {
+     "row": 1,
+     "frames": 4,
+     "fps": 10
+    }
+   },
+   "vis": [
+    1,
+    9,
+    22,
+    18
+   ]
+  },
+  "creature.bankside_monitor.baby.v": {
+   "file": "sprites/creatures/bankside_monitor_baby_v.png",
+   "fw": 24,
+   "fh": 24,
+   "anchor": [
+    12,
+    12
+   ],
+   "anims": {
+    "idle": {
+     "row": 0,
+     "frames": 4,
+     "fps": 5
+    },
+    "move": {
+     "row": 1,
+     "frames": 4,
+     "fps": 10
+    }
+   },
+   "vis": [
+    3,
+    9,
+    17,
+    16
+   ]
+  },
   "creature.bankside_monitor.baby": {
    "file": "sprites/creatures/bankside_monitor_baby.png",
    "fw": 24,
@@ -4280,6 +7898,87 @@ AQ.manifest = {
    "vis": [
     2,
     4,
+    22,
+    18
+   ]
+  },
+  "creature.muckhide_octopus.v": {
+   "file": "sprites/creatures/muckhide_octopus_v.png",
+   "fw": 24,
+   "fh": 24,
+   "anchor": [
+    12,
+    12
+   ],
+   "anims": {
+    "idle": {
+     "row": 0,
+     "frames": 4,
+     "fps": 5
+    },
+    "move": {
+     "row": 1,
+     "frames": 4,
+     "fps": 10
+    }
+   },
+   "vis": [
+    2,
+    4,
+    22,
+    18
+   ]
+  },
+  "creature.muckhide_octopus.v.m": {
+   "file": "sprites/creatures/muckhide_octopus_v_m.png",
+   "fw": 24,
+   "fh": 24,
+   "anchor": [
+    12,
+    12
+   ],
+   "anims": {
+    "idle": {
+     "row": 0,
+     "frames": 4,
+     "fps": 5
+    },
+    "move": {
+     "row": 1,
+     "frames": 4,
+     "fps": 10
+    }
+   },
+   "vis": [
+    2,
+    4,
+    22,
+    18
+   ]
+  },
+  "creature.muckhide_octopus.baby.v": {
+   "file": "sprites/creatures/muckhide_octopus_baby_v.png",
+   "fw": 24,
+   "fh": 24,
+   "anchor": [
+    12,
+    12
+   ],
+   "anims": {
+    "idle": {
+     "row": 0,
+     "frames": 4,
+     "fps": 5
+    },
+    "move": {
+     "row": 1,
+     "frames": 4,
+     "fps": 10
+    }
+   },
+   "vis": [
+    2,
+    5,
     22,
     18
    ]
@@ -4387,6 +8086,87 @@ AQ.manifest = {
     13
    ]
   },
+  "creature.frostfin.v": {
+   "file": "sprites/creatures/frostfin_v.png",
+   "fw": 16,
+   "fh": 16,
+   "anchor": [
+    8,
+    8
+   ],
+   "anims": {
+    "idle": {
+     "row": 0,
+     "frames": 4,
+     "fps": 5
+    },
+    "move": {
+     "row": 1,
+     "frames": 4,
+     "fps": 10
+    }
+   },
+   "vis": [
+    2,
+    2,
+    14,
+    13
+   ]
+  },
+  "creature.frostfin.v.m": {
+   "file": "sprites/creatures/frostfin_v_m.png",
+   "fw": 16,
+   "fh": 16,
+   "anchor": [
+    8,
+    8
+   ],
+   "anims": {
+    "idle": {
+     "row": 0,
+     "frames": 4,
+     "fps": 5
+    },
+    "move": {
+     "row": 1,
+     "frames": 4,
+     "fps": 10
+    }
+   },
+   "vis": [
+    2,
+    2,
+    14,
+    13
+   ]
+  },
+  "creature.frostfin.baby.v": {
+   "file": "sprites/creatures/frostfin_baby_v.png",
+   "fw": 16,
+   "fh": 16,
+   "anchor": [
+    8,
+    8
+   ],
+   "anims": {
+    "idle": {
+     "row": 0,
+     "frames": 4,
+     "fps": 5
+    },
+    "move": {
+     "row": 1,
+     "frames": 4,
+     "fps": 10
+    }
+   },
+   "vis": [
+    4,
+    4,
+    11,
+    12
+   ]
+  },
   "creature.frostfin.baby": {
    "file": "sprites/creatures/frostfin_baby.png",
    "fw": 16,
@@ -4466,6 +8246,87 @@ AQ.manifest = {
     6,
     22,
     19
+   ]
+  },
+  "creature.iceback_seal_pup.v": {
+   "file": "sprites/creatures/iceback_seal_pup_v.png",
+   "fw": 24,
+   "fh": 24,
+   "anchor": [
+    12,
+    12
+   ],
+   "anims": {
+    "idle": {
+     "row": 0,
+     "frames": 4,
+     "fps": 5
+    },
+    "move": {
+     "row": 1,
+     "frames": 4,
+     "fps": 10
+    }
+   },
+   "vis": [
+    1,
+    6,
+    22,
+    19
+   ]
+  },
+  "creature.iceback_seal_pup.v.m": {
+   "file": "sprites/creatures/iceback_seal_pup_v_m.png",
+   "fw": 24,
+   "fh": 24,
+   "anchor": [
+    12,
+    12
+   ],
+   "anims": {
+    "idle": {
+     "row": 0,
+     "frames": 4,
+     "fps": 5
+    },
+    "move": {
+     "row": 1,
+     "frames": 4,
+     "fps": 10
+    }
+   },
+   "vis": [
+    1,
+    6,
+    22,
+    19
+   ]
+  },
+  "creature.iceback_seal_pup.baby.v": {
+   "file": "sprites/creatures/iceback_seal_pup_baby_v.png",
+   "fw": 24,
+   "fh": 24,
+   "anchor": [
+    12,
+    12
+   ],
+   "anims": {
+    "idle": {
+     "row": 0,
+     "frames": 4,
+     "fps": 5
+    },
+    "move": {
+     "row": 1,
+     "frames": 4,
+     "fps": 10
+    }
+   },
+   "vis": [
+    5,
+    8,
+    19,
+    17
    ]
   },
   "creature.iceback_seal_pup.baby": {
@@ -4549,6 +8410,87 @@ AQ.manifest = {
     13
    ]
   },
+  "creature.frost_isopod.v": {
+   "file": "sprites/creatures/frost_isopod_v.png",
+   "fw": 16,
+   "fh": 16,
+   "anchor": [
+    8,
+    8
+   ],
+   "anims": {
+    "idle": {
+     "row": 0,
+     "frames": 4,
+     "fps": 5
+    },
+    "move": {
+     "row": 1,
+     "frames": 4,
+     "fps": 10
+    }
+   },
+   "vis": [
+    2,
+    6,
+    14,
+    13
+   ]
+  },
+  "creature.frost_isopod.v.m": {
+   "file": "sprites/creatures/frost_isopod_v_m.png",
+   "fw": 16,
+   "fh": 16,
+   "anchor": [
+    8,
+    8
+   ],
+   "anims": {
+    "idle": {
+     "row": 0,
+     "frames": 4,
+     "fps": 5
+    },
+    "move": {
+     "row": 1,
+     "frames": 4,
+     "fps": 10
+    }
+   },
+   "vis": [
+    2,
+    6,
+    14,
+    13
+   ]
+  },
+  "creature.frost_isopod.baby.v": {
+   "file": "sprites/creatures/frost_isopod_baby_v.png",
+   "fw": 16,
+   "fh": 16,
+   "anchor": [
+    8,
+    8
+   ],
+   "anims": {
+    "idle": {
+     "row": 0,
+     "frames": 4,
+     "fps": 5
+    },
+    "move": {
+     "row": 1,
+     "frames": 4,
+     "fps": 10
+    }
+   },
+   "vis": [
+    3,
+    6,
+    14,
+    12
+   ]
+  },
   "creature.frost_isopod.baby": {
    "file": "sprites/creatures/frost_isopod_baby.png",
    "fw": 16,
@@ -4605,6 +8547,87 @@ AQ.manifest = {
   },
   "creature.iceshell_snail": {
    "file": "sprites/creatures/iceshell_snail.png",
+   "fw": 12,
+   "fh": 12,
+   "anchor": [
+    6,
+    6
+   ],
+   "anims": {
+    "idle": {
+     "row": 0,
+     "frames": 4,
+     "fps": 5
+    },
+    "move": {
+     "row": 1,
+     "frames": 4,
+     "fps": 10
+    }
+   },
+   "vis": [
+    1,
+    3,
+    10,
+    9
+   ]
+  },
+  "creature.iceshell_snail.v": {
+   "file": "sprites/creatures/iceshell_snail_v.png",
+   "fw": 12,
+   "fh": 12,
+   "anchor": [
+    6,
+    6
+   ],
+   "anims": {
+    "idle": {
+     "row": 0,
+     "frames": 4,
+     "fps": 5
+    },
+    "move": {
+     "row": 1,
+     "frames": 4,
+     "fps": 10
+    }
+   },
+   "vis": [
+    1,
+    3,
+    10,
+    9
+   ]
+  },
+  "creature.iceshell_snail.v.m": {
+   "file": "sprites/creatures/iceshell_snail_v_m.png",
+   "fw": 12,
+   "fh": 12,
+   "anchor": [
+    6,
+    6
+   ],
+   "anims": {
+    "idle": {
+     "row": 0,
+     "frames": 4,
+     "fps": 5
+    },
+    "move": {
+     "row": 1,
+     "frames": 4,
+     "fps": 10
+    }
+   },
+   "vis": [
+    1,
+    3,
+    10,
+    9
+   ]
+  },
+  "creature.iceshell_snail.baby.v": {
+   "file": "sprites/creatures/iceshell_snail_baby_v.png",
    "fw": 12,
    "fh": 12,
    "anchor": [
@@ -4711,6 +8734,87 @@ AQ.manifest = {
     19
    ]
   },
+  "creature.cavepetalia.v": {
+   "file": "sprites/creatures/cavepetalia_v.png",
+   "fw": 24,
+   "fh": 24,
+   "anchor": [
+    12,
+    12
+   ],
+   "anims": {
+    "idle": {
+     "row": 0,
+     "frames": 4,
+     "fps": 5
+    },
+    "move": {
+     "row": 1,
+     "frames": 4,
+     "fps": 10
+    }
+   },
+   "vis": [
+    1,
+    7,
+    22,
+    19
+   ]
+  },
+  "creature.cavepetalia.v.m": {
+   "file": "sprites/creatures/cavepetalia_v_m.png",
+   "fw": 24,
+   "fh": 24,
+   "anchor": [
+    12,
+    12
+   ],
+   "anims": {
+    "idle": {
+     "row": 0,
+     "frames": 4,
+     "fps": 5
+    },
+    "move": {
+     "row": 1,
+     "frames": 4,
+     "fps": 10
+    }
+   },
+   "vis": [
+    1,
+    7,
+    22,
+    19
+   ]
+  },
+  "creature.cavepetalia.baby.v": {
+   "file": "sprites/creatures/cavepetalia_baby_v.png",
+   "fw": 24,
+   "fh": 24,
+   "anchor": [
+    12,
+    12
+   ],
+   "anims": {
+    "idle": {
+     "row": 0,
+     "frames": 4,
+     "fps": 5
+    },
+    "move": {
+     "row": 1,
+     "frames": 4,
+     "fps": 10
+    }
+   },
+   "vis": [
+    3,
+    6,
+    17,
+    18
+   ]
+  },
   "creature.cavepetalia.baby": {
    "file": "sprites/creatures/cavepetalia_baby.png",
    "fw": 24,
@@ -4790,6 +8894,87 @@ AQ.manifest = {
     7,
     22,
     16
+   ]
+  },
+  "creature.auroravein_squid.v": {
+   "file": "sprites/creatures/auroravein_squid_v.png",
+   "fw": 24,
+   "fh": 24,
+   "anchor": [
+    12,
+    12
+   ],
+   "anims": {
+    "idle": {
+     "row": 0,
+     "frames": 4,
+     "fps": 5
+    },
+    "move": {
+     "row": 1,
+     "frames": 4,
+     "fps": 10
+    }
+   },
+   "vis": [
+    1,
+    7,
+    22,
+    16
+   ]
+  },
+  "creature.auroravein_squid.v.m": {
+   "file": "sprites/creatures/auroravein_squid_v_m.png",
+   "fw": 24,
+   "fh": 24,
+   "anchor": [
+    12,
+    12
+   ],
+   "anims": {
+    "idle": {
+     "row": 0,
+     "frames": 4,
+     "fps": 5
+    },
+    "move": {
+     "row": 1,
+     "frames": 4,
+     "fps": 10
+    }
+   },
+   "vis": [
+    1,
+    7,
+    22,
+    16
+   ]
+  },
+  "creature.auroravein_squid.baby.v": {
+   "file": "sprites/creatures/auroravein_squid_baby_v.png",
+   "fw": 24,
+   "fh": 24,
+   "anchor": [
+    12,
+    12
+   ],
+   "anims": {
+    "idle": {
+     "row": 0,
+     "frames": 4,
+     "fps": 5
+    },
+    "move": {
+     "row": 1,
+     "frames": 4,
+     "fps": 10
+    }
+   },
+   "vis": [
+    5,
+    9,
+    18,
+    15
    ]
   },
   "creature.auroravein_squid.baby": {
@@ -4873,6 +9058,87 @@ AQ.manifest = {
     12
    ]
   },
+  "creature.moonshell_crab.v": {
+   "file": "sprites/creatures/moonshell_crab_v.png",
+   "fw": 16,
+   "fh": 16,
+   "anchor": [
+    8,
+    8
+   ],
+   "anims": {
+    "idle": {
+     "row": 0,
+     "frames": 4,
+     "fps": 5
+    },
+    "move": {
+     "row": 1,
+     "frames": 4,
+     "fps": 10
+    }
+   },
+   "vis": [
+    2,
+    4,
+    14,
+    12
+   ]
+  },
+  "creature.moonshell_crab.v.m": {
+   "file": "sprites/creatures/moonshell_crab_v_m.png",
+   "fw": 16,
+   "fh": 16,
+   "anchor": [
+    8,
+    8
+   ],
+   "anims": {
+    "idle": {
+     "row": 0,
+     "frames": 4,
+     "fps": 5
+    },
+    "move": {
+     "row": 1,
+     "frames": 4,
+     "fps": 10
+    }
+   },
+   "vis": [
+    2,
+    4,
+    14,
+    12
+   ]
+  },
+  "creature.moonshell_crab.baby.v": {
+   "file": "sprites/creatures/moonshell_crab_baby_v.png",
+   "fw": 16,
+   "fh": 16,
+   "anchor": [
+    8,
+    8
+   ],
+   "anims": {
+    "idle": {
+     "row": 0,
+     "frames": 4,
+     "fps": 5
+    },
+    "move": {
+     "row": 1,
+     "frames": 4,
+     "fps": 10
+    }
+   },
+   "vis": [
+    2,
+    4,
+    13,
+    12
+   ]
+  },
   "creature.moonshell_crab.baby": {
    "file": "sprites/creatures/moonshell_crab_baby.png",
    "fw": 16,
@@ -4952,6 +9218,87 @@ AQ.manifest = {
     2,
     21,
     21
+   ]
+  },
+  "creature.ribbonmane.v": {
+   "file": "sprites/creatures/ribbonmane_v.png",
+   "fw": 24,
+   "fh": 24,
+   "anchor": [
+    12,
+    12
+   ],
+   "anims": {
+    "idle": {
+     "row": 0,
+     "frames": 4,
+     "fps": 5
+    },
+    "move": {
+     "row": 1,
+     "frames": 4,
+     "fps": 10
+    }
+   },
+   "vis": [
+    3,
+    2,
+    21,
+    21
+   ]
+  },
+  "creature.ribbonmane.v.m": {
+   "file": "sprites/creatures/ribbonmane_v_m.png",
+   "fw": 24,
+   "fh": 24,
+   "anchor": [
+    12,
+    12
+   ],
+   "anims": {
+    "idle": {
+     "row": 0,
+     "frames": 4,
+     "fps": 5
+    },
+    "move": {
+     "row": 1,
+     "frames": 4,
+     "fps": 10
+    }
+   },
+   "vis": [
+    3,
+    2,
+    21,
+    21
+   ]
+  },
+  "creature.ribbonmane.baby.v": {
+   "file": "sprites/creatures/ribbonmane_baby_v.png",
+   "fw": 24,
+   "fh": 24,
+   "anchor": [
+    12,
+    12
+   ],
+   "anims": {
+    "idle": {
+     "row": 0,
+     "frames": 4,
+     "fps": 5
+    },
+    "move": {
+     "row": 1,
+     "frames": 4,
+     "fps": 10
+    }
+   },
+   "vis": [
+    6,
+    6,
+    18,
+    17
    ]
   },
   "creature.ribbonmane.baby": {
@@ -5079,6 +9426,87 @@ AQ.manifest = {
     14
    ]
   },
+  "creature.skyleap_flyfish.v": {
+   "file": "sprites/creatures/skyleap_flyfish_v.png",
+   "fw": 16,
+   "fh": 16,
+   "anchor": [
+    8,
+    8
+   ],
+   "anims": {
+    "idle": {
+     "row": 0,
+     "frames": 4,
+     "fps": 5
+    },
+    "move": {
+     "row": 1,
+     "frames": 4,
+     "fps": 10
+    }
+   },
+   "vis": [
+    1,
+    1,
+    14,
+    14
+   ]
+  },
+  "creature.skyleap_flyfish.v.m": {
+   "file": "sprites/creatures/skyleap_flyfish_v_m.png",
+   "fw": 16,
+   "fh": 16,
+   "anchor": [
+    8,
+    8
+   ],
+   "anims": {
+    "idle": {
+     "row": 0,
+     "frames": 4,
+     "fps": 5
+    },
+    "move": {
+     "row": 1,
+     "frames": 4,
+     "fps": 10
+    }
+   },
+   "vis": [
+    1,
+    1,
+    14,
+    14
+   ]
+  },
+  "creature.skyleap_flyfish.baby.v": {
+   "file": "sprites/creatures/skyleap_flyfish_baby_v.png",
+   "fw": 16,
+   "fh": 16,
+   "anchor": [
+    8,
+    8
+   ],
+   "anims": {
+    "idle": {
+     "row": 0,
+     "frames": 4,
+     "fps": 5
+    },
+    "move": {
+     "row": 1,
+     "frames": 4,
+     "fps": 10
+    }
+   },
+   "vis": [
+    2,
+    4,
+    11,
+    11
+   ]
+  },
   "creature.skyleap_flyfish.baby": {
    "file": "sprites/creatures/skyleap_flyfish_baby.png",
    "fw": 16,
@@ -5158,6 +9586,87 @@ AQ.manifest = {
     1,
     43,
     22
+   ]
+  },
+  "creature.sail_turtle.v": {
+   "file": "sprites/creatures/sail_turtle_v.png",
+   "fw": 48,
+   "fh": 24,
+   "anchor": [
+    24,
+    12
+   ],
+   "anims": {
+    "idle": {
+     "row": 0,
+     "frames": 4,
+     "fps": 5
+    },
+    "move": {
+     "row": 1,
+     "frames": 4,
+     "fps": 10
+    }
+   },
+   "vis": [
+    8,
+    1,
+    43,
+    22
+   ]
+  },
+  "creature.sail_turtle.v.m": {
+   "file": "sprites/creatures/sail_turtle_v_m.png",
+   "fw": 48,
+   "fh": 24,
+   "anchor": [
+    24,
+    12
+   ],
+   "anims": {
+    "idle": {
+     "row": 0,
+     "frames": 4,
+     "fps": 5
+    },
+    "move": {
+     "row": 1,
+     "frames": 4,
+     "fps": 10
+    }
+   },
+   "vis": [
+    8,
+    1,
+    43,
+    22
+   ]
+  },
+  "creature.sail_turtle.baby.v": {
+   "file": "sprites/creatures/sail_turtle_baby_v.png",
+   "fw": 48,
+   "fh": 24,
+   "anchor": [
+    24,
+    12
+   ],
+   "anims": {
+    "idle": {
+     "row": 0,
+     "frames": 4,
+     "fps": 5
+    },
+    "move": {
+     "row": 1,
+     "frames": 4,
+     "fps": 10
+    }
+   },
+   "vis": [
+    9,
+    4,
+    40,
+    20
    ]
   },
   "creature.sail_turtle.baby": {
@@ -5241,6 +9750,87 @@ AQ.manifest = {
     14
    ]
   },
+  "creature.pressure_tortoise.v": {
+   "file": "sprites/creatures/pressure_tortoise_v.png",
+   "fw": 32,
+   "fh": 16,
+   "anchor": [
+    16,
+    8
+   ],
+   "anims": {
+    "idle": {
+     "row": 0,
+     "frames": 4,
+     "fps": 5
+    },
+    "move": {
+     "row": 1,
+     "frames": 4,
+     "fps": 10
+    }
+   },
+   "vis": [
+    4,
+    4,
+    29,
+    14
+   ]
+  },
+  "creature.pressure_tortoise.v.m": {
+   "file": "sprites/creatures/pressure_tortoise_v_m.png",
+   "fw": 32,
+   "fh": 16,
+   "anchor": [
+    16,
+    8
+   ],
+   "anims": {
+    "idle": {
+     "row": 0,
+     "frames": 4,
+     "fps": 5
+    },
+    "move": {
+     "row": 1,
+     "frames": 4,
+     "fps": 10
+    }
+   },
+   "vis": [
+    4,
+    4,
+    29,
+    14
+   ]
+  },
+  "creature.pressure_tortoise.baby.v": {
+   "file": "sprites/creatures/pressure_tortoise_baby_v.png",
+   "fw": 32,
+   "fh": 16,
+   "anchor": [
+    16,
+    8
+   ],
+   "anims": {
+    "idle": {
+     "row": 0,
+     "frames": 4,
+     "fps": 5
+    },
+    "move": {
+     "row": 1,
+     "frames": 4,
+     "fps": 10
+    }
+   },
+   "vis": [
+    6,
+    6,
+    26,
+    12
+   ]
+  },
   "creature.pressure_tortoise.baby": {
    "file": "sprites/creatures/pressure_tortoise_baby.png",
    "fw": 32,
@@ -5319,6 +9909,87 @@ AQ.manifest = {
     2,
     3,
     14,
+    12
+   ]
+  },
+  "creature.bellcrab.v": {
+   "file": "sprites/creatures/bellcrab_v.png",
+   "fw": 16,
+   "fh": 16,
+   "anchor": [
+    8,
+    8
+   ],
+   "anims": {
+    "idle": {
+     "row": 0,
+     "frames": 4,
+     "fps": 5
+    },
+    "move": {
+     "row": 1,
+     "frames": 4,
+     "fps": 10
+    }
+   },
+   "vis": [
+    2,
+    3,
+    14,
+    12
+   ]
+  },
+  "creature.bellcrab.v.m": {
+   "file": "sprites/creatures/bellcrab_v_m.png",
+   "fw": 16,
+   "fh": 16,
+   "anchor": [
+    8,
+    8
+   ],
+   "anims": {
+    "idle": {
+     "row": 0,
+     "frames": 4,
+     "fps": 5
+    },
+    "move": {
+     "row": 1,
+     "frames": 4,
+     "fps": 10
+    }
+   },
+   "vis": [
+    2,
+    3,
+    14,
+    12
+   ]
+  },
+  "creature.bellcrab.baby.v": {
+   "file": "sprites/creatures/bellcrab_baby_v.png",
+   "fw": 16,
+   "fh": 16,
+   "anchor": [
+    8,
+    8
+   ],
+   "anims": {
+    "idle": {
+     "row": 0,
+     "frames": 4,
+     "fps": 5
+    },
+    "move": {
+     "row": 1,
+     "frames": 4,
+     "fps": 10
+    }
+   },
+   "vis": [
+    2,
+    3,
+    13,
     12
    ]
   },
@@ -5401,6 +10072,87 @@ AQ.manifest = {
     3,
     14,
     13
+   ]
+  },
+  "creature.firefly_frog.v": {
+   "file": "sprites/creatures/firefly_frog_v.png",
+   "fw": 16,
+   "fh": 16,
+   "anchor": [
+    8,
+    8
+   ],
+   "anims": {
+    "idle": {
+     "row": 0,
+     "frames": 4,
+     "fps": 5
+    },
+    "move": {
+     "row": 1,
+     "frames": 4,
+     "fps": 10
+    }
+   },
+   "vis": [
+    1,
+    3,
+    14,
+    13
+   ]
+  },
+  "creature.firefly_frog.v.m": {
+   "file": "sprites/creatures/firefly_frog_v_m.png",
+   "fw": 16,
+   "fh": 16,
+   "anchor": [
+    8,
+    8
+   ],
+   "anims": {
+    "idle": {
+     "row": 0,
+     "frames": 4,
+     "fps": 5
+    },
+    "move": {
+     "row": 1,
+     "frames": 4,
+     "fps": 10
+    }
+   },
+   "vis": [
+    1,
+    3,
+    14,
+    13
+   ]
+  },
+  "creature.firefly_frog.baby.v": {
+   "file": "sprites/creatures/firefly_frog_baby_v.png",
+   "fw": 16,
+   "fh": 16,
+   "anchor": [
+    8,
+    8
+   ],
+   "anims": {
+    "idle": {
+     "row": 0,
+     "frames": 4,
+     "fps": 5
+    },
+    "move": {
+     "row": 1,
+     "frames": 4,
+     "fps": 10
+    }
+   },
+   "vis": [
+    1,
+    3,
+    13,
+    12
    ]
   },
   "creature.firefly_frog.baby": {

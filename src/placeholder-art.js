@@ -1296,6 +1296,24 @@
     put(cx - 1, top + 1, crest); put(cx, top + 1, crest); put(cx + 1, top + 1, crest); put(cx, top, tip); put(cx, top + 2, crest);
   }
 
+  // Rare colour variants (bred babies only): every colour rotated around the colour wheel by `deg`.
+  function hueShift(p, deg) {
+    const d = p.d, k = deg / 360;
+    for (let i = 0; i < d.length; i += 4) {
+      if (!d[i + 3]) continue;
+      let r = d[i] / 255, g = d[i + 1] / 255, b = d[i + 2] / 255;
+      const mx = Math.max(r, g, b), mn = Math.min(r, g, b), l = (mx + mn) / 2;
+      if (mx - mn < 0.04) continue;                                 // greys / outlines stay
+      const dd = mx - mn, s = l > 0.5 ? dd / (2 - mx - mn) : dd / (mx + mn);
+      let h = mx === r ? (g - b) / dd + (g < b ? 6 : 0) : mx === g ? (b - r) / dd + 2 : (r - g) / dd + 4;
+      h = (h / 6 + k) % 1;
+      const q = l < 0.5 ? l * (1 + s) : l + s - l * s, pp = 2 * l - q;
+      const f = (t) => { t = (t + 1) % 1; return t < 1 / 6 ? pp + (q - pp) * 6 * t : t < 0.5 ? q : t < 2 / 3 ? pp + (q - pp) * (2 / 3 - t) * 6 : pp; };
+      d[i] = f(h + 1 / 3) * 255; d[i + 1] = f(h) * 255; d[i + 2] = f(h - 1 / 3) * 255;
+    }
+  }
+  PH.hueShift = hueShift;
+
   // Juveniles: a lighter, softer version of the adult colours.
   function lighten(p, k) {
     const d = p.d;
@@ -1332,6 +1350,7 @@
           fn(p, opts);
           if (art.male) maleMark(p);
           if (art.baby) lighten(p, 0.3);
+          if (art.hue) hueShift(p, art.hue);
           // offset of the frame's origin inside this padded buffer (drawing area centred / bottom-aligned)
           const fx0 = M - Math.floor((fw - vw) / 2), fy0 = M - (bottomAnchored ? fh - vh : Math.floor((fh - vh) / 2));
           for (let y = 0; y < p.bh; y++) for (let x = 0; x < p.bw; x++) if (p.d[(y * p.bw + x) * 4 + 3]) {

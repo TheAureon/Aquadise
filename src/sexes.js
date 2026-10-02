@@ -24,9 +24,16 @@ AQ.Sex = (function () {
   S.random = (def) => (S.has(def) ? (Math.random() < 0.5 ? 'm' : 'f') : null);
 
   // sprite for this creature: males use the `creature.<id>.m` sheet when it exists
-  S.spriteKey = function (def, sex) {
-    const base = def.spriteKey || ('creature.' + def.id);
+  // rare colour variants (bred babies) use `creature.<id>.v` (and `.v.m` for males)
+  S.spriteKey = function (def, sex, variant) {
+    let base = def.spriteKey || ('creature.' + def.id);
+    if (variant && AQ.Assets.has(base + '.v')) base += '.v';
     return sex === 'm' && AQ.Assets.has(base + '.m') ? base + '.m' : base;
+  };
+  S.babyKey = function (def, variant) {
+    const base = (def.spriteKey || ('creature.' + def.id)) + '.baby';
+    if (variant && AQ.Assets.has(base + '.v')) return base + '.v';
+    return AQ.Assets.has(base) ? base : null;
   };
 
   // collection-log status for a species

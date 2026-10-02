@@ -74,6 +74,15 @@ for (const c of AQ.data.creatures || []) {
   const folder = c.is_plant ? 'plants' : 'creatures';
   add(`${kind}.${c.id}`, `sprites/${folder}/${c.id}.png`, kind, c.sprite_size, Object.assign({ shape: c.art.shape, color: c.color, accent: c.accent }, c.art));
   // male variant (the base sheet doubles as the female): same art + a small crest
+  // rare colour variant (only bred babies can be one): hue-shifted copies of the adult, male and baby sheets
+  if (!c.is_plant) {
+    let h = 0; for (const ch of c.id) h = (h * 31 + ch.charCodeAt(0)) % 997;
+    const hue = 100 + (h % 160);                                   // 100..260 degrees: clearly different
+    const base = Object.assign({ shape: c.art.shape, color: c.color, accent: c.accent }, c.art, { hue });
+    add(`${kind}.${c.id}.v`, `sprites/${folder}/${c.id}_v.png`, kind, c.sprite_size, base);
+    if (c.sexes !== 'none') add(`${kind}.${c.id}.v.m`, `sprites/${folder}/${c.id}_v_m.png`, kind, c.sprite_size, Object.assign({}, base, { male: true }));
+    add(`${kind}.${c.id}.baby.v`, `sprites/${folder}/${c.id}_baby_v.png`, kind, c.sprite_size, Object.assign({}, base, { baby: true }));
+  }
   // night-blooming plants also get a closed-bud sheet for the daytime
   if (c.is_plant && c.bloom) add(`${kind}.${c.id}.closed`, `sprites/${folder}/${c.id}_closed.png`, kind, c.sprite_size, Object.assign({ shape: c.art.shape, color: c.color, accent: c.accent, closed: true }, c.art));
   // juvenile (born in the tanks): the same art drawn ~60% size and lighter, same frame + anchor

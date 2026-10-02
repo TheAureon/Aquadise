@@ -96,6 +96,8 @@ Click a creature for its info card. Hover the stars for what's helping and what'
   areas look the same as before. The HUD shows a sun, sunrise or moon. Creatures with
   `active: 'night'` only come out at night and fade away at dawn. Testing: set
   `debug.timeSkip: true` and press **N** in the sea to jump ahead `clock.skipHours`.
+- **Rare colour variants.** A baby born in a tank has a small chance (`breeding.variantChance`, 4%) to
+  be a rare colour variant (✦). Only bred babies, never wild ones. The log has a ✦ slot per species.
 - **Aquarium.** One tank per biome, and a creature can only live in its own biome's tank.
   Nothing ever dies and nothing is punished:
   - **Tank vibe (0-5 stars):** decor variety and amount, biome-themed pieces, plants, being fed

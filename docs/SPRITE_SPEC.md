@@ -79,12 +79,28 @@ Every animal also has a juvenile sheet, `creatures/<id>_baby.png` (key `creature
 size and lighter, centred in the frame. Babies use it until they grow up, then switch to the adult
 (♂ or ♀) sheet. If it's missing, the adult sheet is used.
 
+## Rare colour variants (bred babies only)
+
+A baby born in a tank has a small chance (`AQ.TUNING.breeding.variantChance`) of being a rare colour
+variant of its species; wild creatures never are. Each animal has three variant sheets, all with the
+same size, rows and anchor as the normal ones:
+
+- `creatures/<id>_v.png` (key `creature.<id>.v`): the variant adult (female / default)
+- `creatures/<id>_v_m.png` (key `creature.<id>.v.m`): the variant male
+- `creatures/<id>_baby_v.png` (key `creature.<id>.baby.v`): the variant juvenile
+
+The placeholders are the normal sheets with every colour rotated around the colour wheel (a fixed
+amount per species, 100–260°). Real art can paint any variant it likes, such as albino, golden or
+dusk-coloured. Draw it on the same frames, and the game picks it up automatically. A missing variant
+sheet falls back to the normal one.
+
 ## File naming
 
 ```
 assets/sprites/creatures/<creature_id>.png    e.g. creatures/drift_snail.png   (female / default)
 assets/sprites/creatures/<creature_id>_m.png  e.g. creatures/drift_snail_m.png (male)
 assets/sprites/creatures/<creature_id>_baby.png  e.g. creatures/drift_snail_baby.png (juvenile)
+assets/sprites/creatures/<creature_id>_v.png / _v_m.png / _baby_v.png   (rare colour variant: adult, male, juvenile)
 assets/sprites/plants/<plant_id>.png          e.g. plants/bell_kelp.png
 assets/sprites/decor/<decoration_id>.png      e.g. decor/castle.png
 assets/sprites/misc/player.png | chest.png | bait.png

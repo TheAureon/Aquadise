@@ -75,9 +75,11 @@ AQ.Breeding = (function () {
     const d = defOf(id), e = { uid: AQ.U.uid(), id, bornAt: now };
     const sex = AQ.Sex.random(d);
     if (sex) e.sex = sex;
+    const rare = Math.random() < cfg().variantChance;           // a rare colour variant (only ever bred)
+    if (rare) { e.variant = true; AQ.Sex.logOf(id).variant = true; }
     tank.creatures.push(e);
     AQ.Sex.logOf(id).bred = true;
-    announce(`A baby ${d.name} was born in the ${tankName(tankId)} tank!`, tankId);
+    announce(rare ? `A rare-coloured baby ${d.name} was born in the ${tankName(tankId)} tank!` : `A baby ${d.name} was born in the ${tankName(tankId)} tank!`, tankId);
     return e;
   }
 
