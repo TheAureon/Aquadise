@@ -28,8 +28,8 @@ AQ.data.world = {
     [2800, 804, 2], [2850, 772, 2], [2905, 806, 2], [2985, 806, 3], [3030, 768, 2], [3080, 806, 2],
     [3165, 806, 3], [3210, 776, 2], [3255, 806, 2], [3290, 806, 2],
     // Deep trench (steep walls)
-    [3320, 830, 4], [3335, 900, 6], [3350, 1000, 6], [3370, 1120, 6], [3400, 1200, 5], [3500, 1222, 4], [3650, 1218, 4],
-    [3800, 1224, 4], [3850, 1200, 5], [3880, 1100, 6], [3900, 980, 6], [3920, 840, 6], [3940, 700, 6], [3955, 560, 5], [3968, 440, 4],
+    [3320, 830, 4], [3335, 900, 6], [3350, 1000, 6], [3370, 1120, 6], [3410, 1196, 4], [3470, 1240, 3], [3540, 1268, 3], [3600, 1284, 2], [3654, 1290, 2],
+    [3710, 1284, 2], [3770, 1266, 3], [3830, 1232, 3], [3862, 1186, 4], [3880, 1100, 6], [3900, 980, 6], [3920, 840, 6], [3940, 700, 6], [3955, 560, 5], [3968, 440, 4],
     // Kelp forest + mangrove roots on the shallower seabed
     [3990, 388, 3], [4200, 384, 4], [4450, 390, 4], [4700, 384, 4], [4880, 388, 4],
     // Mangrove: a shallow, muddy flat (real mangroves grow in shallow water)
@@ -68,15 +68,10 @@ AQ.data.world = {
     { id: 'trench', name: 'Deep Trench', short: 'Trench', rect: [3320, 640, 660, 800],
       palette: { top: ['#2c3448', '#252c3d', '#1e2433'], rock: ['#1b2130', '#161b27', '#11151f'], accent: '#3c6b7a', style: 'strata' }, water: '#050c1c', waterMix: 0.4, dark: 0.74,
       props: [
-        { type: 'spire', at: 'floor', n: 10, y: [1150, 1214] },
-        { type: 'bones', at: 'floor', n: 3, y: [1150, 1214] },
-        { type: 'rock', at: 'floor', n: 14, y: [0, 1214] },
-        { type: 'tubeworms', at: 'floor', n: 6, y: [1150, 1214] },
-        // the deep bowl sunk into the trench floor has its own little garden of the same things
-        { type: 'spire', at: 'floor', n: 5, area: [3540, 3770], y: [1225, 1420] },
-        { type: 'tubeworms', at: 'floor', n: 7, area: [3540, 3770], y: [1225, 1420] },
-        { type: 'rock', at: 'floor', n: 8, area: [3540, 3770], y: [1225, 1420] },
-        { type: 'bones', at: 'floor', n: 2, area: [3540, 3770], y: [1300, 1420] }
+        { type: 'spire', at: 'floor', n: 10, y: [1150, 1300] },
+        { type: 'bones', at: 'floor', n: 3, y: [1150, 1300] },
+        { type: 'rock', at: 'floor', n: 14, y: [0, 1300] },
+        { type: 'tubeworms', at: 'floor', n: 10, y: [1150, 1300] }
       ] },
     { id: 'vents', name: 'Volcanic Vents', short: 'Vents', rect: [2560, 600, 760, 840],
       palette: { top: ['#4a3f44', '#3d3338', '#33292e'], rock: ['#2f282c', '#272124', '#1f1a1d'], accent: '#ff8a3a', style: 'strata', embers: true }, water: '#3a2230', waterMix: 0.25, dark: 0.55,
@@ -186,10 +181,6 @@ AQ.data.world = {
     { op: 'carve', shape: 'rect', x: 2136, y: 213, w: 16, h: 18 },
     { op: 'carve', shape: 'rect', x: 2094, y: 228, w: 18, h: 14 },
     { op: 'solid', shape: 'circle', mat: 'metal', x: 2372, y: 266, r: 10, jitter: 1, back: true },
-
-    // --- Deep places past the gentle depth limits (see AQ.TUNING.upgrades.depthLimitY):
-    // The trench's deepest place (DEPTH 3): one wide, smooth bowl sunk into the trench floor.
-    { op: 'carve', shape: 'poly', jitter: 0.5, pts: [[3530,1196], [3536,1212], [3537,1243], [3540,1270], [3545,1295], [3552,1317], [3560,1337], [3571,1355], [3582,1371], [3595,1384], [3609,1395], [3623,1402], [3639,1406], [3654,1408], [3669,1406], [3685,1402], [3699,1395], [3713,1384], [3726,1371], [3737,1355], [3748,1337], [3756,1317], [3763,1295], [3768,1270], [3771,1243], [3772,1212], [3778,1196]] },
 
     // --- Volcanic vents: smoking craters on top of the mounds (y is found automatically)
     { shape: 'vent', x: 2850 }, { shape: 'vent', x: 3030 }, { shape: 'vent', x: 3210 },

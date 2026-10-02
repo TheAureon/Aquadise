@@ -50,9 +50,9 @@ AQ.TUNING = {
     lanternRadius: [0, 16, 32, 50],   // extra light radius (px) around you in dark places, per lantern level
     depthMax: 3,
     // Below this world y the water gets heavy, per depth level 0..3 (null = no limit). The sea surface
-    // is y 96. Level 0 (1250) reaches everything from before this update (the trench floor is ~1224);
-    // level 3 opens the trench's deepest bowl (~1220-1405).
-    depthLimitY: [1250, 1275, 1350, null],
+    // is y 96. The trench floor is a rounded U (rim ~1200, lowest ~1290): each level lets you sink a
+    // little further into it, and level 3 reaches the very bottom (the Pressure Tortoise).
+    depthLimitY: [1240, 1256, 1272, null],
     heavySlow: 0.55,          // swim speed multiplier while in heavy water
     heavyPush: 140,           // gentle upward nudge (px/s^2), growing a little the deeper past the limit you are
     heavyHaze: 0.35           // how much the screen softens (0..1)
