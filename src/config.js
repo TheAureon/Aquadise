@@ -208,7 +208,7 @@ AQ.TUNING = {
     lookahead: 0.3,           // seconds of music notes scheduled ahead (keeps timing steady, cheap)
     creatureVoiceEvery: 9,    // average seconds between little creature sounds (higher = rarer)
     creatureVoiceRange: 120,  // only creatures this close (px) make sounds
-    stepEvery: 9,             // px walked between footsteps
+    stepEvery: 20,            // px walked between footsteps (about two steps a second at walking speed)
     muteKey: 'KeyO'           // quick mute / unmute, anywhere
   },
 

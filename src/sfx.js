@@ -97,7 +97,7 @@ var AQ = (typeof AQ !== 'undefined') ? AQ : {};
   reg('step_grass', 'moving', 'STEP GRASS', (c, o, t) => {
     H.noise(c, o, t, { ft: 'highpass', f: rnd(2800, 3600), a: 0.006, d: 0.05, v: 0.12 });
     return H.noise(c, o, t + 0.01, { f: 900, q: 1, a: 0.004, d: 0.04, v: 0.1 });
-  }, { minGap: 0.08 });
+  }, { minGap: 0.25 });
   reg('step_metal', 'moving', 'STEP METAL', (c, o, t) => {
     const f = rnd(480, 560);
     H.tone(c, o, t, { f, d: 0.1, v: 0.07, type: 'triangle', lp: 1800 });

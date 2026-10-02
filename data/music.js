@@ -68,7 +68,7 @@ AQ.data.creatureVoices = {
 AQ.data.audioFiles = {
   // footsteps on the sand (tide pool shore) and on the hill's grass: single steps cut from recordings
   step_sand: { files: [1, 2, 3, 4, 5, 6].map((i) => `assets/audio/sand-step-${i}.mp3`), vol: 0.13, vary: 0.06 },
-  step_grass: { files: [1, 2, 3, 4, 5, 6].map((i) => `assets/audio/grass-step-${i}.mp3`), vol: 0.13, vary: 0.06 },
+  step_grass: { files: [1, 2, 3, 4, 5, 6, 7, 8].map((i) => `assets/audio/grass-step-${i}.mp3`), vol: 0.3, vary: 0.03 },
   // going into and climbing out of the water (two different moments of the same recording)
   splash_in: { files: ['assets/audio/water-in.mp3'], vol: 0.4, vary: 0.04 },
   splash_out: { files: ['assets/audio/water-out.mp3'], vol: 0.4, vary: 0.04 }

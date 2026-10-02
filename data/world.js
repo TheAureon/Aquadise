@@ -184,11 +184,17 @@ AQ.data.world = {
 
     // --- Deep places past the gentle depth limits (see AQ.TUNING.upgrades.depthLimitY):
     // the open ocean's Blue Hole (a winding shaft below the drop-off that opens into a round bowl, DEPTH 2) ...
-    { op: 'carve', shape: 'tunnel', r: 16, jitter: 0.35, path: [[2492, 380, 20], [2480, 560, 14], [2500, 760, 17], [2484, 960, 13], [2498, 1140, 16], [2490, 1250, 22]] },
-    { op: 'carve', shape: 'tunnel', r: 26, jitter: 0.3, path: [[2448, 1302, 16], [2470, 1300, 26], [2494, 1296, 32], [2520, 1300, 26], [2540, 1304, 16]] },
+    // A broad funnel: wide where it opens in the drop-off, narrowing as it winds down, then
+    // widening again into a round bowl at the bottom.
+    { op: 'carve', shape: 'tunnel', r: 40, jitter: 0.2, path: [[2470, 330, 62], [2492, 480, 46], [2522, 640, 36], [2536, 800, 32], [2516, 960, 36], [2486, 1120, 34], [2496, 1250, 42]] },
+    { op: 'carve', shape: 'tunnel', r: 20, jitter: 0.3, path: [[2540, 700, 16], [2552, 728, 22], [2546, 756, 14]] },     // little side pockets
+    { op: 'carve', shape: 'tunnel', r: 20, jitter: 0.3, path: [[2490, 1020, 14], [2462, 1046, 22], [2470, 1074, 14]] },
+    { op: 'carve', shape: 'tunnel', r: 40, jitter: 0.15, path: [[2436, 1300, 24], [2462, 1298, 38], [2492, 1294, 44], [2522, 1298, 38], [2548, 1300, 24]] },
     // ... and the trench's deepest slot (DEPTH 3): a funnel in the trench floor down into a bowl
-    { op: 'carve', shape: 'tunnel', r: 15, jitter: 0.3, path: [[3652, 1206, 28], [3648, 1250, 17], [3652, 1310, 14], [3654, 1356, 20]] },
-    { op: 'carve', shape: 'tunnel', r: 20, jitter: 0.3, path: [[3606, 1386, 13], [3628, 1386, 20], [3654, 1384, 25], [3680, 1386, 20], [3702, 1388, 13]] },
+    // A wide, smooth bowl sunk into the trench floor: broad at the top, sloping down on both sides.
+    { op: 'carve', shape: 'tunnel', r: 30, jitter: 0.15, path: [[3540, 1222, 24], [3600, 1240, 34], [3654, 1250, 40], [3708, 1240, 34], [3770, 1222, 24]] },
+    { op: 'carve', shape: 'tunnel', r: 34, jitter: 0.15, path: [[3584, 1300, 26], [3620, 1318, 36], [3654, 1324, 40], [3690, 1318, 36], [3724, 1300, 26]] },
+    { op: 'carve', shape: 'tunnel', r: 28, jitter: 0.15, path: [[3618, 1372, 18], [3640, 1382, 26], [3654, 1384, 28], [3668, 1382, 26], [3690, 1372, 18]] },
 
     // --- Volcanic vents: smoking craters on top of the mounds (y is found automatically)
     { shape: 'vent', x: 2850 }, { shape: 'vent', x: 3030 }, { shape: 'vent', x: 3210 },
