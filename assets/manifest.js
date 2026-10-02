@@ -490,8 +490,62 @@ AQ.manifest = {
     9
    ]
   },
+  "creature.drift_snail.m": {
+   "file": "sprites/creatures/drift_snail_m.png",
+   "fw": 12,
+   "fh": 12,
+   "anchor": [
+    6,
+    6
+   ],
+   "anims": {
+    "idle": {
+     "row": 0,
+     "frames": 4,
+     "fps": 5
+    },
+    "move": {
+     "row": 1,
+     "frames": 4,
+     "fps": 10
+    }
+   },
+   "vis": [
+    1,
+    3,
+    10,
+    9
+   ]
+  },
   "creature.knuckle_crab": {
    "file": "sprites/creatures/knuckle_crab.png",
+   "fw": 16,
+   "fh": 16,
+   "anchor": [
+    8,
+    8
+   ],
+   "anims": {
+    "idle": {
+     "row": 0,
+     "frames": 4,
+     "fps": 5
+    },
+    "move": {
+     "row": 1,
+     "frames": 4,
+     "fps": 10
+    }
+   },
+   "vis": [
+    2,
+    4,
+    14,
+    12
+   ]
+  },
+  "creature.knuckle_crab.m": {
+   "file": "sprites/creatures/knuckle_crab_m.png",
    "fw": 16,
    "fh": 16,
    "anchor": [
@@ -544,8 +598,62 @@ AQ.manifest = {
     10
    ]
   },
+  "creature.glasswinged_minnow.m": {
+   "file": "sprites/creatures/glasswinged_minnow_m.png",
+   "fw": 12,
+   "fh": 12,
+   "anchor": [
+    6,
+    6
+   ],
+   "anims": {
+    "idle": {
+     "row": 0,
+     "frames": 4,
+     "fps": 5
+    },
+    "move": {
+     "row": 1,
+     "frames": 4,
+     "fps": 10
+    }
+   },
+   "vis": [
+    1,
+    1,
+    10,
+    10
+   ]
+  },
   "creature.puddlejack": {
    "file": "sprites/creatures/puddlejack.png",
+   "fw": 16,
+   "fh": 16,
+   "anchor": [
+    8,
+    8
+   ],
+   "anims": {
+    "idle": {
+     "row": 0,
+     "frames": 4,
+     "fps": 5
+    },
+    "move": {
+     "row": 1,
+     "frames": 4,
+     "fps": 10
+    }
+   },
+   "vis": [
+    1,
+    3,
+    14,
+    13
+   ]
+  },
+  "creature.puddlejack.m": {
+   "file": "sprites/creatures/puddlejack_m.png",
    "fw": 16,
    "fh": 16,
    "anchor": [
@@ -598,8 +706,62 @@ AQ.manifest = {
     13
    ]
   },
+  "creature.bladefin_perch.m": {
+   "file": "sprites/creatures/bladefin_perch_m.png",
+   "fw": 16,
+   "fh": 16,
+   "anchor": [
+    8,
+    8
+   ],
+   "anims": {
+    "idle": {
+     "row": 0,
+     "frames": 4,
+     "fps": 5
+    },
+    "move": {
+     "row": 1,
+     "frames": 4,
+     "fps": 10
+    }
+   },
+   "vis": [
+    2,
+    2,
+    14,
+    13
+   ]
+  },
   "creature.kelp_otter": {
    "file": "sprites/creatures/kelp_otter.png",
+   "fw": 24,
+   "fh": 24,
+   "anchor": [
+    12,
+    12
+   ],
+   "anims": {
+    "idle": {
+     "row": 0,
+     "frames": 4,
+     "fps": 5
+    },
+    "move": {
+     "row": 1,
+     "frames": 4,
+     "fps": 10
+    }
+   },
+   "vis": [
+    1,
+    7,
+    22,
+    18
+   ]
+  },
+  "creature.kelp_otter.m": {
+   "file": "sprites/creatures/kelp_otter_m.png",
    "fw": 24,
    "fh": 24,
    "anchor": [
@@ -652,6 +814,33 @@ AQ.manifest = {
     11
    ]
   },
+  "creature.frond_squid.m": {
+   "file": "sprites/creatures/frond_squid_m.png",
+   "fw": 16,
+   "fh": 16,
+   "anchor": [
+    8,
+    8
+   ],
+   "anims": {
+    "idle": {
+     "row": 0,
+     "frames": 4,
+     "fps": 5
+    },
+    "move": {
+     "row": 1,
+     "frames": 4,
+     "fps": 10
+    }
+   },
+   "vis": [
+    1,
+    5,
+    14,
+    11
+   ]
+  },
   "creature.coilback_newt": {
    "file": "sprites/creatures/coilback_newt.png",
    "fw": 16,
@@ -679,8 +868,62 @@ AQ.manifest = {
     12
    ]
   },
+  "creature.coilback_newt.m": {
+   "file": "sprites/creatures/coilback_newt_m.png",
+   "fw": 16,
+   "fh": 16,
+   "anchor": [
+    8,
+    8
+   ],
+   "anims": {
+    "idle": {
+     "row": 0,
+     "frames": 4,
+     "fps": 5
+    },
+    "move": {
+     "row": 1,
+     "frames": 4,
+     "fps": 10
+    }
+   },
+   "vis": [
+    1,
+    5,
+    14,
+    12
+   ]
+  },
   "creature.sandveil_skink": {
    "file": "sprites/creatures/sandveil_skink.png",
+   "fw": 16,
+   "fh": 16,
+   "anchor": [
+    8,
+    8
+   ],
+   "anims": {
+    "idle": {
+     "row": 0,
+     "frames": 4,
+     "fps": 5
+    },
+    "move": {
+     "row": 1,
+     "frames": 4,
+     "fps": 10
+    }
+   },
+   "vis": [
+    1,
+    5,
+    14,
+    12
+   ]
+  },
+  "creature.sandveil_skink.m": {
+   "file": "sprites/creatures/sandveil_skink_m.png",
    "fw": 16,
    "fh": 16,
    "anchor": [
@@ -755,8 +998,62 @@ AQ.manifest = {
     14
    ]
   },
+  "creature.fanray_damsel.m": {
+   "file": "sprites/creatures/fanray_damsel_m.png",
+   "fw": 16,
+   "fh": 16,
+   "anchor": [
+    8,
+    8
+   ],
+   "anims": {
+    "idle": {
+     "row": 0,
+     "frames": 4,
+     "fps": 5
+    },
+    "move": {
+     "row": 1,
+     "frames": 4,
+     "fps": 10
+    }
+   },
+   "vis": [
+    2,
+    1,
+    13,
+    14
+   ]
+  },
   "creature.coral_whelk": {
    "file": "sprites/creatures/coral_whelk.png",
+   "fw": 12,
+   "fh": 12,
+   "anchor": [
+    6,
+    6
+   ],
+   "anims": {
+    "idle": {
+     "row": 0,
+     "frames": 4,
+     "fps": 5
+    },
+    "move": {
+     "row": 1,
+     "frames": 4,
+     "fps": 10
+    }
+   },
+   "vis": [
+    1,
+    3,
+    10,
+    9
+   ]
+  },
+  "creature.coral_whelk.m": {
+   "file": "sprites/creatures/coral_whelk_m.png",
    "fw": 12,
    "fh": 12,
    "anchor": [
@@ -809,8 +1106,62 @@ AQ.manifest = {
     14
    ]
   },
+  "creature.pincer_hermit.m": {
+   "file": "sprites/creatures/pincer_hermit_m.png",
+   "fw": 16,
+   "fh": 16,
+   "anchor": [
+    8,
+    8
+   ],
+   "anims": {
+    "idle": {
+     "row": 0,
+     "frames": 4,
+     "fps": 5
+    },
+    "move": {
+     "row": 1,
+     "frames": 4,
+     "fps": 10
+    }
+   },
+   "vis": [
+    2,
+    3,
+    14,
+    14
+   ]
+  },
   "creature.reef_mimic": {
    "file": "sprites/creatures/reef_mimic.png",
+   "fw": 24,
+   "fh": 24,
+   "anchor": [
+    12,
+    12
+   ],
+   "anims": {
+    "idle": {
+     "row": 0,
+     "frames": 4,
+     "fps": 5
+    },
+    "move": {
+     "row": 1,
+     "frames": 4,
+     "fps": 10
+    }
+   },
+   "vis": [
+    2,
+    4,
+    22,
+    18
+   ]
+  },
+  "creature.reef_mimic.m": {
+   "file": "sprites/creatures/reef_mimic_m.png",
    "fw": 24,
    "fh": 24,
    "anchor": [
@@ -885,8 +1236,62 @@ AQ.manifest = {
     18
    ]
   },
+  "creature.ridgeback_basker.m": {
+   "file": "sprites/creatures/ridgeback_basker_m.png",
+   "fw": 24,
+   "fh": 24,
+   "anchor": [
+    12,
+    12
+   ],
+   "anims": {
+    "idle": {
+     "row": 0,
+     "frames": 4,
+     "fps": 5
+    },
+    "move": {
+     "row": 1,
+     "frames": 4,
+     "fps": 10
+    }
+   },
+   "vis": [
+    1,
+    9,
+    22,
+    18
+   ]
+  },
   "creature.coral_viper": {
    "file": "sprites/creatures/coral_viper.png",
+   "fw": 32,
+   "fh": 16,
+   "anchor": [
+    16,
+    8
+   ],
+   "anims": {
+    "idle": {
+     "row": 0,
+     "frames": 4,
+     "fps": 5
+    },
+    "move": {
+     "row": 1,
+     "frames": 4,
+     "fps": 10
+    }
+   },
+   "vis": [
+    1,
+    3,
+    29,
+    12
+   ]
+  },
+  "creature.coral_viper.m": {
+   "file": "sprites/creatures/coral_viper_m.png",
    "fw": 32,
    "fh": 16,
    "anchor": [
@@ -961,8 +1366,62 @@ AQ.manifest = {
     19
    ]
   },
+  "creature.lanternjaw.m": {
+   "file": "sprites/creatures/lanternjaw_m.png",
+   "fw": 24,
+   "fh": 24,
+   "anchor": [
+    12,
+    12
+   ],
+   "anims": {
+    "idle": {
+     "row": 0,
+     "frames": 4,
+     "fps": 5
+    },
+    "move": {
+     "row": 1,
+     "frames": 4,
+     "fps": 10
+    }
+   },
+   "vis": [
+    2,
+    2,
+    22,
+    19
+   ]
+  },
   "creature.vent_shell": {
    "file": "sprites/creatures/vent_shell.png",
+   "fw": 16,
+   "fh": 16,
+   "anchor": [
+    8,
+    8
+   ],
+   "anims": {
+    "idle": {
+     "row": 0,
+     "frames": 4,
+     "fps": 5
+    },
+    "move": {
+     "row": 1,
+     "frames": 4,
+     "fps": 10
+    }
+   },
+   "vis": [
+    2,
+    6,
+    14,
+    13
+   ]
+  },
+  "creature.vent_shell.m": {
+   "file": "sprites/creatures/vent_shell_m.png",
    "fw": 16,
    "fh": 16,
    "anchor": [
@@ -1015,8 +1474,62 @@ AQ.manifest = {
     22
    ]
   },
+  "creature.abyss_drifter.m": {
+   "file": "sprites/creatures/abyss_drifter_m.png",
+   "fw": 24,
+   "fh": 24,
+   "anchor": [
+    12,
+    12
+   ],
+   "anims": {
+    "idle": {
+     "row": 0,
+     "frames": 4,
+     "fps": 5
+    },
+    "move": {
+     "row": 1,
+     "frames": 4,
+     "fps": 10
+    }
+   },
+   "vis": [
+    1,
+    2,
+    22,
+    22
+   ]
+  },
   "creature.trenchmaw": {
    "file": "sprites/creatures/trenchmaw.png",
+   "fw": 48,
+   "fh": 48,
+   "anchor": [
+    24,
+    24
+   ],
+   "anims": {
+    "idle": {
+     "row": 0,
+     "frames": 4,
+     "fps": 5
+    },
+    "move": {
+     "row": 1,
+     "frames": 4,
+     "fps": 10
+    }
+   },
+   "vis": [
+    3,
+    15,
+    43,
+    32
+   ]
+  },
+  "creature.trenchmaw.m": {
+   "file": "sprites/creatures/trenchmaw_m.png",
    "fw": 48,
    "fh": 48,
    "anchor": [
@@ -1091,8 +1604,62 @@ AQ.manifest = {
     13
    ]
   },
+  "creature.blindgill.m": {
+   "file": "sprites/creatures/blindgill_m.png",
+   "fw": 16,
+   "fh": 16,
+   "anchor": [
+    8,
+    8
+   ],
+   "anims": {
+    "idle": {
+     "row": 0,
+     "frames": 4,
+     "fps": 5
+    },
+    "move": {
+     "row": 1,
+     "frames": 4,
+     "fps": 10
+    }
+   },
+   "vis": [
+    2,
+    2,
+    14,
+    13
+   ]
+  },
   "creature.cave_newt": {
    "file": "sprites/creatures/cave_newt.png",
+   "fw": 16,
+   "fh": 16,
+   "anchor": [
+    8,
+    8
+   ],
+   "anims": {
+    "idle": {
+     "row": 0,
+     "frames": 4,
+     "fps": 5
+    },
+    "move": {
+     "row": 1,
+     "frames": 4,
+     "fps": 10
+    }
+   },
+   "vis": [
+    1,
+    2,
+    14,
+    14
+   ]
+  },
+  "creature.cave_newt.m": {
+   "file": "sprites/creatures/cave_newt_m.png",
    "fw": 16,
    "fh": 16,
    "anchor": [
@@ -1145,8 +1712,62 @@ AQ.manifest = {
     14
    ]
   },
+  "creature.stoneshell.m": {
+   "file": "sprites/creatures/stoneshell_m.png",
+   "fw": 16,
+   "fh": 16,
+   "anchor": [
+    8,
+    8
+   ],
+   "anims": {
+    "idle": {
+     "row": 0,
+     "frames": 4,
+     "fps": 5
+    },
+    "move": {
+     "row": 1,
+     "frames": 4,
+     "fps": 10
+    }
+   },
+   "vis": [
+    1,
+    4,
+    14,
+    14
+   ]
+  },
   "creature.cave_crawler": {
    "file": "sprites/creatures/cave_crawler.png",
+   "fw": 32,
+   "fh": 32,
+   "anchor": [
+    16,
+    16
+   ],
+   "anims": {
+    "idle": {
+     "row": 0,
+     "frames": 4,
+     "fps": 5
+    },
+    "move": {
+     "row": 1,
+     "frames": 4,
+     "fps": 10
+    }
+   },
+   "vis": [
+    2,
+    11,
+    30,
+    24
+   ]
+  },
+  "creature.cave_crawler.m": {
+   "file": "sprites/creatures/cave_crawler_m.png",
    "fw": 32,
    "fh": 32,
    "anchor": [
@@ -1221,8 +1842,62 @@ AQ.manifest = {
     18
    ]
   },
+  "creature.driftfin.m": {
+   "file": "sprites/creatures/driftfin_m.png",
+   "fw": 24,
+   "fh": 24,
+   "anchor": [
+    12,
+    12
+   ],
+   "anims": {
+    "idle": {
+     "row": 0,
+     "frames": 4,
+     "fps": 5
+    },
+    "move": {
+     "row": 1,
+     "frames": 4,
+     "fps": 10
+    }
+   },
+   "vis": [
+    1,
+    4,
+    21,
+    18
+   ]
+  },
   "creature.blue_runner": {
    "file": "sprites/creatures/blue_runner.png",
+   "fw": 32,
+   "fh": 32,
+   "anchor": [
+    16,
+    16
+   ],
+   "anims": {
+    "idle": {
+     "row": 0,
+     "frames": 4,
+     "fps": 5
+    },
+    "move": {
+     "row": 1,
+     "frames": 4,
+     "fps": 10
+    }
+   },
+   "vis": [
+    1,
+    7,
+    30,
+    23
+   ]
+  },
+  "creature.blue_runner.m": {
+   "file": "sprites/creatures/blue_runner_m.png",
    "fw": 32,
    "fh": 32,
    "anchor": [
@@ -1275,8 +1950,62 @@ AQ.manifest = {
     14
    ]
   },
+  "creature.open_drifter.m": {
+   "file": "sprites/creatures/open_drifter_m.png",
+   "fw": 16,
+   "fh": 16,
+   "anchor": [
+    8,
+    8
+   ],
+   "anims": {
+    "idle": {
+     "row": 0,
+     "frames": 4,
+     "fps": 5
+    },
+    "move": {
+     "row": 1,
+     "frames": 4,
+     "fps": 10
+    }
+   },
+   "vis": [
+    1,
+    1,
+    14,
+    14
+   ]
+  },
   "creature.longneck_sea_lizard": {
    "file": "sprites/creatures/longneck_sea_lizard.png",
+   "fw": 32,
+   "fh": 32,
+   "anchor": [
+    16,
+    16
+   ],
+   "anims": {
+    "idle": {
+     "row": 0,
+     "frames": 4,
+     "fps": 5
+    },
+    "move": {
+     "row": 1,
+     "frames": 4,
+     "fps": 10
+    }
+   },
+   "vis": [
+    1,
+    7,
+    29,
+    25
+   ]
+  },
+  "creature.longneck_sea_lizard.m": {
+   "file": "sprites/creatures/longneck_sea_lizard_m.png",
    "fw": 32,
    "fh": 32,
    "anchor": [
@@ -1351,8 +2080,62 @@ AQ.manifest = {
     34
    ]
   },
+  "creature.reeftooth.m": {
+   "file": "sprites/creatures/reeftooth_m.png",
+   "fw": 48,
+   "fh": 48,
+   "anchor": [
+    24,
+    24
+   ],
+   "anims": {
+    "idle": {
+     "row": 0,
+     "frames": 4,
+     "fps": 5
+    },
+    "move": {
+     "row": 1,
+     "frames": 4,
+     "fps": 10
+    }
+   },
+   "vis": [
+    1,
+    8,
+    45,
+    34
+   ]
+  },
   "creature.wandershell_nautilus": {
    "file": "sprites/creatures/wandershell_nautilus.png",
+   "fw": 16,
+   "fh": 16,
+   "anchor": [
+    8,
+    8
+   ],
+   "anims": {
+    "idle": {
+     "row": 0,
+     "frames": 4,
+     "fps": 5
+    },
+    "move": {
+     "row": 1,
+     "frames": 4,
+     "fps": 10
+    }
+   },
+   "vis": [
+    1,
+    3,
+    14,
+    14
+   ]
+  },
+  "creature.wandershell_nautilus.m": {
+   "file": "sprites/creatures/wandershell_nautilus_m.png",
    "fw": 16,
    "fh": 16,
    "anchor": [
@@ -1405,8 +2188,62 @@ AQ.manifest = {
     18
    ]
   },
+  "creature.crimsonback.m": {
+   "file": "sprites/creatures/crimsonback_m.png",
+   "fw": 24,
+   "fh": 24,
+   "anchor": [
+    12,
+    12
+   ],
+   "anims": {
+    "idle": {
+     "row": 0,
+     "frames": 4,
+     "fps": 5
+    },
+    "move": {
+     "row": 1,
+     "frames": 4,
+     "fps": 10
+    }
+   },
+   "vis": [
+    1,
+    4,
+    21,
+    18
+   ]
+  },
   "creature.ironfin": {
    "file": "sprites/creatures/ironfin.png",
+   "fw": 24,
+   "fh": 24,
+   "anchor": [
+    12,
+    12
+   ],
+   "anims": {
+    "idle": {
+     "row": 0,
+     "frames": 4,
+     "fps": 5
+    },
+    "move": {
+     "row": 1,
+     "frames": 4,
+     "fps": 10
+    }
+   },
+   "vis": [
+    1,
+    4,
+    21,
+    19
+   ]
+  },
+  "creature.ironfin.m": {
+   "file": "sprites/creatures/ironfin_m.png",
    "fw": 24,
    "fh": 24,
    "anchor": [
@@ -1459,8 +2296,62 @@ AQ.manifest = {
     13
    ]
   },
+  "creature.porthole_darter.m": {
+   "file": "sprites/creatures/porthole_darter_m.png",
+   "fw": 16,
+   "fh": 16,
+   "anchor": [
+    8,
+    8
+   ],
+   "anims": {
+    "idle": {
+     "row": 0,
+     "frames": 4,
+     "fps": 5
+    },
+    "move": {
+     "row": 1,
+     "frames": 4,
+     "fps": 10
+    }
+   },
+   "vis": [
+    2,
+    2,
+    14,
+    13
+   ]
+  },
   "creature.rustclaw": {
    "file": "sprites/creatures/rustclaw.png",
+   "fw": 16,
+   "fh": 16,
+   "anchor": [
+    8,
+    8
+   ],
+   "anims": {
+    "idle": {
+     "row": 0,
+     "frames": 4,
+     "fps": 5
+    },
+    "move": {
+     "row": 1,
+     "frames": 4,
+     "fps": 10
+    }
+   },
+   "vis": [
+    2,
+    4,
+    14,
+    12
+   ]
+  },
+  "creature.rustclaw.m": {
+   "file": "sprites/creatures/rustclaw_m.png",
    "fw": 16,
    "fh": 16,
    "anchor": [
@@ -1513,8 +2404,62 @@ AQ.manifest = {
     18
    ]
   },
+  "creature.chest_octopus.m": {
+   "file": "sprites/creatures/chest_octopus_m.png",
+   "fw": 24,
+   "fh": 24,
+   "anchor": [
+    12,
+    12
+   ],
+   "anims": {
+    "idle": {
+     "row": 0,
+     "frames": 4,
+     "fps": 5
+    },
+    "move": {
+     "row": 1,
+     "frames": 4,
+     "fps": 10
+    }
+   },
+   "vis": [
+    2,
+    4,
+    22,
+    18
+   ]
+  },
   "creature.wreck_eel": {
    "file": "sprites/creatures/wreck_eel.png",
+   "fw": 32,
+   "fh": 16,
+   "anchor": [
+    16,
+    8
+   ],
+   "anims": {
+    "idle": {
+     "row": 0,
+     "frames": 4,
+     "fps": 5
+    },
+    "move": {
+     "row": 1,
+     "frames": 4,
+     "fps": 10
+    }
+   },
+   "vis": [
+    1,
+    3,
+    29,
+    12
+   ]
+  },
+  "creature.wreck_eel.m": {
+   "file": "sprites/creatures/wreck_eel_m.png",
    "fw": 32,
    "fh": 16,
    "anchor": [
@@ -1616,8 +2561,62 @@ AQ.manifest = {
     10
    ]
   },
+  "creature.ember_goby.m": {
+   "file": "sprites/creatures/ember_goby_m.png",
+   "fw": 12,
+   "fh": 12,
+   "anchor": [
+    6,
+    6
+   ],
+   "anims": {
+    "idle": {
+     "row": 0,
+     "frames": 4,
+     "fps": 5
+    },
+    "move": {
+     "row": 1,
+     "frames": 4,
+     "fps": 10
+    }
+   },
+   "vis": [
+    2,
+    2,
+    9,
+    10
+   ]
+  },
   "creature.sulfur_crab": {
    "file": "sprites/creatures/sulfur_crab.png",
+   "fw": 16,
+   "fh": 16,
+   "anchor": [
+    8,
+    8
+   ],
+   "anims": {
+    "idle": {
+     "row": 0,
+     "frames": 4,
+     "fps": 5
+    },
+    "move": {
+     "row": 1,
+     "frames": 4,
+     "fps": 10
+    }
+   },
+   "vis": [
+    2,
+    4,
+    14,
+    12
+   ]
+  },
+  "creature.sulfur_crab.m": {
+   "file": "sprites/creatures/sulfur_crab_m.png",
    "fw": 16,
    "fh": 16,
    "anchor": [
@@ -1670,8 +2669,62 @@ AQ.manifest = {
     10
    ]
   },
+  "creature.vent_limpet.m": {
+   "file": "sprites/creatures/vent_limpet_m.png",
+   "fw": 12,
+   "fh": 12,
+   "anchor": [
+    6,
+    6
+   ],
+   "anims": {
+    "idle": {
+     "row": 0,
+     "frames": 4,
+     "fps": 5
+    },
+    "move": {
+     "row": 1,
+     "frames": 4,
+     "fps": 10
+    }
+   },
+   "vis": [
+    1,
+    4,
+    10,
+    10
+   ]
+  },
   "creature.vent_salamander": {
    "file": "sprites/creatures/vent_salamander.png",
+   "fw": 24,
+   "fh": 24,
+   "anchor": [
+    12,
+    12
+   ],
+   "anims": {
+    "idle": {
+     "row": 0,
+     "frames": 4,
+     "fps": 5
+    },
+    "move": {
+     "row": 1,
+     "frames": 4,
+     "fps": 10
+    }
+   },
+   "vis": [
+    1,
+    7,
+    22,
+    19
+   ]
+  },
+  "creature.vent_salamander.m": {
+   "file": "sprites/creatures/vent_salamander_m.png",
    "fw": 24,
    "fh": 24,
    "anchor": [
@@ -1746,8 +2799,62 @@ AQ.manifest = {
     13
    ]
   },
+  "creature.rootback_mudskipper.m": {
+   "file": "sprites/creatures/rootback_mudskipper_m.png",
+   "fw": 16,
+   "fh": 16,
+   "anchor": [
+    8,
+    8
+   ],
+   "anims": {
+    "idle": {
+     "row": 0,
+     "frames": 4,
+     "fps": 5
+    },
+    "move": {
+     "row": 1,
+     "frames": 4,
+     "fps": 10
+    }
+   },
+   "vis": [
+    2,
+    2,
+    14,
+    13
+   ]
+  },
   "creature.mangrove_fiddler": {
    "file": "sprites/creatures/mangrove_fiddler.png",
+   "fw": 16,
+   "fh": 16,
+   "anchor": [
+    8,
+    8
+   ],
+   "anims": {
+    "idle": {
+     "row": 0,
+     "frames": 4,
+     "fps": 5
+    },
+    "move": {
+     "row": 1,
+     "frames": 4,
+     "fps": 10
+    }
+   },
+   "vis": [
+    2,
+    4,
+    14,
+    12
+   ]
+  },
+  "creature.mangrove_fiddler.m": {
+   "file": "sprites/creatures/mangrove_fiddler_m.png",
    "fw": 16,
    "fh": 16,
    "anchor": [
@@ -1800,8 +2907,62 @@ AQ.manifest = {
     11
    ]
   },
+  "creature.rootcoil_snake.m": {
+   "file": "sprites/creatures/rootcoil_snake_m.png",
+   "fw": 32,
+   "fh": 16,
+   "anchor": [
+    16,
+    8
+   ],
+   "anims": {
+    "idle": {
+     "row": 0,
+     "frames": 4,
+     "fps": 5
+    },
+    "move": {
+     "row": 1,
+     "frames": 4,
+     "fps": 10
+    }
+   },
+   "vis": [
+    1,
+    4,
+    29,
+    11
+   ]
+  },
   "creature.dwarf_croc": {
    "file": "sprites/creatures/dwarf_croc.png",
+   "fw": 48,
+   "fh": 24,
+   "anchor": [
+    24,
+    12
+   ],
+   "anims": {
+    "idle": {
+     "row": 0,
+     "frames": 4,
+     "fps": 5
+    },
+    "move": {
+     "row": 1,
+     "frames": 4,
+     "fps": 10
+    }
+   },
+   "vis": [
+    1,
+    9,
+    45,
+    20
+   ]
+  },
+  "creature.dwarf_croc.m": {
+   "file": "sprites/creatures/dwarf_croc_m.png",
    "fw": 48,
    "fh": 24,
    "anchor": [
@@ -1854,8 +3015,62 @@ AQ.manifest = {
     18
    ]
   },
+  "creature.bankside_monitor.m": {
+   "file": "sprites/creatures/bankside_monitor_m.png",
+   "fw": 24,
+   "fh": 24,
+   "anchor": [
+    12,
+    12
+   ],
+   "anims": {
+    "idle": {
+     "row": 0,
+     "frames": 4,
+     "fps": 5
+    },
+    "move": {
+     "row": 1,
+     "frames": 4,
+     "fps": 10
+    }
+   },
+   "vis": [
+    1,
+    9,
+    22,
+    18
+   ]
+  },
   "creature.muckhide_octopus": {
    "file": "sprites/creatures/muckhide_octopus.png",
+   "fw": 24,
+   "fh": 24,
+   "anchor": [
+    12,
+    12
+   ],
+   "anims": {
+    "idle": {
+     "row": 0,
+     "frames": 4,
+     "fps": 5
+    },
+    "move": {
+     "row": 1,
+     "frames": 4,
+     "fps": 10
+    }
+   },
+   "vis": [
+    2,
+    4,
+    22,
+    18
+   ]
+  },
+  "creature.muckhide_octopus.m": {
+   "file": "sprites/creatures/muckhide_octopus_m.png",
    "fw": 24,
    "fh": 24,
    "anchor": [
@@ -1930,8 +3145,62 @@ AQ.manifest = {
     13
    ]
   },
+  "creature.frostfin.m": {
+   "file": "sprites/creatures/frostfin_m.png",
+   "fw": 16,
+   "fh": 16,
+   "anchor": [
+    8,
+    8
+   ],
+   "anims": {
+    "idle": {
+     "row": 0,
+     "frames": 4,
+     "fps": 5
+    },
+    "move": {
+     "row": 1,
+     "frames": 4,
+     "fps": 10
+    }
+   },
+   "vis": [
+    2,
+    2,
+    14,
+    13
+   ]
+  },
   "creature.iceback_seal_pup": {
    "file": "sprites/creatures/iceback_seal_pup.png",
+   "fw": 24,
+   "fh": 24,
+   "anchor": [
+    12,
+    12
+   ],
+   "anims": {
+    "idle": {
+     "row": 0,
+     "frames": 4,
+     "fps": 5
+    },
+    "move": {
+     "row": 1,
+     "frames": 4,
+     "fps": 10
+    }
+   },
+   "vis": [
+    1,
+    6,
+    22,
+    19
+   ]
+  },
+  "creature.iceback_seal_pup.m": {
+   "file": "sprites/creatures/iceback_seal_pup_m.png",
    "fw": 24,
    "fh": 24,
    "anchor": [
@@ -1984,6 +3253,33 @@ AQ.manifest = {
     13
    ]
   },
+  "creature.frost_isopod.m": {
+   "file": "sprites/creatures/frost_isopod_m.png",
+   "fw": 16,
+   "fh": 16,
+   "anchor": [
+    8,
+    8
+   ],
+   "anims": {
+    "idle": {
+     "row": 0,
+     "frames": 4,
+     "fps": 5
+    },
+    "move": {
+     "row": 1,
+     "frames": 4,
+     "fps": 10
+    }
+   },
+   "vis": [
+    2,
+    6,
+    14,
+    13
+   ]
+  },
   "creature.iceshell_snail": {
    "file": "sprites/creatures/iceshell_snail.png",
    "fw": 12,
@@ -2011,8 +3307,62 @@ AQ.manifest = {
     9
    ]
   },
+  "creature.iceshell_snail.m": {
+   "file": "sprites/creatures/iceshell_snail_m.png",
+   "fw": 12,
+   "fh": 12,
+   "anchor": [
+    6,
+    6
+   ],
+   "anims": {
+    "idle": {
+     "row": 0,
+     "frames": 4,
+     "fps": 5
+    },
+    "move": {
+     "row": 1,
+     "frames": 4,
+     "fps": 10
+    }
+   },
+   "vis": [
+    1,
+    3,
+    10,
+    9
+   ]
+  },
   "creature.cavepetalia": {
    "file": "sprites/creatures/cavepetalia.png",
+   "fw": 24,
+   "fh": 24,
+   "anchor": [
+    12,
+    12
+   ],
+   "anims": {
+    "idle": {
+     "row": 0,
+     "frames": 4,
+     "fps": 5
+    },
+    "move": {
+     "row": 1,
+     "frames": 4,
+     "fps": 10
+    }
+   },
+   "vis": [
+    1,
+    7,
+    22,
+    19
+   ]
+  },
+  "creature.cavepetalia.m": {
+   "file": "sprites/creatures/cavepetalia_m.png",
    "fw": 24,
    "fh": 24,
    "anchor": [

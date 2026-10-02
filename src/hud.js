@@ -53,7 +53,7 @@ AQ.HUD = (function () {
     if (AQ.Collection) {
       const c = AQ.Collection.progress();
       ctx.globalAlpha = 0.85;
-      F.draw(ctx, `${c.caught}/${c.total}`, vw - 4, 4, '#ffe9a8', { align: 'right', shadow: SH });
+      F.draw(ctx, `${c.discovered}/${c.total}`, vw - 4, 4, '#ffe9a8', { align: 'right', shadow: SH });
       ctx.globalAlpha = 1;
     }
     if (game.player.sneaking) { ctx.globalAlpha = 0.8; F.draw(ctx, 'SNEAKING', 4, 19, '#9fe8ff', { shadow: SH }); ctx.globalAlpha = 1; }

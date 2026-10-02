@@ -71,6 +71,10 @@ Click a creature for its info card. Hover the stars for what's helping and what'
   the grouping is data in `data/aquarium.js` (`predatorTanks`). Each floor has 5 tank slots
   (`data/scenes.js`); unused slots stay dark. Old saves move predators over automatically.
   Creatures only get nervous when a tank is crowded (more than `aquarium.nervousAbove`).
+- **Sexes.** Every animal is ♂ or ♀ (plants have none; `sexes: 'none'` in data/creatures.js
+  opts a species out). Males have a small cyan marking. The log tracks both: a species is
+  *discovered* when you catch either sex and *complete* with both. Once you have one sex, the other
+  spawns more often (`sexes.missingBias`).
 - **Aquarium.** One tank per biome, and a creature can only live in its own biome's tank.
   Nothing ever dies and nothing is punished:
   - **Tank vibe (0-5 stars):** decor variety and amount, biome-themed pieces, plants, being fed

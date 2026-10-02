@@ -249,7 +249,7 @@ AQ.Title = (function () {
       F().draw(g, it.label, it.x + it.w / 2 + 5, it.y + 3, on ? '#ffffff' : '#c3dfec', { align: 'center', shadow: on ? false : SH });
     });
     const c = AQ.Collection.progress();
-    F().draw(g, `${c.caught}/${c.total} SPECIES`, 316, 172, '#7fa4ba', { align: 'right', shadow: SH });
+    F().draw(g, `${c.discovered}/${c.total} FOUND  ${c.complete} COMPLETE`, 316, 172, '#7fa4ba', { align: 'right', shadow: SH });
     F().draw(g, 'ARROWS + ENTER OR CLICK', 4, 172, '#7fa4ba', { shadow: SH });
     T.drawFade(g);
   };

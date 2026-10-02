@@ -8,7 +8,8 @@ AQ.State = {
   upgrades: { net: 1, speed: 1 },
   unlocks: {},      // decorId -> true once unlocked by a tank's happiness
   tankBest: {},     // biomeId -> best stars that tank has ever reached
-  settings: {}      // player options (e.g. stationZoomOut)
+  settings: {},     // player options (e.g. stationZoomOut)
+  log: {}           // species id -> { m: true, f: true } sexes caught (plants: none)
 };
 
 AQ.Collection = (function () {
@@ -22,11 +23,13 @@ AQ.Collection = (function () {
   };
 
   // Records a catch; returns true if this species is new to the log.
-  Col.recordCatch = function (def) {
+  Col.recordCatch = function (def, sex) {
     const isNew = !S().collection[def.id];
     S().collection[def.id] = (S().collection[def.id] || 0) + 1;
     const tank = Col.tank(AQ.Tanks.forCreature(def));   // biome tank, or a predator tank
+    if (AQ.Sex.has(def) && sex !== 'm' && sex !== 'f') sex = AQ.Sex.random(def);
     const entry = { uid: AQ.U.uid(), id: def.id };
+    if (sex) { entry.sex = sex; AQ.Sex.logOf(def.id)[sex] = true; }
     if (tank.creatures.length < AQ.TUNING.tank.capacity) tank.creatures.push(entry); else tank.storage.push(entry);
     AQ.Save && AQ.Save.dirty();
     return isNew;
@@ -39,9 +42,11 @@ AQ.Collection = (function () {
     return isNew;
   };
 
+  // discovered = caught either sex (or harvested); complete = both sexes (or one catch, if no sexes)
   Col.progress = function () {
     const all = AQ.data.creatures;
-    return { caught: all.filter((d) => S().collection[d.id]).length, total: all.length };
+    const discovered = all.filter((d) => S().collection[d.id]).length;
+    return { caught: discovered, discovered, complete: all.filter((d) => AQ.Sex.complete(d)).length, total: all.length };
   };
   Col.has = (id) => !!S().collection[id];
   return Col;

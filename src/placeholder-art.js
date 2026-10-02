@@ -1198,6 +1198,23 @@
 
   function mkRand(seed) { let s = seed * 9301 + 49297; return () => { s = (s * 9301 + 49297) % 233280; return s / 233280; }; }
 
+  // Male variant marking: a small bright cyan spot on top of the body (same spot on every frame shape),
+  // so ♂ and ♀ read at a glance. Works on any shape by finding the top of the drawn body.
+  function maleMark(p) {
+    const W = p.bw, H = p.bh, d = p.d, A = (x, y) => (x < 0 || y < 0 || x >= W || y >= H ? 0 : d[(y * W + x) * 4 + 3]);
+    let x0 = W, x1 = -1;
+    for (let y = 0; y < H; y++) for (let x = 0; x < W; x++) if (A(x, y)) { x0 = Math.min(x0, x); x1 = Math.max(x1, x); }
+    if (x1 < 0) return;
+    const cx = Math.round((x0 + x1) / 2);
+    let top = -1;
+    for (let y = 0; y < H && top < 0; y++) for (let dx = -1; dx <= 1; dx++) if (A(cx + dx, y)) { top = y; break; }
+    if (top < 0) return;
+    // painted onto the top of the body (never outside it), so males stay exactly the female's size
+    const put = (x, y, c) => { if (!A(x, y)) return; const i = (y * W + x) * 4; d[i] = c[0]; d[i + 1] = c[1]; d[i + 2] = c[2]; };
+    const crest = [95, 224, 255], tip = [235, 255, 255];
+    put(cx - 1, top + 1, crest); put(cx, top + 1, crest); put(cx + 1, top + 1, crest); put(cx, top, tip); put(cx, top + 2, crest);
+  }
+
   // ---------- sheet builder ----------
   // entry: { fw, fh, anims: { name: {row, col?, frames, fps} }, art: { shape, color, accent, ...opts } }
   // Renders every frame with a hidden margin, measures the union of all frames, and fits it into
@@ -1224,6 +1241,7 @@
             t: f / a.frames, frame: f, anim: name, moving: name === 'move' || name === 'swim'
           });
           fn(p, opts);
+          if (art.male) maleMark(p);
           // offset of the frame's origin inside this padded buffer (drawing area centred / bottom-aligned)
           const fx0 = M - Math.floor((fw - vw) / 2), fy0 = M - (bottomAnchored ? fh - vh : Math.floor((fh - vh) / 2));
           for (let y = 0; y < p.bh; y++) for (let x = 0; x < p.bw; x++) if (p.d[(y * p.bw + x) * 4 + 3]) {

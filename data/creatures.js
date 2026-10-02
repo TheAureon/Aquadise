@@ -8,7 +8,8 @@
 //   requires_upgraded_net                needs net level >= 2
 //   draft                                true = not finalized in the design doc
 //   rare                                 0..1 chance the spawn slot is occupied on each (re)spawn
-//   predator                             stresses smaller non-predators sharing its tank
+//   predator                             lives in a predator tank (data/aquarium.js predatorTanks)
+//   sexes                                optional: 'none' = no ♂/♀ (e.g. hermaphrodites). Default: male + female
 //   sprite_size                          size class from data/sprite-spec.js
 //   color, accent, art                   placeholder-art hints only (ignored once real art exists)
 //   spawn                                { n, at: floor|water|surface|wall|ceiling|pool|ice_top|reef, area:[x0,x1], y:[y0,y1] }
@@ -209,7 +210,7 @@ AQ.data.creatures = [
     params: { alertR: 60, fleeSpeed: 38, tightBonus: 1.4 },
     sprite_size: 'wide', color: '#4a5a3a', accent: '#8a9a5a', art: { shape: 'eel' },
     spawn: { n: 2, at: 'water', y: [180, 270] }, hint: 'Fast in tight wreck spaces, slow in open water. Chase it into the open.' },
-  { id: 'barnacle_crawler', likes: ['wood', 'metal'], name: 'Barnacle Crawler', biome: 'ruins', category: 'gastropod', catch_behavior: 'spotting',
+  { id: 'barnacle_crawler', likes: ['wood', 'metal'], sexes: 'none', name: 'Barnacle Crawler', biome: 'ruins', category: 'gastropod', catch_behavior: 'spotting',
     params: { alpha: 0.3, speed: 1 },
     sprite_size: 'tiny', color: '#cfc4b0', accent: '#9a8f7a', art: { shape: 'barnacles' },
     spawn: { n: 4, at: 'floor' }, hint: 'Extremely slow. The only challenge is spotting it.' },

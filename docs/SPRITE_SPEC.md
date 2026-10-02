@@ -60,10 +60,23 @@ The anchor is the pixel inside a frame that sits on the entity's world position.
   touches the ground, so don't leave empty rows under the base.
 - Ceiling clingers (Frost Isopod) are flipped vertically by the engine. Draw them upright.
 
+## Male / female variants
+
+Every animal with two sexes has two sheets with the same size, rows and anchor:
+
+- `creatures/<id>.png` (key `creature.<id>`) is the base art and is used for **females**.
+- `creatures/<id>_m.png` (key `creature.<id>.m`) is used for **males**.
+
+The placeholder male is the same art plus a small bright cyan marking on top of the body. Real art
+can make the difference anything readable (colour, fin, crest), but keep the size and anchor. If a
+`_m` sheet is missing, males fall back to the base sheet. Species with `sexes: 'none'` (and plants)
+have no male sheet.
+
 ## File naming
 
 ```
-assets/sprites/creatures/<creature_id>.png    e.g. creatures/drift_snail.png
+assets/sprites/creatures/<creature_id>.png    e.g. creatures/drift_snail.png   (female / default)
+assets/sprites/creatures/<creature_id>_m.png  e.g. creatures/drift_snail_m.png (male)
 assets/sprites/plants/<plant_id>.png          e.g. plants/bell_kelp.png
 assets/sprites/decor/<decoration_id>.png      e.g. decor/castle.png
 assets/sprites/misc/player.png | chest.png | bait.png

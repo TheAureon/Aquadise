@@ -194,7 +194,7 @@ AQ.Station = (function () {
     if (st.dark) { ctx.fillStyle = `rgba(2,6,16,${st.dark * 0.6})`; ctx.fillRect(ix, iy, iw, ih); }
     // its creatures, drifting about
     tank.creatures.slice(0, 7).forEach((e, k) => {
-      const key = 'creature.' + e.id, en = AQ.Assets.entry(key), def = AQ.Creatures.defs[e.id];
+      const def = AQ.Creatures.defs[e.id], key = def ? AQ.Sex.spriteKey(def, e.sex) : 'creature.' + e.id, en = AQ.Assets.entry(key);
       if (!en || !def) return;
       const sc = Math.min(0.6, 11 / Math.max(en.fw, en.fh));
       const u = String(e.uid), seed = (u.charCodeAt(0) + u.charCodeAt(u.length - 1) * 7 + k * 13) % 100;

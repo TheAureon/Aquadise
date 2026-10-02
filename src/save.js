@@ -20,6 +20,8 @@ AQ.Save = (function () {
     AQ.State.settings = st.settings || {};   // player options (e.g. the building's zoomed-out view)
     // predators moved out of the biome tanks into their own tanks (4th floor): move any old ones over
     if (AQ.Tanks) AQ.Tanks.migrate();
+    AQ.State.log = st.log || {};
+    if (AQ.Sex) AQ.Sex.migrate();              // older saves: give caught creatures a sex, fill ♂/♀ log slots
     // where you were: scene + spot (older saves have no scene -> the sea world). Validated against
     // that scene's map at boot (AQ.Scenes.restore), which falls back to a safe spot if needed.
     game.scene = (data.scene && AQ.Scenes.list[data.scene]) ? data.scene : 'world';
@@ -34,7 +36,7 @@ AQ.Save = (function () {
   S.dirty = () => { S.isDirty = true; };
   // Fresh start without reloading the page (title screen > New Game).
   S.newGame = function (game) {
-    AQ.State.collection = {}; AQ.State.plants = {}; AQ.State.tanks = {}; AQ.State.unlocks = {}; AQ.State.tankBest = {}; AQ.State.settings = {};
+    AQ.State.collection = {}; AQ.State.plants = {}; AQ.State.tanks = {}; AQ.State.unlocks = {}; AQ.State.tankBest = {}; AQ.State.settings = {}; AQ.State.log = {};
     AQ.State.upgrades = { net: 1, speed: 1 };
     game.upgrades = AQ.State.upgrades;
     const st = AQ.data.world.playerStart, P = game.player;

@@ -50,8 +50,10 @@ AQ.Creatures = (function () {
       def, p: def.params, slot, x, y, hx: x, hy: y, vx: 0, vy: 0, facing: R.chance(0.5) ? 1 : -1,
       t: R.range(0, 10), st: 0, seed: R.range(0, 100), alpha: 0, targetAlpha: 1,
       catchable: true, pryable: false, hidden: false, hostileActive: false, hitCD: 0,
-      icon: null, iconT: 0, r: spriteR(def), foot: footOf(def), movement: movementOf(def), harvested: false
+      icon: null, iconT: 0, r: spriteR(def), foot: footOf(def), movement: movementOf(def), harvested: false,
+      sex: AQ.Sex ? AQ.Sex.roll(def) : null
     };
+    c.key = AQ.Sex ? AQ.Sex.spriteKey(def, c.sex) : def.spriteKey;
     if (AQ.World.air(x, y)) c.allowAir = true;   // lives on dry land
     c.bhv = AQ.Behaviors[def.catch_behavior] || AQ.Behaviors.easy;
     if (def.catch_behavior === 'clinger' && def.spawn && def.spawn.at === 'ceiling') c.flipY = true;
@@ -208,7 +210,7 @@ AQ.Creatures = (function () {
       if (!onScreen(c)) continue;
       if (c.p.home && AQ.Assets.has(c.p.home)) AQ.Assets.draw(g, c.p.home, 'idle', c.hx, c.hy + c.foot);
       if (c.alpha < 0.02) continue;
-      AQ.Assets.draw(g, c.def.spriteKey, c.moving ? 'move' : 'idle', c.x, c.y, { t: c.t, flip: c.facing < 0, flipY: c.flipY, alpha: Math.min(1, c.alpha) });
+      AQ.Assets.draw(g, c.key || c.def.spriteKey, c.moving ? 'move' : 'idle', c.x, c.y, { t: c.t, flip: c.facing < 0, flipY: c.flipY, alpha: Math.min(1, c.alpha) });
     }
   };
   C.drawFront = function (g) {

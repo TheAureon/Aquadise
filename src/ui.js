@@ -72,9 +72,10 @@ AQ.LogUI = (function () {
   L.draw = function (g) {
     const b = biomes()[L.biomeIdx], list = entries(b), prog = AQ.Collection.progress();
     g.fillStyle = 'rgba(5,14,26,0.94)'; g.fillRect(0, 0, 320, 180);
-    F().draw(g, `COLLECTION LOG  ${prog.caught}/${prog.total}`, 8, 5, '#ffe9a8');
-    const got = list.filter((d) => AQ.Collection.has(d.id)).length;
-    F().draw(g, `${b.name} ${got}/${list.length}`, 85, 18, got === list.length ? '#7ef0c0' : '#e8fbff', { align: 'center' });
+    F().draw(g, 'COLLECTION LOG', 8, 5, '#ffe9a8');
+    F().draw(g, `DISCOVERED ${prog.discovered}/${prog.total}   COMPLETE ${prog.complete}/${prog.total}`, 72, 5, '#9fd3ee');
+    const got = list.filter((d) => AQ.Collection.has(d.id)).length, done = list.filter((d) => AQ.Sex.complete(d)).length;
+    F().draw(g, `${b.name} ${got}/${list.length}`, 85, 18, done === list.length ? '#7ef0c0' : '#e8fbff', { align: 'center' });
     for (const r of L.ui) {
       if (r.id !== 'cell') { AQ.Aquarium.button(g, r, L.hover === r); continue; }
       const d = r.d, has = AQ.Collection.has(d.id), sel = r.i === L.sel;
@@ -89,7 +90,14 @@ AQ.LogUI = (function () {
         g.restore();
       }
       F().draw(g, has ? 'X' + AQ.State.collection[d.id] : '?', r.x + r.w - 3, r.y + 36, has ? '#ffe9a8' : '#6a8aa0', { align: 'right' });
-      if (d.draft) F().draw(g, 'D', r.x + 3, r.y + 36, '#8aa4b8');
+      // ♂ / ♀ slots (lit once caught); animals only
+      if (AQ.Sex.has(d)) {
+        const L = (AQ.State.log || {})[d.id] || {};
+        F().draw(g, '♂', r.x + 3, r.y + 36, L.m ? AQ.Sex.COLOR.m : '#2c4a5e', { shadow: false });
+        F().draw(g, '♀', r.x + 8, r.y + 36, L.f ? AQ.Sex.COLOR.f : '#2c4a5e', { shadow: false });
+      }
+      if (AQ.Sex.complete(d)) { g.fillStyle = '#7ef0c0'; g.fillRect(r.x + r.w - 4, r.y + 2, 2, 2); }
+      if (d.draft && !AQ.Sex.has(d)) F().draw(g, 'D', r.x + 3, r.y + 36, '#8aa4b8');
     }
     // details
     const d = list[L.sel];
@@ -99,7 +107,12 @@ AQ.LogUI = (function () {
       F().draw(g, has ? d.name : '???', 10, 130, has ? '#ffe9a8' : '#8aa4b8');
       const tags = [CAT_LABEL[d.category] || d.category, d.is_plant ? 'harvest' : '', d.requires_upgraded_net ? 'needs net lv2' : '', d.rare ? 'rare' : '', d.hostile ? 'hostile' : '', d.draft ? 'draft' : ''].filter(Boolean).join(' - ');
       F().draw(g, tags, 310, 130, '#9fd3ee', { align: 'right' });
-      wrap('Tip: ' + (d.hint || ''), 75).slice(0, 4).forEach((l, i) => F().draw(g, l, 10, 140 + i * 8, '#d8eef8'));
+      if (has && AQ.Sex.has(d)) {
+        const L = (AQ.State.log || {})[d.id] || {};
+        const txt = AQ.Sex.complete(d) ? 'COMPLETE: BOTH ♂ AND ♀ CAUGHT' : `STILL TO FIND: ${L.m ? 'A FEMALE ♀' : 'A MALE ♂'}`;
+        F().draw(g, txt, 10, 164, AQ.Sex.complete(d) ? '#7ef0c0' : '#ffcf8a');
+      }
+      wrap('Tip: ' + (d.hint || ''), 75).slice(0, has && AQ.Sex.has(d) ? 3 : 4).forEach((l, i) => F().draw(g, l, 10, 140 + i * 8, '#d8eef8'));
     }
     F().draw(g, 'Q/E OR ARROWS: BIOME   ESC: CLOSE', 160, 173, '#5f7f96', { align: 'center' });
   };

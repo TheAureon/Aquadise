@@ -148,7 +148,7 @@ AQ.Catching = (function () {
     const ctx = ctxFor(game, c);
     if (c.bhv.onCaught) c.bhv.onCaught(c, ctx);
     AQ.Creatures.remove(c);
-    const isNew = AQ.Collection.recordCatch(c.def);
+    const isNew = AQ.Collection.recordCatch(c.def, c.sex);
     AQ.FX.sparkle(c.x, c.y, '#fff7c2', 12);
     AQ.FX.text(c.x, c.y - 8, pried ? 'PRIED!' : 'GOT IT!', '#ffe36b');
     AQ.HUD.toast(`Caught ${c.def.name}!${isNew ? '  NEW!' : ''}`, isNew ? '#ffe36b' : '#ffffff', 3);

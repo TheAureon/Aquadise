@@ -25,9 +25,14 @@ AQ.Font = (function () {
     '#': ['#.#', '###', '#.#', '###', '#.#'], '&': ['.#.', '#.#', '.#.', '#.#', '.##'], '^': ['.#.', '#.#', '...', '...', '...'],
     '~': ['...', '.##', '##.', '...', '...'], '"': ['#.#', '#.#', '...', '...', '...'],
     '♥': ['...', '#.#', '###', '.#.', '...'], // heart
+    '♂': ['..###', '...##', '###.#', '#.#..', '###..'], // male (5 wide)
+    '♀': ['.###.', '.#.#.', '.###.', '..#..', '.###.'], // female (5 wide)
     ' ': ['...', '...', '...', '...', '...']
   };
-  const GW = 3, GH = 5, ADV = 4, LINE = 7;
+  // most glyphs are 3 wide; a few (♂ ♀) are wider - each glyph advances by its own width + 1
+  const GW = 5, GH = 5, LINE = 7;
+  const gw = (k) => (G[k] ? G[k][0].length : 3);
+  const adv = (ch) => gw(ch) + 1;
   const atlases = new Map();
   const keys = Object.keys(G);
 
@@ -41,14 +46,14 @@ AQ.Font = (function () {
     const index = {};
     keys.forEach((k, i) => {
       index[k] = i;
-      G[k].forEach((row, ry) => { for (let rx = 0; rx < GW; rx++) if (row[rx] === '#') x.fillRect(i * GW + rx, ry, 1, 1); });
+      G[k].forEach((row, ry) => { for (let rx = 0; rx < row.length; rx++) if (row[rx] === '#') x.fillRect(i * GW + rx, ry, 1, 1); });
     });
     a = { canvas: c, index };
     atlases.set(color, a);
     return a;
   }
 
-  function width(str) { return Math.max(0, String(str).length * ADV - 1); }
+  function width(str) { let w = 0; for (const ch of String(str).toUpperCase()) w += adv(ch); return Math.max(0, w - 1); }
 
   // opts: { align: 'left'|'center'|'right', shadow: color|false }
   function draw(ctx, str, x, y, color = '#fff', opts = {}) {
@@ -64,10 +69,11 @@ AQ.Font = (function () {
   }
   function drawLine(ctx, line, x, y, color) {
     const a = atlas(color);
-    for (let i = 0; i < line.length; i++) {
-      const gi = a.index[line[i]];
-      if (gi === undefined) continue;
-      ctx.drawImage(a.canvas, gi * GW, 0, GW, GH, x + i * ADV, y, GW, GH);
+    let cx = x;
+    for (const ch of line) {
+      const gi = a.index[ch];
+      if (gi !== undefined) ctx.drawImage(a.canvas, gi * GW, 0, gw(ch), GH, cx, y, gw(ch), GH);
+      cx += adv(ch);
     }
   }
 

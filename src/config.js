@@ -135,6 +135,11 @@ AQ.TUNING = {
 
   climb: { speed: 42 },
 
+  sexes: {
+    missingBias: 0.25         // once you have one sex of a species, the other spawns this much more often
+                              // (0.25 -> 75% chance; 0 = always 50/50)
+  },
+
   station: {                  // the aquarium building in space
     zoomedOutByDefault: false, // OPTIONAL view: true starts zoomed out to see the whole building (all tanks)
     zoomKey: 'KeyV',          // toggles the zoomed-out view in the building (your choice is saved)

@@ -113,7 +113,7 @@ AQ.Aquarium = (function () {
     const loco = def.tank || (def.category === 'crustacean' || def.category === 'gastropod' ? 'crawl' : 'swim');
     const r = AQ.Creatures.spriteR(def);
     const f = {
-      uid: e.uid, def, loco, r, key: def.spriteKey || 'creature.' + def.id,
+      uid: e.uid, def, loco, r, key: AQ.Sex.spriteKey(def, e.sex), sex: e.sex || null,
       x: R.range(30, 290), y: loco === 'swim' ? R.range(40, 110) : 0, vx: 0, vy: 0, facing: R.chance(0.5) ? 1 : -1,
       z: R.range(TANK.sandTop + 2, TANK.bottom), state: 'swim', st: R.range(1, 4), t: R.range(0, 9), stress: false, target: null
     };
@@ -410,8 +410,9 @@ AQ.Aquarium = (function () {
       Object.entries(AQ.State.plants).forEach(([id, n]) => { const d = defOf(id); if (d && n > 0) out.push({ id: 'item', kind: 'plant', ref: id, key: 'plant.' + id, name: d.name, count: n }); });
     } else {
       const tank = AQ.Collection.tank(A.biome);
-      tank.creatures.forEach((e) => out.push({ id: 'fish', where: 'tank', uid: e.uid, ref: e.id, key: 'creature.' + e.id, name: defOf(e.id).name }));
-      tank.storage.forEach((e) => out.push({ id: 'fish', where: 'storage', uid: e.uid, ref: e.id, key: 'creature.' + e.id, name: defOf(e.id).name }));
+      const sx = (e) => (e.sex ? ' ' + AQ.Sex.SYMBOL[e.sex] : '');
+      tank.creatures.forEach((e) => out.push({ id: 'fish', where: 'tank', uid: e.uid, ref: e.id, sex: e.sex, key: AQ.Sex.spriteKey(defOf(e.id), e.sex), name: defOf(e.id).name + sx(e) }));
+      tank.storage.forEach((e) => out.push({ id: 'fish', where: 'storage', uid: e.uid, ref: e.id, sex: e.sex, key: AQ.Sex.spriteKey(defOf(e.id), e.sex), name: defOf(e.id).name + sx(e) }));
     }
     return out;
   }
@@ -770,7 +771,7 @@ AQ.Aquarium = (function () {
     // hover tooltip on creatures
     if (!A.holding && inTank(m)) {
       const f = fishAt(m);
-      if (f && A.card !== f.uid) tip(g, `${f.def.name} - ${f.moodName || 'CONTENT'}${f.near ? ' (LOVES THE ' + f.near.tag.replace(/_/g, ' ').toUpperCase() + ')' : ''}`, m.x, m.y - 10, f.moodCol || '#fff');
+      if (f && A.card !== f.uid) tip(g, `${f.def.name}${f.sex ? ' ' + AQ.Sex.SYMBOL[f.sex] : ''} - ${f.moodName || 'CONTENT'}${f.near ? ' (LOVES THE ' + f.near.tag.replace(/_/g, ' ').toUpperCase() + ')' : ''}`, m.x, m.y - 10, f.moodCol || '#fff');
     }
 
     const cf = A.card && A.fish.find((f) => f.uid === A.card);
@@ -805,7 +806,7 @@ AQ.Aquarium = (function () {
     return '';
   }
   function drawCard(g, f) {
-    const W = 136, H = 50, x = f.x < 160 ? TANK.x + TANK.w - W - 6 : TANK.x + 6, y = TANK.waterTop + 4;
+    const W = 136, H = 58, x = f.x < 160 ? TANK.x + TANK.w - W - 6 : TANK.x + 6, y = TANK.waterTop + 4;
     const tank = AQ.Collection.tank(A.biome), likes = f.def.likes || [];
     const have = new Set(); tank.decor.forEach((d) => AQ.Vibe.tagsOf(d).forEach((t) => have.add(t)));
     g.fillStyle = 'rgba(6,18,34,0.92)'; g.fillRect(x, y, W, H);
@@ -820,6 +821,7 @@ AQ.Aquarium = (function () {
     }
     const tx = x + 33, b = AQ.World.biomeById[f.def.biome];
     F().draw(g, f.def.name.toUpperCase(), tx, y + 4, '#ffe9a8', { shadow: false });
+    if (f.sex) F().draw(g, AQ.Sex.SYMBOL[f.sex], tx + F().width(f.def.name.toUpperCase()) + 3, y + 4, AQ.Sex.COLOR[f.sex], { shadow: false });
     F().draw(g, 'MOOD:', tx, y + 12, '#8fb6cc', { shadow: false });
     F().draw(g, f.moodName || 'CONTENT', tx + 24, y + 12, f.moodCol || '#bfe8ff', { shadow: false });
     F().draw(g, 'LIKES:', tx, y + 20, '#8fb6cc', { shadow: false });
@@ -832,9 +834,11 @@ AQ.Aquarium = (function () {
     });
     F().draw(g, 'FROM:', tx, y + 28, '#8fb6cc', { shadow: false });
     F().draw(g, ((b && b.name) || f.def.biome).toUpperCase(), tx + 24, y + 28, '#cfe8ff', { shadow: false });
-    F().draw(g, activity(f), x + 4, y + 35, '#e8fbff', { shadow: false });
+    F().draw(g, 'SEX:', x + 4, y + 35, '#8fb6cc', { shadow: false });
+    F().draw(g, f.sex ? `${AQ.Sex.NAME[f.sex]} ${AQ.Sex.SYMBOL[f.sex]}` : 'NONE', x + 24, y + 35, f.sex ? AQ.Sex.COLOR[f.sex] : '#cfe8ff', { shadow: false });
+    F().draw(g, activity(f), x + 4, y + 43, '#e8fbff', { shadow: false });
     const missing = likes.filter((l) => !have.has(l));
-    F().draw(g, missing.length ? 'WOULD LOVE SOME ' + TAGWORD(missing[0]) : (f.stress ? 'A BIGGER CREATURE MAKES IT NERVOUS' : 'HAS EVERYTHING IT LIKES'), x + 4, y + 42, missing.length || f.stress ? '#ffcf8a' : '#8ff0b0', { shadow: false });
+    F().draw(g, missing.length ? 'WOULD LOVE SOME ' + TAGWORD(missing[0]) : (f.stress ? 'THE TANK FEELS A BIT CROWDED' : 'HAS EVERYTHING IT LIKES'), x + 4, y + 50, missing.length || f.stress ? '#ffcf8a' : '#8ff0b0', { shadow: false });
   }
 
   // Glanceable mood: a tiny icon pops over each creature now and then (always while nervous
@@ -1158,6 +1162,7 @@ AQ.Aquarium = (function () {
           miniStar(g, r.x + r.w / 2 - 3 + Math.ceil(F().width(txt) / 2), r.y + 22);
         }
         if (r.fresh && Math.floor(A.t * 3) % 2 === 0) F().draw(g, 'NEW', r.x + r.w / 2, r.y + 1, '#ffe08a', { align: 'center' });
+        if (r.id === 'fish' && r.sex) F().draw(g, AQ.Sex.SYMBOL[r.sex], r.x + 2, r.y + 2, AQ.Sex.COLOR[r.sex], { shadow: false });
         if (r.id === 'fish') F().draw(g, r.where === 'tank' ? 'IN' : 'OUT', r.x + r.w / 2, r.y + 23, r.where === 'tank' ? '#7ef0c0' : '#a8b8c8', { align: 'center' });
       } else if (r.id !== 'stars') button(g, r, hover);
     }
