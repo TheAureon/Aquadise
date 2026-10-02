@@ -17,7 +17,7 @@
 var AQ = (typeof AQ !== 'undefined') ? AQ : {};
 
 AQ.Audio = (function () {
-  const A = { sounds: {}, ctx: null, ready: false, voices: 0, last: {}, musicWanted: null };
+  const A = { sounds: {}, ctx: null, ready: false, voices: 0, last: {}, musicWanted: null, buffers: {} };
   const cfg = () => AQ.TUNING.audio;
 
   A.register = function (id, def) { A.sounds[id] = Object.assign({ id, kind: 'sfx', label: id }, def); };
@@ -79,6 +79,7 @@ AQ.Audio = (function () {
     A.noiseBuf = noiseBuffer(4);
     A.ready = true;
     A.applyVolumes(true);
+    loadRecordings();
     if (AQ.Music) AQ.Music.start();
     if (AQ.Ambience) AQ.Ambience.start();
   }
@@ -120,10 +121,9 @@ AQ.Audio = (function () {
   };
   A.play = function (id, opts = {}) {
     if (!A.ready || A.ctx.state !== 'running' || A.settings().mute) return;
-    const file = AQ.data.audioFiles && AQ.data.audioFiles[id];
-    if (file) { playFile(file, opts); return; }
-    const s = A.sounds[id];
-    if (!s || !s.fn) return;
+    const rec = recordingFor(id);
+    const s = A.sounds[id] || (rec ? { id } : null);
+    if (!s || (!s.fn && !rec)) return;
     // the same sound fired many times in a blink plays once
     const t = A.ctx.currentTime, min = s.minGap != null ? s.minGap : 0.05;
     if (A.last[id] && t - A.last[id] < min) return;
@@ -134,11 +134,54 @@ AQ.Audio = (function () {
       let node = out;
       if (opts.pan && A.ctx.createStereoPanner) { const p = A.ctx.createStereoPanner(); p.pan.value = Math.max(-1, Math.min(1, opts.pan)); out.connect(p); node = p; }
       node.connect(s.bus === 'music' ? A.musicBus : A.sfxBus);
-      const dur = (s.fn(A.ctx, out, t + 0.01 + (opts.delay || 0), opts) || 1) + (opts.delay || 0);
+      const dur = (rec ? playBuffer(rec, out, t + 0.01 + (opts.delay || 0)) : s.fn(A.ctx, out, t + 0.01 + (opts.delay || 0), opts) || 1) + (opts.delay || 0);
       A.voice(dur);
       setTimeout(() => { try { node.disconnect(); out.disconnect(); } catch (e) {} }, (dur + 0.5) * 1000);
     } catch (e) { /* a sound must never break the game */ }
   };
+  // ---------------------------------------------------------------- recordings (AQ.data.audioFiles)
+  // An effect mapped to recordings plays one of them (picked at random, with a tiny pitch change so
+  // repeats don't sound identical) through the same mixer as everything else: volume sliders,
+  // underwater muffling and the voice limit all apply. Until a file has loaded (or if it can't load),
+  // the generated version plays instead. Files packed by tools/embed-audio.js load from
+  // AQ.data.audioEmbedded, so they also work when the game is opened straight from disk.
+  const mapOf = (id) => {
+    const m = AQ.data.audioFiles && AQ.data.audioFiles[id];
+    if (!m) return null;
+    if (typeof m === 'string') return { files: [m], vol: 1 };
+    if (Array.isArray(m)) return { files: m, vol: 1 };
+    return { files: m.files || [], vol: m.vol != null ? m.vol : 1, vary: m.vary };
+  };
+  function recordingFor(id) {
+    const m = mapOf(id);
+    if (!m) return null;
+    const ready = m.files.map((f) => A.buffers[f]).filter((b) => b && b !== 'loading' && b !== 'failed');
+    return ready.length ? { buf: ready[Math.floor(Math.random() * ready.length)], vol: m.vol, vary: m.vary != null ? m.vary : 0.05 } : null;
+  }
+  A.hasRecording = (id) => !!mapOf(id);
+  function playBuffer(rec, out, t) {
+    const src = A.ctx.createBufferSource(), g = A.ctx.createGain();
+    src.buffer = rec.buf; src.playbackRate.value = 1 + (Math.random() * 2 - 1) * rec.vary;
+    g.gain.value = rec.vol; src.connect(g); g.connect(out);
+    src.start(t);
+    return rec.buf.duration / src.playbackRate.value;
+  }
+  function loadRecordings() {
+    const all = AQ.data.audioFiles || {};
+    for (const id in all) {
+      if (A.sounds[id] && A.sounds[id].kind !== 'sfx') continue;    // beds + music stream instead
+      const m = mapOf(id);
+      if (!m) continue;
+      m.files.forEach((url) => {
+        if (A.buffers[url]) return;
+        A.buffers[url] = 'loading';
+        const emb = AQ.data.audioEmbedded && AQ.data.audioEmbedded[url];
+        const bytes = emb ? Promise.resolve(Uint8Array.from(atob(emb), (ch) => ch.charCodeAt(0)).buffer) : fetch(url).then((r) => r.arrayBuffer());
+        bytes.then((ab) => A.ctx.decodeAudioData(ab)).then((buf) => { A.buffers[url] = buf; }).catch(() => { A.buffers[url] = 'failed'; });
+      });
+    }
+  }
+
   // A recording in place of a generated sound (AQ.data.audioFiles). One-shots go through the effects
   // (or given) bus; loops (ambience beds, music) feed a gain node the caller fades.
   function playFile(url, opts = {}) {

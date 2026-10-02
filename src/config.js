@@ -199,6 +199,8 @@ AQ.TUNING = {
     underwaterCutoff: 900,    // how muffled effects + ambience are underwater (Hz; lower = more muffled)
     musicPace: 1,             // music tempo multiplier (0.8 = slower, 1.2 = quicker)
     musicRest: 1,             // silence between music phrases multiplier (2 = twice as much quiet)
+    musicAmbient: 1,          // 1 = ambient (slow, a soft pad that never stops, long airy notes, more echo);
+                              // 0 = the livelier, plucky style; anything in between blends
     nightPace: 0.8,           // night versions of the sea music play this much slower...
     nightVolume: 0.7,         // ...and this much quieter
     crossfadeSeconds: 3,      // how long music + ambience take to blend into the next place

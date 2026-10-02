@@ -15,6 +15,7 @@ AQ.Music = (function () {
   const D = () => AQ.data.music;
   const R = Math.random;
   const pick = (arr) => arr[Math.floor(R() * arr.length)];
+  const ambient = () => Math.max(0, Math.min(1, cfg().musicAmbient != null ? cfg().musicAmbient : 1));
 
   // ---------------------------------------------------------------- instruments
   // (c, dest, t, freq, vel, beats-in-seconds) -> seconds
@@ -102,7 +103,7 @@ AQ.Music = (function () {
       p.bounce = false; p.dark = true;
       p.rest = [p.rest[0] + 1, p.rest[1] + 2];
     }
-    p.bpm *= cfg().musicPace;
+    p.bpm *= cfg().musicPace * (1 - 0.3 * ambient());
     return p;
   }
   function noteOf(p, step, oct = 0) {
@@ -143,28 +144,42 @@ AQ.Music = (function () {
   }
 
   // Queue one phrase (+ its pad, bass, arpeggio and the rest after it) starting at time t0.
+  // AQ.TUNING.audio.musicAmbient (0..1) turns every piece towards ambient: slower, a held pad that
+  // never stops (each chord melts into the next), longer and softer melody notes, sparser
+  // arpeggios, a single low bass note, more echo, and now and then a passage of pad alone.
   function queuePhrase(inst, t0) {
-    const p = inst.p, beat = 60 / p.bpm, Q = inst.queue;
-    const ph = makePhrase(inst);
+    const p = inst.p, beat = 60 / p.bpm, Q = inst.queue, amb = ambient();
     const chord = p.chords[inst.chordIdx++ % p.chords.length];
     const v = 0.9 * (p.vol || 1);
+    const padOnly = R() < 0.3 * amb;                               // just the pad breathing for a while
+    const ph = padOnly ? [] : makePhrase(inst);
     let t = t0, total = 0;
     ph.forEach((n) => {
-      Q.push({ t, ins: p.lead, midi: noteOf(p, n.step + chord, 0), v: v * (0.8 + R() * 0.2), len: n.beats * beat });
-      t += n.beats * beat; total += n.beats;
+      const beats = n.beats * (1 + 0.5 * amb);
+      Q.push({ t, ins: p.lead, midi: noteOf(p, n.step + chord, 0), v: v * (0.8 + R() * 0.2) * (1 - 0.3 * amb), len: beats * beat });
+      t += beats * beat; total += beats;
     });
-    const restBeats = (p.rest[0] + R() * (p.rest[1] - p.rest[0])) * cfg().musicRest;
-    const span = (total + restBeats * 0.6) * beat;
-    if (p.pad) [0, 2, 4].forEach((k) => Q.push({ t: t0, ins: p.pad, midi: noteOf(p, chord + k, -1), v, len: span }));
+    if (padOnly) total = 6 + Math.floor(R() * 4);
+    const restBeats = (p.rest[0] + R() * (p.rest[1] - p.rest[0])) * cfg().musicRest * (1 + amb);
+    const pad = p.pad || (amb > 0.5 ? 'warm' : null);
+    if (pad) {
+      // ambient: the pad lasts through the rest and overlaps the next chord (no gaps)
+      const span = amb > 0.5 ? (total + restBeats) * beat + 2.5 : (total + restBeats * 0.6) * beat;
+      [0, 2, 4].forEach((k) => Q.push({ t: t0, ins: pad, midi: noteOf(p, chord + k, -1), v, len: span }));
+      if (amb > 0.5) Q.push({ t: t0 + beat, ins: 'glass', midi: noteOf(p, chord + 4, 0), v: v * 0.35 * amb, len: span });   // a faint shimmer on top
+    }
     if (p.bass) {
-      Q.push({ t: t0, ins: 'bass', midi: noteOf(p, chord, -2), v, len: beat * 2 });
-      if (total > 4 && R() < 0.6) Q.push({ t: t0 + Math.floor(total / 2) * beat, ins: 'bass', midi: noteOf(p, chord + 4, -2), v: v * 0.8, len: beat * 2 });
+      if (amb > 0.5) Q.push({ t: t0, ins: 'bass', midi: noteOf(p, chord, -2), v: v * 0.6, len: (total + restBeats * 0.5) * beat });
+      else {
+        Q.push({ t: t0, ins: 'bass', midi: noteOf(p, chord, -2), v, len: beat * 2 });
+        if (total > 4 && R() < 0.6) Q.push({ t: t0 + Math.floor(total / 2) * beat, ins: 'bass', midi: noteOf(p, chord + 4, -2), v: v * 0.8, len: beat * 2 });
+      }
     }
-    if (p.arp) {
-      const pat = [0, 2, 4, 7, 4, 2], step = beat / 2;
-      for (let i = 0; i < total * 2; i++) if (R() < (p.arpDensity || 0.5)) Q.push({ t: t0 + i * step, ins: p.arp, midi: noteOf(p, chord + pat[i % pat.length], p.arp === 'chip' ? 1 : 0), v: v * 0.55, len: step });
+    if (p.arp && !padOnly) {
+      const pat = [0, 2, 4, 7, 4, 2], step = amb > 0.5 ? beat : beat / 2;
+      for (let i = 0; i * step < total * beat; i++) if (R() < (p.arpDensity || 0.5) * (1 - 0.5 * amb)) Q.push({ t: t0 + i * step, ins: p.arp, midi: noteOf(p, chord + pat[i % pat.length], p.arp === 'chip' ? 1 : 0), v: v * 0.5, len: step });
     }
-    if (p.bounce) {
+    if (p.bounce && amb <= 0.5) {
       for (let b = 0.5; b < total; b += 1) if (R() < 0.6) [0, 2, 4].forEach((k) => Q.push({ t: t0 + b * beat, ins: 'guitar', midi: noteOf(p, chord + k, 0), v: v * 0.25, len: beat * 0.4 }));
     }
     Q.sort((a, b) => a.t - b.t);
@@ -224,7 +239,12 @@ AQ.Music = (function () {
   };
 
   // ---------------------------------------------------------------- director
-  M.start = function () { M.started = true; };
+  M.start = function () {
+    M.started = true;
+    // ambient music gets more space: more reverb and a longer, softer echo
+    const amb = ambient();
+    A.musicVerb.gain.value = 0.35 + 0.4 * amb;
+  };
   M.wanted = function (game) {
     if (M.test) return M.test;
     const st = game.state;

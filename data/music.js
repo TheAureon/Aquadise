@@ -62,4 +62,13 @@ AQ.data.creatureVoices = {
 // beds 'amb:<place>', music 'music:<piece>' (beds + music loop), e.g.
 //   AQ.data.audioFiles = { catch: 'audio/catch.ogg', 'amb:kelp': 'audio/kelp-bed.ogg', 'music:kelp': 'audio/kelp.ogg' };
 // The SOUND TEST screen lists every id. Serve the game over http for files to play reliably.
-AQ.data.audioFiles = {};
+// A value can be one file, a list (one is picked at random each time), or
+//   { files: [...], vol: 0..1, vary: 0..0.2 }   (vol = loudness, vary = random pitch change).
+// After adding a file to assets/audio/, run `node tools/embed-audio.js` so it also plays from file://.
+AQ.data.audioFiles = {
+  // footsteps on the sand (tide pool shore) and on the hill's grass: single steps cut from recordings
+  step_sand: { files: [1, 2, 3, 4, 5, 6].map((i) => `assets/audio/sand-step-${i}.mp3`), vol: 0.2, vary: 0.06 },
+  step_grass: { files: [1, 2, 3, 4, 5, 6].map((i) => `assets/audio/grass-step-${i}.mp3`), vol: 0.6, vary: 0.06 },
+  // climbing out of the water
+  splash_out: { files: ['assets/audio/water-out.mp3'], vol: 0.4, vary: 0.04 }
+};
