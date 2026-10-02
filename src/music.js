@@ -79,11 +79,11 @@ AQ.Music = (function () {
     },
     warm(c, d, t, f, v, len) {          // pad: two slightly detuned saws through a dark filter
       const g = voice(c, d, t, len + 3, [osc(c, 'sawtooth', f, -7), osc(c, 'sawtooth', f, 7)], lp(c, 650));
-      return env(c, g, t, 1.4, v * 0.07, Math.max(0, len - 1.4), 2.2);
+      return env(c, g, t, 1.8, v * 0.11, Math.max(0, len - 1.8), 2.6);
     },
     glass(c, d, t, f, v, len) {         // pad: glassy sines with a slow shimmer
       const g = voice(c, d, t, len + 3, [osc(c, 'sine', f), osc(c, 'sine', f * 2, 6), osc(c, 'triangle', f * 3, -6)], lp(c, 2400));
-      return env(c, g, t, 1.6, v * 0.09, Math.max(0, len - 1.6), 2.4);
+      return env(c, g, t, 1.8, v * 0.11, Math.max(0, len - 1.8), 2.6);
     }
   };
   M.instruments = I;

@@ -138,7 +138,7 @@ before that), and pauses while the tab is hidden.
   sparse, with long rests. At night the sea pieces play slower, quieter and darker.
 - **Creature sounds:** rare and quiet. One nearby creature makes a little sound every so often,
   by category, or its own `voice:` in `data/creatures.js`.
-- **Recordings:** footsteps on sand and grass, and climbing out of the water, use real recordings
+- **Recordings:** footsteps on sand and grass, and going into and climbing out of the water, use real recordings
   (single steps cut from the walking clips in `assets/audio/`; a random one plays each step).
   To swap any other sound for a file, put it in `assets/audio/`, map its id in
   `AQ.data.audioFiles` (`data/music.js`), and run `node tools/embed-audio.js` so it also plays when
