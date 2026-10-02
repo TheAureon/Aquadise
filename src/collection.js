@@ -4,7 +4,7 @@ var AQ = (typeof AQ !== 'undefined') ? AQ : {};
 AQ.State = {
   collection: {},   // id -> number caught / harvested
   plants: {},       // id -> plants in inventory (usable as decorations)
-  tanks: {},        // biomeId -> { creatures: [{uid,id}], storage: [{uid,id}], decor: [{uid,type,id,x,y}] }
+  tanks: {},        // tankId (biome id or predator tank id) -> { creatures: [{uid,id}], storage: [{uid,id}], decor: [{uid,type,id,x,y}] }
   upgrades: { net: 1, speed: 1 },
   unlocks: {},      // decorId -> true once unlocked by a tank's happiness
   tankBest: {},     // biomeId -> best stars that tank has ever reached
@@ -25,7 +25,7 @@ AQ.Collection = (function () {
   Col.recordCatch = function (def) {
     const isNew = !S().collection[def.id];
     S().collection[def.id] = (S().collection[def.id] || 0) + 1;
-    const tank = Col.tank(def.biome);
+    const tank = Col.tank(AQ.Tanks.forCreature(def));   // biome tank, or a predator tank
     const entry = { uid: AQ.U.uid(), id: def.id };
     if (tank.creatures.length < AQ.TUNING.tank.capacity) tank.creatures.push(entry); else tank.storage.push(entry);
     AQ.Save && AQ.Save.dirty();

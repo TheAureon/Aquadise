@@ -1,4 +1,5 @@
-// Per-biome aquarium tank looks. Every field is optional; missing ones fall back to `default`.
+// Aquarium tanks: per-tank looks (tankStyles) and the predator tanks (predatorTanks).
+// Per-tank aquarium looks. Every field is optional; missing ones fall back to `default`.
 // top/deep:  water gradient colours (top of tank -> sand)
 // shafts:    strength of the swaying light shafts from the lid (0 = none)
 // caustics:  strength of the light ripples on the sand
@@ -20,5 +21,36 @@ AQ.data.tankStyles = {
   vents:      { top: '#6a4048', deep: '#1a0a10', shafts: 0, caustics: 0.05, dark: 0.32, particles: 'embers', lamp: '#ff9a5a' },
   mangrove:   { top: '#b4cc8a', deep: '#33452a', shafts: 0.07, caustics: 0.14, dark: 0.05, particles: 'spores', lamp: '#e8f0a0' },
   ice:        { top: '#eefcff', deep: '#4f9ccc', shafts: 0.11, caustics: 0.32, particles: 'snow', lamp: '#ffffff' },
-  lush_cave:  { top: '#5a7a6a', deep: '#141e2a', shafts: 0.03, caustics: 0.06, dark: 0.32, particles: 'fireflies', lamp: '#ffc0f0' }
+  lush_cave:  { top: '#5a7a6a', deep: '#141e2a', shafts: 0.03, caustics: 0.06, dark: 0.32, particles: 'fireflies', lamp: '#ffc0f0' },
+  // predator tanks (4th floor)
+  pred_reef:  { top: '#9fe2e8', deep: '#1f5f8a', shafts: 0.07, caustics: 0.24, dark: 0.08, lamp: '#ffb0a0' },
+  pred_open:  { top: '#7fc8ea', deep: '#0f3478', shafts: 0.09, caustics: 0.2, lamp: '#bfe0ff' },
+  pred_deep:  { top: '#1e3058', deep: '#03060f', shafts: 0, caustics: 0, dark: 0.55, particles: 'snow', lamp: '#7f6fff' },
+  pred_cave:  { top: '#3a4a52', deep: '#0a1218', shafts: 0.02, caustics: 0.03, dark: 0.42, particles: 'motes', lamp: '#a8c8b8' },
+  pred_swamp: { top: '#a8b878', deep: '#28351e', shafts: 0.06, caustics: 0.12, dark: 0.1, particles: 'spores', lamp: '#f0e08a' }
 };
+
+// Predator tanks. Predators (creatures with `predator: true` in data/creatures.js) live here instead of
+// in their biome's tank. Regroup them by moving ids between `members`; a predator not listed in any
+// group falls back to the group whose `themes` include its biome, then to the first group.
+//   themes:  biomes whose decor/plants count as "on theme" for this tank (vibe theme bonus, tray order)
+//   theme:   which biome-style silhouettes to paint in the tank backdrop
+//   tiny:    shortest label (used when names must squeeze, e.g. the zoomed-out building)
+//   palette: sand (top) and rock colours, like a biome palette; water: tint colour
+AQ.data.predatorTanks = [
+  { id: 'pred_reef', tiny: 'REEF', name: 'Reef Hunters', short: 'Reef Hunters', members: ['coral_viper', 'wreck_eel'],
+    themes: ['coral', 'ruins'], theme: 'coral', water: '#2f9ab8',
+    palette: { top: ['#e8d6a8', '#d6c08e', '#c0a878'], rock: ['#a88a72', '#8d725d', '#725c4a'] } },
+  { id: 'pred_open', tiny: 'OPEN SEA', name: 'Open-Water Hunters', short: 'Open Water', members: ['reeftooth'],
+    themes: ['open_ocean'], theme: 'open_ocean', water: '#1f5fa8',
+    palette: { top: ['#6d7c88', '#5d6b78', '#4f5c68'], rock: ['#46525e', '#3c4652', '#323b46'] } },
+  { id: 'pred_deep', tiny: 'DEEP', name: 'Deep Hunters', short: 'Deep Hunters', members: ['lanternjaw', 'trenchmaw'],
+    themes: ['trench', 'vents'], theme: 'vents', water: '#050c1c',
+    palette: { top: ['#2c3448', '#252c3d', '#1e2433'], rock: ['#1b2130', '#161b27', '#11151f'] } },
+  { id: 'pred_cave', tiny: 'CAVE', name: 'Cave Hunters', short: 'Cave Hunters', members: ['cave_crawler'],
+    themes: ['cave', 'lush_cave'], theme: 'ruins', water: '#1c3550',
+    palette: { top: ['#56606b', '#4a535d', '#3f4750'], rock: ['#3e444d', '#343941', '#2a2e35'] } },
+  { id: 'pred_swamp', tiny: 'SWAMP', name: 'Swamp Hunters', short: 'Swamp Hunters', members: ['dwarf_croc', 'bankside_monitor'],
+    themes: ['mangrove'], theme: 'mangrove', water: '#5c7a3a',
+    palette: { top: ['#6e5a3c', '#5c4b32', '#4a3c29'], rock: ['#4e4234', '#41372b', '#342c23'] } }
+];

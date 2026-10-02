@@ -4,7 +4,7 @@
 //          rock shell coral kelp plant wood metal arch pillar hideout perch light ice crystal roots
 //          treasure vent bubbles
 // biomes:  tanks it matches for the vibe "theme" bonus (omit = fits anywhere, no bonus)
-// unlock:  { biome, tier } - unlocked when that biome's tank first reaches the star count for that tier
+// unlock:  { biome | tank, tier } - unlocked when that biome's (or predator) tank first reaches the star count for that tier
 //          (tiers 1/2/3 = AQ.TUNING.aquarium.unlockStars in config.js; `stars: n` overrides). Omit = always.
 // glow:    colour of the soft light it gives off in dark tanks (light-tagged pieces)
 // The first 13 pieces are the basic set; after them each biome has one free themed piece and
@@ -91,5 +91,22 @@ AQ.data.decorations = [
   { id: 'glow_mushrooms', name: 'Glow Mushrooms', kind: 'floor', sprite_size: 'small', color: '#ff9fd0', accent: '#fff1a8', art: { shape: 'mushroom' }, tags: ['plant', 'light'], glow: '#ffb0e0', biomes: ['lush_cave'] },
   { id: 'mossy_stone', name: 'Mossy Stone', kind: 'floor', sprite_size: 'wide', color: '#5a5560', art: { shape: 'flatrock', seed: 3, moss: '#6fa456' }, tags: ['rock', 'plant', 'perch'], biomes: ['lush_cave'], unlock: { biome: 'lush_cave', tier: 1 } },
   { id: 'flower_arch', name: 'Flower Arch', kind: 'floor', sprite_size: 'large', color: '#5a5560', accent: '#ff9fd0', art: { shape: 'florarch', leaf: '#6fa456' }, tags: ['arch', 'plant', 'hideout'], biomes: ['lush_cave'], unlock: { biome: 'lush_cave', tier: 2 } },
-  { id: 'fairy_lantern', name: 'Fairy Lantern', kind: 'floor', sprite_size: 'small', color: '#5a4a3a', accent: '#ffd0f0', art: { shape: 'lantern', metal: '#6a5a4a' }, tags: ['light'], glow: '#ffc0f0', biomes: ['lush_cave'], unlock: { biome: 'lush_cave', tier: 3 } }
+  { id: 'fairy_lantern', name: 'Fairy Lantern', kind: 'floor', sprite_size: 'small', color: '#5a4a3a', accent: '#ffd0f0', art: { shape: 'lantern', metal: '#6a5a4a' }, tags: ['light'], glow: '#ffc0f0', biomes: ['lush_cave'], unlock: { biome: 'lush_cave', tier: 3 } },
+
+  // ---- Predator tanks (4th floor): their basics come from their theme biomes; these unlock with stars
+  { id: 'ambush_coral', name: 'Ambush Coral', kind: 'floor', sprite_size: 'medium', color: '#c8503a', accent: '#ffb0a0', art: { shape: 'branchcoral', seed: 7 }, tags: ['coral', 'hideout'], biomes: ['pred_reef'], unlock: { tank: 'pred_reef', tier: 1 } },
+  { id: 'wreck_ribs', name: 'Wreck Ribs', kind: 'floor', sprite_size: 'widelarge', color: '#7a5a3a', art: { shape: 'ribs' }, tags: ['wood', 'arch', 'hideout'], biomes: ['pred_reef'], unlock: { tank: 'pred_reef', tier: 2 } },
+  { id: 'reef_throne', name: 'Reef Throne', kind: 'floor', sprite_size: 'large', color: '#8a7a6a', accent: '#ff8aa0', art: { shape: 'kelparch', kelp: '#ef8aa0' }, tags: ['arch', 'coral', 'rock', 'perch'], biomes: ['pred_reef'], unlock: { tank: 'pred_reef', tier: 3 } },
+  { id: 'drift_rope', name: 'Drift Rope', kind: 'float', hang: 10, sprite_size: 'medium', color: '#b49a6a', accent: '#d8c090', art: { shape: 'tangle' }, tags: ['wood'], biomes: ['pred_open'], unlock: { tank: 'pred_open', tier: 1 } },
+  { id: 'great_bones', name: 'Great Bones', kind: 'floor', sprite_size: 'widelarge', color: '#e6dfcc', art: { shape: 'ribs' }, tags: ['arch', 'hideout'], biomes: ['pred_open'], unlock: { tank: 'pred_open', tier: 2 } },
+  { id: 'storm_buoy', name: 'Storm Buoy', kind: 'float', hang: 10, sprite_size: 'small', color: '#f2c14e', accent: '#2a2a32', art: { shape: 'buoy' }, tags: ['metal', 'light'], glow: '#fff1a8', biomes: ['pred_open'], unlock: { tank: 'pred_open', tier: 3 } },
+  { id: 'angler_lamp', name: 'Angler Lamp', kind: 'floor', sprite_size: 'small', color: '#3a3448', accent: '#c8a0ff', art: { shape: 'lantern', metal: '#3a3448' }, tags: ['light', 'metal'], glow: '#c8a0ff', biomes: ['pred_deep'], unlock: { tank: 'pred_deep', tier: 1 } },
+  { id: 'abyss_spire', name: 'Abyss Spire', kind: 'floor', sprite_size: 'tall', color: '#252c3d', art: { shape: 'stalagmite', seed: 5 }, tags: ['rock', 'pillar'], biomes: ['pred_deep'], unlock: { tank: 'pred_deep', tier: 2 } },
+  { id: 'hunter_geode', name: 'Hunter Geode', kind: 'floor', sprite_size: 'medium', color: '#2f2a3a', accent: '#7ff6ff', art: { shape: 'geode' }, tags: ['crystal', 'rock', 'light', 'treasure'], glow: '#7ff6ff', biomes: ['pred_deep'], unlock: { tank: 'pred_deep', tier: 3 } },
+  { id: 'gnaw_rock', name: 'Gnawed Rock', kind: 'floor', sprite_size: 'wide', color: '#4a535d', art: { shape: 'flatrock', seed: 9 }, tags: ['rock', 'perch'], biomes: ['pred_cave'], unlock: { tank: 'pred_cave', tier: 1 } },
+  { id: 'burrow_den', name: 'Burrow Den', kind: 'floor', sprite_size: 'large', color: '#3e444d', art: { shape: 'den' }, tags: ['rock', 'hideout'], biomes: ['pred_cave'], unlock: { tank: 'pred_cave', tier: 2 } },
+  { id: 'glow_crystals', name: 'Glow Crystals', kind: 'floor', sprite_size: 'medium', color: '#5fe0b0', accent: '#d0fff0', art: { shape: 'crystals' }, tags: ['crystal', 'light'], glow: '#a0ffd8', biomes: ['pred_cave'], unlock: { tank: 'pred_cave', tier: 3 } },
+  { id: 'basking_log', name: 'Basking Log', kind: 'floor', sprite_size: 'wide', color: '#6e5236', accent: '#7d8f3c', art: { shape: 'log' }, tags: ['wood', 'perch', 'hideout'], biomes: ['pred_swamp'], unlock: { tank: 'pred_swamp', tier: 1 } },
+  { id: 'reed_clump', name: 'Reed Clump', kind: 'floor', sprite_size: 'medium', color: '#7d8f3c', accent: '#c8b070', art: { shape: 'tuft' }, tags: ['plant', 'roots'], biomes: ['pred_swamp'], unlock: { tank: 'pred_swamp', tier: 2 } },
+  { id: 'swamp_lantern', name: 'Swamp Lantern', kind: 'floor', sprite_size: 'small', color: '#5a4a3a', accent: '#ffd890', art: { shape: 'lantern', metal: '#4a3a2a' }, tags: ['light'], glow: '#ffd890', biomes: ['pred_swamp'], unlock: { tank: 'pred_swamp', tier: 3 } }
 ];

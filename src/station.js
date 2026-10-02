@@ -30,10 +30,9 @@ AQ.Station = (function () {
   St.zoneName = () => 'Aquarium Station';
   St.valid = (x, y) => W.standable(x, y) && W.boxHits(x, y + 3, 5, 4) && x > L.hull.x + 10 && x < L.hull.x + L.hull.w - 10 && y > L.hull.y && y < L.floors[0];
 
-  function biomeOrder() { return AQ.World.biomes.slice().sort((a, b) => (a.rect[0] + (a.id === 'lush_cave' ? 1 : 0) + (a.id === 'cave' ? -1 : 0)) - (b.rect[0] + (b.id === 'lush_cave' ? 1 : 0) + (b.id === 'cave' ? -1 : 0))); }
+  // tank slots straight from data/scenes.js (b = the tank def, or null for an empty slot)
   function layoutTanks() {
-    const bs = biomeOrder();
-    tanks = L.tanks.slice(0, bs.length).map((t, i) => ({ x: t.x, floor: t.floor, y: L.floors[t.floor], b: bs[i] }));
+    tanks = L.tanks.map((t) => ({ x: t.x, floor: t.floor, y: L.floors[t.floor], b: t.tank ? AQ.Tanks.get(t.tank) : null }));
   }
 
   St.enter = function (game, spawn) {
@@ -51,7 +50,7 @@ AQ.Station = (function () {
     if (fl < 0 || P.mode !== 'walk') return null;
     if (fl === 0 && Math.abs(P.x - L.pad.x) < 13) return { kind: 'pad', text: 'BEAM DOWN TO THE HILL' };
     if (fl === 0 && Math.abs(P.x - L.console.x) < 11) return { kind: 'console', text: 'TANK DIRECTORY' };
-    const t = tanks.find((k) => k.floor === fl && Math.abs(P.x - k.x) < 26);
+    const t = tanks.find((k) => k.b && k.floor === fl && Math.abs(P.x - k.x) < 26);
     if (t) return { kind: 'tank', tank: t, text: `TEND THE ${(t.b.short || t.b.name).toUpperCase()} TANK` };
     return null;
   }
@@ -138,9 +137,7 @@ AQ.Station = (function () {
     });
     // signs
     const sign = (x, y, text, col) => { const w = F().width(text) + 6; g.fillStyle = '#16283a'; g.fillRect(x - w / 2, y - 2, w, 9); g.fillStyle = col; g.fillRect(x - w / 2, y - 2, w, 1); F().draw(g, text, x, y, col, { align: 'center', shadow: false }); };
-    sign(L.pad.x, L.floors[0] - 66, 'BEAM PAD', '#9feff0');
-    sign(L.console.x, L.floors[0] - 66, 'DIRECTORY', '#ffe08a');
-    sign(inner.x0 + 70, L.floors[2] - 70, 'AQUARIUM STATION', '#ffd0e0');
+    (L.signs || []).forEach(([text, sx, fl, col]) => sign(sx, L.floors[fl] - (fl === 0 ? 66 : 72), text, col));
     // potted plants
     L.plants.forEach(([px, fl]) => {
       const fy = L.floors[fl];
@@ -149,7 +146,8 @@ AQ.Station = (function () {
       g.fillStyle = '#8fd06a'; g.fillRect(px - 1, fy - 15, 1, 2); g.fillRect(px + 3, fy - 12, 1, 2);
     });
     // outside: antenna, solar wings and soft thrusters (the building floats)
-    g.fillStyle = '#7a8696'; g.fillRect(300, h.y - 16, 2, 16); g.fillStyle = '#ff9fd0'; g.fillRect(299, h.y - 18, 4, 3);
+    const ax = h.x + Math.round(h.w / 2);
+    g.fillStyle = '#7a8696'; g.fillRect(ax, h.y - 16, 2, 16); g.fillStyle = '#ff9fd0'; g.fillRect(ax - 1, h.y - 18, 4, 3);
     for (const [x0, dir] of [[h.x, -1], [h.x + h.w, 1]]) {
       g.fillStyle = '#6a7686'; g.fillRect(dir < 0 ? x0 - 18 : x0, h.y + 100, 18, 3);
       for (let k = 0; k < 2; k++) {
@@ -180,7 +178,15 @@ AQ.Station = (function () {
   }
   function drawTank(ctx, tk) {
     const frame = AQ.Assets.sprites['misc.tank_frame'], fw = 64, fh = 44, x0 = tk.x - fw / 2, y0 = tk.y - fh;
-    const ix = x0 + 4, iy = y0 + 4, iw = fw - 8, ih = fh - 12, b = tk.b, tank = AQ.Collection.tank(b.id), t = AQ.Render.t;
+    const ix = x0 + 4, iy = y0 + 4, iw = fw - 8, ih = fh - 12, b = tk.b, t = AQ.Render.t;
+    if (!b) {
+      // an empty, unlit slot waiting for a future tank
+      ctx.fillStyle = '#0a1420'; ctx.fillRect(ix, iy, iw, ih);
+      ctx.fillStyle = 'rgba(160,200,230,0.06)'; ctx.fillRect(ix + 2, iy + 1, 6, ih - 2);
+      if (frame) { ctx.globalAlpha = 0.6; AQ.Assets.draw(ctx, 'misc.tank_frame', 'idle', tk.x, tk.y, {}); ctx.globalAlpha = 1; }
+      return;
+    }
+    const tank = AQ.Collection.tank(b.id);
     // the tank's own water + backdrop, cropped to the window
     const bd = AQ.Aquarium.backdropOf(b), sw = Math.round(bd.height * iw / ih);
     ctx.drawImage(bd, Math.round((bd.width - sw) / 2), 0, sw, bd.height, ix, iy, iw, ih);
@@ -254,7 +260,9 @@ AQ.Station = (function () {
       ctx.restore();
       if (zoomAmt > 0.5) {
         ctx.globalAlpha = U.clamp((zoomAmt - 0.5) * 3, 0, 1);
-        tanks.forEach((tk) => F().draw(ctx, (tk.b.short || tk.b.name).toUpperCase(), Math.round((tk.x - sx) * z), Math.round((tk.y - 44 - sy) * z) - 7, '#e8fbff', { align: 'center', shadow: 'rgba(4,12,24,0.9)' }));
+        // room for each label = distance to the nearest neighbouring slot on the same floor
+        const room = (tk) => Math.min(...tanks.filter((o) => o !== tk && o.floor === tk.floor).map((o) => Math.abs(o.x - tk.x)), 200) * z - 4;
+        tanks.filter((tk) => tk.b).forEach((tk) => F().draw(ctx, AQ.Tanks.labelFor(tk.b, room(tk)), Math.round((tk.x - sx) * z), Math.round((tk.y - 44 - sy) * z) - 7, '#e8fbff', { align: 'center', shadow: 'rgba(4,12,24,0.9)' }));
         ctx.globalAlpha = 1;
       }
       drawPrompt(ctx, P, sx, sy, z);

@@ -18,20 +18,20 @@ AQ.Vibe = (function () {
     if (item.type === 'plant') { const d = creatureDef(item.id); return ['plant'].concat((d && d.tags) || []); }
     const d = decorDef(item.id); return (d && d.tags) || [];
   };
-  // Does a placed item match this tank's biome theme?
-  V.matchesTheme = function (item, biome) {
-    if (item.type === 'plant') { const d = creatureDef(item.id); return !!d && d.biome === biome; }
-    const d = decorDef(item.id); return !!(d && d.biomes && d.biomes.indexOf(biome) >= 0);
+  // Does a placed item match this tank's theme? (a biome tank's own biome; a predator tank's themes)
+  V.matchesTheme = function (item, tankId) {
+    const themes = AQ.Tanks.themesOf(tankId);
+    if (item.type === 'plant') { const d = creatureDef(item.id); return !!d && themes.indexOf(d.biome) >= 0; }
+    const d = decorDef(item.id); return !!(d && d.biomes && d.biomes.some((b) => themes.indexOf(b) >= 0));
   };
-  // Creatures stressed by a bigger predator sharing the tank (same rule as the old aquarium).
+  // Nervous creatures. Predators live in their own tanks now, so the only thing that makes anyone
+  // nervous is crowding: past AQ.TUNING.aquarium.nervousAbove creatures, the smallest few get
+  // nervous (one per creature over the limit). Nobody is ever hurt.
   V.stressedIds = function (creatures) {
-    const defs = creatures.map((e) => creatureDef(e.id)).filter(Boolean);
-    const rank = (d) => SIZE_RANK[d.sprite_size] || 1;
-    const out = new Set();
-    creatures.forEach((e) => {
-      const d = creatureDef(e.id);
-      if (d && !d.predator && defs.some((o) => o !== d && o.predator && rank(o) >= rank(d))) out.add(e.uid);
-    });
+    const out = new Set(), over = creatures.length - T().nervousAbove;
+    if (over <= 0) return out;
+    const rank = (e) => { const d = creatureDef(e.id); return d ? (SIZE_RANK[d.sprite_size] || 1) : 1; };
+    creatures.slice().sort((a, b) => rank(a) - rank(b)).slice(0, over).forEach((e) => out.add(e.uid));
     return out;
   };
   // 1 = recently fed ... 0 = hungry (fades slowly over real time; nothing bad ever happens).
@@ -55,7 +55,7 @@ AQ.Vibe = (function () {
   // Full evaluation of a tank. Returns { score (0..1), stars (0..5 in halves), parts, helps, missing }.
   V.evaluate = function (biomeId) {
     const tank = AQ.Collection.tank(biomeId), cfg = T(), w = cfg.weights;
-    const b = AQ.World.biomeById[biomeId], short = (b && (b.short || b.name)) || biomeId;
+    const b = AQ.Tanks.get(biomeId), short = (b && (b.short || b.name)) || biomeId;
     const decor = tank.decor || [], creatures = tank.creatures || [];
     const nonPlant = decor.filter((d) => d.type !== 'plant'), plants = decor.filter((d) => d.type === 'plant');
     const kinds = new Set(decor.map((d) => d.type + ':' + d.id)).size;
@@ -89,11 +89,12 @@ AQ.Vibe = (function () {
     const good = (k) => parts[k] >= 0.75;
     if (!n) missing.push('NO CREATURES YET - CATCH SOME!');
     if (good('decor')) helps.push('LOTS OF DECOR VARIETY'); else missing.push(decor.length < cfg.decorAmountTarget / 2 ? 'ADD MORE DECOR' : 'ADD DIFFERENT KINDS OF DECOR');
-    if (good('theme')) helps.push(`FEELS LIKE THE ${short.toUpperCase()}`); else missing.push(`ADD ${short.toUpperCase()} DECOR OR PLANTS`);
+    const themeName = (AQ.Tanks.isPredatorTank(biomeId) ? (AQ.World.biomeById[AQ.Tanks.themesOf(biomeId)[1]] || {}).short || short : short).toUpperCase();
+    if (good('theme')) helps.push(`FEELS LIKE THE ${themeName}`); else missing.push(`ADD ${themeName} DECOR OR PLANTS`);
     if (good('plants')) helps.push('PLANTS TO GRAZE ON'); else missing.push('ADD PLANTS (HARVEST THEM IN THE WILD)');
     if (n) {
       if (good('fed')) helps.push('RECENTLY FED'); else missing.push(parts.fed > 0 ? 'GETTING PECKISH - FEED THEM' : 'HUNGRY - PRESS FEED');
-      if (stressed.size) missing.push(`${stressed.size} NERVOUS NEAR A PREDATOR`); else helps.push('EVERYONE IS CALM');
+      if (stressed.size) missing.push(`${stressed.size} NERVOUS - A BIT CROWDED`); else helps.push('EVERYONE IS CALM');
       if (good('space')) helps.push('PLENTY OF ROOM'); else missing.push('A LITTLE CROWDED');
       if (good('likes')) helps.push('THEY HAVE THINGS THEY LIKE');
       wants.slice(0, 2).forEach((wn) => missing.push(`${wn.name.toUpperCase()} WOULD LIKE ${pretty(wn.like).toUpperCase()}`));
@@ -104,7 +105,7 @@ AQ.Vibe = (function () {
   // ---- happiness milestones -> new decor (no currency, no shop)
   V.unlockStars = (dd) => (dd.unlock.stars != null ? dd.unlock.stars : T().unlockStars[U.clamp((dd.unlock.tier || 1) - 1, 0, T().unlockStars.length - 1)]);
   V.isUnlocked = (dd) => !dd.unlock || !!(AQ.State.unlocks && AQ.State.unlocks[dd.id]);
-  V.lockedFor = (biomeId) => AQ.data.decorations.filter((d) => d.unlock && d.unlock.biome === biomeId && !V.isUnlocked(d))
+  V.lockedFor = (biomeId) => AQ.data.decorations.filter((d) => d.unlock && (d.unlock.tank || d.unlock.biome) === biomeId && !V.isUnlocked(d))
     .sort((a, b) => V.unlockStars(a) - V.unlockStars(b));
   V.nextUnlock = (biomeId) => { const l = V.lockedFor(biomeId)[0]; return l ? { def: l, stars: V.unlockStars(l) } : null; };
   // Remember a tank's best stars; returns decor that just got unlocked by it.

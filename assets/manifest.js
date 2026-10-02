@@ -3291,6 +3291,336 @@ AQ.manifest = {
     12,
     15
    ]
+  },
+  "decor.ambush_coral": {
+   "file": "sprites/decor/ambush_coral.png",
+   "fw": 24,
+   "fh": 24,
+   "anchor": [
+    12,
+    23
+   ],
+   "anims": {
+    "idle": {
+     "row": 0,
+     "frames": 1,
+     "fps": 1
+    }
+   },
+   "vis": [
+    1,
+    4,
+    22,
+    23
+   ]
+  },
+  "decor.wreck_ribs": {
+   "file": "sprites/decor/wreck_ribs.png",
+   "fw": 48,
+   "fh": 24,
+   "anchor": [
+    24,
+    23
+   ],
+   "anims": {
+    "idle": {
+     "row": 0,
+     "frames": 1,
+     "fps": 1
+    }
+   },
+   "vis": [
+    1,
+    4,
+    46,
+    23
+   ]
+  },
+  "decor.reef_throne": {
+   "file": "sprites/decor/reef_throne.png",
+   "fw": 32,
+   "fh": 32,
+   "anchor": [
+    16,
+    31
+   ],
+   "anims": {
+    "idle": {
+     "row": 0,
+     "frames": 1,
+     "fps": 1
+    }
+   },
+   "vis": [
+    4,
+    4,
+    27,
+    31
+   ]
+  },
+  "decor.drift_rope": {
+   "file": "sprites/decor/drift_rope.png",
+   "fw": 24,
+   "fh": 24,
+   "anchor": [
+    12,
+    23
+   ],
+   "anims": {
+    "idle": {
+     "row": 0,
+     "frames": 1,
+     "fps": 1
+    }
+   },
+   "vis": [
+    2,
+    6,
+    21,
+    21
+   ]
+  },
+  "decor.great_bones": {
+   "file": "sprites/decor/great_bones.png",
+   "fw": 48,
+   "fh": 24,
+   "anchor": [
+    24,
+    23
+   ],
+   "anims": {
+    "idle": {
+     "row": 0,
+     "frames": 1,
+     "fps": 1
+    }
+   },
+   "vis": [
+    1,
+    4,
+    46,
+    23
+   ]
+  },
+  "decor.storm_buoy": {
+   "file": "sprites/decor/storm_buoy.png",
+   "fw": 16,
+   "fh": 16,
+   "anchor": [
+    8,
+    15
+   ],
+   "anims": {
+    "idle": {
+     "row": 0,
+     "frames": 1,
+     "fps": 1
+    }
+   },
+   "vis": [
+    4,
+    2,
+    12,
+    15
+   ]
+  },
+  "decor.angler_lamp": {
+   "file": "sprites/decor/angler_lamp.png",
+   "fw": 16,
+   "fh": 16,
+   "anchor": [
+    8,
+    15
+   ],
+   "anims": {
+    "idle": {
+     "row": 0,
+     "frames": 1,
+     "fps": 1
+    }
+   },
+   "vis": [
+    3,
+    1,
+    12,
+    15
+   ]
+  },
+  "decor.abyss_spire": {
+   "file": "sprites/decor/abyss_spire.png",
+   "fw": 16,
+   "fh": 32,
+   "anchor": [
+    8,
+    31
+   ],
+   "anims": {
+    "idle": {
+     "row": 0,
+     "frames": 1,
+     "fps": 1
+    }
+   },
+   "vis": [
+    1,
+    2,
+    14,
+    31
+   ]
+  },
+  "decor.hunter_geode": {
+   "file": "sprites/decor/hunter_geode.png",
+   "fw": 24,
+   "fh": 24,
+   "anchor": [
+    12,
+    23
+   ],
+   "anims": {
+    "idle": {
+     "row": 0,
+     "frames": 1,
+     "fps": 1
+    }
+   },
+   "vis": [
+    4,
+    9,
+    19,
+    23
+   ]
+  },
+  "decor.gnaw_rock": {
+   "file": "sprites/decor/gnaw_rock.png",
+   "fw": 32,
+   "fh": 16,
+   "anchor": [
+    16,
+    15
+   ],
+   "anims": {
+    "idle": {
+     "row": 0,
+     "frames": 1,
+     "fps": 1
+    }
+   },
+   "vis": [
+    1,
+    7,
+    30,
+    15
+   ]
+  },
+  "decor.burrow_den": {
+   "file": "sprites/decor/burrow_den.png",
+   "fw": 32,
+   "fh": 32,
+   "anchor": [
+    16,
+    31
+   ],
+   "anims": {
+    "idle": {
+     "row": 0,
+     "frames": 1,
+     "fps": 1
+    }
+   },
+   "vis": [
+    1,
+    9,
+    30,
+    31
+   ]
+  },
+  "decor.glow_crystals": {
+   "file": "sprites/decor/glow_crystals.png",
+   "fw": 24,
+   "fh": 24,
+   "anchor": [
+    12,
+    23
+   ],
+   "anims": {
+    "idle": {
+     "row": 0,
+     "frames": 1,
+     "fps": 1
+    }
+   },
+   "vis": [
+    2,
+    6,
+    21,
+    23
+   ]
+  },
+  "decor.basking_log": {
+   "file": "sprites/decor/basking_log.png",
+   "fw": 32,
+   "fh": 16,
+   "anchor": [
+    16,
+    15
+   ],
+   "anims": {
+    "idle": {
+     "row": 0,
+     "frames": 1,
+     "fps": 1
+    }
+   },
+   "vis": [
+    1,
+    3,
+    30,
+    15
+   ]
+  },
+  "decor.reed_clump": {
+   "file": "sprites/decor/reed_clump.png",
+   "fw": 24,
+   "fh": 24,
+   "anchor": [
+    12,
+    23
+   ],
+   "anims": {
+    "idle": {
+     "row": 0,
+     "frames": 1,
+     "fps": 1
+    }
+   },
+   "vis": [
+    4,
+    6,
+    20,
+    23
+   ]
+  },
+  "decor.swamp_lantern": {
+   "file": "sprites/decor/swamp_lantern.png",
+   "fw": 16,
+   "fh": 16,
+   "anchor": [
+    8,
+    15
+   ],
+   "anims": {
+    "idle": {
+     "row": 0,
+     "frames": 1,
+     "fps": 1
+    }
+   },
+   "vis": [
+    3,
+    1,
+    12,
+    15
+   ]
   }
  }
 };

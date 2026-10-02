@@ -18,6 +18,8 @@ AQ.Save = (function () {
     AQ.State.unlocks = st.unlocks || {};      // older saves: nothing unlocked yet, best stars 0
     AQ.State.tankBest = st.tankBest || {};
     AQ.State.settings = st.settings || {};   // player options (e.g. the building's zoomed-out view)
+    // predators moved out of the biome tanks into their own tanks (4th floor): move any old ones over
+    if (AQ.Tanks) AQ.Tanks.migrate();
     // where you were: scene + spot (older saves have no scene -> the sea world). Validated against
     // that scene's map at boot (AQ.Scenes.restore), which falls back to a safe spot if needed.
     game.scene = (data.scene && AQ.Scenes.list[data.scene]) ? data.scene : 'world';

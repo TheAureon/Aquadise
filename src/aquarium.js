@@ -12,9 +12,8 @@ AQ.Aquarium = (function () {
   const styleOf = (id) => Object.assign({}, AQ.data.tankStyles.default, AQ.data.tankStyles[id] || {});
   const defOf = (id) => AQ.Creatures.defs[id] || AQ.data.creatures.find((d) => d.id === id);
   const decorDef = (id) => AQ.data.decorations.find((d) => d.id === id);
-  const biomes = () => AQ.World.biomes.slice().sort((a, b) => order(a) - order(b));
-  // tabs follow the left-to-right world order
-  function order(b) { return b.rect[0] + (b.id === 'lush_cave' ? 1 : 0) + (b.id === 'cave' ? -1 : 0); }
+  // every tank (biome tanks + predator tanks) in building order; Q/E steps through this list
+  const biomes = () => AQ.Tanks.list();
 
   // ---------------------------------------------------------------- open / close
   A.open = function (game, from, biome) {
@@ -126,11 +125,12 @@ AQ.Aquarium = (function () {
     return f;
   }
 
+  // nervous = the tank is crowded (see AQ.Vibe.stressedIds); nervous creatures hide for a while
   function computeStress() {
-    const rank = (f) => SIZE_RANK[f.def.sprite_size] || 1;
+    const nervous = AQ.Vibe.stressedIds(AQ.Collection.tank(A.biome).creatures);
     A.fish.forEach((f) => {
       const was = f.stress;
-      f.stress = !f.def.predator && A.fish.some((o) => o !== f && o.def.predator && rank(o) >= rank(f));
+      f.stress = nervous.has(f.uid);
       if (f.stress && !was) { f.state = 'hide'; f.st = 0; f.hideX = R.chance(0.5) ? 18 : 302; }
       if (!f.stress && was) { f.state = 'swim'; f.st = 1; }
     });
@@ -398,12 +398,13 @@ AQ.Aquarium = (function () {
   function trayItems() {
     const out = [];
     if (A.tray === 'decor') {
-      const rank = (d) => (d.biomes && d.biomes.indexOf(A.biome) >= 0 ? 0 : !d.biomes ? 1 : 2);
+      const themes = AQ.Tanks.themesOf(A.biome);
+      const rank = (d) => (d.biomes && d.biomes.some((x) => themes.indexOf(x) >= 0) ? 0 : !d.biomes ? 1 : 2);
       AQ.data.decorations.map((d, i) => [d, i]).sort((a, b) => rank(a[0]) - rank(b[0]) || a[1] - b[1])
         .forEach(([d]) => {
           // locked pieces: this tank's show as a goal; other biomes' stay hidden until unlocked
           const locked = !AQ.Vibe.isUnlocked(d);
-          if (locked && d.unlock.biome !== A.biome) return;
+          if (locked && (d.unlock.tank || d.unlock.biome) !== A.biome) return;
           out.push({ id: 'item', kind: 'decor', ref: d.id, key: 'decor.' + d.id, name: d.name, count: Infinity, locked, need: locked ? AQ.Vibe.unlockStars(d) : 0, fresh: !!(A.fresh && A.fresh[d.id]) });
         });
       Object.entries(AQ.State.plants).forEach(([id, n]) => { const d = defOf(id); if (d && n > 0) out.push({ id: 'item', kind: 'plant', ref: id, key: 'plant.' + id, name: d.name, count: n }); });
@@ -687,7 +688,7 @@ AQ.Aquarium = (function () {
   // ---------------------------------------------------------------- drawing
   A.draw = function (g, game) {
     if (A.view === 'overview') { drawOverview(g); return; }
-    const b = AQ.World.biomeById[A.biome], tank = AQ.Collection.tank(A.biome);
+    const b = AQ.Tanks.get(A.biome), tank = AQ.Collection.tank(A.biome);
     const st = styleOf(b.id);
     g.fillStyle = '#0b1a2c'; g.fillRect(0, 0, 320, 180);
     g.drawImage(backdrop(b), TANK.x, TANK.y);
@@ -861,25 +862,37 @@ AQ.Aquarium = (function () {
   }
 
   // ---------------------------------------------------------------- overview: every tank at a glance
-  const CARD = { w: 76, h: 49, gap: 2, x0: 5, y0: 16 };
+  // A grid that mirrors the building: one row per floor (top floor first), 5 slots per row.
+  const CARD = { w: 60, h: 37, gap: 2, x0: 6, y0: 15, cols: 5 };
   A.openOverview = () => openOverview();
   A.backdropOf = (b) => backdrop(b);
   A.styleOf = styleOf;
+  function overviewSlots() {
+    const st = AQ.data.station, floors = st.floors.length;
+    const rows = [];
+    for (let f = floors - 1; f >= 0; f--) rows.push(st.tanks.filter((t) => t.floor === f).sort((a, b) => a.x - b.x));
+    const out = [];
+    rows.forEach((row, ri) => row.slice(0, CARD.cols).forEach((t, ci) => {
+      const b = t.tank && AQ.Tanks.get(t.tank);
+      out.push({ i: out.length, row: ri, col: ci, b, v: b ? AQ.Vibe.evaluate(b.id) : null });
+    }));
+    return out;
+  }
   function openOverview() {
     putBack();
     A.view = 'overview'; A.card = null; A.ovT = 0; A.ovHover = null;
-    A.overview = biomes().map((b) => ({ b, v: AQ.Vibe.evaluate(b.id) }));
+    A.overview = overviewSlots();
   }
-  function cardRect(i) { return { x: CARD.x0 + (i % 4) * (CARD.w + CARD.gap), y: CARD.y0 + Math.floor(i / 4) * (CARD.h + CARD.gap), w: CARD.w, h: CARD.h }; }
+  function cardRect(o) { return { x: CARD.x0 + o.col * (CARD.w + CARD.gap), y: CARD.y0 + o.row * (CARD.h + CARD.gap), w: CARD.w, h: CARD.h }; }
   function overviewButtons() { return [{ id: 'ov_back', x: 292, y: 2, w: 26, h: 10, label: 'TANK' }]; }
   function updateOverview(dt, game) {
     const I = AQ.Input, m = I.mouse;
     A.ovT += dt;
-    if (A.ovT > 1) { A.ovT = 0; A.overview = biomes().map((b) => ({ b, v: AQ.Vibe.evaluate(b.id) })); }
+    if (A.ovT > 1) { A.ovT = 0; A.overview = overviewSlots(); }
     if (I.wasPressed('Escape', 'KeyT')) { A.view = 'tank'; return; }
     if (I.wasPressed('Tab')) { A.view = 'tank'; A.close(game); return; }
     A.ovHover = null;
-    A.overview.forEach((o, i) => { if (hit(cardRect(i), m)) A.ovHover = i; });
+    A.overview.forEach((o) => { if (o.b && hit(cardRect(o), m)) A.ovHover = o.i; });
     const btn = overviewButtons().find((r) => hit(r, m));
     if (m.pressed[0]) {
       if (btn) { A.view = 'tank'; return; }
@@ -892,60 +905,60 @@ AQ.Aquarium = (function () {
     AQ.FX.update(dt, { water: () => true });
   }
   function drawOverview(g) {
-    const m = AQ.Input.mouse;
+    const m = AQ.Input.mouse, real = A.overview.filter((o) => o.b);
     g.fillStyle = '#0b1a2c'; g.fillRect(0, 0, 320, 180);
     F().draw(g, 'YOUR AQUARIUM', 6, 4, '#ffe9a8');
-    const total = A.overview.reduce((a, o) => a + o.v.creatures, 0), stars = A.overview.reduce((a, o) => a + o.v.stars, 0);
-    F().draw(g, `${total} CREATURES   ${stars} STARS IN ALL`, 160, 4, '#8fb6cc', { align: 'center' });
+    const total = real.reduce((a, o) => a + o.v.creatures, 0), stars = real.reduce((a, o) => a + o.v.stars, 0);
+    const lockable = AQ.data.decorations.filter((d) => d.unlock), got = lockable.filter((d) => AQ.Vibe.isUnlocked(d)).length;
+    F().draw(g, `${total} CREATURES  ${stars} STARS  DECOR ${got}/${lockable.length}`, 186, 4, '#8fb6cc', { align: 'center' });
     overviewButtons().forEach((r) => button(g, r, hit(r, m)));
-    A.overview.forEach((o, i) => {
-      const r = cardRect(i), b = o.b, v = o.v, tank = AQ.Collection.tank(b.id), hov = A.ovHover === i, cur = b.id === A.biome;
-      g.fillStyle = hov ? '#1d4460' : '#132b40'; g.fillRect(r.x, r.y, r.w, r.h);
-      g.fillStyle = cur ? '#ffe9a8' : hov ? '#5fc6d9' : 'rgba(160,220,240,0.3)'; g.fillRect(r.x, r.y, r.w, 1);
+    A.overview.forEach((o) => {
+      const r = cardRect(o), b = o.b;
+      if (!b) {   // an empty, unlit slot
+        g.fillStyle = '#0e2132'; g.fillRect(r.x, r.y, r.w, r.h);
+        g.fillStyle = '#081622'; g.fillRect(r.x + 2, r.y + 9, r.w - 4, 12);
+        F().draw(g, 'EMPTY SLOT', r.x + r.w / 2, r.y + 26, '#3a5266', { align: 'center', shadow: false });
+        return;
+      }
+      const v = o.v, tank = AQ.Collection.tank(b.id), hov = A.ovHover === o.i, cur = b.id === A.biome;
+      g.fillStyle = hov ? '#1d4460' : b.kind === 'predator' ? '#2a2234' : '#132b40'; g.fillRect(r.x, r.y, r.w, r.h);
+      g.fillStyle = cur ? '#ffe9a8' : hov ? '#5fc6d9' : b.kind === 'predator' ? 'rgba(255,170,150,0.45)' : 'rgba(160,220,240,0.3)'; g.fillRect(r.x, r.y, r.w, 1);
       // thumbnail: the tank's own backdrop + its creatures
-      const tx = r.x + 2, ty = r.y + 9, tw = r.w - 4, th = 21;
-      g.drawImage(backdrop(b), 0, 0, TANK.w, TANK.h, tx, ty, tw, th);
+      const tx = r.x + 2, ty = r.y + 9, tw = r.w - 4, th = 12;
+      g.drawImage(backdrop(b), 0, 30, TANK.w, TANK.h - 30, tx, ty, tw, th);
       const st = styleOf(b.id);
       if (st.dark) { g.fillStyle = `rgba(2,6,16,${st.dark * 0.6})`; g.fillRect(tx, ty, tw, th); }
       const ids = [...new Set(tank.creatures.map((e) => e.id))];
       const stressed = AQ.Vibe.stressedIds(tank.creatures);
-      ids.slice(0, 5).forEach((id, k) => {
+      ids.slice(0, 4).forEach((id, k) => {
         const key = 'creature.' + id, e = AQ.Assets.entry(key);
         if (!e) return;
-        const sc = Math.min(0.6, 12 / Math.max(e.fw, e.fh)), cx = tx + 8 + k * 14, cy = ty + 11 + Math.round(Math.sin(A.t * 2 + k) * 1);
+        const sc = Math.min(0.5, 9 / Math.max(e.fw, e.fh)), cx = tx + 6 + k * 12, cy = ty + 6 + Math.round(Math.sin(A.t * 2 + k) * 1);
         g.save(); g.translate(cx, cy); g.scale(sc, sc);
         AQ.Assets.draw(g, key, 'idle', 0, 0, { t: A.t + k, flip: k % 2 === 1 });
         g.restore();
-        if (tank.creatures.some((e2) => e2.id === id && stressed.has(e2.uid)) && Math.floor(A.t * 2) % 2 === 0) { g.fillStyle = '#9fd8ff'; g.fillRect(cx + 3, cy - 7, 1, 2); g.fillRect(cx + 2, cy - 5, 3, 1); }
+        if (tank.creatures.some((e2) => e2.id === id && stressed.has(e2.uid)) && Math.floor(A.t * 2) % 2 === 0) { g.fillStyle = '#9fd8ff'; g.fillRect(cx + 3, cy - 6, 1, 2); g.fillRect(cx + 2, cy - 4, 3, 1); }
       });
-      if (ids.length > 5) F().draw(g, '+' + (ids.length - 5), tx + tw - 2, ty + th - 7, '#ffffff', { align: 'right' });
-      F().draw(g, (b.short || b.name).toUpperCase(), r.x + 3, r.y + 2, cur ? '#ffe9a8' : '#e8fbff', { shadow: false });
-      drawStars(g, r.x + 2, r.y + 32, v.stars);
-      F().draw(g, `${ids.length} SP`, r.x + r.w - 2, r.y + 33, '#8fb6cc', { align: 'right', shadow: false });
+      g.save(); g.beginPath(); g.rect(r.x, r.y, r.w, r.h); g.clip();
+      F().draw(g, (b.short || b.name).toUpperCase(), r.x + 2, r.y + 2, cur ? '#ffe9a8' : '#e8fbff', { shadow: false });
+      g.restore();
+      drawStars(g, r.x + 2, r.y + 22, v.stars);
+      F().draw(g, `${ids.length}`, r.x + r.w - 2, r.y + 23, '#8fb6cc', { align: 'right', shadow: false });
       // one-line status: the most useful thing to know about this tank
       let status, col;
-      if (!v.creatures) { status = tank.decor.length ? 'NO CREATURES YET' : 'EMPTY'; col = '#7d8fa0'; }
+      if (!v.creatures) { status = tank.decor.length ? 'NO CREATURES' : 'EMPTY'; col = '#7d8fa0'; }
       else if (v.stressed) { status = `${v.stressed} NERVOUS`; col = '#9fd8ff'; }
       else if (v.parts.fed < 0.5) { status = 'HUNGRY'; col = '#ffcf8a'; }
       else if (v.stars >= 4.5) { status = 'VERY HAPPY'; col = '#8ff0b0'; }
       else { status = 'CONTENT'; col = '#cfe8ff'; }
-      F().draw(g, status, r.x + 3, r.y + 42, col, { shadow: false });
+      F().draw(g, status, r.x + 2, r.y + 30, col, { shadow: false });
     });
-    // spare slot: unlock progress across all tanks
-    const lockable = AQ.data.decorations.filter((d) => d.unlock), got = lockable.filter((d) => AQ.Vibe.isUnlocked(d)).length;
-    const r = cardRect(A.overview.length);
-    if (r.y + r.h < 172) {
-      F().draw(g, 'DECOR UNLOCKED', r.x + r.w / 2, r.y + 10, '#8fb6cc', { align: 'center' });
-      F().draw(g, `${got} / ${lockable.length}`, r.x + r.w / 2, r.y + 20, '#ffe08a', { align: 'center' });
-      lockIcon(g, r.x + r.w / 2 - 3, r.y + 30);
-      F().draw(g, 'FROM HAPPY TANKS', r.x + r.w / 2, r.y + 43 - 1, '#5f7a8c', { align: 'center' });
-    }
     // hover: what's helping / missing in that tank
     if (A.ovHover != null) {
       const o = A.overview[A.ovHover], nx = AQ.Vibe.nextUnlock(o.b.id);
       const line = o.v.missing[0] ? '- ' + o.v.missing[0] : '+ ' + (o.v.helps[0] || '');
-      tip(g, `${line}${nx ? '   NEXT UNLOCK AT ' + nx.stars + ' STARS' : ''}`, 160, 170, o.v.missing[0] ? '#ffcf8a' : '#8ff0b0');
-    } else tip(g, 'CLICK A TANK TO VISIT IT   (T / ESC: BACK)', 160, 170, '#8fb6cc');
+      tip(g, `${(o.b.short || o.b.name).toUpperCase()}: ${line}${nx ? '  NEXT UNLOCK ' + nx.stars + ' STARS' : ''}`, 160, 172, o.v.missing[0] ? '#ffcf8a' : '#8ff0b0');
+    } else tip(g, 'TOP ROW = PREDATOR WING   CLICK A TANK TO VISIT IT   (T / ESC: BACK)', 160, 172, '#8fb6cc');
   }
 
   // Ambient particles per tank style.
@@ -1028,7 +1041,7 @@ AQ.Aquarium = (function () {
     const st = styleOf(b.id), water = U.hex(b.water || '#3497bd');
     const top = st.top ? U.hex(st.top) : U.mix([150, 225, 235], water, 0.35), deep = st.deep ? U.hex(st.deep) : U.mix([26, 70, 110], water, 0.45);
     const pal = b.palette, sand = pal.top.map(U.hex), rock = U.mix(U.hex(pal.rock[1]), deep, 0.55), rockFar = U.mix(rock, deep, 0.5);
-    const seed = b.index * 31 + 7, theme = b.id;
+    const seed = b.index * 31 + 7, theme = b.theme || b.id;
     const sandY = (x) => TANK.sandTop - TANK.y + Math.round(Math.sin(x * 0.05) * 1.5 + Math.sin(x * 0.13) * 0.8);
     const farH = (x) => 34 + Math.sin(x * 0.021 + seed) * 10 + Math.sin(x * 0.07 + seed * 2) * 5;
     const midH = (x) => 20 + Math.sin(x * 0.04 + seed * 3) * 7 + U.noise1(x * 0.08, seed) * 6;

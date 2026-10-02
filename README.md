@@ -66,6 +66,11 @@ Click a creature for its info card. Hover the stars for what's helping and what'
   The hill and the building are their own scenes and never appear on the world map. The game
   saves which scene you're in. Caught creatures still go straight to their tank. (The old Tab
   shortcut is a test-only setting: `AQ.TUNING.debug.tabOpensAquarium`, off by default.)
+- **Predator wing.** The building's 4th floor holds 5 predator tanks (Reef, Open-Water, Deep, Cave
+  and Swamp Hunters). Every creature marked `predator` lives there instead of in its biome's tank;
+  the grouping is data in `data/aquarium.js` (`predatorTanks`). Each floor has 5 tank slots
+  (`data/scenes.js`); unused slots stay dark. Old saves move predators over automatically.
+  Creatures only get nervous when a tank is crowded (more than `aquarium.nervousAbove`).
 - **Aquarium.** One tank per biome, and a creature can only live in its own biome's tank.
   Nothing ever dies and nothing is punished:
   - **Tank vibe (0-5 stars):** decor variety and amount, biome-themed pieces, plants, being fed

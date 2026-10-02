@@ -73,7 +73,8 @@ AQ.TUNING = {
     plantTarget: 3,           // plants for a full "plants" score
     comfortable: 8,           // creatures before the tank starts to feel crowded
     crowdedFloor: 0.5,        // "space" score when the tank is completely full (never lower)
-    stressPenalty: 0.6,       // how much a fully stressed tank lowers "calm" (gentle on purpose)
+    stressPenalty: 0.6,       // how much a fully nervous tank lowers "calm" (gentle on purpose)
+    nervousAbove: 10,         // more creatures than this in one tank -> the smallest few feel a bit nervous
     fedFreshMinutes: 20,      // real minutes a feeding counts as "fed"...
     fedFadeMinutes: 40,       // ...then fades to hungry over this many minutes (they never starve)
     recomputeEvery: 0.5,      // seconds between vibe updates while watching a tank
