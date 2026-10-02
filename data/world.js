@@ -71,7 +71,12 @@ AQ.data.world = {
         { type: 'spire', at: 'floor', n: 10, y: [1150, 1214] },
         { type: 'bones', at: 'floor', n: 3, y: [1150, 1214] },
         { type: 'rock', at: 'floor', n: 14, y: [0, 1214] },
-        { type: 'tubeworms', at: 'floor', n: 6, y: [1150, 1214] }
+        { type: 'tubeworms', at: 'floor', n: 6, y: [1150, 1214] },
+        // the deep bowl sunk into the trench floor has its own little garden of the same things
+        { type: 'spire', at: 'floor', n: 5, area: [3540, 3770], y: [1225, 1420] },
+        { type: 'tubeworms', at: 'floor', n: 7, area: [3540, 3770], y: [1225, 1420] },
+        { type: 'rock', at: 'floor', n: 8, area: [3540, 3770], y: [1225, 1420] },
+        { type: 'bones', at: 'floor', n: 2, area: [3540, 3770], y: [1300, 1420] }
       ] },
     { id: 'vents', name: 'Volcanic Vents', short: 'Vents', rect: [2560, 600, 760, 840],
       palette: { top: ['#4a3f44', '#3d3338', '#33292e'], rock: ['#2f282c', '#272124', '#1f1a1d'], accent: '#ff8a3a', style: 'strata', embers: true }, water: '#3a2230', waterMix: 0.25, dark: 0.55,

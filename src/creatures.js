@@ -13,12 +13,15 @@ AQ.Creatures = (function () {
       def.params = def.params || {};
       def.spriteKey = (def.is_plant ? 'plant.' : 'creature.') + def.id;
       if (!AQ.World.biomeById[def.biome]) { console.warn('[creatures] unknown biome', def.biome, def.id); continue; }
-      const n = (def.spawn && def.spawn.n) || 1;
-      for (let i = 0; i < n; i++) {
-        const slot = { def, timer: 0, members: [] };
-        C.slots.push(slot);
-        spawnSlot(slot);
-      }
+      // spawn.extra: more places this creature also lives, each { n, at, area, y } like spawn itself
+      const groups = [def.spawn || { at: 'water' }].concat((def.spawn && def.spawn.extra) || []);
+      groups.forEach((sp, gi) => {
+        for (let i = 0; i < (sp.n || 1); i++) {
+          const slot = { def, timer: 0, members: [], sp: gi ? sp : null };
+          C.slots.push(slot);
+          spawnSlot(slot);
+        }
+      });
     }
   };
 
@@ -63,11 +66,11 @@ AQ.Creatures = (function () {
   }
 
   function spawnSlot(slot) {
-    const def = slot.def, sp = def.spawn || { at: 'water' };
+    const def = slot.def, sp = slot.sp || def.spawn || { at: 'water' };
     if (AQ.Clock && !AQ.Clock.activeFor(def)) { slot.timer = 8; return; }   // night-only (or day-only): wait for its hours
     if (def.rare !== undefined && R() > def.rare) { slot.timer = 60; return; }
     if (def.catch_behavior === 'school') {
-      const spot = C.findSpot(def, sp.at);
+      const spot = C.findSpot(def, sp.at, undefined, undefined, sp);
       if (!spot) { slot.timer = 10; return; }
       const size = R.int(def.params.size ? def.params.size[0] : 5, def.params.size ? def.params.size[1] : 7);
       const school = { x: spot[0], y: spot[1], hx: spot[0], hy: spot[1], vx: 0, vy: 0, t: 0, fleeT: 0, members: [] };
@@ -82,7 +85,7 @@ AQ.Creatures = (function () {
       }
       return;
     }
-    const spot = C.findSpot(def, sp.at);
+    const spot = C.findSpot(def, sp.at, undefined, undefined, sp);
     if (!spot) { slot.timer = 15; return; }
     slot.members.push(makeCreature(def, spot[0], spot[1], slot));
   }
@@ -102,8 +105,8 @@ AQ.Creatures = (function () {
   }
 
   // Returns a creature-centre position for placement kind `at`, or null.
-  C.findSpot = function (def, at, nearX, radius) {
-    const W = AQ.World, b = W.biomeById[def.biome], sp = def.spawn || {};
+  C.findSpot = function (def, at, nearX, radius, spawn) {
+    const W = AQ.World, b = W.biomeById[def.biome], sp = spawn || def.spawn || {};
     const r = spriteR(def);
     const [bx, by, bw, bh] = b.rect;
     let x0 = Math.max(bx, (sp.area && sp.area[0]) || bx), x1 = Math.min(bx + bw, (sp.area && sp.area[1]) || bx + bw);
@@ -154,7 +157,7 @@ AQ.Creatures = (function () {
         if (W.water(x, y) && W.water(x + 8, y) && W.water(x - 8, y) && W.water(x, y + 8) && W.water(x, y - 8)) return [x, y];
       }
     }
-    if (at === 'ice_top') return C.findSpot(def, 'surface', nearX, radius);
+    if (at === 'ice_top') return C.findSpot(def, 'surface', nearX, radius, spawn);
     return null;
   };
 

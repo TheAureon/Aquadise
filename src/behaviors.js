@@ -233,7 +233,7 @@ AQ.Behaviors = (function () {
         if (c.near > (p.relocateAfter || 4)) {
           c.near = 0;
           AQ.FX.puff(c.x, c.y, 'rgba(255,200,180,0.7)', 8);
-          const spot = AQ.Creatures.findSpot(c.def, 'floor', c.hx, 80);
+          const spot = AQ.Creatures.findSpot(c.def, 'floor', c.hx, 80, c.slot && c.slot.sp);
           if (spot) { c.x = spot[0]; c.y = spot[1]; c.hx = spot[0]; c.hy = spot[1]; }
           c.alpha = 0;
         }

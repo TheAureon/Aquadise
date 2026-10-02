@@ -23,6 +23,7 @@
 //   sprite_size                          size class from data/sprite-spec.js
 //   color, accent, art                   placeholder-art hints only (ignored once real art exists)
 //   spawn                                { n, at: floor|water|surface|wall|ceiling|pool|ice_top|reef, area:[x0,x1], y:[y0,y1] }
+//                                        + optional extra: [{ n, at, area, y }, ...] for more places it also lives
 //   light                                { r, color } emits light in dark biomes
 //   tank                                 tank idle locomotion: swim | crawl | still (default from category)
 //   voice                                optional: its own little sound id (src/sfx.js); otherwise one per category
@@ -120,16 +121,16 @@ AQ.data.creatures = [
     params: { reaction: 'flee', alertR: 38, carelessNoise: 0.25, fleeSpeed: 70, speed: 10 },
     sprite_size: 'medium', color: '#3a2f4a', accent: '#5a4a6a', art: { shape: 'fish', lure: true, glow: '#9ff7ff' },
     light: { r: 22, color: '#9ff7ff' },
-    spawn: { n: 3, at: 'water', y: [900, 1200] }, hint: 'Its glowing lure gives it away from afar. Skittish up close: go slow.' },
+    spawn: { n: 3, at: 'water', y: [900, 1200], extra: [{ n: 1, at: 'water', area: [3540, 3770], y: [1250, 1370] }] }, hint: 'Its glowing lure gives it away from afar. Skittish up close: go slow.' },
   { id: 'vent_shell', likes: ['rock', 'vent'], name: 'Vent Shell', biome: 'trench', category: 'crustacean', catch_behavior: 'clinger',
     params: { pry: true },
     sprite_size: 'small', color: '#8a6a5a', accent: '#c98a6a', art: { shape: 'isopod' }, tank: 'crawl',
-    spawn: { n: 3, at: 'wall', y: [850, 1200] }, hint: "Won't flee, but it's stuck fast. Hold the net to pry it off the wall." },
+    spawn: { n: 3, at: 'wall', y: [850, 1200], extra: [{ n: 2, at: 'wall', area: [3540, 3770], y: [1225, 1400] }] }, hint: "Won't flee, but it's stuck fast. Hold the net to pry it off the wall." },
   { id: 'abyss_drifter', likes: ['light'], name: 'Abyss Drifter', biome: 'trench', category: 'cephalopod', catch_behavior: 'camouflage',
     params: { alpha: 0.05, pulse: true, pulseEvery: [3, 5], moveEvery: [8, 12] },
     sprite_size: 'medium', color: '#5a6fd5', accent: '#a6f0ff', art: { shape: 'jelly' },
     light: { r: 26, color: '#7fdcff', pulse: true },
-    spawn: { n: 3, at: 'water', y: [850, 1180] }, hint: 'Nearly invisible in the dark until it pulses with light.' },
+    spawn: { n: 3, at: 'water', y: [850, 1180], extra: [{ n: 2, at: 'water', area: [3540, 3770], y: [1230, 1380] }] }, hint: 'Nearly invisible in the dark until it pulses with light.' },
   { id: 'trenchmaw', likes: ['hideout', 'arch'], name: 'Trenchmaw', biome: 'trench', category: 'cephalopod', catch_behavior: 'ambush', rare: 0.45,
     hostile: true, knockback: 'strong', requires_upgraded_net: true, predator: true,
     params: { aggroR: 52, lungeSpeed: 120, alpha: 0.5 },
@@ -137,7 +138,7 @@ AQ.data.creatures = [
     spawn: { n: 1, at: 'water', y: [1080, 1200] }, hint: 'Rare. Needs an upgraded net. Lunges at careless divers.' },
   { id: 'glow_tuft', tags: ['light'], name: 'Glow Tuft', biome: 'trench', category: 'plant', is_plant: true, catch_behavior: 'plant',
     sprite_size: 'small', color: '#2f5f6a', accent: '#7ff7e0', art: { shape: 'tuft' }, light: { r: 34, color: '#7ff7e0' },
-    spawn: { n: 10, at: 'floor', y: [900, 1240] }, hint: 'Bioluminescent: the main light source of the trench.' },
+    spawn: { n: 10, at: 'floor', y: [900, 1240], extra: [{ n: 6, at: 'floor', area: [3540, 3770], y: [1225, 1420] }] }, hint: 'Bioluminescent: the main light source of the trench.' },
 
   // ------------------------------------------------------------------ Flooded Cave System
   { id: 'blindgill', likes: ['rock', 'bubbles'], name: 'Blindgill', biome: 'cave', category: 'fish', catch_behavior: 'wary',
