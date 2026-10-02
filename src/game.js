@@ -108,6 +108,7 @@ AQ.Game = (function () {
       AQ.Title.update(dt, G);
     }
     AQ.Transition.update(dt);
+    if (AQ.Breeding && G.state !== 'loading') AQ.Breeding.update(dt);   // tanks live on wherever you are
     I.endFrame();
   }
 

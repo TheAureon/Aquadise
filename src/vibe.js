@@ -99,7 +99,9 @@ AQ.Vibe = (function () {
       if (good('likes')) helps.push('THEY HAVE THINGS THEY LIKE');
       wants.slice(0, 2).forEach((wn) => missing.push(`${wn.name.toUpperCase()} WOULD LIKE ${pretty(wn.like).toUpperCase()}`));
     }
-    return { score, stars, parts, helps, missing, stressed: stressed.size, creatures: n };
+    const out = { score, stars, parts, helps, missing, stressed: stressed.size, creatures: n };
+    out.breeding = AQ.Breeding ? AQ.Breeding.describe(biomeId, tank, out) : null;
+    return out;
   };
 
   // ---- happiness milestones -> new decor (no currency, no shop)

@@ -10,6 +10,7 @@
 //   rare                                 0..1 chance the spawn slot is occupied on each (re)spawn
 //   predator                             lives in a predator tank (data/aquarium.js predatorTanks)
 //   sexes                                optional: 'none' = no ♂/♀ (e.g. hermaphrodites). Default: male + female
+//   eggs                                 optional true/false: lays eggs when breeding (default: all but mammals)
 //   sprite_size                          size class from data/sprite-spec.js
 //   color, accent, art                   placeholder-art hints only (ignored once real art exists)
 //   spawn                                { n, at: floor|water|surface|wall|ceiling|pool|ice_top|reef, area:[x0,x1], y:[y0,y1] }

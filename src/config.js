@@ -135,6 +135,20 @@ AQ.TUNING = {
 
   climb: { speed: 42 },
 
+  // Breeding in the tanks (optional, never needed for anything). Calm and slow on purpose.
+  // A ♂ + ♀ of the same species living in a tank court, then an egg (or a baby) appears.
+  breeding: {
+    enabled: true,
+    minStars: 3,              // tank vibe needed before anyone courts
+    fedLevel: 0.5,            // "fed recently" (1 = just fed; it fades over aquarium.fedFadeMinutes)
+    startChance: 0.3,         // each check, chance a ready pair starts courting
+    courtMinutes: 2,          // real minutes of courting before an egg / baby
+    eggMinutes: 4,            // real minutes from egg to baby (egg-laying species)
+    cooldownMinutes: 20,      // real minutes a tank rests after a new arrival
+    growMinutes: 30,          // real minutes for a baby to grow up
+    checkSeconds: 5           // how often all tanks are checked (cheap; runs anywhere in the game)
+  },
+
   sexes: {
     missingBias: 0.25         // once you have one sex of a species, the other spawns this much more often
                               // (0.25 -> 75% chance; 0 = always 50/50)

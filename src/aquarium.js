@@ -41,6 +41,8 @@ AQ.Aquarium = (function () {
   A.refreshVibe = function () {
     A.vibe = AQ.Vibe.evaluate(A.biome); A.vibeT = AQ.TUNING.aquarium.recomputeEvery;
     A.fish.forEach(updateMood);
+    A.fish.forEach(setAge);
+    A.courtPair = new Set(AQ.Breeding.courting(AQ.Collection.tank(A.biome)) || []);
     AQ.Vibe.recordBest(A.biome, A.vibe.stars).forEach(celebrate);
   };
 
@@ -99,6 +101,19 @@ AQ.Aquarium = (function () {
   }
   A.moodOf = (f) => ({ name: f.moodName, color: f.moodCol, value: f.mood });
 
+  // babies use the smaller, lighter juvenile sheet until they've grown up
+  function footOfKey(key, fallback) { const en = AQ.Assets.entry(key); return en && en.vis ? en.vis[3] - en.anchor[1] + 1 : fallback; }
+  function setAge(f) {
+    const juv = AQ.Breeding.isJuvenile(f.entry);
+    if (juv === f.juv) return;
+    f.juv = juv;
+    const babyKey = (f.def.spriteKey || 'creature.' + f.def.id) + '.baby';
+    f.key = juv && AQ.Assets.has(babyKey) ? babyKey : AQ.Sex.spriteKey(f.def, f.sex);
+    f.r = juv ? Math.max(3, Math.round(f.adultR * 0.6)) : f.adultR;
+    f.foot = footOfKey(f.key, AQ.Creatures.footOf(f.def));
+    if (f.loco !== 'swim') f.y = f.z - f.foot;
+  }
+
   A.rebuild = function () {
     const tank = AQ.Collection.tank(A.biome);
     const old = new Map(A.fish.map((f) => [f.uid, f]));
@@ -118,6 +133,8 @@ AQ.Aquarium = (function () {
       z: R.range(TANK.sandTop + 2, TANK.bottom), state: 'swim', st: R.range(1, 4), t: R.range(0, 9), stress: false, target: null
     };
     f.foot = AQ.Creatures.footOf(def);
+    f.adultR = r; f.entry = e;
+    setAge(f);
     const cfg = AQ.TUNING.aquarium;
     f.moodPh = R.range(0, cfg.moodIconEvery); f.fxT = R.range(0, 1);
     f.pace = R.range(cfg.pace[0], cfg.pace[1]); f.bubT = R.range(1, cfg.bubbleEvery); f.lift = 0; f.side = R.chance(0.5) ? 1 : -1;
@@ -263,6 +280,21 @@ AQ.Aquarium = (function () {
       clampFish(f); return;
     }
     if (food && f.loco === 'still' && Math.abs(food.x - f.x) < 8 && food.y > TANK.sandTop - 6) eat(f, food);
+    // courting: the pair swims (or walks) together in a slow loop, with hearts
+    if (A.courtPair && A.courtPair.has(f.uid) && !f.stress && f.loco !== 'still') {
+      const mate = A.fish.find((o) => o !== f && A.courtPair.has(o.uid));
+      if (mate) {
+        f.state = 'court'; f.st = 1; f.hop = 0;
+        if (!A.courtC) A.courtC = [U.clamp((f.x + mate.x) / 2, 70, 250), U.clamp((f.y + mate.y) / 2, 50, 100)];
+        const first = f.uid < mate.uid, ang = A.t * 1.1 + (first ? 0 : Math.PI);
+        if (f.loco === 'swim') steer(f, A.courtC[0] + Math.cos(ang) * 16, A.courtC[1] + Math.sin(ang * 2) * 6, (Math.hypot(f.x - A.courtC[0], f.y - A.courtC[1]) > 30 ? 30 : 18) * f.pace, dt, 3);
+        else { walk(f, A.courtC[0] + (first ? -6 : 6), 8, dt); if (Math.abs(f.x - A.courtC[0]) < 9) { f.facing = first ? 1 : -1; f.hop = Math.max(0, Math.sin(f.t * 6)) * 1.5; } }
+        f.fxT -= dt;
+        if (first && f.fxT <= 0) { f.fxT = 1.3; AQ.FX.text((f.x + mate.x) / 2, Math.min(f.y, mate.y) - Math.max(f.r, mate.r) - 3, '♥', '#ff9fc0'); }
+        clampFish(f); return;
+      }
+    }
+    if (f.state === 'court') { f.state = 'swim'; f.st = 0; A.courtC = null; }
     if (f.st <= 0) nextState(f);
     if (f.state !== 'enjoy') f.hop = 0;
     if (!(f.state === 'rest' && f.perch)) f.lift = Math.max(0, (f.lift || 0) - dt * 3);
@@ -470,6 +502,11 @@ AQ.Aquarium = (function () {
 
     A.vibeT -= dt;
     if (A.vibeT <= 0) A.refreshVibe();
+    if (tank.creatures.length !== A.fish.length) {
+      const before = new Set(A.fish.map((f) => f.uid));
+      A.rebuild();
+      A.fish.forEach((f) => { if (!before.has(f.uid) && f.entry.bornAt) { f.x = R.range(80, 240); AQ.FX.sparkle(f.x, f.y, '#ffb0d0', 10); } });
+    }
     for (const f of A.fish) { f.walking = false; updateFish(f, dt); }
     updateShaker(dt);
     for (let i = A.food.length - 1; i >= 0; i--) {
@@ -719,9 +756,11 @@ AQ.Aquarium = (function () {
     // depth-sorted decor + creatures
     const items = [];
     tank.decor.forEach((d) => items.push({ z: zOf(d), d }));
+    (tank.eggs || []).forEach((egg) => items.push({ z: TANK.sandTop + 5, egg }));
     A.fish.forEach((f) => items.push({ z: f.zDraw != null ? f.zDraw : f.z, f }));
     items.sort((a, b) => a.z - b.z);
     for (const it of items) {
+      if (it.egg) { drawEgg(g, it.egg); continue; }
       if (it.d) {
         const d = it.d, key = (d.type === 'plant' ? 'plant.' : 'decor.') + d.id;
         AQ.Assets.draw(g, key, 'idle', d.x, d.y, { t: A.t + d.x * 0.01, flip: !!d.flip, alpha: d.layer === 'back' ? 0.78 : 1 });
@@ -786,6 +825,18 @@ AQ.Aquarium = (function () {
     g.fillStyle = '#ffe9a8';
     for (const [sx, sy] of [[-1, -1], [1, -1], [-1, 1], [1, 1]]) { g.fillRect(x + sx * r - (sx > 0 ? 1 : 0), y + sy * r - (sy > 0 ? 1 : 0), 1, 1); g.fillRect(x + sx * r - (sx > 0 ? 2 : -1), y + sy * r - (sy > 0 ? 1 : 0), 1, 1); g.fillRect(x + sx * r - (sx > 0 ? 1 : 0), y + sy * r - (sy > 0 ? 2 : -1), 1, 1); }
   }
+  // a small clutch of soft, glowing eggs on the sand that wobbles as it gets ready to hatch
+  function drawEgg(g, egg) {
+    const d = defOf(egg.id), c = U.hex((d && (d.accent || d.color)) || '#ffe0c0');
+    const ready = U.clamp((Date.now() - egg.laidAt) / (AQ.TUNING.breeding.eggMinutes * 60000), 0, 1);
+    const x = Math.round(egg.x), y = TANK.sandTop + 5, wob = ready > 0.7 && Math.sin(A.t * 9) > 0.6 ? 1 : 0;
+    [[0, 0], [3, 1], [-3, 1]].forEach(([dx, dy], i) => {
+      const ex = x + dx + (i === 0 ? wob : 0), ey = y + dy;
+      g.fillStyle = 'rgba(40,30,20,0.55)'; g.fillRect(ex - 2, ey - 3, 5, 3); g.fillRect(ex - 1, ey - 4, 3, 1); g.fillRect(ex - 1, ey, 3, 1);
+      g.fillStyle = `rgba(${c[0]},${c[1]},${c[2]},0.95)`; g.fillRect(ex - 1, ey - 3, 3, 3); g.fillRect(ex, ey - 4, 1, 1);
+      g.fillStyle = 'rgba(255,255,255,0.8)'; g.fillRect(ex - 1, ey - 3, 1, 1);
+    });
+  }
   const TAGWORD = (t) => t.replace(/_/g, ' ').toUpperCase();
   function activity(f) {
     const nm = (gm) => (gm && gm.d ? (gm.d.type === 'plant' ? defOf(gm.d.id).name : decorDef(gm.d.id).name).toUpperCase() : '');
@@ -795,6 +846,7 @@ AQ.Aquarium = (function () {
       case 'hide': return f.shelter ? 'HIDING IN THE ' + nm(f.shelter) : 'HIDING IN A CORNER';
       case 'swim': return f.leader ? 'SWIMMING WITH ITS SCHOOL' : f.loco === 'swim' ? 'SWIMMING AROUND' : 'WANDERING';
       case 'feed': return f.graze ? 'GRAZING ON ' + nm(f.graze) : 'NIBBLING THE SAND';
+      case 'court': return 'COURTING ♥';
       case 'play': return f.buddy ? 'PLAYING WITH ' + f.buddy.def.name.toUpperCase() : 'PLAYING';
       case 'rest': return f.perch ? 'RESTING ON THE ' + nm(f.perch) : 'RESTING';
       case 'shelter': return 'NAPPING IN THE ' + nm(f.shelter);
@@ -806,7 +858,7 @@ AQ.Aquarium = (function () {
     return '';
   }
   function drawCard(g, f) {
-    const W = 136, H = 58, x = f.x < 160 ? TANK.x + TANK.w - W - 6 : TANK.x + 6, y = TANK.waterTop + 4;
+    const W = 168, H = 58, x = f.x < 160 ? TANK.x + TANK.w - W - 6 : TANK.x + 6, y = TANK.waterTop + 4;
     const tank = AQ.Collection.tank(A.biome), likes = f.def.likes || [];
     const have = new Set(); tank.decor.forEach((d) => AQ.Vibe.tagsOf(d).forEach((t) => have.add(t)));
     g.fillStyle = 'rgba(6,18,34,0.92)'; g.fillRect(x, y, W, H);
@@ -835,8 +887,11 @@ AQ.Aquarium = (function () {
     F().draw(g, 'FROM:', tx, y + 28, '#8fb6cc', { shadow: false });
     F().draw(g, ((b && b.name) || f.def.biome).toUpperCase(), tx + 24, y + 28, '#cfe8ff', { shadow: false });
     F().draw(g, 'SEX:', x + 4, y + 35, '#8fb6cc', { shadow: false });
-    F().draw(g, f.sex ? `${AQ.Sex.NAME[f.sex]} ${AQ.Sex.SYMBOL[f.sex]}` : 'NONE', x + 24, y + 35, f.sex ? AQ.Sex.COLOR[f.sex] : '#cfe8ff', { shadow: false });
-    F().draw(g, activity(f), x + 4, y + 43, '#e8fbff', { shadow: false });
+    const sexTxt = f.sex ? `${AQ.Sex.NAME[f.sex]} ${AQ.Sex.SYMBOL[f.sex]}` : 'NONE';
+    F().draw(g, sexTxt, x + 24, y + 35, f.sex ? AQ.Sex.COLOR[f.sex] : '#cfe8ff', { shadow: false });
+    const ageTxt = f.juv ? `BABY (${AQ.Breeding.growLeftMin(f.entry)} MIN TO GROW)` : 'ADULT';
+    F().draw(g, ageTxt, x + 24 + F().width(sexTxt) + 6, y + 35, f.juv ? '#ffe9a8' : '#cfe8ff', { shadow: false });
+    F().draw(g, activity(f), x + 4, y + 43, f.state === 'court' ? '#ffb0d0' : '#e8fbff', { shadow: false });
     const missing = likes.filter((l) => !have.has(l));
     F().draw(g, missing.length ? 'WOULD LOVE SOME ' + TAGWORD(missing[0]) : (f.stress ? 'THE TANK FEELS A BIT CROWDED' : 'HAS EVERYTHING IT LIKES'), x + 4, y + 50, missing.length || f.stress ? '#ffcf8a' : '#8ff0b0', { shadow: false });
   }
@@ -953,6 +1008,7 @@ AQ.Aquarium = (function () {
       if (!v.creatures) { status = tank.decor.length ? 'NO CREATURES' : 'EMPTY'; col = '#7d8fa0'; }
       else if (v.stressed) { status = `${v.stressed} NERVOUS`; col = '#9fd8ff'; }
       else if (v.parts.fed < 0.5) { status = 'HUNGRY'; col = '#ffcf8a'; }
+      else if (tank.court) { status = 'COURTING ♥'; col = '#ffb0d0'; }
       else if (v.stars >= 4.5) { status = 'VERY HAPPY'; col = '#8ff0b0'; }
       else { status = 'CONTENT'; col = '#cfe8ff'; }
       F().draw(g, status, r.x + 2, r.y + 30, col, { shadow: false });
@@ -1106,6 +1162,7 @@ AQ.Aquarium = (function () {
   function vibeTooltip(g, v) {
     const lines = v.helps.slice(0, 5).map((t) => ['+ ' + t, '#8ff0b0']).concat(v.missing.slice(0, 5).map((t) => ['- ' + t, '#ffcf8a']));
     const nx = AQ.Vibe.nextUnlock(A.biome), best = (AQ.State.tankBest || {})[A.biome] || 0;
+    if (v.breeding) lines.push([(v.breeding.good ? '♥ ' : '- ') + v.breeding.text, v.breeding.good ? '#ffb0d0' : '#ffcf8a']);
     lines.push(nx ? [`NEXT: ${nx.stars} STARS UNLOCKS ${nx.def.name.toUpperCase()}`, '#ffe08a'] : ['ALL OF THIS TANK\'S DECOR IS UNLOCKED!', '#ffe08a']);
     if (best > v.stars) lines.push([`BEST SO FAR: ${best} STARS`, '#8fb6cc']);
     const w = Math.max(120, ...lines.map((l) => F().width(l[0]))) + 10, h = 14 + lines.length * 7;

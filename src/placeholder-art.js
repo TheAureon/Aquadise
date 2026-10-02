@@ -1215,6 +1215,12 @@
     put(cx - 1, top + 1, crest); put(cx, top + 1, crest); put(cx + 1, top + 1, crest); put(cx, top, tip); put(cx, top + 2, crest);
   }
 
+  // Juveniles: a lighter, softer version of the adult colours.
+  function lighten(p, k) {
+    const d = p.d;
+    for (let i = 0; i < d.length; i += 4) if (d[i + 3]) { d[i] += (255 - d[i]) * k; d[i + 1] += (255 - d[i + 1]) * k; d[i + 2] += (255 - d[i + 2]) * k; }
+  }
+
   // ---------- sheet builder ----------
   // entry: { fw, fh, anims: { name: {row, col?, frames, fps} }, art: { shape, color, accent, ...opts } }
   // Renders every frame with a hidden margin, measures the union of all frames, and fits it into
@@ -1227,6 +1233,7 @@
     const art = entry.art || {};
     const fn = S[art.shape] || S.fish;
     const bottomAnchored = entry.anchor && entry.anchor[1] === fh - 1;
+    const babyK = art.baby ? 2 * Math.round(Math.min(fw, fh) * 0.2) : 0;   // juveniles: ~60% size
     const M = 8;
     const render = (k) => {
       const frames = [];
@@ -1234,7 +1241,8 @@
       for (const name in anims) {
         const a = anims[name];
         for (let f = 0; f < a.frames; f++) {
-          const vw = fw - k, vh = fh - (bottomAnchored ? Math.round(k / 2) : k);
+          const kk = k + babyK;                      // babies are drawn smaller in the same frame
+          const vw = fw - kk, vh = fh - (bottomAnchored ? Math.round(kk / 2) : kk);
           const p = new Pix(vw, vh, M);
           const opts = Object.assign({}, art, {
             c: hex(art.color), a: hex(art.accent || art.color), glow: art.glow ? hex(art.glow) : undefined,
@@ -1242,6 +1250,7 @@
           });
           fn(p, opts);
           if (art.male) maleMark(p);
+          if (art.baby) lighten(p, 0.3);
           // offset of the frame's origin inside this padded buffer (drawing area centred / bottom-aligned)
           const fx0 = M - Math.floor((fw - vw) / 2), fy0 = M - (bottomAnchored ? fh - vh : Math.floor((fh - vh) / 2));
           for (let y = 0; y < p.bh; y++) for (let x = 0; x < p.bw; x++) if (p.d[(y * p.bw + x) * 4 + 3]) {

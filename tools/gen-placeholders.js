@@ -74,6 +74,8 @@ for (const c of AQ.data.creatures || []) {
   const folder = c.is_plant ? 'plants' : 'creatures';
   add(`${kind}.${c.id}`, `sprites/${folder}/${c.id}.png`, kind, c.sprite_size, Object.assign({ shape: c.art.shape, color: c.color, accent: c.accent }, c.art));
   // male variant (the base sheet doubles as the female): same art + a small crest
+  // juvenile (born in the tanks): the same art drawn ~60% size and lighter, same frame + anchor
+  if (!c.is_plant) add(`${kind}.${c.id}.baby`, `sprites/${folder}/${c.id}_baby.png`, kind, c.sprite_size, Object.assign({ shape: c.art.shape, color: c.color, accent: c.accent, baby: true }, c.art));
   if (!c.is_plant && c.sexes !== 'none') add(`${kind}.${c.id}.m`, `sprites/${folder}/${c.id}_m.png`, kind, c.sprite_size, Object.assign({ shape: c.art.shape, color: c.color, accent: c.accent, male: true }, c.art));
 }
 for (const d of AQ.data.decorations || []) {

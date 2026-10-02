@@ -75,6 +75,11 @@ Click a creature for its info card. Hover the stars for what's helping and what'
   opts a species out). Males have a small cyan marking. The log tracks both: a species is
   *discovered* when you catch either sex and *complete* with both. Once you have one sex, the other
   spawns more often (`sexes.missingBias`).
+- **Breeding (optional).** A ♂ and ♀ of the same species living in one tank may court (they swim
+  together with hearts) when the tank has at least `breeding.minStars`, was fed recently, nobody
+  is nervous and there's room. Then an egg appears (a baby for mammals) and later hatches; babies
+  grow up over `breeding.growMinutes`. It all runs on real time, wherever you are in the game. The
+  log marks species you've bred with a ♥. Nothing requires it.
 - **Aquarium.** One tank per biome, and a creature can only live in its own biome's tank.
   Nothing ever dies and nothing is punished:
   - **Tank vibe (0-5 stars):** decor variety and amount, biome-themed pieces, plants, being fed

@@ -72,11 +72,19 @@ can make the difference anything readable (colour, fin, crest), but keep the siz
 `_m` sheet is missing, males fall back to the base sheet. Species with `sexes: 'none'` (and plants)
 have no male sheet.
 
+## Juveniles (babies born in the tanks)
+
+Every animal also has a juvenile sheet, `creatures/<id>_baby.png` (key `creature.<id>.baby`), with the
+**same frame size, rows and anchor** as the adult. The placeholder is the adult art drawn about 60%
+size and lighter, centred in the frame. Babies use it until they grow up, then switch to the adult
+(♂ or ♀) sheet. If it's missing, the adult sheet is used.
+
 ## File naming
 
 ```
 assets/sprites/creatures/<creature_id>.png    e.g. creatures/drift_snail.png   (female / default)
 assets/sprites/creatures/<creature_id>_m.png  e.g. creatures/drift_snail_m.png (male)
+assets/sprites/creatures/<creature_id>_baby.png  e.g. creatures/drift_snail_baby.png (juvenile)
 assets/sprites/plants/<plant_id>.png          e.g. plants/bell_kelp.png
 assets/sprites/decor/<decoration_id>.png      e.g. decor/castle.png
 assets/sprites/misc/player.png | chest.png | bait.png
