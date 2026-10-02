@@ -10,6 +10,14 @@ AQ.Render = (function () {
     [0, '#62c6d6'], [140, '#3497bd'], [380, '#1f6a9a'], [650, '#164a7a'], [900, '#0d2d55'], [1300, '#06142a']
   ].map(([d, c]) => [d, U.hex(c)]);
   const SKY = [U.hex('#78c3e6'), U.hex('#cdeff2')];
+  // sky colours [top, horizon] through the day; blended by the clock
+  const SKY_NIGHT = [U.hex('#0b1430'), U.hex('#22305a')], SKY_TWI = [U.hex('#4a4a86'), U.hex('#f2a97e')];
+  R.skyCols = function () {
+    if (!AQ.Clock || (AQ.Game && AQ.Game.state === 'title')) return SKY;
+    const d = AQ.Clock.daylight(), tw = AQ.Clock.twilight();
+    const base = [U.mix(SKY_NIGHT[0], SKY[0], d), U.mix(SKY_NIGHT[1], SKY[1], d)];
+    return [U.mix(base[0], SKY_TWI[0], tw * 0.6), U.mix(base[1], SKY_TWI[1], tw * 0.75)];
+  };
   const bandCache = new Map();
 
   R.init = function (canvas) {
@@ -57,7 +65,7 @@ AQ.Render = (function () {
   R.waterCss = function (wx, wy) {
     const W = AQ.World;
     const band = Math.floor(wy / 6) * 6;
-    if (band < W.sea) return U.css(U.mix(SKY[0], SKY[1], U.clamp(band / W.sea, 0, 1)));
+    if (band < W.sea) { const s = R.sky || SKY; return U.css(U.mix(s[0], s[1], U.clamp(band / W.sea, 0, 1))); }
     const t = R.tint, gx = U.clamp(Math.floor(wx / TC), 0, t.gw - 1), gy = U.clamp(Math.floor(wy / TC), 0, t.gh - 1), i = (gy * t.gw + gx) * 4;
     const key = (Math.round(t.f[i] / 6) << 24) ^ (Math.round(t.f[i + 1] / 6) << 16) ^ (Math.round(t.f[i + 2] / 6) << 8) ^ Math.round(t.f[i + 3] * 40) ^ (band << 2) * 7919;
     let c = bandCache.get(key);
@@ -71,6 +79,7 @@ AQ.Render = (function () {
 
   R.background = function (cam) {
     const ctx = R.ctx;
+    R.sky = R.skyCols();
     const left = cam.left(), top = cam.top();
     const COL = 8;
     const first = Math.floor(left / COL) * COL;
@@ -97,6 +106,18 @@ AQ.Render = (function () {
       }
       ctx.restore();
     }
+    // stars over the sea at night
+    const night = AQ.Clock && !(AQ.Game && AQ.Game.state === 'title') ? 1 - AQ.Clock.daylight() : 0;
+    if (night > 0.05 && seaY > 0) {
+      for (let i = 0; i < 40; i++) {
+        const x = ((i * 97 + 13 - left * 0.05) % 320 + 320) % 320, y = (i * 53) % Math.max(1, Math.min(seaY - 4, 120));
+        if (y >= seaY - 4) continue;
+        ctx.globalAlpha = night * (0.45 + 0.4 * Math.sin(R.t * (1 + (i % 3)) + i));
+        ctx.fillStyle = i % 5 ? '#e8f0ff' : '#fff6d0';
+        ctx.fillRect(Math.round(x), Math.round(y), 1, 1);
+      }
+      ctx.globalAlpha = 1;
+    }
     // drifting marine snow (parallax)
     ctx.fillStyle = 'rgba(220,240,255,0.22)';
     for (const s of R.snow) {
@@ -119,6 +140,18 @@ AQ.Render = (function () {
     }
   };
 
+  // warm glow over the sky and the sunlit water at dawn and dusk (fades out with depth)
+  R.twilightTint = function (cam) {
+    if (!AQ.Clock || (AQ.Game && AQ.Game.state === 'title')) return;
+    const tw = AQ.Clock.twilight();
+    if (tw < 0.02) return;
+    const y1 = AQ.World.sea + 160 - cam.top();
+    if (y1 <= 0) return;
+    const g = R.ctx.createLinearGradient(0, 0, 0, y1);
+    g.addColorStop(0, `rgba(255,150,100,${(0.16 * tw).toFixed(3)})`); g.addColorStop(1, 'rgba(255,150,100,0)');
+    R.ctx.fillStyle = g; R.ctx.fillRect(0, 0, cam.w, Math.min(cam.h, y1));
+  };
+
   // lights: [{x, y, r, color?}] in world coords
   R.lighting = function (cam, lights, target) {
     R.darkness += (target - R.darkness) * 0.04;
@@ -126,7 +159,9 @@ AQ.Render = (function () {
     const l = R.lctx, left = cam.left(), top = cam.top();
     l.globalCompositeOperation = 'source-over';
     l.clearRect(0, 0, cam.w, cam.h);
-    l.fillStyle = `rgba(3,6,18,${R.darkness.toFixed(3)})`;
+    // a little bluer at night (the overlay colour shifts with the clock)
+    const nb = AQ.Clock && !(AQ.Game && AQ.Game.state === 'title') ? 1 - AQ.Clock.daylight() : 0;
+    l.fillStyle = `rgba(${Math.round(3 + nb * 3)},${Math.round(6 + nb * 8)},${Math.round(18 + nb * 22)},${R.darkness.toFixed(3)})`;
     l.fillRect(0, 0, cam.w, cam.h);
     l.globalCompositeOperation = 'destination-out';
     for (const L of lights) {

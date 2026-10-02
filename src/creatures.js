@@ -64,6 +64,7 @@ AQ.Creatures = (function () {
 
   function spawnSlot(slot) {
     const def = slot.def, sp = def.spawn || { at: 'water' };
+    if (AQ.Clock && !AQ.Clock.activeFor(def)) { slot.timer = 8; return; }   // night-only (or day-only): wait for its hours
     if (def.rare !== undefined && R() > def.rare) { slot.timer = 60; return; }
     if (def.catch_behavior === 'school') {
       const spot = C.findSpot(def, sp.at);
@@ -162,13 +163,17 @@ AQ.Creatures = (function () {
   C.update = function (dt, game) {
     const P = game.player, simR = AQ.TUNING.creatures.simRadius;
     ctx.P = P; ctx.noise = P.noise(); ctx.bait = AQ.Catching ? AQ.Catching.bait : null;
-    for (const c of C.list) {
+    for (const c of C.list.slice()) {
       const dx = P.x - c.x, dy = P.y - c.y;
-      if (Math.abs(dx) > simR || Math.abs(dy) > simR) continue;
+      const far = Math.abs(dx) > simR || Math.abs(dy) > simR;
+      // out of its hours and nowhere near you: it has simply gone home
+      if (far && c.def.active && AQ.Clock && !AQ.Clock.activeFor(c.def)) { C.remove(c); if (c.slot) c.slot.timer = 8; continue; }
+      if (far) continue;
       ctx.dx = dx; ctx.dy = dy; ctx.dist = Math.hypot(dx, dy);
       c.t += dt; c.iconT -= dt; c.hitCD -= dt;
       c.bhv.update(c, ctx, dt);
-      c.alpha += (c.targetAlpha - c.alpha) * Math.min(1, dt * 5);
+      if (c.def.active && AQ.Clock && !AQ.Clock.activeFor(c.def)) leave(c, dt);
+      c.alpha += (c.targetAlpha - c.alpha) * Math.min(1, dt * (c.leaving ? 1 : 5));
       if (c.hostileActive && c.hitCD <= 0 && ctx.dist < c.r + 7) {
         const k = AQ.TUNING.knockback[c.def.knockback === 'strong' ? 'strong' : 'light'];
         P.knock(dx || 1, dy - 2, k);
@@ -185,6 +190,16 @@ AQ.Creatures = (function () {
       if (s.timer <= 0) spawnSlot(s);
     }
   };
+
+  // Out of its hours (e.g. a night creature at dawn): it can't be netted any more and slowly fades
+  // away: swimmers drift off and down, crawlers and plants sink into the ground (burrow / close up).
+  function leave(c, dt) {
+    if (!c.leaving) { c.leaving = true; c.leaveDir = R.chance(0.5) ? 1 : -1; }
+    c.catchable = false; c.pryable = false; c.targetAlpha = 0; c.hostileActive = false;
+    if (c.movement === 'swim') { c.x += c.leaveDir * 10 * dt; c.y += 4 * dt; c.facing = c.leaveDir; }
+    else c.y += 2 * dt;
+    if (c.alpha < 0.04) { C.remove(c); if (c.slot) c.slot.timer = 8; }
+  }
 
   // Removes a caught creature and schedules its slot to respawn once empty.
   C.remove = function (c) {

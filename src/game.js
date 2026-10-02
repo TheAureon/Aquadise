@@ -88,7 +88,9 @@ AQ.Game = (function () {
 
     if (G.state === 'play' || G.state === 'map') {
       const frozen = AQ.Transition.blocking(), inWorld = G.scene === 'world';
+      if (inWorld) AQ.Clock.update(dt);            // the sea's day/night clock (the hill + space aquarium don't follow it)
       if (!frozen) {
+        if (AQ.TUNING.debug.timeSkip && inWorld && I.wasPressed(AQ.TUNING.debug.timeSkipKey)) { AQ.Clock.set(AQ.Clock.hour() + AQ.TUNING.clock.skipHours); AQ.HUD.toast(`Time skip: ${AQ.HUD.clockText()}`, '#cfe8ff'); }
         if (I.wasPressed('KeyH')) { AQ.HUD.showHelp = true; AQ.HUD.helpT = AQ.HUD.helpT > 0 ? 0 : 12; }
         if (I.wasPressed('KeyM')) { if (inWorld) G.state = G.state === 'map' ? 'play' : 'map'; else AQ.HUD.toast('The map only shows the sea.', '#cfe8ff'); }
         if (I.wasPressed('Tab') && AQ.Aquarium && AQ.TUNING.debug.tabOpensAquarium) { AQ.Aquarium.open(G); I.endFrame(); return; }
@@ -149,6 +151,7 @@ AQ.Game = (function () {
     if (AQ.Terrain.drawFront) AQ.Terrain.drawFront(ctx, cam);
     AQ.Render.surface(cam);
     AQ.Render.lighting(cam, collectLights(), targetDarkness());
+    AQ.Render.twilightTint(cam);
     AQ.Terrain.drawGlow(ctx, cam);
     if (title) { if (G.state === 'log') AQ.LogUI.draw(ctx, G); else AQ.Title.draw(ctx, G); return; }
     drawOverlays(ctx);
@@ -164,7 +167,9 @@ AQ.Game = (function () {
     const W = AQ.World, cx = AQ.Camera.x, cy = AQ.Camera.y;
     const b = W.biomeAt(cx, cy);
     const depth = AQ.U.clamp((cy - W.sea - 320) / 900, 0, 0.65);
-    return Math.max(b.dark || 0, depth);
+    // night darkens the sunlit sea; places that are already darker (deep water, caves) are unchanged
+    const night = G.state === 'title' ? 0 : (1 - AQ.Clock.daylight()) * AQ.TUNING.clock.nightDarkness;
+    return Math.max(b.dark || 0, depth, night);
   }
 
   function collectLights() {

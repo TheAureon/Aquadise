@@ -28,6 +28,23 @@ AQ.HUD = (function () {
 
   // Minimal HUD: no boxes, just small shadowed text that stays out of the way of the scene.
   const SH = 'rgba(4,12,24,0.75)';
+  H.clockText = function () {
+    const h = AQ.Clock.hour(), hh = Math.floor(h), mm = Math.floor((h - hh) * 60 / 10) * 10;
+    return `${AQ.Clock.phase().toUpperCase()} ${String(hh).padStart(2, '0')}:${String(mm).padStart(2, '0')}`;
+  };
+  // 9x7 pixel icon for the current phase
+  const SUN = ['..#.#.#..', '...###...', '.#######.', '..#####..', '.#######.', '...###...', '..#.#.#..'];
+  const MOON = ['...###...', '..##.....', '.##......', '.##......', '.##......', '..##.....', '...###...'];
+  const RISE = ['.........', '#...#...#', '..#####..', '.#######.', '#########', '.........', '#########'];
+  function drawClockIcon(ctx, x, y) {
+    const p = AQ.Clock.phase(), icon = p === 'day' ? SUN : p === 'night' ? MOON : RISE;
+    const col = p === 'day' ? '#ffe36b' : p === 'night' ? '#d8e4ff' : '#ffb27a';
+    ctx.globalAlpha = 0.9;
+    icon.forEach((row, ry) => [...row].forEach((v, rx) => { if (v === '#') { ctx.fillStyle = 'rgba(4,12,24,0.75)'; ctx.fillRect(x + rx + 1, y + ry + 1, 1, 1); } }));
+    icon.forEach((row, ry) => [...row].forEach((v, rx) => { if (v === '#') { ctx.fillStyle = col; ctx.fillRect(x + rx, y + ry, 1, 1); } }));
+    ctx.globalAlpha = 1;
+  }
+
   H.draw = function (ctx, game) {
     const F = AQ.Font, vw = AQ.TUNING.view.w, vh = AQ.TUNING.view.h;
     // biome name: fades in, lingers briefly, fades out
@@ -49,6 +66,8 @@ AQ.HUD = (function () {
       }
       ctx.globalAlpha = 1;
     }
+    // the time of day (sea only): sun, sunrise/sunset or moon
+    if (game.scene === 'world') drawClockIcon(ctx, vw - 12, 12);
     // collection progress (top-right)
     if (AQ.Collection) {
       const c = AQ.Collection.progress();

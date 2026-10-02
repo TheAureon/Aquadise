@@ -101,9 +101,22 @@ AQ.TUNING = {
     unlockStars: [2, 3.5, 5]  // tank stars needed for each biome's unlock tiers 1, 2 and 3 (new themed decor)
   },
 
+  // ---- day and night (the sea world only; the hill and the space aquarium don't follow it)
+  clock: {
+    dayMinutes: 6,            // real minutes for one full day + night
+    startHour: 5,             // a new game (and an older save) starts here: the beginning of the day (dawn)
+    dawnHour: 5, dawnHours: 1.5,   // dawn starts at 5:00 and takes 1.5 game hours to become full day
+    duskHour: 18.5, duskHours: 1.5, // dusk starts at 18:30 and takes 1.5 game hours to become night
+    nightBelow: 0.35,         // night-only creatures come out when daylight drops below this
+    nightDarkness: 0.5,       // how dark the sunlit sea gets at night (deep / cave areas are already darker)
+    skipHours: 3              // the debug time-skip key jumps this many hours
+  },
+
   // ---- getting to the aquarium building (Tide Pools -> the hill -> the UFO -> the building in space)
   debug: {
-    tabOpensAquarium: false   // TESTING ONLY: true lets Tab open the tank screen from anywhere (the old shortcut)
+    tabOpensAquarium: false,  // TESTING ONLY: true lets Tab open the tank screen from anywhere (the old shortcut)
+    timeSkip: false,          // TESTING ONLY: true lets you press N in the sea to skip ahead clock.skipHours
+    timeSkipKey: 'KeyN'
   },
   interactKeys: ['KeyE'],     // "interact" (beam up/down, open a tank, use the directory)
 

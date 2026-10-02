@@ -9,7 +9,8 @@ AQ.State = {
   unlocks: {},      // decorId -> true once unlocked by a tank's happiness
   tankBest: {},     // biomeId -> best stars that tank has ever reached
   settings: {},     // player options (e.g. stationZoomOut)
-  log: {}           // species id -> { m: true, f: true } sexes caught (plants: none)
+  log: {},          // species id -> { m: true, f: true } sexes caught (plants: none)
+  clock: null       // { hour } of the day/night clock (null -> starts at AQ.TUNING.clock.startHour)
 };
 
 AQ.Collection = (function () {

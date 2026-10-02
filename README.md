@@ -80,6 +80,11 @@ Click a creature for its info card. Hover the stars for what's helping and what'
   is nervous and there's room. Then an egg appears (a baby for mammals) and later hatches; babies
   grow up over `breeding.growMinutes`. It all runs on real time, wherever you are in the game. The
   log marks species you've bred with a ♥. Nothing requires it.
+- **Day and night.** The sea has a calm clock (`clock.dayMinutes`, 6 real minutes per day by default)
+  with dawn, day, dusk and night; nights are darker and bluer near the surface, while deep and cave
+  areas look the same as before. The HUD shows a sun, sunrise or moon. Creatures with
+  `active: 'night'` only come out at night and fade away at dawn. Testing: set
+  `debug.timeSkip: true` and press **N** in the sea to jump ahead `clock.skipHours`.
 - **Aquarium.** One tank per biome, and a creature can only live in its own biome's tank.
   Nothing ever dies and nothing is punished:
   - **Tank vibe (0-5 stars):** decor variety and amount, biome-themed pieces, plants, being fed
