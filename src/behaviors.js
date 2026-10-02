@@ -508,6 +508,7 @@ AQ.Behaviors = (function () {
     },
     onSwing(c, ctx) {
       if (c.state === 'guard' && ctx.dist < 30) {
+        if (c.p.withdraw) { AQ.FX.text(c.x, c.y - c.r - 4, '...', '#dfe'); AQ.HUD.toast('It pulls into its shell. Wait for it to relax.', '#cfe8ff'); return; }
         ctx.P.knock(ctx.dx || 1, ctx.dy - 4, AQ.TUNING.knockback.light);
         AQ.HUD.toast('Pinched! Wait for it to relax.', '#ffd56b');
       }
@@ -711,7 +712,11 @@ AQ.Behaviors = (function () {
   // Plants: harvested with the net, regrow after a while. drift: floats around the surface.
   B.plant = {
     update(c, ctx, dt) {
-      c.catchable = !c.harvested; c.targetAlpha = c.harvested ? 0.25 : 1;
+      // night-blooming plants (bloom: 'night') are closed buds by day: they can't be harvested then
+      c.closed = c.def.bloom === 'night' && AQ.Clock && !AQ.Clock.isNight();
+      c.catchable = !c.harvested && !c.closed; c.targetAlpha = c.harvested ? 0.25 : 1;
+      const want = c.closed && AQ.Assets.has(c.def.spriteKey + '.closed') ? c.def.spriteKey + '.closed' : c.def.spriteKey;
+      if (c.key !== want) c.key = want;
       if (c.harvested) { c.st -= dt; if (c.st <= 0) { c.harvested = false; AQ.FX.sparkle(c.x, c.y - 4, '#cfffbf', 5); } }
       if (c.p.drift) { c.allowAir = true; c.x = c.hx + Math.sin(c.t * 0.05 + c.seed) * 80; c.y = AQ.World.sea + 1 + Math.sin(c.t * 1.2) * 0.8; c.facing = Math.cos(c.t * 0.05 + c.seed) > 0 ? 1 : -1; }
     }

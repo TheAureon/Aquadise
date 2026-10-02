@@ -4765,6 +4765,698 @@ AQ.manifest = {
     19
    ]
   },
+  "creature.auroravein_squid": {
+   "file": "sprites/creatures/auroravein_squid.png",
+   "fw": 24,
+   "fh": 24,
+   "anchor": [
+    12,
+    12
+   ],
+   "anims": {
+    "idle": {
+     "row": 0,
+     "frames": 4,
+     "fps": 5
+    },
+    "move": {
+     "row": 1,
+     "frames": 4,
+     "fps": 10
+    }
+   },
+   "vis": [
+    1,
+    7,
+    22,
+    16
+   ]
+  },
+  "creature.auroravein_squid.baby": {
+   "file": "sprites/creatures/auroravein_squid_baby.png",
+   "fw": 24,
+   "fh": 24,
+   "anchor": [
+    12,
+    12
+   ],
+   "anims": {
+    "idle": {
+     "row": 0,
+     "frames": 4,
+     "fps": 5
+    },
+    "move": {
+     "row": 1,
+     "frames": 4,
+     "fps": 10
+    }
+   },
+   "vis": [
+    5,
+    9,
+    18,
+    15
+   ]
+  },
+  "creature.auroravein_squid.m": {
+   "file": "sprites/creatures/auroravein_squid_m.png",
+   "fw": 24,
+   "fh": 24,
+   "anchor": [
+    12,
+    12
+   ],
+   "anims": {
+    "idle": {
+     "row": 0,
+     "frames": 4,
+     "fps": 5
+    },
+    "move": {
+     "row": 1,
+     "frames": 4,
+     "fps": 10
+    }
+   },
+   "vis": [
+    1,
+    7,
+    22,
+    16
+   ]
+  },
+  "creature.moonshell_crab": {
+   "file": "sprites/creatures/moonshell_crab.png",
+   "fw": 16,
+   "fh": 16,
+   "anchor": [
+    8,
+    8
+   ],
+   "anims": {
+    "idle": {
+     "row": 0,
+     "frames": 4,
+     "fps": 5
+    },
+    "move": {
+     "row": 1,
+     "frames": 4,
+     "fps": 10
+    }
+   },
+   "vis": [
+    2,
+    4,
+    14,
+    12
+   ]
+  },
+  "creature.moonshell_crab.baby": {
+   "file": "sprites/creatures/moonshell_crab_baby.png",
+   "fw": 16,
+   "fh": 16,
+   "anchor": [
+    8,
+    8
+   ],
+   "anims": {
+    "idle": {
+     "row": 0,
+     "frames": 4,
+     "fps": 5
+    },
+    "move": {
+     "row": 1,
+     "frames": 4,
+     "fps": 10
+    }
+   },
+   "vis": [
+    2,
+    4,
+    13,
+    12
+   ]
+  },
+  "creature.moonshell_crab.m": {
+   "file": "sprites/creatures/moonshell_crab_m.png",
+   "fw": 16,
+   "fh": 16,
+   "anchor": [
+    8,
+    8
+   ],
+   "anims": {
+    "idle": {
+     "row": 0,
+     "frames": 4,
+     "fps": 5
+    },
+    "move": {
+     "row": 1,
+     "frames": 4,
+     "fps": 10
+    }
+   },
+   "vis": [
+    2,
+    4,
+    14,
+    12
+   ]
+  },
+  "creature.ribbonmane": {
+   "file": "sprites/creatures/ribbonmane.png",
+   "fw": 24,
+   "fh": 24,
+   "anchor": [
+    12,
+    12
+   ],
+   "anims": {
+    "idle": {
+     "row": 0,
+     "frames": 4,
+     "fps": 5
+    },
+    "move": {
+     "row": 1,
+     "frames": 4,
+     "fps": 10
+    }
+   },
+   "vis": [
+    3,
+    2,
+    21,
+    21
+   ]
+  },
+  "creature.ribbonmane.baby": {
+   "file": "sprites/creatures/ribbonmane_baby.png",
+   "fw": 24,
+   "fh": 24,
+   "anchor": [
+    12,
+    12
+   ],
+   "anims": {
+    "idle": {
+     "row": 0,
+     "frames": 4,
+     "fps": 5
+    },
+    "move": {
+     "row": 1,
+     "frames": 4,
+     "fps": 10
+    }
+   },
+   "vis": [
+    6,
+    6,
+    18,
+    17
+   ]
+  },
+  "creature.ribbonmane.m": {
+   "file": "sprites/creatures/ribbonmane_m.png",
+   "fw": 24,
+   "fh": 24,
+   "anchor": [
+    12,
+    12
+   ],
+   "anims": {
+    "idle": {
+     "row": 0,
+     "frames": 4,
+     "fps": 5
+    },
+    "move": {
+     "row": 1,
+     "frames": 4,
+     "fps": 10
+    }
+   },
+   "vis": [
+    3,
+    2,
+    21,
+    21
+   ]
+  },
+  "plant.candlepolyp": {
+   "file": "sprites/plants/candlepolyp.png",
+   "fw": 24,
+   "fh": 24,
+   "anchor": [
+    12,
+    23
+   ],
+   "anims": {
+    "idle": {
+     "row": 0,
+     "frames": 4,
+     "fps": 3
+    }
+   },
+   "vis": [
+    3,
+    2,
+    22,
+    23
+   ]
+  },
+  "plant.candlepolyp.closed": {
+   "file": "sprites/plants/candlepolyp_closed.png",
+   "fw": 24,
+   "fh": 24,
+   "anchor": [
+    12,
+    23
+   ],
+   "anims": {
+    "idle": {
+     "row": 0,
+     "frames": 4,
+     "fps": 3
+    }
+   },
+   "vis": [
+    3,
+    2,
+    20,
+    23
+   ]
+  },
+  "creature.skyleap_flyfish": {
+   "file": "sprites/creatures/skyleap_flyfish.png",
+   "fw": 16,
+   "fh": 16,
+   "anchor": [
+    8,
+    8
+   ],
+   "anims": {
+    "idle": {
+     "row": 0,
+     "frames": 4,
+     "fps": 5
+    },
+    "move": {
+     "row": 1,
+     "frames": 4,
+     "fps": 10
+    }
+   },
+   "vis": [
+    1,
+    1,
+    14,
+    14
+   ]
+  },
+  "creature.skyleap_flyfish.baby": {
+   "file": "sprites/creatures/skyleap_flyfish_baby.png",
+   "fw": 16,
+   "fh": 16,
+   "anchor": [
+    8,
+    8
+   ],
+   "anims": {
+    "idle": {
+     "row": 0,
+     "frames": 4,
+     "fps": 5
+    },
+    "move": {
+     "row": 1,
+     "frames": 4,
+     "fps": 10
+    }
+   },
+   "vis": [
+    2,
+    4,
+    11,
+    11
+   ]
+  },
+  "creature.skyleap_flyfish.m": {
+   "file": "sprites/creatures/skyleap_flyfish_m.png",
+   "fw": 16,
+   "fh": 16,
+   "anchor": [
+    8,
+    8
+   ],
+   "anims": {
+    "idle": {
+     "row": 0,
+     "frames": 4,
+     "fps": 5
+    },
+    "move": {
+     "row": 1,
+     "frames": 4,
+     "fps": 10
+    }
+   },
+   "vis": [
+    1,
+    1,
+    14,
+    14
+   ]
+  },
+  "creature.sail_turtle": {
+   "file": "sprites/creatures/sail_turtle.png",
+   "fw": 48,
+   "fh": 24,
+   "anchor": [
+    24,
+    12
+   ],
+   "anims": {
+    "idle": {
+     "row": 0,
+     "frames": 4,
+     "fps": 5
+    },
+    "move": {
+     "row": 1,
+     "frames": 4,
+     "fps": 10
+    }
+   },
+   "vis": [
+    8,
+    1,
+    43,
+    22
+   ]
+  },
+  "creature.sail_turtle.baby": {
+   "file": "sprites/creatures/sail_turtle_baby.png",
+   "fw": 48,
+   "fh": 24,
+   "anchor": [
+    24,
+    12
+   ],
+   "anims": {
+    "idle": {
+     "row": 0,
+     "frames": 4,
+     "fps": 5
+    },
+    "move": {
+     "row": 1,
+     "frames": 4,
+     "fps": 10
+    }
+   },
+   "vis": [
+    9,
+    4,
+    40,
+    20
+   ]
+  },
+  "creature.sail_turtle.m": {
+   "file": "sprites/creatures/sail_turtle_m.png",
+   "fw": 48,
+   "fh": 24,
+   "anchor": [
+    24,
+    12
+   ],
+   "anims": {
+    "idle": {
+     "row": 0,
+     "frames": 4,
+     "fps": 5
+    },
+    "move": {
+     "row": 1,
+     "frames": 4,
+     "fps": 10
+    }
+   },
+   "vis": [
+    8,
+    1,
+    43,
+    22
+   ]
+  },
+  "creature.pressure_tortoise": {
+   "file": "sprites/creatures/pressure_tortoise.png",
+   "fw": 32,
+   "fh": 16,
+   "anchor": [
+    16,
+    8
+   ],
+   "anims": {
+    "idle": {
+     "row": 0,
+     "frames": 4,
+     "fps": 5
+    },
+    "move": {
+     "row": 1,
+     "frames": 4,
+     "fps": 10
+    }
+   },
+   "vis": [
+    4,
+    4,
+    29,
+    14
+   ]
+  },
+  "creature.pressure_tortoise.baby": {
+   "file": "sprites/creatures/pressure_tortoise_baby.png",
+   "fw": 32,
+   "fh": 16,
+   "anchor": [
+    16,
+    8
+   ],
+   "anims": {
+    "idle": {
+     "row": 0,
+     "frames": 4,
+     "fps": 5
+    },
+    "move": {
+     "row": 1,
+     "frames": 4,
+     "fps": 10
+    }
+   },
+   "vis": [
+    6,
+    6,
+    26,
+    12
+   ]
+  },
+  "creature.pressure_tortoise.m": {
+   "file": "sprites/creatures/pressure_tortoise_m.png",
+   "fw": 32,
+   "fh": 16,
+   "anchor": [
+    16,
+    8
+   ],
+   "anims": {
+    "idle": {
+     "row": 0,
+     "frames": 4,
+     "fps": 5
+    },
+    "move": {
+     "row": 1,
+     "frames": 4,
+     "fps": 10
+    }
+   },
+   "vis": [
+    4,
+    4,
+    29,
+    14
+   ]
+  },
+  "creature.bellcrab": {
+   "file": "sprites/creatures/bellcrab.png",
+   "fw": 16,
+   "fh": 16,
+   "anchor": [
+    8,
+    8
+   ],
+   "anims": {
+    "idle": {
+     "row": 0,
+     "frames": 4,
+     "fps": 5
+    },
+    "move": {
+     "row": 1,
+     "frames": 4,
+     "fps": 10
+    }
+   },
+   "vis": [
+    2,
+    3,
+    14,
+    12
+   ]
+  },
+  "creature.bellcrab.baby": {
+   "file": "sprites/creatures/bellcrab_baby.png",
+   "fw": 16,
+   "fh": 16,
+   "anchor": [
+    8,
+    8
+   ],
+   "anims": {
+    "idle": {
+     "row": 0,
+     "frames": 4,
+     "fps": 5
+    },
+    "move": {
+     "row": 1,
+     "frames": 4,
+     "fps": 10
+    }
+   },
+   "vis": [
+    2,
+    3,
+    13,
+    12
+   ]
+  },
+  "creature.bellcrab.m": {
+   "file": "sprites/creatures/bellcrab_m.png",
+   "fw": 16,
+   "fh": 16,
+   "anchor": [
+    8,
+    8
+   ],
+   "anims": {
+    "idle": {
+     "row": 0,
+     "frames": 4,
+     "fps": 5
+    },
+    "move": {
+     "row": 1,
+     "frames": 4,
+     "fps": 10
+    }
+   },
+   "vis": [
+    2,
+    3,
+    14,
+    12
+   ]
+  },
+  "creature.firefly_frog": {
+   "file": "sprites/creatures/firefly_frog.png",
+   "fw": 16,
+   "fh": 16,
+   "anchor": [
+    8,
+    8
+   ],
+   "anims": {
+    "idle": {
+     "row": 0,
+     "frames": 4,
+     "fps": 5
+    },
+    "move": {
+     "row": 1,
+     "frames": 4,
+     "fps": 10
+    }
+   },
+   "vis": [
+    1,
+    3,
+    14,
+    13
+   ]
+  },
+  "creature.firefly_frog.baby": {
+   "file": "sprites/creatures/firefly_frog_baby.png",
+   "fw": 16,
+   "fh": 16,
+   "anchor": [
+    8,
+    8
+   ],
+   "anims": {
+    "idle": {
+     "row": 0,
+     "frames": 4,
+     "fps": 5
+    },
+    "move": {
+     "row": 1,
+     "frames": 4,
+     "fps": 10
+    }
+   },
+   "vis": [
+    1,
+    3,
+    13,
+    12
+   ]
+  },
+  "creature.firefly_frog.m": {
+   "file": "sprites/creatures/firefly_frog_m.png",
+   "fw": 16,
+   "fh": 16,
+   "anchor": [
+    8,
+    8
+   ],
+   "anims": {
+    "idle": {
+     "row": 0,
+     "frames": 4,
+     "fps": 5
+    },
+    "move": {
+     "row": 1,
+     "frames": 4,
+     "fps": 10
+    }
+   },
+   "vis": [
+    1,
+    3,
+    14,
+    13
+   ]
+  },
   "decor.pebble_rock": {
    "file": "sprites/decor/pebble_rock.png",
    "fw": 16,

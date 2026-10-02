@@ -17,6 +17,8 @@
 //   midair      (new) cruises under the surface and leaps out every few seconds; only nettable in the air
 //               params: leapEvery [min,max], leap, speed, depth, wanderR
 //   active                               optional 'night' | 'day': only out at those hours (default: always)
+//   bloom                                plants: 'night' = closed (not harvestable) by day, open + glowing at night
+//   requires_depth                       lives past a depth limit: needs that DEPTH upgrade level to reach (log tag)
 //   eggs                                 optional true/false: lays eggs when breeding (default: all but mammals)
 //   sprite_size                          size class from data/sprite-spec.js
 //   color, accent, art                   placeholder-art hints only (ignored once real art exists)
@@ -304,5 +306,43 @@ AQ.data.creatures = [
   { id: 'cavepetalia', likes: ['plant', 'light'], name: 'Cavepetalia', biome: 'lush_cave', category: 'amphibian', catch_behavior: 'easy',
     params: { speed: 7 },
     sprite_size: 'medium', color: '#f5c6d6', accent: '#ffffff', art: { shape: 'lizard', gills: true, belly: true },
-    spawn: { n: 3, at: 'water' }, hint: 'Pale pink with feathery gills. Barely reacts to you at all.' }
+    spawn: { n: 3, at: 'water' }, hint: 'Pale pink with feathery gills. Barely reacts to you at all.' },
+
+  // ---- Day & night update: nine new creatures (night-only, depth-gated, and the new behaviours)
+  { id: 'auroravein_squid', likes: ['ice', 'light'], name: 'Auroravein Squid', biome: 'ice', category: 'cephalopod', catch_behavior: 'drift', active: 'night',
+    params: { speed: 6, alpha: 0.95 },
+    sprite_size: 'medium', color: '#cfe6dc', accent: '#c9a8ff', art: { shape: 'squid', veins: true }, light: { r: 30, color: '#b8ffd8' },
+    spawn: { n: 2, at: 'water', y: [150, 360] }, hint: 'Pale green-violet veins pulse with light. Drifts slowly under the ice on calm nights.' },
+  { id: 'moonshell_crab', likes: ['shell', 'rock'], name: 'Moonshell Crab', biome: 'tide_pools', category: 'crustacean', catch_behavior: 'camouflage', active: 'night',
+    params: { freezeOnApproach: true, alpha: 0.25, visibleAlpha: 0.95, crawl: true, moveEvery: [3, 5] },
+    sprite_size: 'small', color: '#dfe4f2', accent: '#a8c4ff', art: { shape: 'crab' }, light: { r: 12, color: '#dfe8ff' },
+    spawn: { n: 2, at: 'ground', area: [40, 700] }, hint: 'Its moonstone shell blends into moonlit sand. It freezes when you come close - look for the faint shimmer.' },
+  { id: 'ribbonmane', likes: ['kelp', 'plant'], name: 'Ribbonmane', biome: 'kelp', category: 'fish', catch_behavior: 'mirror',
+    params: { range: 72, calmTime: 0.9, approach: 26, wanderR: 50 },
+    sprite_size: 'medium', color: '#e8a04a', accent: '#ff7f9a', art: { shape: 'seahorse' },
+    spawn: { n: 2, at: 'water', y: [170, 360] }, hint: 'A seahorse that dances your moves back at you, mirrored. Hold still and it drifts in close.' },
+  { id: 'candlepolyp', tags: ['coral', 'light'], name: 'Candlepolyp', biome: 'coral', category: 'plant', is_plant: true, catch_behavior: 'plant', bloom: 'night',
+    params: {},
+    sprite_size: 'medium', color: '#6a4a6a', accent: '#ffd98a', art: { shape: 'candlepolyp' }, light: { r: 22, color: '#ffd98a' },
+    spawn: { n: 5, at: 'floor' }, hint: 'Closed tight by day. At night its tips open like little candles - harvest it then.' },
+  { id: 'skyleap_flyfish', likes: ['bubbles', 'arch'], name: 'Skyleap Flyfish', biome: 'open_ocean', category: 'fish', catch_behavior: 'midair',
+    params: { leapEvery: [2.5, 4.5], leap: 125, speed: 24, depth: 14, wanderR: 100 },
+    sprite_size: 'small', color: '#5fa8e8', accent: '#e8f4ff', art: { shape: 'flyfish' },
+    spawn: { n: 3, at: 'surface' }, hint: 'Skims under the surface and leaps out in an arc. Too quick underwater - net it mid-leap.' },
+  { id: 'sail_turtle', likes: ['rock', 'arch'], name: 'Sail Turtle', biome: 'open_ocean', category: 'reptile', catch_behavior: 'patrol', requires_depth: 2,
+    params: { speed: 10, noticeR: 56, stillNoise: 0.12, span: 40 },
+    sprite_size: 'widelarge', color: '#6a9a7a', accent: '#c8a060', art: { shape: 'turtle', sail: true },
+    spawn: { n: 1, at: 'water', area: [2436, 2550], y: [1290, 1328] }, hint: 'A gentle giant that sails slowly around the bottom of the Blue Hole. Wait still on its path.' },
+  { id: 'pressure_tortoise', likes: ['rock', 'crystal'], name: 'Pressure Tortoise', biome: 'trench', category: 'reptile', catch_behavior: 'defensive', requires_depth: 3, tank: 'crawl',
+    params: { alertR: 40, relaxTime: 2.5, withdraw: true },
+    sprite_size: 'wide', color: '#5a5a6a', accent: '#8f98b8', art: { shape: 'turtle', dome: true },
+    spawn: { n: 1, at: 'floor', area: [3600, 3712], y: [1380, 1410] }, hint: 'Lives at the very bottom of the trench. Pulls into its shell if you rush it - wait until it relaxes.' },
+  { id: 'bellcrab', likes: ['metal', 'treasure'], name: 'Bellcrab', biome: 'ruins', category: 'crustacean', catch_behavior: 'wary',
+    params: { reaction: 'hide', pry: true, alertR: 46, speed: 6, wanderR: 28 },
+    sprite_size: 'small', color: '#c8a060', accent: '#d8c090', art: { shape: 'crab', bell: true },
+    spawn: { n: 2, at: 'floor' }, hint: 'Its shell has a little bell-shaped hollow. Sneak up; if it hides, hold the net to pry it out.' },
+  { id: 'firefly_frog', likes: ['roots', 'plant'], name: 'Firefly Frog', biome: 'mangrove', category: 'amphibian', catch_behavior: 'lure', active: 'night',
+    params: { decoyDist: 11, decoyColor: '#f0ff8a', alpha: 0.55, glow: 28 },
+    sprite_size: 'small', color: '#4a6a3a', accent: '#e8ff7a', art: { shape: 'frog', glow: true }, light: { r: 12, color: '#e8ff8a' },
+    spawn: { n: 2, at: 'floor' }, hint: 'Glows at night. Its bright "firefly" is a decoy on a stalk - net the dim frog sitting just beside it.' }
 ];

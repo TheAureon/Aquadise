@@ -60,6 +60,10 @@ Click a creature for its info card. Hover the stars for what's helping and what'
 - **New catch behaviours:** `mirror` (copies your swimming mirrored; hold still and it drifts in),
   `lure` (a glowing decoy on a stalk; net the dim creature beside it, not the light) and `midair`
   (leaps out of the water; only nettable in the air). See the header of data/creatures.js.
+- **Nine new creatures (70 in all):** Auroravein Squid (ice, night), Moonshell Crab (tide pools,
+  night), Ribbonmane (kelp, mirror), Candlepolyp (coral plant, blooms at night), Skyleap Flyfish
+  (open ocean, mid-air), Sail Turtle (Blue Hole, depth 2), Pressure Tortoise (trench slot, depth 3),
+  Bellcrab (ruins) and Firefly Frog (mangrove, night, lure). Existing creatures have no new gates.
 - **No fail state.** Hostile creatures only knock you back. Air is unlimited.
 - **Progression** comes only from chests: a bigger net (3 levels) and faster swimming (3 levels).
   Six chests exist at a time, and they despawn and respawn around the world.

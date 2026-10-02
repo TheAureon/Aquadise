@@ -131,6 +131,7 @@ AQ.Catching = (function () {
 
   function harvest(game, c) {
     if (c.harvested) return;
+    if (c.closed) { AQ.HUD.toast(`The ${c.def.name} is closed tight. Come back at night.`, '#cfe8ff'); AQ.FX.puff(c.x, c.y - 4, 'rgba(255,255,255,0.4)', 3); return; }
     const ctx = ctxFor(game, c);
     if (c.p.sting && ctx.noise > AQ.TUNING.stealth.carelessNoise) {
       game.player.knock(ctx.dx || 1, ctx.dy - 3, AQ.TUNING.knockback.light);

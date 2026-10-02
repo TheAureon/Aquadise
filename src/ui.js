@@ -108,14 +108,15 @@ AQ.LogUI = (function () {
       const has = AQ.Collection.has(d.id);
       F().draw(g, has ? d.name : '???', 10, 130, has ? '#ffe9a8' : '#8aa4b8');
       const tags = [CAT_LABEL[d.category] || d.category, d.is_plant ? 'harvest' : '', d.requires_upgraded_net ? 'needs net lv2' : '',
-        d.active === 'night' ? 'night only' : d.active === 'day' ? 'day only' : '', d.rare ? 'rare' : '', d.hostile ? 'hostile' : '', d.draft ? 'draft' : ''].filter(Boolean).join(' - ');
+        d.active === 'night' || d.bloom === 'night' ? 'night only' : d.active === 'day' ? 'day only' : '',
+        d.requires_depth ? 'needs depth ' + d.requires_depth : '', d.rare ? 'rare' : '', d.hostile ? 'hostile' : '', d.draft ? 'draft' : ''].filter(Boolean).join(' - ');
       F().draw(g, tags, 310, 130, '#9fd3ee', { align: 'right' });
       if (has && AQ.Sex.has(d)) {
         const L = (AQ.State.log || {})[d.id] || {};
         const txt = (AQ.Sex.complete(d) ? 'COMPLETE: BOTH ♂ AND ♀ CAUGHT' : `STILL TO FIND: ${L.m ? 'A FEMALE ♀' : 'A MALE ♂'}`) + (L.bred ? '   ♥ BRED IN YOUR AQUARIUM' : '');
         F().draw(g, txt, 10, 164, AQ.Sex.complete(d) ? '#7ef0c0' : '#ffcf8a');
       }
-      wrap('Tip: ' + (d.active === 'night' ? 'Comes out at night. ' : d.active === 'day' ? 'Only out by day. ' : '') + (d.hint || ''), 75).slice(0, has && AQ.Sex.has(d) ? 3 : 4).forEach((l, i) => F().draw(g, l, 10, 140 + i * 8, '#d8eef8'));
+      wrap('Tip: ' + (d.active === 'night' ? 'Comes out at night. ' : d.bloom === 'night' ? 'Opens at night. ' : d.active === 'day' ? 'Only out by day. ' : '') + (d.requires_depth ? `Lives deep: needs the depth upgrade (level ${d.requires_depth}). ` : '') + (d.hint || ''), 75).slice(0, has && AQ.Sex.has(d) ? 3 : 4).forEach((l, i) => F().draw(g, l, 10, 140 + i * 8, '#d8eef8'));
     }
     F().draw(g, 'Q/E OR ARROWS: BIOME   ESC: CLOSE', 160, 173, '#5f7f96', { align: 'center' });
   };

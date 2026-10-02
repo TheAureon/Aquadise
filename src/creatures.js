@@ -254,6 +254,7 @@ AQ.Creatures = (function () {
       const lt = c.def.light;
       if (!lt || c.harvested || c.x < l || c.x > l + cam.w + 120 || c.y < t || c.y > t + cam.h + 120) continue;
       if (lt.pulse && !c.glow) continue;
+      if (c.closed) continue;                    // a night bloom closed for the day
       const yy = c.def.is_plant ? c.y - 5 : c.y;
       L.push({ x: c.x + (c.def.art && c.def.art.lure ? c.facing * c.r : 0), y: yy, r: lt.r, color: lt.color, power: Math.max(0.4, c.alpha) });
     }

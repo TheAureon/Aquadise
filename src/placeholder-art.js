@@ -167,6 +167,14 @@
     p.shade();
     p.line(cx - 2, cy - ry, cx - 2, cy - ry - 2, o.c); p.line(cx + 2, cy - ry, cx + 2, cy - ry - 2, o.c);
     p.set(cx - 2, cy - ry - 3, BLACK); p.set(cx + 2, cy - ry - 3, BLACK);
+    if (o.bell) {
+      // a bell-shaped shell with a little hollow (and a tiny clapper)
+      const top = cy - ry - H * 0.24, bw = rx * 0.75;
+      for (let y = Math.round(top); y <= cy - 1; y++) { const u = (y - top) / (cy - 1 - top), w = bw * (0.45 + 0.55 * u * u); p.rect(Math.round(cx - w), y, Math.round(w * 2), 1, mix(o.a, WHITE, 0.15)); }
+      p.rect(Math.round(cx - bw - 1), cy - 1, Math.round(bw * 2 + 2), 1, mul(o.a, 0.8));
+      p.ellipse(cx, cy - 2, bw * 0.5, 1.4, mul(o.c, 0.45)); p.set(cx, cy - 1, hex('#f2c14e'));
+      p.set(cx, Math.round(top) - 1, mul(o.a, 0.8));
+    }
     p.outline();
   };
 
@@ -241,6 +249,14 @@
     p.shade();
     eye(p, Math.round(mx - W * 0.12), Math.round(my - 1), W >= 20);
     p.outline();
+    if (o.veins) {
+      // glowing veins along the mantle that pulse brighter frame by frame
+      const glow = mix(o.a, WHITE, 0.25 + 0.35 * (0.5 + 0.5 * Math.sin(ph)));
+      for (let k = -1; k <= 1; k++) for (let i = 0; i < 8; i++) {
+        const u = i / 8, x = mx - W * 0.18 + u * W * 0.4, y = my + k * H * 0.07 + Math.sin(u * 7 + k) * 1;
+        if (p.a(Math.round(x), Math.round(y))) p.set(x, y, glow);
+      }
+    }
     if (o.ghost) for (let i = 0; i < p.d.length; i += 4) if (p.d[i + 3]) p.d[i + 3] = 200;
   };
 
@@ -428,6 +444,7 @@
     p.shade();
     eye(p, Math.round(W * 0.68), Math.round(H * 0.4 - leap * 2), false);
     p.outline();
+    if (o.glow) [[0.42, 0.5], [0.52, 0.46], [0.6, 0.5], [0.36, 0.6]].forEach(([x, y], i) => p.set(W * x, H * y - leap * 2, i % 2 ? WHITE : o.a));
   };
 
   S.otter = function (p, o) {
@@ -733,6 +750,70 @@
     p.circle(W / 2, 2.5, 1.6, o.c);
     for (let a = 0.3; a < Math.PI - 0.3; a += 0.1) p.set(W / 2 + Math.cos(a) * W * 0.36, H - 6 + Math.sin(a) * 4, o.c);
     p.shade(0.2); p.outline();
+  };
+
+  // ---------- new creatures (day & night update) ----------
+  // Seahorse-like: upright curled body, long snout, flowing ribbon mane.
+  S.seahorse = function (p, o) {
+    const W = p.w, H = p.h, ph = o.t * Math.PI * 2;
+    const spine = [[0.56, 0.24], [0.52, 0.34], [0.48, 0.45], [0.5, 0.57], [0.55, 0.67], [0.52, 0.77], [0.44, 0.83], [0.38, 0.78], [0.41, 0.71]];
+    const rad = [0.11, 0.1, 0.12, 0.12, 0.1, 0.08, 0.06, 0.05, 0.04];
+    // ribbons trail behind (left) and sway
+    for (let k = 0; k < 3; k++) for (let i = 0; i < 9; i++) {
+      const u = i / 9, x = W * (0.46 - u * 0.32), y = H * (0.22 + k * 0.1) + u * H * 0.18 + Math.sin(u * 5 + ph + k) * H * 0.05;
+      p.set(x, y, k === 1 ? mul(o.a, 1.1) : o.a);
+    }
+    spine.forEach(([x, y], i) => p.circle(W * x, H * y, Math.max(0.8, W * rad[i]), o.c));
+    p.line(W * 0.62, H * 0.24, W * 0.84, H * 0.27, o.c); p.line(W * 0.62, H * 0.26, W * 0.84, H * 0.28, mul(o.c, 0.9));   // snout
+    p.shade(0.25);
+    for (let i = 0; i < 4; i++) p.set(W * (0.47 + (i % 2) * 0.04), H * (0.4 + i * 0.08), mul(o.c, 0.8));   // belly rings
+    eye(p, Math.round(W * 0.58), Math.round(H * 0.22), false);
+    p.outline(0.4);
+  };
+  // Candle-like polyps: stalks with glowing blooms at night; closed buds by day (o.closed).
+  S.candlepolyp = function (p, o) {
+    const W = p.w, H = p.h, ph = o.t * Math.PI * 2;
+    p.ellipse(W / 2, H - 2, W * 0.36, 2.2, mul(o.c, 0.8));
+    [[0.3, 0.42], [0.45, 0.22], [0.6, 0.32], [0.74, 0.5]].forEach(([x, t], i) => {
+      const sway = o.closed ? 0 : Math.sin(ph + i) * 0.8, tx = W * x + sway, ty = H * t;
+      p.line(W * x, H - 2, tx, ty, o.c); p.line(W * x + 1, H - 2, tx + 1, ty, mul(o.c, 0.85));
+      if (o.closed) { p.ellipse(tx + 0.5, ty, 1.6, 2.2, mul(o.c, 1.2)); }
+      else { p.circle(tx + 0.5, ty - 1, 2.2, o.a); p.set(tx + 0.5, ty - 1, WHITE); p.set(tx - 1.5, ty - 2, mix(o.a, WHITE, 0.4)); p.set(tx + 2.5, ty - 2, mix(o.a, WHITE, 0.4)); }
+    });
+    p.shade(0.2); p.outline(0.4);
+  };
+  // Flying fish: slim body with big wing-fins that flap.
+  S.flyfish = function (p, o) {
+    const W = p.w, H = p.h, ph = o.t * Math.PI * 2, flap = Math.sin(ph) * (o.moving ? 1 : 0.5);
+    p.tri([W * 0.2, H * 0.5], [W * 0.04, H * 0.3], [W * 0.04, H * 0.7], mul(o.c, 0.9));   // forked tail
+    p.ellipse(W * 0.5, H * 0.52, W * 0.32, H * 0.14, o.c);
+    p.tri([W * 0.52, H * 0.46], [W * 0.26, H * (0.12 - flap * 0.08)], [W * 0.36, H * 0.48], o.a);   // wing
+    p.tri([W * 0.5, H * 0.6], [W * 0.3, H * (0.82 + flap * 0.06)], [W * 0.4, H * 0.58], mul(o.a, 0.85));
+    p.ellipse(W * 0.5, H * 0.58, W * 0.24, H * 0.05, mix(o.c, WHITE, 0.5));             // pale belly
+    p.shade(0.25);
+    eye(p, Math.round(W * 0.74), Math.round(H * 0.48), W >= 20);
+    p.outline();
+  };
+  // Turtle side view. o.sail: a tall sail-like fin on the shell; o.dome: a heavy tortoise dome.
+  S.turtle = function (p, o) {
+    const W = p.w, H = p.h, ph = o.t * Math.PI * 2, paddle = Math.sin(ph) * (o.moving ? 1 : 0.4);
+    const cx = W * 0.47, cy = H * (o.dome ? 0.62 : 0.6), rx = W * (o.dome ? 0.3 : 0.32), ry = H * (o.dome ? 0.3 : 0.22);
+    // flippers / legs
+    if (o.dome) { p.rect(Math.round(cx - rx * 0.6), Math.round(cy + ry * 0.4), 4, Math.round(H * 0.16), mul(o.c, 0.8)); p.rect(Math.round(cx + rx * 0.4), Math.round(cy + ry * 0.4), 4, Math.round(H * 0.16), mul(o.c, 0.8)); }
+    else {
+      p.tri([cx + rx * 0.4, cy], [cx + rx * 0.9, cy + ry * (1.6 + paddle * 0.6)], [cx + rx * 0.1, cy + ry * 0.8], mul(o.c, 0.85));
+      p.tri([cx - rx * 0.5, cy + ry * 0.2], [cx - rx * 1.05, cy + ry * (1.2 - paddle * 0.5)], [cx - rx * 0.2, cy + ry * 0.7], mul(o.c, 0.8));
+    }
+    // head + neck
+    p.ellipse(cx + rx + W * 0.06, cy - ry * (o.dome ? 0.1 : 0.2), W * 0.08, H * 0.1, mix(o.c, WHITE, 0.15));
+    // shell: dome on top, flat belly
+    for (let y = -ry; y <= 0; y++) { const w = rx * Math.sqrt(1 - (y * y) / (ry * ry)); p.rect(Math.round(cx - w), Math.round(cy + y), Math.round(w * 2), 1, o.a); }
+    p.rect(Math.round(cx - rx), Math.round(cy), Math.round(rx * 2), Math.max(2, Math.round(H * 0.08)), mix(o.c, WHITE, 0.3));
+    for (let i = -2; i <= 2; i++) p.line(cx + i * rx * 0.36, cy - 1, cx + i * rx * 0.26, cy - ry * 0.8, mul(o.a, 0.75));   // scutes
+    if (o.sail) p.tri([cx - rx * 0.4, cy - ry * 0.8], [cx + rx * 0.5, cy - ry * 0.8], [cx - rx * 0.05, cy - ry - H * 0.38], mix(o.a, WHITE, 0.35));
+    p.shade(0.2);
+    eye(p, Math.round(cx + rx + W * 0.09), Math.round(cy - ry * (o.dome ? 0.15 : 0.25)), false);
+    p.outline();
   };
 
   // ---------- themed decorations (aquarium stage 4) ----------
