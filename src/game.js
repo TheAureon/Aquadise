@@ -101,6 +101,7 @@ AQ.Game = (function () {
       }
       AQ.Scenes.cur(G).update(dt, G, frozen ? NO_INPUT : I);
       if (AQ.Gulls) AQ.Gulls.update(dt, G);         // distant seagulls in the sky (sea + hill)
+      if (AQ.ShootingStars) AQ.ShootingStars.update(dt, G);   // night streaks (sky, water glow, portholes)
       AQ.HUD.update(dt, G);
       if (AQ.Save) AQ.Save.tick(dt, G);
     } else if (G.state === 'aquarium') {
@@ -142,7 +143,7 @@ AQ.Game = (function () {
     }
     AQ.Render.background(cam);
     if (G.state === 'title') AQ.Title.drawBack(ctx);
-    else if (AQ.Gulls) AQ.Gulls.draw(ctx, G);       // far behind everything, just after the sky
+    else { if (AQ.ShootingStars) AQ.ShootingStars.draw(ctx, G); if (AQ.Gulls) AQ.Gulls.draw(ctx, G); }   // far behind everything, just after the sky
     AQ.Terrain.draw(ctx, cam);
     ctx.save();
     ctx.translate(-cam.left(), -cam.top());
@@ -162,6 +163,7 @@ AQ.Game = (function () {
     AQ.Render.surface(cam);
     AQ.Render.lighting(cam, collectLights(), targetDarkness());
     AQ.Render.twilightTint(cam);
+    if (!title && AQ.ShootingStars) AQ.ShootingStars.drawWater(ctx, G);   // a star's glow passing through the water
     AQ.Render.heavyHaze(G.player.heavy || 0);
     AQ.Terrain.drawGlow(ctx, cam);
     if (title) { if (G.state === 'log') AQ.LogUI.draw(ctx, G); else AQ.Title.draw(ctx, G); return; }

@@ -201,6 +201,24 @@ AQ.TUNING = {
     cryMinGap: 25             // at most one cry every this many seconds
   },
 
+  // Shooting stars (scenery only): thin bright streaks across the night sky (sea surface, Tide Pools
+  // shore, hill), a faint glow passing through the water when you're under the surface, and now and
+  // then a streak outside the portholes of the aquarium building (space: day or night).
+  shootingStars: {
+    everySeconds: [9, 22],    // at night, a new streak after this many seconds (random in the range)
+    stationEverySeconds: [14, 30], // in the building, a streak past a porthole after this many seconds
+    nightBelow: 0.3,          // daylight below this counts as "night" for streaks (they fade in with the dark)
+    speed: [170, 260],        // screen px/s
+    life: [0.45, 0.8],        // seconds a streak lasts
+    trail: [12, 24],          // trail length in px (fades from the bright head to nothing)
+    angle: [14, 38],          // degrees below horizontal (left or right)
+    colors: ['#fff6dc', '#dcefff', '#ffe6f2', '#e8fff4'],   // soft tints, picked per streak
+    waterGlow: 0.10,          // underwater: how bright the passing glow is (0 = off)
+    waterGlowDepth: 500,      // ...fading to nothing this many px below the surface
+    soundVolume: 0.55,        // the soft whoosh, on top of the ambience volume (respects mute)
+    soundMinGap: 4            // at most one whoosh every this many seconds
+  },
+
   // ---- photo mode on the tank screen (PHOTO button or the key below)
   photo: {
     key: 'KeyP',              // enter / leave photo mode

@@ -175,6 +175,7 @@ AQ.Station = (function () {
       const x = (i * 97 + 13) % 320, y = (i * 53 + 29) % 180, a = 0.5 + 0.5 * Math.sin(t * (1 + i % 3) + i);
       ctx.fillStyle = `rgba(255,255,255,${(a * 0.8).toFixed(2)})`; ctx.fillRect(x, y, 1, 1);
     }
+    if (AQ.ShootingStars) AQ.ShootingStars.drawSpace(ctx, left, top);   // a streak outside the portholes
   }
   function drawTank(ctx, tk) {
     const frame = AQ.Assets.sprites['misc.tank_frame'], fw = 64, fh = 44, x0 = tk.x - fw / 2, y0 = tk.y - fh;
@@ -232,6 +233,8 @@ AQ.Station = (function () {
   };
   const ease = (x) => x * x * (3 - 2 * x);
 
+  // porthole centres (building space), for streaks passing outside
+  St.portholes = () => (L ? L.windows : []).map(([wx, fl]) => ({ x: wx, y: L.floors[fl] - 50 }));
   St.draw = function (ctx, game) {
     if (!canvas) paint();
     if (!tanks.length) layoutTanks();

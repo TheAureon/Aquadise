@@ -108,6 +108,13 @@ browsers won't let a page save pictures made from file:// images.
   fade away at night), tinted to suit the sky; scenery only. A very faint, rate-limited gull cry plays
   as a flock passes, through the ambience volume (and mute). Tuning: `AQ.TUNING.gulls` (how often,
   most flocks at once, flock size, speed, parallax, flap speed, cry volume and gap).
+- **Shooting stars (scenery):** at night (the shared day/night clock) a thin bright streak with a short
+  fading trail now and then crosses the sky wherever it shows: the sea surface, the Tide Pools shore and
+  the hill. Under the surface you see a faint glow sliding through the water instead (fading with
+  depth). In the aquarium building, which is in space, a streak now and then passes outside a porthole
+  you can see, day or night. Each streak has a very soft whoosh on the ambience volume (and mute);
+  it's in the Sound Test as SHOOTING STAR. Tuning: `AQ.TUNING.shootingStars` (how often, speed, trail
+  length, angle, tints, underwater glow, sound volume).
 - **No fail state.** Hostile creatures only knock you back. Air is unlimited.
 - **Progression** comes only from chests: a bigger net (3 levels) and faster swimming (3 levels).
   Six chests exist at a time, and they despawn and respawn around the world.
@@ -222,6 +229,7 @@ src/hill.js           the hill scene with the UFO and its beam
 src/station.js        the aquarium building in space (tanks on the walls, directory, beam pad)
 src/ui.js             collection log, map, pause
 src/gulls.js          distant seagull flocks in the sky (sea + hill)
+src/shootingstars.js  night shooting-star streaks (sky, underwater glow, station portholes)
 src/bottles.js        message bottles: deterministic, reachable placement, pickup, glint
 assets/sprites-embedded.js   base64 copy of the sprites for file:// (tools/embed-sprites.js)
 src/audio.js          audio engine: mixer, voice limit, underwater filter, settings, file mapping

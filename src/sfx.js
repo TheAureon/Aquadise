@@ -154,6 +154,12 @@ var AQ = (typeof AQ !== 'undefined') ? AQ : {};
   }, { important: true, minGap: 0.2 });
   // a very faint, far-off gull cry as a flock passes: played through the AMBIENCE bus (ambience
   // volume + mute apply), rate-limited by AQ.TUNING.gulls.cryMinGap
+  // a shooting star: a very soft airy whoosh with a faint high shimmer on top
+  reg('star_whoosh', 'world', 'SHOOTING STAR', (c, o, t) => {
+    H.noise(c, o, t, { f: 2400, f2: 900, q: 0.9, a: 0.12, d: 0.55, v: 0.035 });
+    H.tone(c, o, t + 0.05, { type: 'sine', f: 2600, f2: 1900, glide: 0.5, a: 0.08, d: 0.5, v: 0.012 });
+    return 0.7;
+  }, { bus: 'amb', minGap: AQ.TUNING.shootingStars.soundMinGap });
   reg('gull_far', 'world', 'DISTANT GULLS', (c, o, t) => {
     const n = 1 + Math.floor(Math.random() * 2);
     for (let i = 0; i < n; i++) {
