@@ -56,6 +56,8 @@ add('bait', 'sprites/misc/bait.png', 'bait', [8, 8], { shape: 'bait' });
 add('misc.signpost', 'sprites/scene/signpost.png', 'prop', [16, 24], { shape: 'signpost' });
 add('misc.ufo', 'sprites/scene/ufo.png', 'ufo', [64, 32], { shape: 'ufo' });
 add('misc.beam', 'sprites/scene/beam.png', 'beam', [32, 96], { shape: 'beam', fit: false });
+add('ui.marker', 'sprites/ui/marker.png', 'uimarker', [16, 16], { shape: 'uimarker', fit: false });
+add('ui.arrow', 'sprites/ui/arrow.png', 'uimarker', [8, 8], { shape: 'uiarrow', fit: false });
 add('ui.icons', 'sprites/ui/icons.png', 'uiicons', [12, 12], { shape: 'uiicons', fit: false });
 add('misc.bottle', 'sprites/scene/bottle.png', 'bottle', [12, 14], { shape: 'bottle', fit: false });
 add('misc.beampad', 'sprites/scene/beampad.png', 'propanim', [40, 12], { shape: 'beampad' });

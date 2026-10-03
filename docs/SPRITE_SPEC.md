@@ -140,6 +140,9 @@ The creatures glow in the sea (`light` in `data/creatures.js`), so keep their br
 |---|---|---|---|---|
 | `ui.icons` | 12 × 12 | 7 (one picture per frame, drawn by frame number) | centre | small icons on the tip boxes: 0 alert (!), 1 moon, 2 star, 3 heart, 4 open book, 5 footprints (sneak), 6 sparkle. Soft bright colours with a dark outline; they sit on a dark navy box. |
 
+| `ui.marker` | 16 × 16 | 4 @ 5 fps (a pulse) | centre | the guided dive's glowing ring around the thing to do: a thin pale-gold ring with a fainter outer ring, growing and shrinking a little |
+| `ui.arrow` | 8 × 8 | 4 @ 5 fps (a bob) | centre | the small pale-gold arrow pointing down at the marker (or at you, for "drop bait") |
+
 The tip box itself is drawn in code (a dark navy panel with a warm yellow top edge and a small ×).
 
 ## Using a different layout

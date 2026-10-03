@@ -23,6 +23,25 @@ AQ.data.tutorial = {
     'BAIT {k:bait}   INTERACT {k:interact}   LOG {k:log}   MAP {k:map}   HELP {k:help}   MUTE {k:mute}'
   ],
 
+  // The optional guided first dive (src/dive.js). Offered once on NEW GAME (a fresh save); restart it any
+  // time from the pause menu (TUTORIAL). Each step completes when you actually do it; the step ids are
+  // what the game checks (move jump swim sneak net catch bait log done), the text is yours to change.
+  dive: {
+    prompt: { title: 'Want a quick guided dive?', lines: ['A few small steps to learn the basics.', 'Skip or stop it any time.'], yes: 'YES', no: 'NO THANKS' },
+    steps: [
+      { id: 'move', text: 'Walk along the shore with {k:move}.' },
+      { id: 'jump', text: 'Press {k:jump} to hop up onto the rocks.' },
+      { id: 'swim', text: 'Wade into the deep water at the end of the shore and swim.' },
+      { id: 'sneak', text: 'Hold {k:sneak} and drift close to the little minnow. Sneaking keeps it calm.' },
+      { id: 'net', text: 'Swing your net with {k:net}.' },
+      { id: 'catch', text: 'Now catch the minnow: aim at it and swing.' },
+      { id: 'bait', text: 'Drop some bait with {k:bait}. It draws curious creatures out.' },
+      { id: 'log', text: 'Open your log with {k:log} to see your catch.' },
+      { id: 'done', text: 'That\'s the basics! The GUIDE in the pause menu has more, whenever you like.' }
+    ],
+    nice: ['NICE!', 'LOVELY!', 'GOT IT!', 'WELL DONE!']
+  },
+
   // the CONTROLS panel on the title screen: [what, keys]
   controls: [
     ['MOVE / SWIM', '{k:move} OR {k:arrows}'], ['JUMP', '{k:jump}'], ['SNEAK', 'HOLD {k:sneak}'],
@@ -66,7 +85,7 @@ AQ.data.tutorial = {
       'Stand in the light and press {k:interact}.'] },
     { id: 'station', on: ['station'], where: 'play', known: ['station'], icon: 'ui:4', lines: [
       'Your aquarium! Ladders lead to every floor.',
-      'The DIRECTORY lists every tank; {k:stationView} shows them all,',
+      'The DIRECTORY lists every tank. {k:stationView} shows them all,',
       'and {k:interact} at a tank lets you tend it.'] },
     { id: 'tank', on: ['tank'], where: 'tank', known: ['tank'], icon: 'ui:3', lines: [
       'Drag decor from the tray into the tank. {k:feed} feeds.',

@@ -56,6 +56,7 @@ AQ.Tips = (function () {
   // where tips may show right now: 'play' | 'tank' | null (nowhere)
   function context(game) {
     if (AQ.Transition && AQ.Transition.active) return null;
+    if (AQ.Dive && AQ.Dive.blocksTips()) return null;           // the "guided dive?" question is up
     if (game.state === 'play') {
       const K = AQ.Catching;
       if (game.scene === 'world' && K && (K.swing || K.pryTarget || K.hold > 0)) return null;   // mid-netting

@@ -177,6 +177,50 @@ AQ.manifest = {
     95
    ]
   },
+  "ui.marker": {
+   "file": "sprites/ui/marker.png",
+   "fw": 16,
+   "fh": 16,
+   "anchor": [
+    8,
+    8
+   ],
+   "anims": {
+    "idle": {
+     "row": 0,
+     "frames": 4,
+     "fps": 5
+    }
+   },
+   "vis": [
+    0,
+    0,
+    15,
+    15
+   ]
+  },
+  "ui.arrow": {
+   "file": "sprites/ui/arrow.png",
+   "fw": 8,
+   "fh": 8,
+   "anchor": [
+    4,
+    4
+   ],
+   "anims": {
+    "idle": {
+     "row": 0,
+     "frames": 4,
+     "fps": 5
+    }
+   },
+   "vis": [
+    0,
+    0,
+    7,
+    7
+   ]
+  },
   "ui.icons": {
    "file": "sprites/ui/icons.png",
    "fw": 12,

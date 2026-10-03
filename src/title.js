@@ -94,6 +94,7 @@ AQ.Title = (function () {
       if (hasProgress() && T.confirmNew <= 0) { T.confirmNew = 3; return; }
       AQ.Save.newGame(game);
       start(game);
+      if (AQ.Dive) AQ.Dive.offer();               // a fresh save: "Want a quick guided dive?" (asked once)
     } else if (it.id === 'aquarium') { AQ.Aquarium.open(game, 'title'); }
     else if (it.id === 'log') { AQ.LogUI.open(game, 'title'); }
     else if (it.id === 'controls') T.panel = 'controls';

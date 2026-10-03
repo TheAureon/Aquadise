@@ -141,6 +141,17 @@ browsers won't let a page save pictures made from file:// images.
   RESET TIPS are in the Sound settings (pause menu or title). Older saves skip every tip their own
   progress shows they already know. Text: `data/tutorial.js` (key names are filled in from the real
   bindings, see below). Sounds: NEW TIP and STEP COMPLETE in the Sound Test. Tuning: `AQ.TUNING.tips`.
+- **Optional guided first dive.** NEW GAME on a fresh save asks "Want a quick guided dive?" (YES /
+  NO THANKS; Esc is no thanks, and the answer is saved). It's a short checklist shown one step at a
+  time in the top-left corner (STEP n OF 9), with a soft glowing ring and arrow near the thing to do:
+  walk, hop onto the rocks, wade into the deep water and swim, sneak up on a little minnow, swing the
+  net, catch it (a very easy Glasswinged Minnow waits in the water for you: it's a real catch), drop
+  bait, open the log, done. Each step completes when you actually do it (a soft chime), nothing ever
+  pauses or takes your controls, and if you wander off it just waits (it dims, and hides away from the
+  sea). SKIP skips a step, STOP ALL ends it. Restart it any time from the pause menu (TUTORIAL); it
+  never changes your progress. Text: `data/tutorial.js` (dive). Tuning: `AQ.TUNING.dive`. Testing: set
+  `debug.tutorialReset: true` and press **R** to restart the dive and reset every tip
+  (`debug.tutorialResetKey`).
 - **Key bindings in one place:** `AQ.TUNING.keys` in config.js (plus `interactKeys`, `audio.muteKey`,
   `photo.key`, `station.zoomKey`). The game reads them, and the help line, the title's CONTROLS panel
   and every tip show key names from them (`src/keys.js`), so changing a key changes the text too.
@@ -288,6 +299,7 @@ src/gulls.js          distant seagull flocks in the sky (sea + hill)
 src/shootingstars.js  night shooting-star streaks (sky, underwater glow, station portholes)
 src/keys.js           key bindings: pressed / held checks and key names for the text
 src/tips.js           one-time tips: events, queue, safe placement, saved as seen
+src/dive.js           the optional guided first dive: prompt, steps, checklist, markers
 src/starfall.js       falling stars + meteor showers: nightly plan, landings, light columns, map/HUD marks
 src/bottles.js        message bottles: deterministic, reachable placement, pickup, glint
 assets/sprites-embedded.js   base64 copy of the sprites for file:// (tools/embed-sprites.js)

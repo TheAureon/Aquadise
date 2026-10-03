@@ -1265,6 +1265,20 @@
     else { p.rect(cx, 0, 1, 12, Y); p.rect(0, 6, 12, 1, Y); p.rect(cx - 1, 5, 3, 3, hex('#ffffff')); p.set(2, 2, B); p.set(9, 9, B); p.set(9, 2, B); }
     p.outline(0.3);
   };
+  // Guided-dive markers: a soft glowing ring that pulses (16 x 16, 4 frames) and a small arrow that bobs
+  // (8 x 8, 4 frames), both a pale warm gold.
+  S.uimarker = function (p, o) {
+    const W = p.w, c = W / 2, r = 4.5 + [0, 0.8, 1.6, 0.8][o.frame], col = hex('#fff1b0');
+    for (let a = 0; a < Math.PI * 2; a += 0.05) p.set(c + Math.cos(a) * r - 0.5, c + Math.sin(a) * r - 0.5, col);
+    const r2 = r + 1.6;
+    for (let a = 0; a < Math.PI * 2; a += 0.08) p.set(c + Math.cos(a) * r2 - 0.5, c + Math.sin(a) * r2 - 0.5, [255, 241, 176, 110]);
+  };
+  S.uiarrow = function (p, o) {
+    const dy = [0, 1, 2, 1][o.frame], col = hex('#fff1b0');
+    p.tri([0, 2 + dy], [p.w, 2 + dy], [p.w / 2, p.h - 1 + dy * 0], col);
+    p.rect(p.w / 2 - 1, dy, 2, 3, col);
+    p.outline(0.35);
+  };
   S.beampad = function (p, o) {
     const W = p.w, H = p.h, cx = W / 2, metal = hex('#8a96a6');
     p.ellipse(cx, H - 4, W / 2 - 1, 3.6, metal);

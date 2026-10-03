@@ -40,6 +40,8 @@ AQ.Game = (function () {
     const start = AQ.data.world.playerStart;
     G.player = new AQ.Player(start[0], start[1]);
     if (save) AQ.Save.apply(save, G);
+    // a brand-new game has tutorial progress from the start, so its saves are never mistaken for an older save
+    if (!AQ.State.tutorial) AQ.State.tutorial = { seen: {} };
     G.upgrades = AQ.State.upgrades;
     G.player.speedLevel = G.upgrades.speed;
 
@@ -94,6 +96,8 @@ AQ.Game = (function () {
       AQ.Clock.update(dt);                         // one day/night clock for everywhere (the sea, the hill, the station)
       if (AQ.Starfall) AQ.Starfall.update(dt, G);   // falling stars + meteor showers: on schedule wherever you are
       if (AQ.Tips) AQ.Tips.update(dt, G);           // one-time tips (first, so an Esc / click that closes a tip is used up)
+      if (AQ.Dive) AQ.Dive.update(dt, G);           // the optional guided dive (its buttons' clicks never swing the net)
+      if (AQ.TUNING.debug.tutorialReset && I.wasPressed(AQ.TUNING.debug.tutorialResetKey) && AQ.Dive) { AQ.Tips.reset(); AQ.Dive.start(G); AQ.HUD.toast('Tutorial restarted, all tips reset.', '#cfe8ff'); }
       if (!frozen) {
         if (AQ.TUNING.debug.timeSkip && I.wasPressed(AQ.TUNING.debug.timeSkipKey)) { AQ.Clock.set(AQ.Clock.hour() + AQ.TUNING.clock.skipHours); AQ.HUD.toast(`Time skip: ${AQ.HUD.clockText()}`, '#cfe8ff'); }
         if (AQ.TUNING.debug.starKeys && AQ.Starfall) {
@@ -175,6 +179,7 @@ AQ.Game = (function () {
     AQ.Render.twilightTint(cam);
     if (!title && AQ.ShootingStars) AQ.ShootingStars.drawWater(ctx, G);   // a star's glow passing through the water
     if (!title && AQ.Starfall) AQ.Starfall.draw(ctx, G);                   // falling stars + light columns over landings
+    if (!title && AQ.Dive) AQ.Dive.drawWorld(ctx, G);                      // the guided dive's glowing marker
     AQ.Render.heavyHaze(G.player.heavy || 0);
     AQ.Terrain.drawGlow(ctx, cam);
     if (title) { if (G.state === 'log') AQ.LogUI.draw(ctx, G); else AQ.Title.draw(ctx, G); return; }
@@ -183,6 +188,7 @@ AQ.Game = (function () {
   function drawOverlays(ctx) {
     AQ.HUD.draw(ctx, G);
     if (G.state === 'play' && AQ.Tips) AQ.Tips.draw(ctx, G);
+    if (G.state === 'play' && AQ.Dive) AQ.Dive.draw(ctx, G);
     if (G.state === 'map') AQ.MapUI.draw(ctx, G);
     if (G.state === 'log') AQ.LogUI.draw(ctx, G);
     if (G.state === 'pause') AQ.PauseUI.draw(ctx, G);

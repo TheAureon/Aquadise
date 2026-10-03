@@ -133,7 +133,19 @@ AQ.TUNING = {
     timeSkipKey: 'KeyN',
     starKeys: false,          // TESTING ONLY: true adds two keys (any time, even by day):
     fallStarKey: 'KeyG',      //   G = a star falls right now
-    showerKey: 'KeyJ'         //   J = a meteor shower starts right now (2-4 stars over the next ~20 seconds)
+    showerKey: 'KeyJ',        //   J = a meteor shower starts right now (2-4 stars over the next ~20 seconds)
+    tutorialReset: false,     // TESTING ONLY: true adds a key that restarts the guided dive and marks every tip unseen
+    tutorialResetKey: 'KeyR'  //   R = restart the guided dive + reset all tips
+  },
+  // The guided first dive (src/dive.js; the text is in data/tutorial.js).
+  dive: {
+    niceSeconds: 1.1,         // the little "NICE!" after a step before the next one shows
+    moveDistance: 40,         // px you walk for the "move" step
+    sneakSeconds: 0.6,        // how long you hold sneak near a creature for the "sneak" step
+    sneakRange: 80,           // ...and how close (px)
+    doneSeconds: 12,          // the final "that's the basics" message closes itself after this long
+    quietAfter: 25,           // seconds without progress before the checklist dims (it never nags)
+    gentleRange: 60           // px from the water's edge where the gentle minnow waits
   },
   interactKeys: ['KeyE'],     // "interact" (beam up/down, open a tank, use the directory)
   // Key bindings (KeyboardEvent.code values; 'Mouse0' = left click, 'Mouse2' = right click). The game

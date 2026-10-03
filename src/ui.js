@@ -118,6 +118,7 @@ AQ.LogUI = (function () {
   // ---------------------------------------------------------------- open / close
   L.open = function (game, from) {
     AQ.Audio.play('log_open');
+    if (AQ.Dive) AQ.Dive.event('log');
     L.from = from || game.state;
     game.state = 'log';
     const here = from === 'aquarium' ? AQ.Aquarium.biome : from === 'title' || game.scene !== 'world' ? 'tide_pools' : AQ.World.biomeAt(game.player.x, game.player.y).id;
@@ -591,13 +592,9 @@ AQ.PauseUI = (function () {
     const I = AQ.Input, m = I.mouse;
     if (P.panel === 'sound') { AQ.SoundUI.update(game, () => { P.panel = null; }, () => AQ.SoundTest.open(game, 'pause')); return; }
     P.confirm = Math.max(0, P.confirm - dt);
-    P.ui = [
-      { id: 'resume', x: 110, y: 54, w: 100, h: 14, label: 'RESUME' },
-      { id: 'help', x: 110, y: 72, w: 100, h: 14, label: 'SHOW CONTROLS' },
-      { id: 'sound', x: 110, y: 90, w: 100, h: 14, label: 'SOUND' },
-      { id: 'home', x: 110, y: 108, w: 100, h: 14, label: 'HOME' },
-      { id: 'reset', x: 110, y: 132, w: 100, h: 14, label: P.confirm > 0 ? 'CLICK AGAIN TO WIPE' : 'RESET SAVE' }
-    ];
+    const rows = [['resume', 'RESUME'], ['help', 'SHOW CONTROLS'], ['tutorial', AQ.Dive && AQ.Dive.active() ? 'RESTART TUTORIAL' : 'TUTORIAL'], ['sound', 'SOUND'], ['home', 'HOME']];
+    P.ui = rows.map(([id, label], i) => ({ id, x: 110, y: 50 + i * 16, w: 100, h: 13, label }));
+    P.ui.push({ id: 'reset', x: 110, y: 50 + rows.length * 16 + 8, w: 100, h: 13, label: P.confirm > 0 ? 'CLICK AGAIN TO WIPE' : 'RESET SAVE' });
     if (I.wasPressed('Escape')) { game.state = 'play'; return; }
     const prev = P.hover;
     P.hover = P.ui.find((r) => m.x >= r.x && m.y >= r.y && m.x < r.x + r.w && m.y < r.y + r.h);
@@ -606,6 +603,7 @@ AQ.PauseUI = (function () {
       AQ.Audio.play('menu_select');
       if (P.hover.id === 'resume') game.state = 'play';
       if (P.hover.id === 'help') { AQ.HUD.helpT = 12; game.state = 'play'; }
+      if (P.hover.id === 'tutorial') { game.state = 'play'; if (game.scene !== 'world') AQ.HUD.toast('The guided dive starts when you are back in the sea.', '#cfe8ff', 4); AQ.Dive.start(game); }
       if (P.hover.id === 'sound') { P.panel = 'sound'; AQ.SoundUI.open(); }
       if (P.hover.id === 'home') { AQ.Save.save(game); AQ.Title.open(game); }
       if (P.hover.id === 'reset') { if (P.confirm > 0) AQ.Save.reset(); else P.confirm = 3; }

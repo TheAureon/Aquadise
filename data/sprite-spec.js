@@ -26,9 +26,10 @@ AQ.data.spriteSpec = {
     beam:     { idle: { row: 0, frames: 4, fps: 8 } },          // drawn stretched to the beam's size
     still:    { idle: { row: 0, frames: 1, fps: 1 } },          // backdrops and repeating tiles
     bottle:   { idle: { row: 0, frames: 4, fps: 4 } },          // message bottle: a glint runs along the glass
-    uiicons:  { idle: { row: 0, frames: 7, fps: 1 } }           // tutorial tip icons: one picture per frame (drawn by frame number)
+    uiicons:  { idle: { row: 0, frames: 7, fps: 1 } },
+    uimarker: { idle: { row: 0, frames: 4, fps: 5 } }           // guided-dive marker ring / arrow (pulse / bob)           // tutorial tip icons: one picture per frame (drawn by frame number)
   },
   // anchor = the pixel inside a frame that sits on the entity's world position
   anchors: { creature: 'center', plant: 'bottom', decor: 'bottom', player: 'center', chest: 'bottom', bait: 'center',
-             prop: 'bottom', propanim: 'bottom', ufo: 'center', beam: 'top', still: 'topleft', bottle: 'bottom', uiicons: 'center' }
+             prop: 'bottom', propanim: 'bottom', ufo: 'center', beam: 'top', still: 'topleft', bottle: 'bottom', uiicons: 'center', uimarker: 'center' }
 };
