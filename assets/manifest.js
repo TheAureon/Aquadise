@@ -8751,9 +8751,9 @@ AQ.manifest = {
    },
    "vis": [
     1,
-    1,
+    7,
     22,
-    18
+    19
    ]
   },
   "creature.azalea_axolotl.v": {
@@ -8778,9 +8778,9 @@ AQ.manifest = {
    },
    "vis": [
     1,
-    1,
+    7,
     22,
-    18
+    19
    ]
   },
   "creature.azalea_axolotl.v.m": {
@@ -8805,9 +8805,9 @@ AQ.manifest = {
    },
    "vis": [
     1,
-    1,
+    7,
     22,
-    18
+    19
    ]
   },
   "creature.azalea_axolotl.baby.v": {
@@ -8831,10 +8831,10 @@ AQ.manifest = {
     }
    },
    "vis": [
-    5,
-    5,
-    19,
-    17
+    3,
+    6,
+    17,
+    18
    ]
   },
   "creature.azalea_axolotl.baby": {
@@ -8858,10 +8858,10 @@ AQ.manifest = {
     }
    },
    "vis": [
-    5,
-    5,
-    19,
-    17
+    3,
+    6,
+    17,
+    18
    ]
   },
   "creature.azalea_axolotl.m": {
@@ -8886,9 +8886,9 @@ AQ.manifest = {
    },
    "vis": [
     1,
-    1,
+    7,
     22,
-    18
+    19
    ]
   },
   "creature.aurum_axolotl": {
@@ -8913,9 +8913,9 @@ AQ.manifest = {
    },
    "vis": [
     1,
-    1,
+    7,
     22,
-    18
+    19
    ]
   },
   "creature.aurum_axolotl.v": {
@@ -8940,9 +8940,9 @@ AQ.manifest = {
    },
    "vis": [
     1,
-    1,
+    7,
     22,
-    18
+    19
    ]
   },
   "creature.aurum_axolotl.v.m": {
@@ -8967,9 +8967,9 @@ AQ.manifest = {
    },
    "vis": [
     1,
-    1,
+    7,
     22,
-    18
+    19
    ]
   },
   "creature.aurum_axolotl.baby.v": {
@@ -8993,10 +8993,10 @@ AQ.manifest = {
     }
    },
    "vis": [
-    5,
-    5,
-    19,
-    17
+    3,
+    6,
+    17,
+    18
    ]
   },
   "creature.aurum_axolotl.baby": {
@@ -9020,10 +9020,10 @@ AQ.manifest = {
     }
    },
    "vis": [
-    5,
-    5,
-    19,
-    17
+    3,
+    6,
+    17,
+    18
    ]
   },
   "creature.aurum_axolotl.m": {
@@ -9048,9 +9048,9 @@ AQ.manifest = {
    },
    "vis": [
     1,
-    1,
+    7,
     22,
-    18
+    19
    ]
   },
   "creature.pluvia_axolotl": {
@@ -9075,9 +9075,9 @@ AQ.manifest = {
    },
    "vis": [
     1,
-    1,
+    7,
     22,
-    18
+    19
    ]
   },
   "creature.pluvia_axolotl.v": {
@@ -9102,9 +9102,9 @@ AQ.manifest = {
    },
    "vis": [
     1,
-    1,
+    7,
     22,
-    18
+    19
    ]
   },
   "creature.pluvia_axolotl.v.m": {
@@ -9129,9 +9129,9 @@ AQ.manifest = {
    },
    "vis": [
     1,
-    1,
+    7,
     22,
-    18
+    19
    ]
   },
   "creature.pluvia_axolotl.baby.v": {
@@ -9155,10 +9155,10 @@ AQ.manifest = {
     }
    },
    "vis": [
-    5,
-    5,
-    19,
-    17
+    3,
+    6,
+    17,
+    18
    ]
   },
   "creature.pluvia_axolotl.baby": {
@@ -9182,10 +9182,10 @@ AQ.manifest = {
     }
    },
    "vis": [
-    5,
-    5,
-    19,
-    17
+    3,
+    6,
+    17,
+    18
    ]
   },
   "creature.pluvia_axolotl.m": {
@@ -9210,9 +9210,9 @@ AQ.manifest = {
    },
    "vis": [
     1,
-    1,
+    7,
     22,
-    18
+    19
    ]
   },
   "creature.viridis_axolotl": {
@@ -9237,9 +9237,9 @@ AQ.manifest = {
    },
    "vis": [
     1,
-    1,
+    7,
     22,
-    18
+    19
    ]
   },
   "creature.viridis_axolotl.v": {
@@ -9264,9 +9264,9 @@ AQ.manifest = {
    },
    "vis": [
     1,
-    1,
+    7,
     22,
-    18
+    19
    ]
   },
   "creature.viridis_axolotl.v.m": {
@@ -9291,9 +9291,9 @@ AQ.manifest = {
    },
    "vis": [
     1,
-    1,
+    7,
     22,
-    18
+    19
    ]
   },
   "creature.viridis_axolotl.baby.v": {
@@ -9317,10 +9317,10 @@ AQ.manifest = {
     }
    },
    "vis": [
-    5,
-    5,
-    19,
-    17
+    3,
+    6,
+    17,
+    18
    ]
   },
   "creature.viridis_axolotl.baby": {
@@ -9344,10 +9344,10 @@ AQ.manifest = {
     }
    },
    "vis": [
-    5,
-    5,
-    19,
-    17
+    3,
+    6,
+    17,
+    18
    ]
   },
   "creature.viridis_axolotl.m": {
@@ -9372,9 +9372,9 @@ AQ.manifest = {
    },
    "vis": [
     1,
-    1,
+    7,
     22,
-    18
+    19
    ]
   },
   "creature.navious_axolotl": {
@@ -9399,9 +9399,9 @@ AQ.manifest = {
    },
    "vis": [
     1,
-    1,
+    7,
     22,
-    18
+    19
    ]
   },
   "creature.navious_axolotl.v": {
@@ -9426,9 +9426,9 @@ AQ.manifest = {
    },
    "vis": [
     1,
-    1,
+    7,
     22,
-    18
+    19
    ]
   },
   "creature.navious_axolotl.v.m": {
@@ -9453,9 +9453,9 @@ AQ.manifest = {
    },
    "vis": [
     1,
-    1,
+    7,
     22,
-    18
+    19
    ]
   },
   "creature.navious_axolotl.baby.v": {
@@ -9479,10 +9479,10 @@ AQ.manifest = {
     }
    },
    "vis": [
-    5,
-    5,
-    19,
-    17
+    3,
+    6,
+    17,
+    18
    ]
   },
   "creature.navious_axolotl.baby": {
@@ -9506,10 +9506,10 @@ AQ.manifest = {
     }
    },
    "vis": [
-    5,
-    5,
-    19,
-    17
+    3,
+    6,
+    17,
+    18
    ]
   },
   "creature.navious_axolotl.m": {
@@ -9534,9 +9534,9 @@ AQ.manifest = {
    },
    "vis": [
     1,
-    1,
+    7,
     22,
-    18
+    19
    ]
   },
   "creature.auroravein_squid": {

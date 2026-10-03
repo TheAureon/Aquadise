@@ -307,28 +307,28 @@ AQ.data.creatures = [
     spawn: { n: 3, at: 'floor' }, hint: 'Translucent and extremely slow. Hard to see.' },
 
   // ------------------------------------------------------------------ Half-Flooded Lush Cave
-  // Five natural axolotl colours (family 'axolotl'): each is its own species with its own log entry,
+  // Five natural axolotl colours (family 'axolotl'), all drawn in the original lush-cave shape: each is its own species with its own log entry,
   // sexes and breeding (a pair always has babies of its own colour). How often each one turns up is
   // set by AQ.data.families.axolotl.weights below.
   { id: 'azalea_axolotl', family: 'axolotl', likes: ['plant', 'light'], name: 'Azalea Axolotl', biome: 'lush_cave', category: 'amphibian', catch_behavior: 'easy',
     params: { speed: 7 },
-    sprite_size: 'medium', color: '#f5b8cc', accent: '#e8708f', art: { shape: 'axolotl' },
+    sprite_size: 'medium', color: '#f5c6d6', accent: '#ffffff', art: { shape: 'lizard', gills: true, belly: true },
     spawn: { at: 'water' }, hint: 'Rosy pink with feathery gills. Barely reacts to you at all.' },
   { id: 'aurum_axolotl', family: 'axolotl', likes: ['plant', 'light'], name: 'Aurum Axolotl', biome: 'lush_cave', category: 'amphibian', catch_behavior: 'easy',
     params: { speed: 7 },
-    sprite_size: 'medium', color: '#f2c24a', accent: '#c98a1c', art: { shape: 'axolotl' },
+    sprite_size: 'medium', color: '#f2c24a', accent: '#fff3c4', art: { shape: 'lizard', gills: true, belly: true },
     spawn: { at: 'water' }, hint: 'A rare golden one. Just as calm as its cousins, if you are lucky enough to meet it.' },
   { id: 'pluvia_axolotl', family: 'axolotl', likes: ['plant', 'light'], name: 'Pluvia Axolotl', biome: 'lush_cave', category: 'amphibian', catch_behavior: 'easy',
     params: { speed: 7 },
-    sprite_size: 'medium', color: '#8ee6ee', accent: '#3fb4c8', art: { shape: 'axolotl' },
+    sprite_size: 'medium', color: '#8ee6ee', accent: '#eafcff', art: { shape: 'lizard', gills: true, belly: true },
     spawn: { at: 'water' }, hint: 'Rain-cyan and gentle. Not as common as the pink and green ones.' },
   { id: 'viridis_axolotl', family: 'axolotl', likes: ['plant', 'light'], name: 'Viridis Axolotl', biome: 'lush_cave', category: 'amphibian', catch_behavior: 'easy',
     params: { speed: 7 },
-    sprite_size: 'medium', color: '#9ed47c', accent: '#5a9a3e', art: { shape: 'axolotl' },
+    sprite_size: 'medium', color: '#9ed47c', accent: '#efffdf', art: { shape: 'lizard', gills: true, belly: true },
     spawn: { at: 'water' }, hint: 'Moss green, often resting among the cave plants.' },
   { id: 'navious_axolotl', family: 'axolotl', likes: ['plant', 'light'], name: 'Navious Axolotl', biome: 'lush_cave', category: 'amphibian', catch_behavior: 'easy',
     params: { speed: 7 },
-    sprite_size: 'medium', color: '#5a82e0', accent: '#2c4ea8', art: { shape: 'axolotl' },
+    sprite_size: 'medium', color: '#5a82e0', accent: '#e2eaff', art: { shape: 'lizard', gills: true, belly: true },
     spawn: { at: 'water' }, hint: 'Deep sea-blue. Not as common as the pink and green ones.' },
 
   // ---- Day & night update: nine new creatures (night-only, depth-gated, and the new behaviours)
