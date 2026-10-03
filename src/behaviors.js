@@ -299,6 +299,7 @@ AQ.Behaviors = (function () {
     }
   };
 
+  const inArea = (c, x) => { const a = c.def.spawn && c.def.spawn.area; return !a || (x >= a[0] - 20 && x <= a[1] + 20); };
   // Schools: members follow a shared roaming anchor; the school flees together (except a straggler).
   B.school = {
     init(c) { c.state = 'calm'; },
@@ -306,7 +307,7 @@ AQ.Behaviors = (function () {
       const s = c.school, p = c.p;
       if (!s) return;
       // the school object is updated once per frame by its first member
-      if (s.frame !== AQ.Game.time) { s.frame = AQ.Game.time; this.updateSchool(s, c, ctx, dt); }
+      if (s.frame !== AQ.Creatures.frame) { s.frame = AQ.Creatures.frame; this.updateSchool(s, c, ctx, dt); }
       const a = s.t * 0.6 + c.slotN * 1.7;
       const spread = 9 * (2 - (p.tight || 1) * 0.6) + (c.straggler ? 16 : 0);
       let tx = s.x + Math.cos(a) * spread + c.ox, ty = s.y + Math.sin(a * 1.3) * spread * 0.6 + c.oy;
@@ -342,8 +343,10 @@ AQ.Behaviors = (function () {
       else {
         if (!s.target || Math.hypot(s.target[0] - s.x, s.target[1] - s.y) < 10) {
           const roam = p.roam || 120;
+          const area = c.def.spawn && c.def.spawn.area, ax0 = area ? area[0] : 0, ax1 = area ? area[1] : W.w;   // stay in its own waters
           for (let i = 0; i < 10; i++) {
-            const t = [s.hx + R.range(-roam, roam), U.clamp(s.hy + R.range(-roam * 0.3, roam * 0.3), W.sea + (p.leap ? 6 : 16), W.h)];
+            const ry = p.roamY != null ? p.roamY : roam * 0.3;      // how far up/down it roams (default: a flat band)
+            const t = [U.clamp(s.hx + R.range(-roam, roam), ax0, ax1), U.clamp(s.hy + R.range(-ry, ry), W.sea + (p.leap ? 6 : 16), p.maxY || W.h)];
             if (W.water(t[0], t[1])) { s.target = t; break; }
           }
           if (!s.target) s.target = [s.hx, s.hy];
@@ -353,7 +356,7 @@ AQ.Behaviors = (function () {
       const dx = tx - s.x, dy = ty - s.y, L = Math.hypot(dx, dy) || 1, k = 1 - Math.exp(-2 * dt);
       s.vx += ((dx / L) * sp - s.vx) * k; s.vy += ((dy / L) * sp - s.vy) * k;
       const nx = s.x + s.vx * dt, ny = s.y + s.vy * dt;
-      if (W.water(nx, ny) && W.depthDist(nx, ny + 6) === 0 && W.water(nx, ny - 6)) { s.x = nx; s.y = ny; } else { s.vx *= -0.5; s.vy *= -0.5; s.target = null; }
+      if (W.water(nx, ny) && W.depthDist(nx, ny + 6) === 0 && W.water(nx, ny - 6) && ny <= (p.maxY || W.h) && inArea(c, nx)) { s.x = nx; s.y = ny; } else { s.vx *= -0.5; s.vy *= -0.5; s.target = null; }
     }
   };
 

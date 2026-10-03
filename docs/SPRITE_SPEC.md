@@ -27,6 +27,7 @@ it shows up in game with no code changes.
 | `tall`      | 16 × 32 | bell kelp, pillar                                           |
 | `wide`      | 32 × 16 | eels, snakes, weed mat, driftwood                           |
 | `widelarge` | 48 × 24 | dwarf croc                                                  |
+| `mediumlong`| 28 × 24 | crimsonback (a mid-size fish that is a little longer)       |
 
 The player diver frame is 28 × 40 (anchor 14,20). The swimming and upright poses are the same size (about 22 px). A creature's class is its `sprite_size` in `data/creatures.js`.
 

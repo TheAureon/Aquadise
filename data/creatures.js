@@ -195,9 +195,10 @@ AQ.data.creatures = [
     sprite_size: 'small', color: '#d9c4a6', accent: '#a65a3a', art: { shape: 'nautilus' },
     spawn: { n: 3, at: 'water', y: [200, 600] }, hint: 'Slow and easy to mistake for floating debris.' },
   { id: 'crimsonback', likes: ['bubbles', 'plant'], name: 'Crimsonback', biome: 'open_ocean', category: 'fish', catch_behavior: 'school', draft: true,
-    params: { size: [5, 7], tight: 1.6, leap: true, speed: 40, alertR: 50 },
-    sprite_size: 'medium', color: '#c23a3a', accent: '#f2a0a0', art: { shape: 'fish', blackEye: true, long: 1.15 },   // 2px longer than a default fish
-    spawn: { n: 1, at: 'surface' }, hint: 'Tight schools that leap at the surface. Red inside and out.' },
+    // roams the whole open-ocean water column (roamY), but never below maxY: the vents + trench start at ~600
+    params: { size: [5, 7], tight: 1.6, leap: true, speed: 40, alertR: 50, roam: 260, roamY: 180, maxY: 560 },
+    sprite_size: 'mediumlong', color: '#c23a3a', accent: '#f2a0a0', art: { shape: 'fish', blackEye: true, long: 1.03, tall: 0.85 },   // a longer frame so it really is longer (23px) than other mid-size fish
+    spawn: { n: 1, at: 'water', area: [2600, 3950], y: [120, 520] }, hint: 'Tight schools that roam the open ocean and leap when they reach the surface. Red inside and out.' },
   { id: 'ironfin', likes: ['arch', 'bubbles'], name: 'Ironfin', biome: 'open_ocean', category: 'fish', catch_behavior: 'timing', draft: true,
     params: { phases: [
       { name: 'cruise', dur: [3, 5], move: 'wander', speed: 30, catchable: false },

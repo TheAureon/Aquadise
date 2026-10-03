@@ -7,7 +7,7 @@ AQ.Vibe = (function () {
   const U = AQ.U;
   const V = {};
   const T = () => AQ.TUNING.aquarium;
-  const SIZE_RANK = { tiny: 0, small: 1, medium: 2, wide: 2, tall: 2, large: 3, widelarge: 3, huge: 4 };
+  const SIZE_RANK = { tiny: 0, small: 1, medium: 2, mediumlong: 2, wide: 2, tall: 2, large: 3, widelarge: 3, huge: 4 };
 
   const creatureDef = (id) => (AQ.Creatures && AQ.Creatures.defs[id]) || AQ.data.creatures.find((d) => d.id === id);
   const decorDef = (id) => AQ.data.decorations.find((d) => d.id === id);

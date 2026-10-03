@@ -7,7 +7,7 @@ AQ.data.spriteSpec = {
   // size class -> [frame width, frame height] in pixels
   sizes: {
     tiny: [12, 12], small: [16, 16], medium: [24, 24], large: [32, 32], huge: [48, 48],
-    tall: [16, 32], wide: [32, 16], widelarge: [48, 24]
+    tall: [16, 32], wide: [32, 16], widelarge: [48, 24], mediumlong: [28, 24]
   },
   // Animation rows. Frames run left -> right; rows top -> bottom. All sprites face RIGHT.
   anims: {

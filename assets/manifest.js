@@ -5295,10 +5295,10 @@ AQ.manifest = {
   },
   "creature.crimsonback": {
    "file": "sprites/creatures/crimsonback.png",
-   "fw": 24,
+   "fw": 28,
    "fh": 24,
    "anchor": [
-    12,
+    14,
     12
    ],
    "anims": {
@@ -5314,18 +5314,18 @@ AQ.manifest = {
     }
    },
    "vis": [
-    1,
-    4,
-    21,
-    18
+    2,
+    5,
+    24,
+    19
    ]
   },
   "creature.crimsonback.v": {
    "file": "sprites/creatures/crimsonback_v.png",
-   "fw": 24,
+   "fw": 28,
    "fh": 24,
    "anchor": [
-    12,
+    14,
     12
    ],
    "anims": {
@@ -5341,18 +5341,18 @@ AQ.manifest = {
     }
    },
    "vis": [
-    1,
-    4,
-    21,
-    18
+    2,
+    5,
+    24,
+    19
    ]
   },
   "creature.crimsonback.v.m": {
    "file": "sprites/creatures/crimsonback_v_m.png",
-   "fw": 24,
+   "fw": 28,
    "fh": 24,
    "anchor": [
-    12,
+    14,
     12
    ],
    "anims": {
@@ -5368,18 +5368,18 @@ AQ.manifest = {
     }
    },
    "vis": [
-    1,
-    4,
-    21,
-    18
+    2,
+    5,
+    24,
+    19
    ]
   },
   "creature.crimsonback.baby.v": {
    "file": "sprites/creatures/crimsonback_baby_v.png",
-   "fw": 24,
+   "fw": 28,
    "fh": 24,
    "anchor": [
-    12,
+    14,
     12
    ],
    "anims": {
@@ -5395,18 +5395,18 @@ AQ.manifest = {
     }
    },
    "vis": [
-    5,
-    6,
-    18,
-    18
+    7,
+    8,
+    20,
+    16
    ]
   },
   "creature.crimsonback.baby": {
    "file": "sprites/creatures/crimsonback_baby.png",
-   "fw": 24,
+   "fw": 28,
    "fh": 24,
    "anchor": [
-    12,
+    14,
     12
    ],
    "anims": {
@@ -5422,18 +5422,18 @@ AQ.manifest = {
     }
    },
    "vis": [
-    5,
-    6,
-    18,
-    18
+    7,
+    8,
+    20,
+    16
    ]
   },
   "creature.crimsonback.m": {
    "file": "sprites/creatures/crimsonback_m.png",
-   "fw": 24,
+   "fw": 28,
    "fh": 24,
    "anchor": [
-    12,
+    14,
     12
    ],
    "anims": {
@@ -5449,10 +5449,10 @@ AQ.manifest = {
     }
    },
    "vis": [
-    1,
-    4,
-    21,
-    18
+    2,
+    5,
+    24,
+    19
    ]
   },
   "creature.ironfin": {

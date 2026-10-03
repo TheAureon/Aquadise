@@ -172,7 +172,9 @@ AQ.Creatures = (function () {
       if (W.water(x, y)) { c.x = x; c.y = y; c.vx = c.vy = 0; c.target = null; return; }
     }
   }
+  C.frame = 0;
   C.update = function (dt, game) {
+    C.frame++;
     const P = game.player, simR = AQ.TUNING.creatures.simRadius;
     ctx.P = P; ctx.noise = P.noise(); ctx.bait = AQ.Catching ? AQ.Catching.bait : null;
     for (const c of C.list.slice()) {
