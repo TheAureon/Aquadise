@@ -61,10 +61,18 @@ Click a creature for its info card. Hover the stars for what's helping and what'
 - **New catch behaviours:** `mirror` (copies your swimming mirrored; hold still and it drifts in),
   `lure` (a glowing decoy on a stalk; net the dim creature beside it, not the light) and `midair`
   (leaps out of the water; only nettable in the air). See the header of data/creatures.js.
-- **Nine new creatures (70 in all):** Auroravein Squid (ice, night), Moonshell Crab (tide pools,
+- **Nine new creatures:** Auroravein Squid (ice, night), Moonshell Crab (tide pools,
   night), Ribbonmane (kelp, mirror), Candlepolyp (coral plant, blooms at night), Skyleap Flyfish
   (open ocean, mid-air), Sail Turtle (open ocean), Pressure Tortoise (bottom of the trench, depth 3),
   Bellcrab (ruins) and Firefly Frog (mangrove, night, lure). Existing creatures have no new gates.
+- **Axolotls (Lush Cave):** five natural colours, each its own species with its own log entry,
+  sexes and breeding: Azalea (pink), Aurum (gold), Pluvia (cyan), Viridis (green) and Navious (blue).
+  A pair always has babies of its own colour. They share a `family: 'axolotl'` tag, so the log groups
+  them under an AXOLOTL heading. Azalea and Viridis are common, Pluvia and Navious uncommon and Aurum
+  rare: the weights (and how many axolotls are out at once) are `AQ.data.families.axolotl` in
+  `data/creatures.js`. Their rare bred variant is a pattern (white with gold speckles), not a hue
+  shift, so it never looks like one of the five colours. Older saves: the pale pink lush-cave species
+  they replace becomes the Azalea Axolotl (catches, log, tanks, storage, eggs and courting pairs).
 - **No fail state.** Hostile creatures only knock you back. Air is unlimited.
 - **Progression** comes only from chests: a bigger net (3 levels) and faster swimming (3 levels).
   Six chests exist at a time, and they despawn and respawn around the world.

@@ -78,7 +78,10 @@ for (const c of AQ.data.creatures || []) {
   if (!c.is_plant) {
     let h = 0; for (const ch of c.id) h = (h * 31 + ch.charCodeAt(0)) % 997;
     const hue = 100 + (h % 160);                                   // 100..260 degrees: clearly different
-    const base = Object.assign({ shape: c.art.shape, color: c.color, accent: c.accent }, c.art, { hue });
+    // a family can give its rare variant a pattern instead (AQ.data.families[...].variantArt), so it
+    // never looks like one of the family's natural colours
+    const famArt = c.family && AQ.data.families && AQ.data.families[c.family] && AQ.data.families[c.family].variantArt;
+    const base = famArt ? Object.assign({ shape: c.art.shape }, c.art, famArt) : Object.assign({ shape: c.art.shape, color: c.color, accent: c.accent }, c.art, { hue });
     add(`${kind}.${c.id}.v`, `sprites/${folder}/${c.id}_v.png`, kind, c.sprite_size, base);
     if (c.sexes !== 'none') add(`${kind}.${c.id}.v.m`, `sprites/${folder}/${c.id}_v_m.png`, kind, c.sprite_size, Object.assign({}, base, { male: true }));
     add(`${kind}.${c.id}.baby.v`, `sprites/${folder}/${c.id}_baby_v.png`, kind, c.sprite_size, Object.assign({}, base, { baby: true }));

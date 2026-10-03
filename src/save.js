@@ -18,9 +18,10 @@ AQ.Save = (function () {
     AQ.State.unlocks = st.unlocks || {};      // older saves: nothing unlocked yet, best stars 0
     AQ.State.tankBest = st.tankBest || {};
     AQ.State.settings = st.settings || {};   // player options (e.g. the building's zoomed-out view)
+    AQ.State.log = st.log || {};
+    S.renameSpecies(RENAMED);                 // species that were replaced: carry progress over (see RENAMED)
     // predators moved out of the biome tanks into their own tanks (4th floor): move any old ones over
     if (AQ.Tanks) AQ.Tanks.migrate();
-    AQ.State.log = st.log || {};
     AQ.State.flags = st.flags || {};
     AQ.State.clock = st.clock && typeof st.clock.hour === 'number' ? st.clock : { hour: AQ.TUNING.clock.startHour };   // older saves: start of the day
     if (AQ.Sex) AQ.Sex.migrate();              // older saves: give caught creatures a sex, fill ♂/♀ log slots
@@ -36,6 +37,24 @@ AQ.Save = (function () {
     } catch (e) { /* storage unavailable: play continues unsaved */ }
   };
   S.dirty = () => { S.isDirty = true; };
+
+  // Old species id -> the species that replaced it. Everything saved under the old id (catch count,
+  // log sexes, bred / rare marks, tank + storage creatures, eggs, courting pairs) moves to the new one.
+  // The removed lush-cave species was pale pink (#f5c6d6), so it becomes the pink Azalea Axolotl.
+  const RENAMED = { cavepetalia: 'azalea_axolotl' };
+  S.renameSpecies = function (map) {
+    const st = AQ.State;
+    for (const from in map) {
+      const to = map[from];
+      if (st.collection && st.collection[from]) { st.collection[to] = (st.collection[to] || 0) + st.collection[from]; delete st.collection[from]; }
+      if (st.log && st.log[from]) { st.log[to] = Object.assign({}, st.log[from], st.log[to] || {}); delete st.log[from]; }
+      for (const id in st.tanks || {}) {
+        const t = st.tanks[id];
+        ['creatures', 'storage', 'eggs'].forEach((k) => (t[k] || []).forEach((e) => { if (e.id === from) e.id = to; }));
+        if (t.court && t.court.id === from) t.court.id = to;
+      }
+    }
+  };
   // Fresh start without reloading the page (title screen > New Game).
   S.newGame = function (game) {
     AQ.State.collection = {}; AQ.State.plants = {}; AQ.State.tanks = {}; AQ.State.unlocks = {}; AQ.State.tankBest = {}; AQ.State.settings = AQ.State.settings && AQ.State.settings.audio ? { audio: AQ.State.settings.audio } : {}; AQ.State.log = {}; AQ.State.flags = {}; AQ.State.clock = { hour: AQ.TUNING.clock.startHour };

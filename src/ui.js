@@ -4,7 +4,7 @@ var AQ = (typeof AQ !== 'undefined') ? AQ : {};
 AQ.LogUI = (function () {
   const U = AQ.U, F = () => AQ.Font;
   const L = { from: 'play', biomeIdx: 0, sel: 0, scroll: 0, ui: [] };
-  const COLS = 5, ROWS = 2;   // cells shown at once; a biome with more creatures scrolls
+  const COLS = 5, CELL_H = 47, HEAD_H = 10, VIEW_H = 94;   // grid area; a biome with more creatures scrolls
   const sil = new Map();
   const CAT_LABEL = { fish: 'Fish', gastropod: 'Gastropod', crustacean: 'Crustacean', amphibian: 'Amphibian', cephalopod: 'Cephalopod', reptile: 'Reptile', mammal: 'Mammal', plant: 'Plant' };
 
@@ -13,7 +13,34 @@ AQ.LogUI = (function () {
     const all = AQ.World.biomes.slice();
     return all.sort((a, b) => (order.indexOf(a.id) + 99) % 99 - (order.indexOf(b.id) + 99) % 99);
   };
-  const entries = (b) => AQ.data.creatures.filter((d) => d.biome === b.id);
+  // a biome's species, with each family (AQ.data.families) kept together where its first member is
+  const entries = (b) => {
+    const out = [], seen = {};
+    for (const d of AQ.data.creatures) {
+      if (d.biome !== b.id) continue;
+      if (!d.family) { out.push(d); continue; }
+      if (seen[d.family]) continue;
+      seen[d.family] = true;
+      AQ.data.creatures.forEach((x) => { if (x.family === d.family && x.biome === b.id) out.push(x); });
+    }
+    return out;
+  };
+  // rows of the grid: family headings ('head') and rows of up to COLS cells ('cells')
+  function rowsOf(list) {
+    const rows = [];
+    let i = 0;
+    while (i < list.length) {
+      const fam = list[i].family;
+      const n = fam ? list.filter((d) => d.family === fam).length : list.slice(i).findIndex((d) => d.family) < 0 ? list.length - i : list.slice(i).findIndex((d) => d.family);
+      if (fam) rows.push({ type: 'head', h: HEAD_H, label: ((AQ.data.families[fam] || {}).label || fam).toUpperCase() });
+      for (let k = 0; k < n; k += COLS) rows.push({ type: 'cells', h: CELL_H, items: list.slice(i + k, i + Math.min(n, k + COLS)).map((d, j) => ({ d, i: i + k + j })) });
+      i += n;
+    }
+    return rows;
+  }
+  // how many rows from `start` fit in the grid area
+  const fitFrom = (rows, start) => { let h = 0, n = 0; for (let r = start; r < rows.length && h + rows[r].h <= VIEW_H; r++) { h += rows[r].h; n++; } return n; };
+  const maxScroll = (rows) => { for (let s = 0; s < rows.length; s++) if (s + fitFrom(rows, s) >= rows.length) return s; return 0; };
 
   L.open = function (game, from) {
     AQ.Audio.play('log_open');
@@ -34,14 +61,18 @@ AQ.LogUI = (function () {
     ui.push({ id: 'prev', x: 8, y: 16, w: 10, h: 10, label: '<' });
     ui.push({ id: 'next', x: 152, y: 16, w: 10, h: 10, label: '>' });
     ui.push({ id: 'close', x: 270, y: 3, w: 46, h: 10, label: 'CLOSE' });
-    const rows = Math.ceil(list.length / COLS);
-    L.scroll = U.clamp(L.scroll, 0, Math.max(0, rows - ROWS));
-    list.forEach((d, i) => {
-      const row = Math.floor(i / COLS) - L.scroll;
-      if (row >= 0 && row < ROWS) ui.push({ id: 'cell', i, d, x: 8 + (i % COLS) * 61, y: 30 + row * 47, w: 58, h: 44 });
-    });
+    const rows = rowsOf(list), maxS = maxScroll(rows);
+    L.scroll = U.clamp(L.scroll, 0, maxS);
+    let y = 30;
+    for (let r = L.scroll, n = fitFrom(rows, L.scroll); r < L.scroll + n; r++) {
+      const row = rows[r];
+      if (row.type === 'head') ui.push({ id: 'head', x: 8, y, w: 302, h: HEAD_H - 2, label: row.label });
+      else row.items.forEach((it, c) => ui.push({ id: 'cell', i: it.i, d: it.d, x: 8 + c * 61, y, w: 58, h: 44 }));
+      y += row.h;
+    }
     if (L.scroll > 0) ui.push({ id: 'up', x: 290, y: 17, w: 12, h: 9, label: '' });
-    if (L.scroll < rows - ROWS) ui.push({ id: 'down', x: 304, y: 17, w: 12, h: 9, label: '' });
+    if (L.scroll < maxS) ui.push({ id: 'down', x: 304, y: 17, w: 12, h: 9, label: '' });
+    L.rows = rows;
     return ui;
   }
 
@@ -52,11 +83,21 @@ AQ.LogUI = (function () {
     if (I.wasPressed('KeyQ', 'ArrowLeft', 'KeyA')) { L.biomeIdx = (L.biomeIdx + n - 1) % n; L.sel = 0; L.scroll = 0; }
     if (I.wasPressed('KeyE', 'ArrowRight', 'KeyD')) { L.biomeIdx = (L.biomeIdx + 1) % n; L.sel = 0; L.scroll = 0; }
     // more creatures than fit: scroll with the mouse wheel, Up/Down (W/S) or the little arrows
-    const count = entries(biomes()[L.biomeIdx]).length, rows = Math.ceil(count / COLS);
-    const step = (d) => { L.sel = U.clamp(L.sel + d * COLS, 0, count - 1); const r = Math.floor(L.sel / COLS); if (r < L.scroll) L.scroll = r; if (r >= L.scroll + ROWS) L.scroll = r - ROWS + 1; };
+    const rows = rowsOf(entries(biomes()[L.biomeIdx]));
+    const rowOf = (i) => rows.findIndex((r) => r.type === 'cells' && r.items.some((it) => it.i === i));
+    const step = (d) => {
+      const r0 = rowOf(L.sel);
+      let r = r0 + d;
+      while (r >= 0 && r < rows.length && rows[r].type !== 'cells') r += d;
+      if (r < 0 || r >= rows.length) return;
+      const col = rows[r0].items.findIndex((it) => it.i === L.sel);
+      L.sel = rows[r].items[Math.min(col, rows[r].items.length - 1)].i;
+      if (r < L.scroll) L.scroll = r > 0 && rows[r - 1].type === 'head' ? r - 1 : r;     // keep its heading in view
+      while (r >= L.scroll + fitFrom(rows, L.scroll)) L.scroll++;
+    };
     if (I.wasPressed('ArrowUp', 'KeyW')) step(-1);
     if (I.wasPressed('ArrowDown', 'KeyS')) step(1);
-    if (m.wheel) L.scroll = U.clamp(L.scroll + Math.sign(m.wheel), 0, Math.max(0, rows - ROWS));
+    if (m.wheel) L.scroll = U.clamp(L.scroll + Math.sign(m.wheel), 0, maxScroll(rows));
     L.ui = layout();
     L.hover = L.ui.find((r) => m.x >= r.x && m.y >= r.y && m.x < r.x + r.w && m.y < r.y + r.h);
     if (L.hover && L.hover.id === 'cell' && (m.x !== L.mx || m.y !== L.my || m.pressed[0])) L.sel = L.hover.i;   // follow the mouse only when it moves
@@ -105,6 +146,11 @@ AQ.LogUI = (function () {
         for (let k = 0; k < 3; k++) g.fillRect(r.x + 6 - k, r.id === 'up' ? r.y + 3 + k : r.y + 5 - k, k * 2 + 1, 1);
         continue;
       }
+      if (r.id === 'head') {                                        // family heading (e.g. AXOLOTL)
+        F().draw(g, r.label, r.x + 2, r.y + 1, '#ffd9a8');
+        g.fillStyle = 'rgba(255,217,168,0.35)'; g.fillRect(r.x + F().width(r.label) + 6, r.y + 3, r.w - F().width(r.label) - 8, 1);
+        continue;
+      }
       if (r.id !== 'cell') { AQ.Aquarium.button(g, r, L.hover === r); continue; }
       const d = r.d, has = AQ.Collection.has(d.id), sel = r.i === L.sel;
       g.fillStyle = sel ? '#24506b' : '#132b40'; g.fillRect(r.x, r.y, r.w, r.h);
@@ -150,7 +196,7 @@ AQ.LogUI = (function () {
       }
       wrap('Tip: ' + (d.active === 'night' ? 'Comes out at night. ' : d.bloom === 'night' ? 'Opens at night. ' : d.active === 'day' ? 'Only out by day. ' : '') + (d.requires_depth ? `Lives deep: needs the depth upgrade (level ${d.requires_depth}). ` : '') + (d.hint || ''), 75).slice(0, has && AQ.Sex.has(d) ? 3 : 4).forEach((l, i) => F().draw(g, l, 10, 140 + i * 8, '#d8eef8'));
     }
-    F().draw(g, list.length > COLS * ROWS ? 'Q/E: BIOME   UP/DOWN OR WHEEL: SCROLL   ESC: CLOSE' : 'Q/E OR ARROWS: BIOME   ESC: CLOSE', 160, 173, '#5f7f96', { align: 'center' });
+    F().draw(g, maxScroll(rowsOf(list)) > 0 ? 'Q/E: BIOME   UP/DOWN OR WHEEL: SCROLL   ESC: CLOSE' : 'Q/E OR ARROWS: BIOME   ESC: CLOSE', 160, 173, '#5f7f96', { align: 'center' });
   };
   return L;
 })();

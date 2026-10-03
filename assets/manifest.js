@@ -8707,8 +8707,8 @@ AQ.manifest = {
     9
    ]
   },
-  "creature.cavepetalia": {
-   "file": "sprites/creatures/cavepetalia.png",
+  "creature.azalea_axolotl": {
+   "file": "sprites/creatures/azalea_axolotl.png",
    "fw": 24,
    "fh": 24,
    "anchor": [
@@ -8729,121 +8729,13 @@ AQ.manifest = {
    },
    "vis": [
     1,
-    7,
-    22,
-    19
-   ]
-  },
-  "creature.cavepetalia.v": {
-   "file": "sprites/creatures/cavepetalia_v.png",
-   "fw": 24,
-   "fh": 24,
-   "anchor": [
-    12,
-    12
-   ],
-   "anims": {
-    "idle": {
-     "row": 0,
-     "frames": 4,
-     "fps": 5
-    },
-    "move": {
-     "row": 1,
-     "frames": 4,
-     "fps": 10
-    }
-   },
-   "vis": [
     1,
-    7,
     22,
-    19
-   ]
-  },
-  "creature.cavepetalia.v.m": {
-   "file": "sprites/creatures/cavepetalia_v_m.png",
-   "fw": 24,
-   "fh": 24,
-   "anchor": [
-    12,
-    12
-   ],
-   "anims": {
-    "idle": {
-     "row": 0,
-     "frames": 4,
-     "fps": 5
-    },
-    "move": {
-     "row": 1,
-     "frames": 4,
-     "fps": 10
-    }
-   },
-   "vis": [
-    1,
-    7,
-    22,
-    19
-   ]
-  },
-  "creature.cavepetalia.baby.v": {
-   "file": "sprites/creatures/cavepetalia_baby_v.png",
-   "fw": 24,
-   "fh": 24,
-   "anchor": [
-    12,
-    12
-   ],
-   "anims": {
-    "idle": {
-     "row": 0,
-     "frames": 4,
-     "fps": 5
-    },
-    "move": {
-     "row": 1,
-     "frames": 4,
-     "fps": 10
-    }
-   },
-   "vis": [
-    3,
-    6,
-    17,
     18
    ]
   },
-  "creature.cavepetalia.baby": {
-   "file": "sprites/creatures/cavepetalia_baby.png",
-   "fw": 24,
-   "fh": 24,
-   "anchor": [
-    12,
-    12
-   ],
-   "anims": {
-    "idle": {
-     "row": 0,
-     "frames": 4,
-     "fps": 5
-    },
-    "move": {
-     "row": 1,
-     "frames": 4,
-     "fps": 10
-    }
-   },
-   "vis": [
-    3,
-    6,
-    17,
-    18
-   ]
-  },
-  "creature.cavepetalia.m": {
-   "file": "sprites/creatures/cavepetalia_m.png",
+  "creature.azalea_axolotl.v": {
+   "file": "sprites/creatures/azalea_axolotl_v.png",
    "fw": 24,
    "fh": 24,
    "anchor": [
@@ -8864,9 +8756,765 @@ AQ.manifest = {
    },
    "vis": [
     1,
-    7,
+    1,
     22,
-    19
+    18
+   ]
+  },
+  "creature.azalea_axolotl.v.m": {
+   "file": "sprites/creatures/azalea_axolotl_v_m.png",
+   "fw": 24,
+   "fh": 24,
+   "anchor": [
+    12,
+    12
+   ],
+   "anims": {
+    "idle": {
+     "row": 0,
+     "frames": 4,
+     "fps": 5
+    },
+    "move": {
+     "row": 1,
+     "frames": 4,
+     "fps": 10
+    }
+   },
+   "vis": [
+    1,
+    1,
+    22,
+    18
+   ]
+  },
+  "creature.azalea_axolotl.baby.v": {
+   "file": "sprites/creatures/azalea_axolotl_baby_v.png",
+   "fw": 24,
+   "fh": 24,
+   "anchor": [
+    12,
+    12
+   ],
+   "anims": {
+    "idle": {
+     "row": 0,
+     "frames": 4,
+     "fps": 5
+    },
+    "move": {
+     "row": 1,
+     "frames": 4,
+     "fps": 10
+    }
+   },
+   "vis": [
+    5,
+    5,
+    19,
+    17
+   ]
+  },
+  "creature.azalea_axolotl.baby": {
+   "file": "sprites/creatures/azalea_axolotl_baby.png",
+   "fw": 24,
+   "fh": 24,
+   "anchor": [
+    12,
+    12
+   ],
+   "anims": {
+    "idle": {
+     "row": 0,
+     "frames": 4,
+     "fps": 5
+    },
+    "move": {
+     "row": 1,
+     "frames": 4,
+     "fps": 10
+    }
+   },
+   "vis": [
+    5,
+    5,
+    19,
+    17
+   ]
+  },
+  "creature.azalea_axolotl.m": {
+   "file": "sprites/creatures/azalea_axolotl_m.png",
+   "fw": 24,
+   "fh": 24,
+   "anchor": [
+    12,
+    12
+   ],
+   "anims": {
+    "idle": {
+     "row": 0,
+     "frames": 4,
+     "fps": 5
+    },
+    "move": {
+     "row": 1,
+     "frames": 4,
+     "fps": 10
+    }
+   },
+   "vis": [
+    1,
+    1,
+    22,
+    18
+   ]
+  },
+  "creature.aurum_axolotl": {
+   "file": "sprites/creatures/aurum_axolotl.png",
+   "fw": 24,
+   "fh": 24,
+   "anchor": [
+    12,
+    12
+   ],
+   "anims": {
+    "idle": {
+     "row": 0,
+     "frames": 4,
+     "fps": 5
+    },
+    "move": {
+     "row": 1,
+     "frames": 4,
+     "fps": 10
+    }
+   },
+   "vis": [
+    1,
+    1,
+    22,
+    18
+   ]
+  },
+  "creature.aurum_axolotl.v": {
+   "file": "sprites/creatures/aurum_axolotl_v.png",
+   "fw": 24,
+   "fh": 24,
+   "anchor": [
+    12,
+    12
+   ],
+   "anims": {
+    "idle": {
+     "row": 0,
+     "frames": 4,
+     "fps": 5
+    },
+    "move": {
+     "row": 1,
+     "frames": 4,
+     "fps": 10
+    }
+   },
+   "vis": [
+    1,
+    1,
+    22,
+    18
+   ]
+  },
+  "creature.aurum_axolotl.v.m": {
+   "file": "sprites/creatures/aurum_axolotl_v_m.png",
+   "fw": 24,
+   "fh": 24,
+   "anchor": [
+    12,
+    12
+   ],
+   "anims": {
+    "idle": {
+     "row": 0,
+     "frames": 4,
+     "fps": 5
+    },
+    "move": {
+     "row": 1,
+     "frames": 4,
+     "fps": 10
+    }
+   },
+   "vis": [
+    1,
+    1,
+    22,
+    18
+   ]
+  },
+  "creature.aurum_axolotl.baby.v": {
+   "file": "sprites/creatures/aurum_axolotl_baby_v.png",
+   "fw": 24,
+   "fh": 24,
+   "anchor": [
+    12,
+    12
+   ],
+   "anims": {
+    "idle": {
+     "row": 0,
+     "frames": 4,
+     "fps": 5
+    },
+    "move": {
+     "row": 1,
+     "frames": 4,
+     "fps": 10
+    }
+   },
+   "vis": [
+    5,
+    5,
+    19,
+    17
+   ]
+  },
+  "creature.aurum_axolotl.baby": {
+   "file": "sprites/creatures/aurum_axolotl_baby.png",
+   "fw": 24,
+   "fh": 24,
+   "anchor": [
+    12,
+    12
+   ],
+   "anims": {
+    "idle": {
+     "row": 0,
+     "frames": 4,
+     "fps": 5
+    },
+    "move": {
+     "row": 1,
+     "frames": 4,
+     "fps": 10
+    }
+   },
+   "vis": [
+    5,
+    5,
+    19,
+    17
+   ]
+  },
+  "creature.aurum_axolotl.m": {
+   "file": "sprites/creatures/aurum_axolotl_m.png",
+   "fw": 24,
+   "fh": 24,
+   "anchor": [
+    12,
+    12
+   ],
+   "anims": {
+    "idle": {
+     "row": 0,
+     "frames": 4,
+     "fps": 5
+    },
+    "move": {
+     "row": 1,
+     "frames": 4,
+     "fps": 10
+    }
+   },
+   "vis": [
+    1,
+    1,
+    22,
+    18
+   ]
+  },
+  "creature.pluvia_axolotl": {
+   "file": "sprites/creatures/pluvia_axolotl.png",
+   "fw": 24,
+   "fh": 24,
+   "anchor": [
+    12,
+    12
+   ],
+   "anims": {
+    "idle": {
+     "row": 0,
+     "frames": 4,
+     "fps": 5
+    },
+    "move": {
+     "row": 1,
+     "frames": 4,
+     "fps": 10
+    }
+   },
+   "vis": [
+    1,
+    1,
+    22,
+    18
+   ]
+  },
+  "creature.pluvia_axolotl.v": {
+   "file": "sprites/creatures/pluvia_axolotl_v.png",
+   "fw": 24,
+   "fh": 24,
+   "anchor": [
+    12,
+    12
+   ],
+   "anims": {
+    "idle": {
+     "row": 0,
+     "frames": 4,
+     "fps": 5
+    },
+    "move": {
+     "row": 1,
+     "frames": 4,
+     "fps": 10
+    }
+   },
+   "vis": [
+    1,
+    1,
+    22,
+    18
+   ]
+  },
+  "creature.pluvia_axolotl.v.m": {
+   "file": "sprites/creatures/pluvia_axolotl_v_m.png",
+   "fw": 24,
+   "fh": 24,
+   "anchor": [
+    12,
+    12
+   ],
+   "anims": {
+    "idle": {
+     "row": 0,
+     "frames": 4,
+     "fps": 5
+    },
+    "move": {
+     "row": 1,
+     "frames": 4,
+     "fps": 10
+    }
+   },
+   "vis": [
+    1,
+    1,
+    22,
+    18
+   ]
+  },
+  "creature.pluvia_axolotl.baby.v": {
+   "file": "sprites/creatures/pluvia_axolotl_baby_v.png",
+   "fw": 24,
+   "fh": 24,
+   "anchor": [
+    12,
+    12
+   ],
+   "anims": {
+    "idle": {
+     "row": 0,
+     "frames": 4,
+     "fps": 5
+    },
+    "move": {
+     "row": 1,
+     "frames": 4,
+     "fps": 10
+    }
+   },
+   "vis": [
+    5,
+    5,
+    19,
+    17
+   ]
+  },
+  "creature.pluvia_axolotl.baby": {
+   "file": "sprites/creatures/pluvia_axolotl_baby.png",
+   "fw": 24,
+   "fh": 24,
+   "anchor": [
+    12,
+    12
+   ],
+   "anims": {
+    "idle": {
+     "row": 0,
+     "frames": 4,
+     "fps": 5
+    },
+    "move": {
+     "row": 1,
+     "frames": 4,
+     "fps": 10
+    }
+   },
+   "vis": [
+    5,
+    5,
+    19,
+    17
+   ]
+  },
+  "creature.pluvia_axolotl.m": {
+   "file": "sprites/creatures/pluvia_axolotl_m.png",
+   "fw": 24,
+   "fh": 24,
+   "anchor": [
+    12,
+    12
+   ],
+   "anims": {
+    "idle": {
+     "row": 0,
+     "frames": 4,
+     "fps": 5
+    },
+    "move": {
+     "row": 1,
+     "frames": 4,
+     "fps": 10
+    }
+   },
+   "vis": [
+    1,
+    1,
+    22,
+    18
+   ]
+  },
+  "creature.viridis_axolotl": {
+   "file": "sprites/creatures/viridis_axolotl.png",
+   "fw": 24,
+   "fh": 24,
+   "anchor": [
+    12,
+    12
+   ],
+   "anims": {
+    "idle": {
+     "row": 0,
+     "frames": 4,
+     "fps": 5
+    },
+    "move": {
+     "row": 1,
+     "frames": 4,
+     "fps": 10
+    }
+   },
+   "vis": [
+    1,
+    1,
+    22,
+    18
+   ]
+  },
+  "creature.viridis_axolotl.v": {
+   "file": "sprites/creatures/viridis_axolotl_v.png",
+   "fw": 24,
+   "fh": 24,
+   "anchor": [
+    12,
+    12
+   ],
+   "anims": {
+    "idle": {
+     "row": 0,
+     "frames": 4,
+     "fps": 5
+    },
+    "move": {
+     "row": 1,
+     "frames": 4,
+     "fps": 10
+    }
+   },
+   "vis": [
+    1,
+    1,
+    22,
+    18
+   ]
+  },
+  "creature.viridis_axolotl.v.m": {
+   "file": "sprites/creatures/viridis_axolotl_v_m.png",
+   "fw": 24,
+   "fh": 24,
+   "anchor": [
+    12,
+    12
+   ],
+   "anims": {
+    "idle": {
+     "row": 0,
+     "frames": 4,
+     "fps": 5
+    },
+    "move": {
+     "row": 1,
+     "frames": 4,
+     "fps": 10
+    }
+   },
+   "vis": [
+    1,
+    1,
+    22,
+    18
+   ]
+  },
+  "creature.viridis_axolotl.baby.v": {
+   "file": "sprites/creatures/viridis_axolotl_baby_v.png",
+   "fw": 24,
+   "fh": 24,
+   "anchor": [
+    12,
+    12
+   ],
+   "anims": {
+    "idle": {
+     "row": 0,
+     "frames": 4,
+     "fps": 5
+    },
+    "move": {
+     "row": 1,
+     "frames": 4,
+     "fps": 10
+    }
+   },
+   "vis": [
+    5,
+    5,
+    19,
+    17
+   ]
+  },
+  "creature.viridis_axolotl.baby": {
+   "file": "sprites/creatures/viridis_axolotl_baby.png",
+   "fw": 24,
+   "fh": 24,
+   "anchor": [
+    12,
+    12
+   ],
+   "anims": {
+    "idle": {
+     "row": 0,
+     "frames": 4,
+     "fps": 5
+    },
+    "move": {
+     "row": 1,
+     "frames": 4,
+     "fps": 10
+    }
+   },
+   "vis": [
+    5,
+    5,
+    19,
+    17
+   ]
+  },
+  "creature.viridis_axolotl.m": {
+   "file": "sprites/creatures/viridis_axolotl_m.png",
+   "fw": 24,
+   "fh": 24,
+   "anchor": [
+    12,
+    12
+   ],
+   "anims": {
+    "idle": {
+     "row": 0,
+     "frames": 4,
+     "fps": 5
+    },
+    "move": {
+     "row": 1,
+     "frames": 4,
+     "fps": 10
+    }
+   },
+   "vis": [
+    1,
+    1,
+    22,
+    18
+   ]
+  },
+  "creature.navious_axolotl": {
+   "file": "sprites/creatures/navious_axolotl.png",
+   "fw": 24,
+   "fh": 24,
+   "anchor": [
+    12,
+    12
+   ],
+   "anims": {
+    "idle": {
+     "row": 0,
+     "frames": 4,
+     "fps": 5
+    },
+    "move": {
+     "row": 1,
+     "frames": 4,
+     "fps": 10
+    }
+   },
+   "vis": [
+    1,
+    1,
+    22,
+    18
+   ]
+  },
+  "creature.navious_axolotl.v": {
+   "file": "sprites/creatures/navious_axolotl_v.png",
+   "fw": 24,
+   "fh": 24,
+   "anchor": [
+    12,
+    12
+   ],
+   "anims": {
+    "idle": {
+     "row": 0,
+     "frames": 4,
+     "fps": 5
+    },
+    "move": {
+     "row": 1,
+     "frames": 4,
+     "fps": 10
+    }
+   },
+   "vis": [
+    1,
+    1,
+    22,
+    18
+   ]
+  },
+  "creature.navious_axolotl.v.m": {
+   "file": "sprites/creatures/navious_axolotl_v_m.png",
+   "fw": 24,
+   "fh": 24,
+   "anchor": [
+    12,
+    12
+   ],
+   "anims": {
+    "idle": {
+     "row": 0,
+     "frames": 4,
+     "fps": 5
+    },
+    "move": {
+     "row": 1,
+     "frames": 4,
+     "fps": 10
+    }
+   },
+   "vis": [
+    1,
+    1,
+    22,
+    18
+   ]
+  },
+  "creature.navious_axolotl.baby.v": {
+   "file": "sprites/creatures/navious_axolotl_baby_v.png",
+   "fw": 24,
+   "fh": 24,
+   "anchor": [
+    12,
+    12
+   ],
+   "anims": {
+    "idle": {
+     "row": 0,
+     "frames": 4,
+     "fps": 5
+    },
+    "move": {
+     "row": 1,
+     "frames": 4,
+     "fps": 10
+    }
+   },
+   "vis": [
+    5,
+    5,
+    19,
+    17
+   ]
+  },
+  "creature.navious_axolotl.baby": {
+   "file": "sprites/creatures/navious_axolotl_baby.png",
+   "fw": 24,
+   "fh": 24,
+   "anchor": [
+    12,
+    12
+   ],
+   "anims": {
+    "idle": {
+     "row": 0,
+     "frames": 4,
+     "fps": 5
+    },
+    "move": {
+     "row": 1,
+     "frames": 4,
+     "fps": 10
+    }
+   },
+   "vis": [
+    5,
+    5,
+    19,
+    17
+   ]
+  },
+  "creature.navious_axolotl.m": {
+   "file": "sprites/creatures/navious_axolotl_m.png",
+   "fw": 24,
+   "fh": 24,
+   "anchor": [
+    12,
+    12
+   ],
+   "anims": {
+    "idle": {
+     "row": 0,
+     "frames": 4,
+     "fps": 5
+    },
+    "move": {
+     "row": 1,
+     "frames": 4,
+     "fps": 10
+    }
+   },
+   "vis": [
+    1,
+    1,
+    22,
+    18
    ]
   },
   "creature.auroravein_squid": {

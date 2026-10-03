@@ -307,10 +307,29 @@ AQ.data.creatures = [
     spawn: { n: 3, at: 'floor' }, hint: 'Translucent and extremely slow. Hard to see.' },
 
   // ------------------------------------------------------------------ Half-Flooded Lush Cave
-  { id: 'cavepetalia', likes: ['plant', 'light'], name: 'Cavepetalia', biome: 'lush_cave', category: 'amphibian', catch_behavior: 'easy',
+  // Five natural axolotl colours (family 'axolotl'): each is its own species with its own log entry,
+  // sexes and breeding (a pair always has babies of its own colour). How often each one turns up is
+  // set by AQ.data.families.axolotl.weights below.
+  { id: 'azalea_axolotl', family: 'axolotl', likes: ['plant', 'light'], name: 'Azalea Axolotl', biome: 'lush_cave', category: 'amphibian', catch_behavior: 'easy',
     params: { speed: 7 },
-    sprite_size: 'medium', color: '#f5c6d6', accent: '#ffffff', art: { shape: 'lizard', gills: true, belly: true },
-    spawn: { n: 3, at: 'water' }, hint: 'Pale pink with feathery gills. Barely reacts to you at all.' },
+    sprite_size: 'medium', color: '#f5b8cc', accent: '#e8708f', art: { shape: 'axolotl' },
+    spawn: { at: 'water' }, hint: 'Rosy pink with feathery gills. Barely reacts to you at all.' },
+  { id: 'aurum_axolotl', family: 'axolotl', likes: ['plant', 'light'], name: 'Aurum Axolotl', biome: 'lush_cave', category: 'amphibian', catch_behavior: 'easy',
+    params: { speed: 7 },
+    sprite_size: 'medium', color: '#f2c24a', accent: '#c98a1c', art: { shape: 'axolotl' },
+    spawn: { at: 'water' }, hint: 'A rare golden one. Just as calm as its cousins, if you are lucky enough to meet it.' },
+  { id: 'pluvia_axolotl', family: 'axolotl', likes: ['plant', 'light'], name: 'Pluvia Axolotl', biome: 'lush_cave', category: 'amphibian', catch_behavior: 'easy',
+    params: { speed: 7 },
+    sprite_size: 'medium', color: '#8ee6ee', accent: '#3fb4c8', art: { shape: 'axolotl' },
+    spawn: { at: 'water' }, hint: 'Rain-cyan and gentle. Not as common as the pink and green ones.' },
+  { id: 'viridis_axolotl', family: 'axolotl', likes: ['plant', 'light'], name: 'Viridis Axolotl', biome: 'lush_cave', category: 'amphibian', catch_behavior: 'easy',
+    params: { speed: 7 },
+    sprite_size: 'medium', color: '#9ed47c', accent: '#5a9a3e', art: { shape: 'axolotl' },
+    spawn: { at: 'water' }, hint: 'Moss green, often resting among the cave plants.' },
+  { id: 'navious_axolotl', family: 'axolotl', likes: ['plant', 'light'], name: 'Navious Axolotl', biome: 'lush_cave', category: 'amphibian', catch_behavior: 'easy',
+    params: { speed: 7 },
+    sprite_size: 'medium', color: '#5a82e0', accent: '#2c4ea8', art: { shape: 'axolotl' },
+    spawn: { at: 'water' }, hint: 'Deep sea-blue. Not as common as the pink and green ones.' },
 
   // ---- Day & night update: nine new creatures (night-only, depth-gated, and the new behaviours)
   { id: 'auroravein_squid', voice: 'glow_chime', likes: ['ice', 'light'], name: 'Auroravein Squid', biome: 'ice', category: 'cephalopod', catch_behavior: 'drift', active: 'night',
@@ -350,3 +369,16 @@ AQ.data.creatures = [
     sprite_size: 'small', color: '#4a6a3a', accent: '#e8ff7a', art: { shape: 'frog', glow: true }, light: { r: 12, color: '#e8ff8a' },
     spawn: { n: 2, at: 'floor' }, hint: 'Glows at night. Its bright "firefly" is a decoy on a stalk - net the dim frog sitting just beside it.' }
 ];
+
+// Families: species that belong together (the log groups them under one heading). A family with
+// `slots` shares that many spawn places in its biome; each time a place fills, one member is picked
+// by `weights` (bigger = more common). `variantArt` replaces the usual hue-shifted rare-variant look
+// with a pattern, so a rare bred one never looks like another natural colour.
+AQ.data.families = {
+  axolotl: {
+    label: 'Axolotl',
+    slots: 5,
+    weights: { azalea_axolotl: 30, viridis_axolotl: 30, pluvia_axolotl: 14, navious_axolotl: 14, aurum_axolotl: 4 },
+    variantArt: { color: '#f6f1e6', accent: '#e9c86a', speckle: '#d9a21e' }   // white with gold speckles
+  }
+};

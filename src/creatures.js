@@ -8,11 +8,22 @@ AQ.Creatures = (function () {
 
   C.init = function () {
     C.list = []; C.slots = [];
+    const fams = AQ.data.families || {}, famDone = {};
     for (const def of AQ.data.creatures) {
       C.defs[def.id] = def;
       def.params = def.params || {};
       def.spriteKey = (def.is_plant ? 'plant.' : 'creature.') + def.id;
       if (!AQ.World.biomeById[def.biome]) { console.warn('[creatures] unknown biome', def.biome, def.id); continue; }
+      // a family with shared slots (AQ.data.families): its members take turns, picked by weight
+      const fam = def.family && fams[def.family];
+      if (fam && fam.slots) {
+        if (famDone[def.family]) continue;
+        famDone[def.family] = true;
+        const pool = AQ.data.creatures.filter((d) => d.family === def.family).map((d) => ({ def: d, w: (fam.weights || {})[d.id] != null ? fam.weights[d.id] : 1 }));
+        pool.forEach((p) => { C.defs[p.def.id] = p.def; p.def.params = p.def.params || {}; p.def.spriteKey = 'creature.' + p.def.id; });
+        for (let i = 0; i < fam.slots; i++) { const slot = { def, timer: 0, members: [], pool }; C.slots.push(slot); spawnSlot(slot); }
+        continue;
+      }
       // spawn.extra: more places this creature also lives, each { n, at, area, y } like spawn itself
       const groups = [def.spawn || { at: 'water' }].concat((def.spawn && def.spawn.extra) || []);
       groups.forEach((sp, gi) => {
@@ -66,6 +77,7 @@ AQ.Creatures = (function () {
   }
 
   function spawnSlot(slot) {
+    if (slot.pool) slot.def = pickWeighted(slot.pool);           // family slot: which member turns up this time
     const def = slot.def, sp = slot.sp || def.spawn || { at: 'water' };
     if (AQ.Clock && !AQ.Clock.activeFor(def)) { slot.timer = 8; return; }   // night-only (or day-only): wait for its hours
     if (def.rare !== undefined && R() > def.rare) { slot.timer = 60; return; }
@@ -88,6 +100,13 @@ AQ.Creatures = (function () {
     const spot = C.findSpot(def, sp.at, undefined, undefined, sp);
     if (!spot) { slot.timer = 15; return; }
     slot.members.push(makeCreature(def, spot[0], spot[1], slot));
+  }
+
+  function pickWeighted(pool) {
+    const total = pool.reduce((a, p) => a + Math.max(0, p.w), 0);
+    let r = R() * total;
+    for (const p of pool) { r -= Math.max(0, p.w); if (r <= 0) return p.def; }
+    return pool[pool.length - 1].def;
   }
 
   // ---------------------------------------------------------------- placement

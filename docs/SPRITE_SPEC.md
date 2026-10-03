@@ -91,7 +91,10 @@ same size, rows and anchor as the normal ones:
 - `creatures/<id>_baby_v.png` (key `creature.<id>.baby.v`): the variant juvenile
 
 The placeholders are the normal sheets with every colour rotated around the colour wheel (a fixed
-amount per species, 100–260°). Real art can paint any variant it likes, such as albino, golden or
+amount per species, 100–260°). A family can override this with a pattern instead
+(`AQ.data.families.<family>.variantArt` in `data/creatures.js`, using the placeholder `speckle` option):
+the axolotls' rare variant is white with gold speckles, so it never matches one of the five natural
+colours (pink, gold, cyan, green, blue). Real art can paint any variant it likes, such as albino, golden or
 dusk-coloured. Draw it on the same frames, and the game picks it up automatically. A missing variant
 sheet falls back to the normal one.
 

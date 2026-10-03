@@ -1329,6 +1329,18 @@
     }
   }
   PH.hueShift = hueShift;
+  // Pattern variants (e.g. the rare axolotl): small speckles sprinkled over the body, never on the
+  // outline. Placed by a fixed hash so the speckles don't flicker between frames.
+  function speckle(p, col) {
+    for (let y = 1; y < p.bh - 1; y++) for (let x = 1; x < p.bw - 1; x++) {
+      const i = (y * p.bw + x) * 4;
+      if (!p.d[i + 3]) continue;
+      const edge = !p.d[i + 7] || !p.d[i - 1] || !p.d[i + p.bw * 4 + 3] || !p.d[i - p.bw * 4 + 3];
+      if (edge || p.d[i] + p.d[i + 1] + p.d[i + 2] < 120) continue;          // keep outline + eyes
+      if (hash(x >> 1, y >> 1, 3) < 0.16 && (x + y) % 2 === 0) { p.d[i] = col[0]; p.d[i + 1] = col[1]; p.d[i + 2] = col[2]; }
+    }
+  }
+  PH.speckle = speckle;
 
   // Juveniles: a lighter, softer version of the adult colours.
   function lighten(p, k) {
@@ -1366,6 +1378,7 @@
           fn(p, opts);
           if (art.male) maleMark(p);
           if (art.baby) lighten(p, 0.3);
+          if (art.speckle) speckle(p, hex(art.speckle));
           if (art.hue) hueShift(p, art.hue);
           // offset of the frame's origin inside this padded buffer (drawing area centred / bottom-aligned)
           const fx0 = M - Math.floor((fw - vw) / 2), fy0 = M - (bottomAnchored ? fh - vh : Math.floor((fh - vh) / 2));
