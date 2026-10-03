@@ -1170,6 +1170,19 @@
       p.set(sx, sy, [240, 236, 255, 140]);
     }
   };
+  // Message bottle (upright; the game tips it over or bobs it): pale sea-glass, a cork, a rolled note
+  // inside, and a small glint that slides down the glass frame by frame.
+  S.bottle = function (p, o) {
+    const W = p.w, H = p.h, cx = Math.floor(W / 2), glass = [150, 214, 200, 210], edge = [96, 168, 160, 255];
+    p.rect(cx - 3, H - 9, 6, 8, glass); p.rect(cx - 2, H - 10, 4, 1, glass);           // body + shoulder
+    p.rect(cx - 1, H - 12, 2, 2, glass);                                                 // neck
+    p.rect(cx - 1, H - 13, 2, 1, hex('#a9774a')); p.set(cx - 1, H - 13, hex('#c99566'));  // cork
+    for (let y = H - 9; y < H - 1; y++) { p.set(cx - 3, y, edge); p.set(cx + 2, y, edge); }
+    p.rect(cx - 3, H - 1, 6, 1, edge);
+    p.rect(cx - 1, H - 8, 2, 5, hex('#f2e6c4')); p.set(cx, H - 7, hex('#c9b78f'));       // the rolled note
+    const gy = H - 9 + (o.frame * 2) % 8;                                                // glint
+    p.set(cx + 1, gy, WHITE); if (gy + 1 < H - 1) p.set(cx + 1, gy + 1, [255, 255, 255, 170]);
+  };
   S.beampad = function (p, o) {
     const W = p.w, H = p.h, cx = W / 2, metal = hex('#8a96a6');
     p.ellipse(cx, H - 4, W / 2 - 1, 3.6, metal);

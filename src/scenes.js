@@ -82,6 +82,7 @@ AQ.Scenes = (function () {
       if (AQ.Doors) AQ.Doors.update(dt, G);
       if (AQ.Creatures) AQ.Creatures.update(dt, G);
       if (AQ.Chests) AQ.Chests.update(dt, G);
+      if (AQ.Bottles) AQ.Bottles.update(dt, G);
       AQ.Camera.update(dt, P, AQ.World);
       AQ.Terrain.update(dt, AQ.Camera);
       AQ.FX.update(dt, AQ.World);

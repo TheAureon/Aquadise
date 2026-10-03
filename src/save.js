@@ -23,6 +23,7 @@ AQ.Save = (function () {
     // predators moved out of the biome tanks into their own tanks (4th floor): move any old ones over
     if (AQ.Tanks) AQ.Tanks.migrate();
     AQ.State.flags = st.flags || {};
+    AQ.State.bottles = st.bottles || {};       // older saves: no bottles found yet
     AQ.State.clock = st.clock && typeof st.clock.hour === 'number' ? st.clock : { hour: AQ.TUNING.clock.startHour };   // older saves: start of the day
     if (AQ.Sex) AQ.Sex.migrate();              // older saves: give caught creatures a sex, fill ♂/♀ log slots
     // where you were: scene + spot (older saves have no scene -> the sea world). Validated against
@@ -57,7 +58,7 @@ AQ.Save = (function () {
   };
   // Fresh start without reloading the page (title screen > New Game).
   S.newGame = function (game) {
-    AQ.State.collection = {}; AQ.State.plants = {}; AQ.State.tanks = {}; AQ.State.unlocks = {}; AQ.State.tankBest = {}; AQ.State.settings = AQ.State.settings && AQ.State.settings.audio ? { audio: AQ.State.settings.audio } : {}; AQ.State.log = {}; AQ.State.flags = {}; AQ.State.clock = { hour: AQ.TUNING.clock.startHour };
+    AQ.State.collection = {}; AQ.State.plants = {}; AQ.State.tanks = {}; AQ.State.unlocks = {}; AQ.State.tankBest = {}; AQ.State.settings = AQ.State.settings && AQ.State.settings.audio ? { audio: AQ.State.settings.audio } : {}; AQ.State.log = {}; AQ.State.flags = {}; AQ.State.bottles = {}; AQ.State.clock = { hour: AQ.TUNING.clock.startHour };
     AQ.State.upgrades = { net: 1, speed: 1, lantern: 0, depth: 0 };
     game.upgrades = AQ.State.upgrades;
     const st = AQ.data.world.playerStart, P = game.player;

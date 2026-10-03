@@ -141,6 +141,11 @@ var AQ = (typeof AQ !== 'undefined') ? AQ : {};
     H.noise(c, o, t, { f: 4000, f2: 1600, q: 0.8, a: 0.03, d: 0.14, v: 0.05 });
     return H.bell(c, o, t + 0.06, m(81), 0.03, 0.4) + 0.06;
   }, { important: true });
+  reg('bottle', 'world', 'BOTTLE PICKUP', (c, o, t) => {
+    H.tone(c, o, t, { f: 520, f2: 260, glide: 0.05, d: 0.06, v: 0.12 });                 // cork pop
+    H.noise(c, o, t, { ft: 'highpass', f: 2500, a: 0.002, d: 0.03, v: 0.05 });
+    return run(c, o, t + 0.1, [88, 95, 100], 0.07, 0.045, 1.1) + 0.1;                       // glass chime
+  }, { important: true, minGap: 0.3 });
   reg('page_turn', 'menus', 'PAGE TURN', (c, o, t) => {
     H.noise(c, o, t, { f: 1800, f2: 3600, q: 0.7, a: 0.03, d: 0.12, v: 0.06 });      // paper swish
     return H.noise(c, o, t + 0.09, { ft: 'lowpass', f: 600, a: 0.005, d: 0.05, v: 0.04 }) + 0.09;   // soft settle

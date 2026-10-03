@@ -136,6 +136,7 @@ All live in `assets/sprites/scene/`. Replace a PNG with real art of the same siz
 | `misc.ufo`           | 64 × 32  | 4 @ 6 fps         | centre        | hovers over the hilltop |
 | `misc.beam`          | 32 × 96  | 4 @ 8 fps         | top-centre    | drawn translucent ("lighter" blend), stretched to the beam's width and length |
 | `misc.beampad`       | 40 × 12  | 4 @ 6 fps         | bottom-centre | the beam pad in the building |
+| `misc.bottle`        | 12 × 14  | 4 @ 4 fps         | bottom-centre | message bottle (drawn upright: the game tips it over on the seabed and bobs it at the surface); a glint slides down the glass |
 | `misc.console`       | 20 × 28  | 4 @ 6 fps         | bottom-centre | the tank directory |
 | `misc.tank_frame`    | 64 × 44  | 1                 | bottom-centre | keep the window (x 4..59, y 4..35) transparent: the live tank shows through it |
 | `bg.hill_sky`        | 320 × 180| 1                 | top-left      | fixed backdrop behind the hill |

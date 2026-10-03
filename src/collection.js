@@ -11,7 +11,8 @@ AQ.State = {
   settings: {},     // player options (e.g. stationZoomOut)
   log: {},          // species id -> { m: true, f: true } sexes caught (plants: none)
   clock: null,      // { hour } of the day/night clock (null -> starts at AQ.TUNING.clock.startHour)
-  flags: {}         // one-time things already shown (e.g. heavyWater toast)
+  flags: {},        // one-time things already shown (e.g. heavyWater toast)
+  bottles: {}       // species id -> true once its message bottle (field notes) is found
 };
 
 AQ.Collection = (function () {

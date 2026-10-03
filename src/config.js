@@ -189,6 +189,17 @@ AQ.TUNING = {
     zoomMargin: 10            // space (px) kept around the building when zoomed out
   },       // ladder climbing speed in the aquarium building (px/s)
 
+  // ---- message bottles (one per species, holding its field notes; see src/bottles.js, data/lore.js)
+  bottles: {
+    pickupRadius: 12,         // how close (px) you get to pick one up
+    glintPerSecond: 1.2,      // how often a bottle sparkles while it's on screen
+    glowRadius: 14,           // soft light around a bottle in dark places
+    minSpacing: 60,           // bottles are kept at least this far apart (px)
+    scanStep: 3,              // placement search step (px); smaller = more candidate spots
+    airBand: 30,              // dry-land bottles only this close above the waterline (the shore), never the sky
+    floatShare: 0.4           // share of bottles floating at the surface (the rest lie on the seabed / shore)
+  },
+
   // ---- sound and music (all made in code; see src/audio.js, src/sfx.js, src/ambience.js, src/music.js)
   audio: {
     master: 0.8,              // overall loudness of everything (0..1)

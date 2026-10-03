@@ -177,6 +177,28 @@ AQ.manifest = {
     95
    ]
   },
+  "misc.bottle": {
+   "file": "sprites/scene/bottle.png",
+   "fw": 12,
+   "fh": 14,
+   "anchor": [
+    6,
+    13
+   ],
+   "anims": {
+    "idle": {
+     "row": 0,
+     "frames": 4,
+     "fps": 4
+    }
+   },
+   "vis": [
+    3,
+    1,
+    8,
+    13
+   ]
+  },
   "misc.beampad": {
    "file": "sprites/scene/beampad.png",
    "fw": 40,
@@ -11621,9 +11643,9 @@ AQ.manifest = {
     }
    },
    "vis": [
-    1,
-    8,
-    14,
+    5,
+    3,
+    10,
     15
    ]
   },
