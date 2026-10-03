@@ -160,6 +160,12 @@ var AQ = (typeof AQ !== 'undefined') ? AQ : {};
     H.tone(c, o, t + 0.05, { type: 'sine', f: 2600, f2: 1900, glide: 0.5, a: 0.08, d: 0.5, v: 0.012 });
     return 0.7;
   }, { bus: 'amb', minGap: AQ.TUNING.shootingStars.soundMinGap });
+  // a falling star lands: a soft descending sparkle (high bell-like notes stepping down)
+  reg('star_land', 'world', 'STAR LANDS', (c, o, t) => {
+    [2637, 2349, 1976, 1760, 1568].forEach((f, i) => H.tone(c, o, t + i * 0.09, { type: 'sine', f, a: 0.005, d: 0.45, v: 0.045 - i * 0.004 }));
+    H.noise(c, o, t, { ft: 'highpass', f: 5000, a: 0.02, d: 0.5, v: 0.012 });
+    return 1.1;
+  }, { minGap: 0.6 });
   reg('gull_far', 'world', 'DISTANT GULLS', (c, o, t) => {
     const n = 1 + Math.floor(Math.random() * 2);
     for (let i = 0; i < n; i++) {

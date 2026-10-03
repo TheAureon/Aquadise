@@ -226,7 +226,7 @@ AQ.Music = (function () {
     const s = D().stingers[id];
     if (!s) return;
     if (AQ.data.audioFiles && AQ.data.audioFiles['music:' + id]) { A.playFile(AQ.data.audioFiles['music:' + id], { bus: A.musicBus }); return; }
-    const c = A.ctx, beat = 60 / s.bpm, out = c.createGain(); out.gain.value = LEVEL * 1.2; out.connect(A.musicBus);
+    const c = A.ctx, beat = 60 / s.bpm, out = c.createGain(); out.gain.value = LEVEL * 1.2 * (s.vol || 1); out.connect(A.musicBus);
     // the music steps back for a moment
     if (M.current) { const g = M.current.out.gain, t = c.currentTime; g.cancelScheduledValues(t); g.setValueAtTime(g.value, t); g.linearRampToValueAtTime(LEVEL * 0.35, t + 0.3); g.setValueAtTime(LEVEL * 0.35, t + 3); g.linearRampToValueAtTime(LEVEL, t + 5); }
     let t = c.currentTime + 0.25;

@@ -75,6 +75,7 @@ AQ.HUD = (function () {
     }
     // the time of day (sea only): sun, sunrise/sunset or moon
     if (game.scene !== 'station') drawClockIcon(ctx, vw - 12, 12);   // (the station floats in space: no sun there)
+    if (AQ.Starfall) AQ.Starfall.drawHud(ctx, vw - 20, 13, game.time);   // a star waiting / a meteor-shower night
     // collection progress (top-right)
     if (AQ.Collection) {
       const c = AQ.Collection.progress();

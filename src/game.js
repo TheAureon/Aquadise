@@ -47,6 +47,7 @@ AQ.Game = (function () {
     if (AQ.Doors) AQ.Doors.init();
     if (AQ.Creatures) AQ.Creatures.init(G);
     if (AQ.Chests) AQ.Chests.init(G);
+    if (AQ.Starfall) AQ.Starfall.init();           // stars still waiting from last time (after the creatures)
     AQ.Scenes.restore(G, G.scene, G.player.x, G.player.y);
     document.getElementById('loading').style.display = 'none';
     AQ.Title.open(G);
@@ -91,6 +92,7 @@ AQ.Game = (function () {
     if (G.state === 'play' || G.state === 'map') {
       const frozen = AQ.Transition.blocking(), inWorld = G.scene === 'world';
       AQ.Clock.update(dt);                         // one day/night clock for everywhere (the sea, the hill, the station)
+      if (AQ.Starfall) AQ.Starfall.update(dt, G);   // falling stars + meteor showers: on schedule wherever you are
       if (!frozen) {
         if (AQ.TUNING.debug.timeSkip && I.wasPressed(AQ.TUNING.debug.timeSkipKey)) { AQ.Clock.set(AQ.Clock.hour() + AQ.TUNING.clock.skipHours); AQ.HUD.toast(`Time skip: ${AQ.HUD.clockText()}`, '#cfe8ff'); }
         if (I.wasPressed('KeyH')) { AQ.HUD.showHelp = true; AQ.HUD.helpT = AQ.HUD.helpT > 0 ? 0 : 12; }
@@ -106,6 +108,7 @@ AQ.Game = (function () {
       if (AQ.Save) AQ.Save.tick(dt, G);
     } else if (G.state === 'aquarium') {
       AQ.Clock.update(dt);                         // time keeps passing while you tend a tank
+      if (AQ.Starfall) AQ.Starfall.update(dt, G);
       AQ.Aquarium.update(dt, G);
     } else if (G.state === 'log') {
       AQ.LogUI.update(dt, G);
@@ -164,6 +167,7 @@ AQ.Game = (function () {
     AQ.Render.lighting(cam, collectLights(), targetDarkness());
     AQ.Render.twilightTint(cam);
     if (!title && AQ.ShootingStars) AQ.ShootingStars.drawWater(ctx, G);   // a star's glow passing through the water
+    if (!title && AQ.Starfall) AQ.Starfall.draw(ctx, G);                   // falling stars + light columns over landings
     AQ.Render.heavyHaze(G.player.heavy || 0);
     AQ.Terrain.drawGlow(ctx, cam);
     if (title) { if (G.state === 'log') AQ.LogUI.draw(ctx, G); else AQ.Title.draw(ctx, G); return; }
@@ -198,6 +202,7 @@ AQ.Game = (function () {
     if (AQ.Creatures) AQ.Creatures.lights(L);
     if (AQ.Chests) AQ.Chests.lights(L);
     if (AQ.Bottles && G.state !== 'title') AQ.Bottles.lights(L);
+    if (AQ.Starfall && G.state !== 'title') AQ.Starfall.lights(L);
     return L;
   }
 

@@ -65,8 +65,9 @@ AQ.ShootingStars = (function () {
     // the sky: only at night, rarer near dusk / dawn
     const n = S.night();
     if (n <= 0) { S.timer = Math.max(S.timer, 3); return; }
-    S.timer -= dt * n;
-    if (S.timer <= 0) { S.timer = R.range(c.everySeconds[0], c.everySeconds[1]); S.spawn(game); }
+    const shower = AQ.Starfall && AQ.Starfall.showerTonight(), boost = shower ? AQ.TUNING.starfall.showerSkyBoost : 1;
+    S.timer -= dt * n * boost;
+    if (S.timer <= 0) { S.timer = R.range(c.everySeconds[0], c.everySeconds[1]); S.spawn(game, { quiet: shower && R.chance(0.6) }); }
   };
 
   // a streak: bright head pixel, a short trail fading behind it, fading in and out over its life

@@ -219,6 +219,31 @@ AQ.TUNING = {
     soundMinGap: 4            // at most one whoosh every this many seconds
   },
 
+  // Falling stars + meteor showers (src/starfall.js). Each night (counted at dusk, saved) gets a plan
+  // seeded from the world seed + night number, so reloading never re-rolls it. Stars only fall at night,
+  // only in the sea, on spots reachable at upgrade level 0 (the message-bottle scan), never on you.
+  // Night length: with the default clock (6-minute days) night lasts about 2.25 real minutes.
+  starfall: {
+    starChance: 0.4,          // chance an ordinary night has a falling star
+    guaranteeEvery: 3,        // ...but never more than this many nights in a row without one
+    showerChance: 0.18,       // chance a night is a meteor shower (about one night in 5-6)
+    showerStars: [2, 4],      // stars that land during a meteor shower (each at a different spot)
+    rayChance: 0.35,          // during a shower, chance each landing also brings a Comet Ray
+    fallWindow: [0.08, 0.7],  // when in the night stars fall (0 = nightfall, 1 = dawn)
+    groundShare: 0.4,         // chance a star lands on the shore / sandy seabed (Aerolite Crab) instead of open water (minnows)
+    minnows: [2, 4],          // Starfall Minnows in a water landing's group
+    lingerMinutes: 3,         // real minutes the creatures wait at a landing before fading
+    fadeSeconds: 20,          // ...the last this many seconds they slowly fade out (can't be netted once faint)
+    maxFloorDepth: 180,       // px below the surface a star can still reach the sandy seabed (and never into caves)
+    minPlayerDist: 90,        // px: never lands closer than this to you
+    minApart: 260,            // px: landings on the same night stay this far apart
+    fallSeconds: 1.4,         // how long the falling streak takes to come down
+    showerSkyBoost: 7,        // during a shower, shooting-star scenery is this many times more frequent
+    column: { height: 260, width: 9, color: '#d8e4ff', alpha: 0.2 },   // the soft light column over a landing
+    chimeVolume: 0.8,         // the soft landing chime (sound effects volume)
+    nearChime: 360            // px: closer than this the chime is full volume, further away it's quieter
+  },
+
   // ---- photo mode on the tank screen (PHOTO button or the key below)
   photo: {
     key: 'KeyP',              // enter / leave photo mode

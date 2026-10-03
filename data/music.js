@@ -47,6 +47,7 @@ AQ.data.music = {
 
   // quiet reward moments (a new decoration unlocked): a short plucked phrase over the music
   stingers: {
+    shower: { label: 'METEOR SHOWER', root: 79, scale: 'major', bpm: 66, lead: 'bell', vol: 0.45, notes: [7, 11, 14, 9, 12, 16, 14], beats: [1, 1, 1.5, 1, 1, 1.5, 4] },
     reward: { label: 'REWARD', root: 67, scale: 'major', bpm: 132, lead: 'guitar', notes: [0, 2, 4, 7, 9, 7, 11, 14], beats: [0.5, 0.5, 0.5, 1, 0.5, 0.5, 1, 3] }
   }
 };

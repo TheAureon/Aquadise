@@ -77,6 +77,9 @@ AQ.Creatures = (function () {
     return c;
   }
 
+  // one creature at (x, y) with no slot (it never respawns): falling-star creatures
+  C.spawnAt = function (def, x, y) { def.params = def.params || {}; def.spriteKey = def.spriteKey || 'creature.' + def.id; return makeCreature(def, x, y, null); };
+
   function spawnSlot(slot) {
     if (slot.pool) slot.def = pickWeighted(slot.pool);           // family slot: which member turns up this time
     const def = slot.def, sp = slot.sp || def.spawn || { at: 'water' };
@@ -209,6 +212,10 @@ AQ.Creatures = (function () {
       if (c.def.active && AQ.Clock && !AQ.Clock.activeFor(c.def)) leave(c, dt);
       if (c.movement === 'swim' && !c.hidden && AQ.World.solid(c.x, c.y)) unstick(c);
       c.alpha += (c.targetAlpha - c.alpha) * Math.min(1, dt * (c.leaving ? 1 : 5));
+      if (c.cap !== undefined) {                 // fading away (a falling star's creature at the end of its stay)
+        c.alpha = Math.min(c.alpha, c.cap);
+        if (c.cap < 0.35) { c.catchable = false; c.pryable = false; }
+      }
       if (c.hostileActive && c.hitCD <= 0 && ctx.dist < c.r + 7) {
         const k = AQ.TUNING.knockback[c.def.knockback === 'strong' ? 'strong' : 'light'];
         P.knock(dx || 1, dy - 2, k);
@@ -240,6 +247,7 @@ AQ.Creatures = (function () {
   C.remove = function (c) {
     const i = C.list.indexOf(c);
     if (i >= 0) C.list.splice(i, 1);
+    if (c.onRemove) c.onRemove(c);
     const s = c.slot;
     if (s) {
       s.members = s.members.filter((m) => m !== c);

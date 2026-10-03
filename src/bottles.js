@@ -74,6 +74,7 @@ AQ.Bottles = (function () {
   B.init = function () {
     const t0 = performance.now();
     const canReach = reachable(), all = candidates(canReach), placed = [];
+    B.spots = all;                                   // also where falling stars may land (src/starfall.js)
     const seed0 = (AQ.data.world.seed || 1) * 7919;
     B.list = [];
     for (const d of AQ.data.creatures) {

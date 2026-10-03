@@ -128,6 +128,29 @@ browsers won't let a page save pictures made from file:// images.
   The hill and the building are their own scenes and never appear on the world map. The game
   saves which scene you're in. Caught creatures still go straight to their tank. (The old Tab
   shortcut is a test-only setting: `AQ.TUNING.debug.tabOpensAquarium`, off by default.)
+- **Falling stars and meteor showers.** Some nights a star visibly falls and lands somewhere in the
+  sea or on the shore: always a spot you can reach at upgrade level 0 (the same scan and checks as the
+  message bottles), with a clear drop from the sky (never in a cave), never inside terrain, past the
+  depth limit or on top of you. It lands with a burst and a soft descending chime, and a soft light
+  column rises from the spot so you can find it from far away. In open water a small group of Starfall
+  Minnows appears; on the shore or the sandy seabed, an Aerolite Crab. They glow, wait a few real
+  minutes (`lingerMinutes`, default 3) and then fade out slowly (once faint they can't be netted).
+  They're caught like anything else and follow the usual ♂/♀ balancing (the sex you're missing is more
+  likely). A toast says where it fell ("A shooting star fell near the Kelp Forest!"), the map (M) shows
+  a sparkling star at the spot, and a little star sits next to the HUD moon while something is waiting.
+  - **Meteor showers:** on rarer nights (about one in 5-6) the sky fills with shooting stars all night
+    and 2-4 stars land at different spots; each landing may also bring a Comet Ray. It's announced at
+    dusk ("The sky is full of falling stars tonight") with a gentle shimmering music cue and a small
+    sparkle next to the HUD moon. The cue (METEOR SHOWER) and the landing chime (STAR LANDS) are in the
+    Sound Test.
+  - **Schedule:** nights are counted at dusk and each night's plan is seeded from the world seed and
+    the night number and saved, so reloading never re-rolls it. Catch-up: a star always falls at least
+    every 3 nights. Stars only fall at night and only in the sea, but it all keeps going wherever you
+    are (the hill, the building, a tank): come back and the star may still be waiting. Waiting stars
+    are saved too.
+  - Tuning: `AQ.TUNING.starfall` (star / shower chances, catch-up, stars per shower, Comet Ray chance,
+    when in the night they fall, water vs shore, group size, how long they wait and fade, distances,
+    the light column, chime volume).
 - **Starfall tank and its three creatures.** The building's 3rd floor has a new tank, STARFALL: deep
   indigo water, drifting twinkling star motes and a faint glow welling up from the middle. It's in every
   list of tanks (the DIRECTORY / TANKS overview, the whole-building view, Q/E switching, vibe tooltips,
@@ -244,6 +267,7 @@ src/station.js        the aquarium building in space (tanks on the walls, direct
 src/ui.js             collection log, map, pause
 src/gulls.js          distant seagull flocks in the sky (sea + hill)
 src/shootingstars.js  night shooting-star streaks (sky, underwater glow, station portholes)
+src/starfall.js       falling stars + meteor showers: nightly plan, landings, light columns, map/HUD marks
 src/bottles.js        message bottles: deterministic, reachable placement, pickup, glint
 assets/sprites-embedded.js   base64 copy of the sprites for file:// (tools/embed-sprites.js)
 src/audio.js          audio engine: mixer, voice limit, underwater filter, settings, file mapping
