@@ -66,13 +66,17 @@ AQ.Input = (function () {
     wasPressed: (...codes) => enabled && any(codes, pressed),
     wasReleased: (...codes) => any(codes, released),
     rawPressed: (...codes) => any(codes, pressed),
+    // swallow a press so nothing else acts on it this frame (e.g. Esc that only closed a tip)
+    consume: (...codes) => codes.forEach((c) => pressed.delete(c)),
+    anyPressed: () => pressed.size > 0,
     axis() {
       if (!enabled) return { x: 0, y: 0 };
       let x = 0, y = 0;
-      if (any(['ArrowLeft', 'KeyA'], down)) x -= 1;
-      if (any(['ArrowRight', 'KeyD'], down)) x += 1;
-      if (any(['ArrowUp', 'KeyW'], down)) y -= 1;
-      if (any(['ArrowDown', 'KeyS'], down)) y += 1;
+      const k = AQ.TUNING.keys;                                   // bindings: AQ.TUNING.keys (src/keys.js)
+      if (any(k.left, down)) x -= 1;
+      if (any(k.right, down)) x += 1;
+      if (any(k.up, down)) y -= 1;
+      if (any(k.down, down)) y += 1;
       if (x && y) { x *= Math.SQRT1_2; y *= Math.SQRT1_2; }
       return { x, y };
     }

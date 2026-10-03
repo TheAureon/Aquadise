@@ -28,6 +28,10 @@ AQ.Save = (function () {
     // falling stars (night count, tonight's plan, stars still waiting); older saves start at night 0
     const sf = st.starfall;
     AQ.State.starfall = sf && typeof sf.night === 'number' ? Object.assign({ lastStar: 0, phase: null, plan: null }, sf, { landings: Array.isArray(sf.landings) ? sf.landings : [] }) : { night: 0, lastStar: 0, phase: null, plan: null, landings: [] };
+    // tutorial: older saves (no tutorial yet) never see the guided dive, and skip every tip their own
+    // progress shows they already know (AQ.Tips.inferFromProgress)
+    if (st.tutorial && st.tutorial.seen) AQ.State.tutorial = st.tutorial;
+    else { AQ.State.tutorial = { seen: {}, diveAsked: true }; if (AQ.Tips) AQ.Tips.inferFromProgress(); }
     if (AQ.Sex) AQ.Sex.migrate();              // older saves: give caught creatures a sex, fill ♂/♀ log slots
     // where you were: scene + spot (older saves have no scene -> the sea world). Validated against
     // that scene's map at boot (AQ.Scenes.restore), which falls back to a safe spot if needed.
@@ -61,7 +65,7 @@ AQ.Save = (function () {
   };
   // Fresh start without reloading the page (title screen > New Game).
   S.newGame = function (game) {
-    AQ.State.collection = {}; AQ.State.plants = {}; AQ.State.tanks = {}; AQ.State.unlocks = {}; AQ.State.tankBest = {}; AQ.State.settings = AQ.State.settings && AQ.State.settings.audio ? { audio: AQ.State.settings.audio } : {}; AQ.State.log = {}; AQ.State.flags = {}; AQ.State.bottles = {}; AQ.State.clock = { hour: AQ.TUNING.clock.startHour };
+    AQ.State.collection = {}; AQ.State.plants = {}; AQ.State.tanks = {}; AQ.State.unlocks = {}; AQ.State.tankBest = {}; AQ.State.settings = AQ.State.settings ? { audio: AQ.State.settings.audio, hints: AQ.State.settings.hints } : {};   // sound + hints carry over AQ.State.log = {}; AQ.State.flags = {}; AQ.State.bottles = {}; AQ.State.clock = { hour: AQ.TUNING.clock.startHour };
     AQ.State.starfall = { night: 0, lastStar: 0, phase: null, plan: null, landings: [] };
     if (AQ.Creatures) AQ.Creatures.list.filter((c) => c.landing).forEach((c) => { c.fadedOut = true; AQ.Creatures.remove(c); });   // no stars waiting in a new game
     AQ.State.upgrades = { net: 1, speed: 1, lantern: 0, depth: 0 };

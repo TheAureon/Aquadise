@@ -243,11 +243,7 @@ AQ.Title = (function () {
       const box = { x: 40, y: 66, w: 240, h: 100 };
       pill(g, box, 'rgba(6,20,38,0.92)', 'rgba(110,240,239,0.6)');
       F().draw(g, 'CONTROLS', 160, 71, '#6ef0ef', { align: 'center', shadow: false });
-      const rows = [
-        ['MOVE / SWIM', 'WASD OR ARROWS'], ['JUMP', 'SPACE'], ['SNEAK', 'HOLD SHIFT'],
-        ['NET', 'LEFT CLICK'], ['PRY', 'HOLD LEFT CLICK'], ['BAIT', 'B OR RIGHT CLICK'],
-        ['AQUARIUM / LOG / MAP', 'TAB / L / M'], ['PAUSE', 'ESC'], ['MUTE SOUND', AQ.TUNING.audio.muteKey.replace('Key', '')]
-      ];
+      const rows = AQ.data.tutorial.controls.map(([a, b]) => [a, AQ.Keys.fill(b)]);   // data/tutorial.js, keys from the bindings
       rows.forEach(([a, b], i) => { F().draw(g, a, 50, 82 + i * 9, '#9fd3ee', { shadow: false }); F().draw(g, b, 270, 82 + i * 9, '#ffffff', { align: 'right', shadow: false }); });
       return;
     }

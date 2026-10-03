@@ -223,6 +223,7 @@ AQ.Creatures = (function () {
         AQ.FX.puff(P.x, P.y, 'rgba(255,255,255,0.7)', 6);
         AQ.HUD.toast(c.def.knockback === 'strong' ? `${c.def.name} shoves you away!` : `${c.def.name} bumps you.`, '#ffcf9a');
         AQ.Audio.play('bump');
+        if (AQ.Tips) AQ.Tips.event('bumped');
       }
     }
     // respawn empty slots out of the player's sight

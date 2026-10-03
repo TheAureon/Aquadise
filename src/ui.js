@@ -126,6 +126,7 @@ AQ.LogUI = (function () {
   };
   L.close = function (game) {
     AQ.Audio.play('log_close');
+    if (AQ.Tips) AQ.Tips.event('logClosed');      // its tip waits until you're back out (no tips inside menus)
     if (L.from === 'title') { AQ.Title.open(game); return; }
     game.state = L.from === 'aquarium' ? 'aquarium' : 'play';
   };

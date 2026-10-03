@@ -55,6 +55,7 @@ AQ.Chests = (function () {
         if (R.chance(dt * 0.8)) AQ.FX.sparkle(c.x + R.range(-6, 6), c.y - R.range(2, 10), '#ffe9a0', 1);
         if (Math.hypot(P.x - c.x, P.y - (c.y - 6)) < 13) {
           c.state = 'open'; c.t = 0;
+          if (AQ.Tips) AQ.Tips.event('chest');
           const what = reward(game);
           AQ.FX.sparkle(c.x, c.y - 8, '#ffe36b', 18);
           AQ.Audio.play('chest');

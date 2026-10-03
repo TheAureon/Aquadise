@@ -1251,6 +1251,20 @@
     const gy = H - 9 + (o.frame * 2) % 8;                                                // glint
     p.set(cx + 1, gy, WHITE); if (gy + 1 < H - 1) p.set(cx + 1, gy + 1, [255, 255, 255, 170]);
   };
+  // Small UI icons for the tutorial tips, one per frame (12 x 12): 0 alert (!), 1 moon, 2 star, 3 heart,
+  // 4 open book, 5 footprints (sneak), 6 sparkle. Soft, bright colours with a dark outline.
+  S.uiicons = function (p, o) {
+    const W = p.w, cx = Math.floor(W / 2), Y = hex('#ffe9a8'), B = hex('#d8e4ff'), P = hex('#ff9fc0');
+    const f = o.frame;
+    if (f === 0) { p.rect(cx - 1, 1, 2, 7, Y); p.rect(cx - 1, 9, 2, 2, Y); }
+    else if (f === 1) { p.circle(cx, 6, 4.5, B); p.circle(cx + 2, 4.5, 3.6, [0, 0, 0, 0]); for (let y = 0; y < 12; y++) for (let x = 0; x < 12; x++) { const i = p.idx(x, y); if (i >= 0 && p.d[i + 3] && p.d[i] === 0 && p.d[i + 1] === 0) p.d[i + 3] = 0; } }
+    else if (f === 2) { p.tri([cx, 0], [cx - 2, 5], [cx + 2, 5], Y); p.tri([0, 4], [W - 1, 4], [cx, 8], Y); p.tri([cx, 6], [2, 11], [cx - 1, 7], Y); p.tri([cx, 6], [W - 2, 11], [cx + 1, 7], Y); }
+    else if (f === 3) { p.circle(cx - 2, 4, 2.6, P); p.circle(cx + 2, 4, 2.6, P); p.tri([1, 5], [W - 1, 5], [cx, 11], P); }
+    else if (f === 4) { p.rect(1, 2, 4, 8, hex('#f2e6c4')); p.rect(7, 2, 4, 8, hex('#f2e6c4')); p.rect(5, 2, 2, 9, hex('#c9a46a')); for (let y = 4; y < 9; y += 2) { p.rect(2, y, 2, 1, hex('#8a7a5a')); p.rect(8, y, 2, 1, hex('#8a7a5a')); } }
+    else if (f === 5) { p.ellipse(3.5, 7.5, 1.6, 2.4, B); p.ellipse(8, 4, 1.6, 2.4, B); p.set(3, 4, B); p.set(8, 1, B); }
+    else { p.rect(cx, 0, 1, 12, Y); p.rect(0, 6, 12, 1, Y); p.rect(cx - 1, 5, 3, 3, hex('#ffffff')); p.set(2, 2, B); p.set(9, 9, B); p.set(9, 2, B); }
+    p.outline(0.3);
+  };
   S.beampad = function (p, o) {
     const W = p.w, H = p.h, cx = W / 2, metal = hex('#8a96a6');
     p.ellipse(cx, H - 4, W / 2 - 1, 3.6, metal);

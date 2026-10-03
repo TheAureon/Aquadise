@@ -166,6 +166,13 @@ var AQ = (typeof AQ !== 'undefined') ? AQ : {};
     H.noise(c, o, t, { ft: 'highpass', f: 5000, a: 0.02, d: 0.5, v: 0.012 });
     return 1.1;
   }, { minGap: 0.6 });
+  // tutorial: a soft "step complete" chime and an even softer "new tip" blip
+  reg('step_done', 'menus', 'STEP COMPLETE', (c, o, t) => {
+    H.tone(c, o, t, { type: 'sine', f: 1318, a: 0.005, d: 0.35, v: 0.05 });
+    H.tone(c, o, t + 0.1, { type: 'sine', f: 1976, a: 0.005, d: 0.5, v: 0.04 });
+    return 0.7;
+  }, { minGap: 0.3 });
+  reg('tip_new', 'menus', 'NEW TIP', (c, o, t) => H.tone(c, o, t, { type: 'sine', f: 1568, f2: 1760, glide: 0.06, a: 0.004, d: 0.12, v: 0.022 }), { minGap: 0.5 });
   reg('gull_far', 'world', 'DISTANT GULLS', (c, o, t) => {
     const n = 1 + Math.floor(Math.random() * 2);
     for (let i = 0; i < n; i++) {

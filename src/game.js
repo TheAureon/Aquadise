@@ -93,17 +93,18 @@ AQ.Game = (function () {
       const frozen = AQ.Transition.blocking(), inWorld = G.scene === 'world';
       AQ.Clock.update(dt);                         // one day/night clock for everywhere (the sea, the hill, the station)
       if (AQ.Starfall) AQ.Starfall.update(dt, G);   // falling stars + meteor showers: on schedule wherever you are
+      if (AQ.Tips) AQ.Tips.update(dt, G);           // one-time tips (first, so an Esc / click that closes a tip is used up)
       if (!frozen) {
         if (AQ.TUNING.debug.timeSkip && I.wasPressed(AQ.TUNING.debug.timeSkipKey)) { AQ.Clock.set(AQ.Clock.hour() + AQ.TUNING.clock.skipHours); AQ.HUD.toast(`Time skip: ${AQ.HUD.clockText()}`, '#cfe8ff'); }
         if (AQ.TUNING.debug.starKeys && AQ.Starfall) {
           if (I.wasPressed(AQ.TUNING.debug.fallStarKey) && !AQ.Starfall.fall(G)) AQ.HUD.toast('No free spot for a star right now.', '#cfe8ff');
           if (I.wasPressed(AQ.TUNING.debug.showerKey)) AQ.Starfall.startShower(G);
         }
-        if (I.wasPressed('KeyH')) { AQ.HUD.showHelp = true; AQ.HUD.helpT = AQ.HUD.helpT > 0 ? 0 : 12; }
-        if (I.wasPressed('KeyM')) { if (inWorld) G.state = G.state === 'map' ? 'play' : 'map'; else AQ.HUD.toast('The map only shows the sea.', '#cfe8ff'); }
+        if (AQ.Keys.pressed('help')) { AQ.HUD.showHelp = true; AQ.HUD.helpT = AQ.HUD.helpT > 0 ? 0 : 12; }
+        if (AQ.Keys.pressed('map')) { if (inWorld) G.state = G.state === 'map' ? 'play' : 'map'; else AQ.HUD.toast('The map only shows the sea.', '#cfe8ff'); }
         if (I.wasPressed('Tab') && AQ.Aquarium && AQ.TUNING.debug.tabOpensAquarium) { AQ.Aquarium.open(G); I.endFrame(); return; }
-        if (I.wasPressed('KeyL') && AQ.LogUI) { AQ.LogUI.open(G); I.endFrame(); return; }
-        if (I.wasPressed('Escape')) { if (G.state === 'map') G.state = 'play'; else { G.state = 'pause'; I.endFrame(); return; } }
+        if (AQ.Keys.pressed('log') && AQ.LogUI) { AQ.LogUI.open(G); I.endFrame(); return; }
+        if (AQ.Keys.pressed('pause')) { if (G.state === 'map') G.state = 'play'; else { G.state = 'pause'; I.endFrame(); return; } }
       }
       AQ.Scenes.cur(G).update(dt, G, frozen ? NO_INPUT : I);
       if (AQ.Gulls) AQ.Gulls.update(dt, G);         // distant seagulls in the sky (sea + hill)
@@ -113,6 +114,7 @@ AQ.Game = (function () {
     } else if (G.state === 'aquarium') {
       AQ.Clock.update(dt);                         // time keeps passing while you tend a tank
       if (AQ.Starfall) AQ.Starfall.update(dt, G);
+      if (AQ.Tips) AQ.Tips.update(dt, G);
       AQ.Aquarium.update(dt, G);
     } else if (G.state === 'log') {
       AQ.LogUI.update(dt, G);
@@ -139,6 +141,7 @@ AQ.Game = (function () {
     if (G.state === 'aquarium' || (G.state === 'log' && AQ.LogUI.from === 'aquarium')) {
       AQ.Aquarium.draw(ctx, G);
       if (G.state === 'log') AQ.LogUI.draw(ctx, G);
+      else if (AQ.Tips) AQ.Tips.draw(ctx, G);
       return;
     }
     const title = G.state === 'title' || (G.state === 'log' && AQ.LogUI.from === 'title');
@@ -179,6 +182,7 @@ AQ.Game = (function () {
   }
   function drawOverlays(ctx) {
     AQ.HUD.draw(ctx, G);
+    if (G.state === 'play' && AQ.Tips) AQ.Tips.draw(ctx, G);
     if (G.state === 'map') AQ.MapUI.draw(ctx, G);
     if (G.state === 'log') AQ.LogUI.draw(ctx, G);
     if (G.state === 'pause') AQ.PauseUI.draw(ctx, G);

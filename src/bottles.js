@@ -117,6 +117,7 @@ AQ.Bottles = (function () {
     b.taken = 0.001;
     AQ.FX.sparkle(b.x, drawY(b) - 4, '#fff7c2', 10);
     AQ.Audio.play('bottle');
+    if (AQ.Tips) AQ.Tips.event('bottle');
     const d = AQ.Creatures.defs[b.id], p = B.progress();
     AQ.HUD.toast(`Message in a bottle! Field notes on ${AQ.Collection.has(b.id) ? d.name : 'a mystery creature'} (L)`, '#ffe9a8', 4);
     AQ.HUD.toast(`Bottles found ${p.found}/${p.total}`, '#cfe8ff', 3);

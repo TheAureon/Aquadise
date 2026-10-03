@@ -81,6 +81,7 @@ AQ.Breeding = (function () {
     (tank.creatures.length < AQ.TUNING.tank.capacity ? tank.creatures : (tank.storage = tank.storage || [])).push(e);
     AQ.Sex.logOf(id).bred = true;
     AQ.Audio.play('baby');
+    if (AQ.Tips) AQ.Tips.event('baby');
     announce(rare ? `A rare-coloured baby ${d.name} was born in the ${tankName(tankId)} tank!` : `A baby ${d.name} was born in the ${tankName(tankId)} tank!`, tankId);
     return e;
   }
@@ -107,6 +108,7 @@ AQ.Breeding = (function () {
       }
       const pairs = B.pairs(tank, now);
       if (!pairs.length) continue;
+      if (AQ.Tips && pairs.some((p) => p[0].sex && p[1].sex)) AQ.Tips.event('pair');
       const vibe = AQ.Vibe.evaluate(id), why = B.blocker(tank, vibe, now);
       if (why && why !== 'resting') continue;                     // paused: courtship (if any) waits
       if (!tank.court) {
@@ -114,6 +116,7 @@ AQ.Breeding = (function () {
         const p = pairs[Math.floor(Math.random() * pairs.length)];
         tank.court = { a: p[0].uid, b: p[1].uid, id: p[0].id, progress: 0 };
         AQ.Audio.play('court');
+        if (AQ.Tips) AQ.Tips.event('court');
         changed = true;
         continue;
       }

@@ -98,6 +98,7 @@ AQ.Starfall = (function () {
       AQ.Audio.play('star_whoosh', { vol: AQ.TUNING.shootingStars.soundVolume });
     } else land(L, game);
     tell(`A shooting star fell near the ${where}!`, game);
+    if (AQ.Tips) AQ.Tips.event('starfall');
     AQ.Save && AQ.Save.dirty();
     return L;
   };
@@ -166,6 +167,7 @@ AQ.Starfall = (function () {
       plan.announced = true;
       tell('The sky is full of falling stars tonight', game);
       if (AQ.Music) AQ.Music.stinger('shower');
+      if (AQ.Tips) AQ.Tips.event('shower');
     }
     // stars fall at their time in the night (time skipped past the night: those stars just don't fall)
     if (plan) {

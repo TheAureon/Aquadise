@@ -22,6 +22,7 @@ AQ.Scenes = (function () {
     const prev = S.cur(game);
     if (prev && prev !== sc && prev.leave) prev.leave(game);
     game.scene = sc.id;
+    if (sc.id === 'station') { AQ.State.flags = AQ.State.flags || {}; AQ.State.flags.visitedStation = true; }
     const P = game.player;
     P.vx = 0; P.vy = 0; P.climbing = null; P.stun = 0;
     if (sc.enter) sc.enter(game, spawn);

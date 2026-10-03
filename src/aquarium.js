@@ -32,6 +32,7 @@ AQ.Aquarium = (function () {
     AQ.FX.list.length = 0;
     A.rebuild();
     AQ.Audio.music('aquarium');
+    if (AQ.Tips) AQ.Tips.event('tank');
   };
   A.close = function (game) {
     putBack();
@@ -44,7 +45,7 @@ AQ.Aquarium = (function () {
   A.refreshVibe = function () {
     const before = A.vibe && A.vibeOf === A.biome ? A.vibe.stars : null;
     A.vibe = AQ.Vibe.evaluate(A.biome); A.vibeOf = A.biome;
-    if (before != null && Math.floor(A.vibe.stars) > Math.floor(before)) AQ.Audio.play('star');   // a whole new star
+    if (before != null && Math.floor(A.vibe.stars) > Math.floor(before)) { AQ.Audio.play('star'); if (AQ.Tips) AQ.Tips.event('tankstar'); }   // a whole new star
     A.vibeT = AQ.TUNING.aquarium.recomputeEvery;
     A.fish.forEach(updateMood);
     A.fish.forEach(setAge);
@@ -104,6 +105,7 @@ AQ.Aquarium = (function () {
     for (let i = 0; i < 5; i++) AQ.FX.sparkle(88 + i * 8, 6, '#fff3b0', 4);
     A.tray = 'decor'; A.trayScroll = 0; A.trayPos = 0;
     AQ.Audio.play('unlock');
+    if (AQ.Tips) AQ.Tips.event('unlock');
     AQ.Audio.play('fanfare', { delay: 0.6 });
     if (AQ.Music) AQ.Music.stinger('reward');
   }
@@ -494,18 +496,18 @@ AQ.Aquarium = (function () {
     if (A.photo.on) { updatePhoto(dt, game, tank); return; }
     A.t += dt;
     if (A.view === 'overview') { updateOverview(dt, game); return; }
-    if (I.wasPressed('KeyT')) { openOverview(); return; }
+    if (AQ.Keys.pressed('tanks')) { openOverview(); return; }
     if (I.wasPressed(AQ.TUNING.photo.key)) { enterPhoto(); return; }
     A.ui = layout();
     if (I.wasPressed('Escape') && A.card && !A.holding) A.card = null;
     else if (I.wasPressed('Tab') || (I.wasPressed('Escape') && !A.holding)) { A.close(game); return; }
-    if (I.wasPressed('KeyL')) { AQ.LogUI.open(game, 'aquarium'); return; }
-    if (I.wasPressed('KeyQ', 'ArrowLeft')) switchTank(-1);
-    if (I.wasPressed('KeyE', 'ArrowRight')) switchTank(1);
-    if (I.wasPressed('KeyF')) feed();
-    if (I.wasPressed('KeyU') || (I.wasPressed('KeyZ') && I.isDown('ControlLeft', 'ControlRight', 'MetaLeft', 'MetaRight'))) undo(tank);
-    else if (I.wasPressed('KeyZ')) cycleLayer(tank);
-    if (I.wasPressed('KeyX')) flipIt(tank);
+    if (AQ.Keys.pressed('log')) { AQ.LogUI.open(game, 'aquarium'); return; }
+    if (AQ.Keys.pressed('prevTank')) switchTank(-1);
+    if (AQ.Keys.pressed('nextTank')) switchTank(1);
+    if (AQ.Keys.pressed('feed')) feed();
+    if (AQ.Keys.pressed('undo') || (I.wasPressed('KeyZ') && I.isDown('ControlLeft', 'ControlRight', 'MetaLeft', 'MetaRight'))) undo(tank);
+    else if (AQ.Keys.pressed('layer')) cycleLayer(tank);
+    if (AQ.Keys.pressed('flip')) flipIt(tank);
     if (A.clearArm > 0) A.clearArm -= dt;
     for (let i = A.notes.length - 1; i >= 0; i--) if ((A.notes[i].t += dt) > A.notes[i].life) A.notes.splice(i, 1);
     if (m.wheelPx) { A.trayScroll += m.wheelPx / 80; A.trayIdle = 0; }  // ~one item per wheel notch, smooth on trackpads
@@ -1184,7 +1186,7 @@ AQ.Aquarium = (function () {
     const I = AQ.Input, m = I.mouse;
     A.ovT += dt;
     if (A.ovT > 1) { A.ovT = 0; A.overview = overviewSlots(); }
-    if (I.wasPressed('Escape', 'KeyT')) { A.view = 'tank'; return; }
+    if (I.wasPressed('Escape') || AQ.Keys.pressed('tanks')) { A.view = 'tank'; return; }
     if (I.wasPressed('Tab')) { A.view = 'tank'; A.close(game); return; }
     A.ovHover = null;
     A.overview.forEach((o) => { if (o.b && hit(cardRect(o), m)) A.ovHover = o.i; });
@@ -1423,6 +1425,7 @@ AQ.Aquarium = (function () {
   function tip(g, text, x, y, col) {
     const w = F().width(text);
     const tx = U.clamp(Math.round(x - w / 2), 3, 317 - w);
+    if (AQ.Tips && AQ.Tips.overlaps(tx - 1, y - 1, w + 2, 7)) return;      // a tutorial tip is there: step aside
     g.globalAlpha = 0.9;
     F().draw(g, text, tx, y, col, { shadow: 'rgba(4,12,24,0.85)' });
     g.globalAlpha = 1;
@@ -1441,6 +1444,7 @@ AQ.Aquarium = (function () {
     }
     const w = Math.max(...lines.map((l) => F().width(l[0]))) + 8, h = lines.length * 7 + 5;
     const x = U.clamp(Math.round(it.x + it.w / 2 - w / 2), 2, 318 - w), y = TRAY_Y - h - 3;
+    if (AQ.Tips && AQ.Tips.overlaps(x, y, w, h)) return;                   // a tutorial tip is there: step aside
     g.fillStyle = 'rgba(6,18,34,0.94)'; g.fillRect(x, y, w, h);
     g.fillStyle = '#5fc6d9'; g.fillRect(x, y, w, 1);
     lines.forEach(([t, c], i) => F().draw(g, t, x + 4, y + 3 + i * 7, c, { shadow: false }));

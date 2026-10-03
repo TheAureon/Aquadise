@@ -106,7 +106,7 @@ AQ.Behaviors = (function () {
     } else { c.feeding = true; H.brake(c, dt); c.facing = b.x > c.x ? 1 : -1; if (R.chance(dt * 1.2)) AQ.FX.text(c.x, c.y - c.r - 4, '♥', '#ff9fc0'); }
     return true;
   };
-  H.alertMark = (c, t = 0.8) => { c.iconT = t; c.icon = '!'; };
+  H.alertMark = (c, t = 0.8) => { c.iconT = t; c.icon = '!'; if (AQ.Tips) AQ.Tips.event('noticed'); };
   // Calm idle movement shared by many behaviours.
   H.idle = function (c, dt) {
     const p = c.p;

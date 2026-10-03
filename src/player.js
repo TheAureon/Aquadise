@@ -33,7 +33,8 @@ AQ.Player = (function () {
     const T = AQ.TUNING.swim, Wk = AQ.TUNING.walk, hb = T.hitbox;
     this.t += dt;
     this.stun = Math.max(0, this.stun - dt);
-    this.sneaking = input.isDown('ShiftLeft', 'ShiftRight');
+    const KB = AQ.TUNING.keys;                         // key bindings (src/keys.js)
+    this.sneaking = input.isDown(...KB.sneak);
     const ax = this.stun > 0 ? { x: 0, y: 0 } : input.axis();
     const hasInput = ax.x !== 0 || ax.y !== 0;
     const mult = 1 + (this.speedLevel - 1) * T.boostPerLevel;
@@ -44,7 +45,7 @@ AQ.Player = (function () {
     const submerged = world.water(this.x, this.y - (Wk.swimDepth - hb.h / 2)) || (world.water(this.x, this.y) && !grounded);
     this.mode = submerged ? 'swim' : grounded ? 'walk' : 'air';
     this.inAir = !world.water(this.x, this.y);
-    const jumpKey = this.stun <= 0 && input.wasPressed('Space', 'KeyW', 'ArrowUp');
+    const jumpKey = this.stun <= 0 && input.wasPressed(...KB.jump, ...KB.up);
 
     // ladders (only side scenes have them): up/down on a ladder climbs, Space hops off
     if (world.ladderAt && this.stun <= 0 && this.climbStep(dt, world, input, ax, grounded)) return;
@@ -59,7 +60,7 @@ AQ.Player = (function () {
       // gentle surface buoyancy so the diver bobs instead of jittering at the waterline
       if (nearSurface && !hasInput) this.vy += 30 * dt;
       // hop out of a pool / onto the shore when there's ground beside you
-      if (nearSurface && (ax.y < 0 || input.isDown('Space')) && (world.solid(this.x + 10 * (ax.x || this.facing), this.y - 2) || world.solid(this.x + 10 * (ax.x || this.facing), this.y + 2))) {
+      if (nearSurface && (ax.y < 0 || input.isDown(...KB.jump)) && (world.solid(this.x + 10 * (ax.x || this.facing), this.y - 2) || world.solid(this.x + 10 * (ax.x || this.facing), this.y + 2))) {
         this.vy = -Wk.jump * 0.85; this.vx += (ax.x || this.facing) * 20;
       }
       const max = this.maxSpeed(), sp = Math.hypot(this.vx, this.vy);
@@ -135,7 +136,7 @@ AQ.Player = (function () {
     world.oneWayOn = false;
     this.mode = 'climb'; this.vx = 0;
     this.x += (L.x - this.x) * Math.min(1, dt * 12);
-    if (input.wasPressed('Space')) {                       // hop off
+    if (input.wasPressed(...AQ.TUNING.keys.jump)) {        // hop off
       this.climbing = null; this.vy = -AQ.TUNING.walk.jump * 0.6; this.mode = 'air';
       return false;
     }

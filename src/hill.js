@@ -49,6 +49,7 @@ AQ.Hill = (function () {
   H.update = function (dt, game, input) {
     const P = game.player, B = AQ.TUNING.beam;
     H.t += dt;
+    H.playerInBeam = H.mode === 'walk' && inBeam(P);       // (the UFO tip watches this)
     if (H.mode === 'walk') {
       P.update(dt, W, input);
       // back down to Tide Pools off the right edge

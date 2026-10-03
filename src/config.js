@@ -136,6 +136,21 @@ AQ.TUNING = {
     showerKey: 'KeyJ'         //   J = a meteor shower starts right now (2-4 stars over the next ~20 seconds)
   },
   interactKeys: ['KeyE'],     // "interact" (beam up/down, open a tank, use the directory)
+  // Key bindings (KeyboardEvent.code values; 'Mouse0' = left click, 'Mouse2' = right click). The game
+  // reads these, and every tip / help line / Guide page shows key names from here (src/keys.js), so
+  // changing a binding changes the text too. (Interact, mute, photo and the building view keys live in
+  // interactKeys, audio.muteKey, photo.key and station.zoomKey.)
+  keys: {
+    left: ['KeyA', 'ArrowLeft'], right: ['KeyD', 'ArrowRight'], up: ['KeyW', 'ArrowUp'], down: ['KeyS', 'ArrowDown'],
+    jump: ['Space'],          // (on land, up also jumps)
+    sneak: ['ShiftLeft', 'ShiftRight'],
+    net: ['Mouse0'],
+    bait: ['KeyB', 'KeyK', 'Mouse2'],
+    log: ['KeyL'], map: ['KeyM'], help: ['KeyH'], pause: ['Escape'],
+    // in a tank
+    feed: ['KeyF'], tanks: ['KeyT'], undo: ['KeyU'], flip: ['KeyX'], layer: ['KeyZ'],
+    prevTank: ['KeyQ', 'ArrowLeft'], nextTank: ['KeyE', 'ArrowRight']
+  },
 
   transition: {               // the fade-to-black used for every scene change
     fadeOut: 0.45,            // seconds to fade to black
@@ -220,6 +235,16 @@ AQ.TUNING = {
     waterGlowDepth: 500,      // ...fading to nothing this many px below the surface
     soundVolume: 0.55,        // the soft whoosh, on top of the ambience volume (respects mute)
     soundMinGap: 4            // at most one whoosh every this many seconds
+  },
+
+  // One-time tips (src/tips.js; the text is in data/tutorial.js). Never blocking: any key or click closes one.
+  tips: {
+    baseSeconds: 4,           // how long a tip stays at least...
+    perChar: 0.045,           // ...plus this much per character of text...
+    maxSeconds: 10,           // ...but never longer than this
+    gapSeconds: 6,            // quiet time between two tips
+    dismissGrace: 1.0,        // a tip ignores key presses for this long after it appears (so a key you're already pressing doesn't close it)
+    maxWidth: 236             // px: the widest a tip box gets
   },
 
   // Falling stars + meteor showers (src/starfall.js). Each night (counted at dusk, saved) gets a plan

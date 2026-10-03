@@ -177,6 +177,28 @@ AQ.manifest = {
     95
    ]
   },
+  "ui.icons": {
+   "file": "sprites/ui/icons.png",
+   "fw": 12,
+   "fh": 12,
+   "anchor": [
+    6,
+    6
+   ],
+   "anims": {
+    "idle": {
+     "row": 0,
+     "frames": 7,
+     "fps": 1
+    }
+   },
+   "vis": [
+    0,
+    0,
+    11,
+    11
+   ]
+  },
   "misc.bottle": {
    "file": "sprites/scene/bottle.png",
    "fw": 12,

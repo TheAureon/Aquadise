@@ -134,6 +134,14 @@ listed here because their placeholder shapes are new.
 
 The creatures glow in the sea (`light` in `data/creatures.js`), so keep their bright parts bright.
 
+## Tutorial UI
+
+| key | frame | frames | anchor | notes |
+|---|---|---|---|---|
+| `ui.icons` | 12 × 12 | 7 (one picture per frame, drawn by frame number) | centre | small icons on the tip boxes: 0 alert (!), 1 moon, 2 star, 3 heart, 4 open book, 5 footprints (sneak), 6 sparkle. Soft bright colours with a dark outline; they sit on a dark navy box. |
+
+The tip box itself is drawn in code (a dark navy panel with a warm yellow top edge and a small ×).
+
 ## Using a different layout
 
 If a generated sheet needs a different frame size or frame count, edit its entry in
