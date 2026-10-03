@@ -27,6 +27,7 @@ AQ.Aquarium = (function () {
     }
     A.prevState = 'play';
     A.undo = []; A.notes = []; A.view = 'tank';
+    A.photo.on = false; A.photo.paused = false; A.photo.previewT = 0;   // always arrive in the normal view
     AQ.FX.list.length = 0;
     A.rebuild();
     AQ.Audio.music('aquarium');

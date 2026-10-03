@@ -29,8 +29,9 @@ AQ.LogUI = (function () {
     }
     return out;
   };
-  // species that have a rare colour variant slot (every animal; plants have none)
-  L.hasVariant = (d) => !d.is_plant;
+  // species that have a rare colour variant slot: rare colours only come from bred babies, so only
+  // species that can breed (animals with sexes) have one; plants and sexless species don't
+  L.hasVariant = (d) => !d.is_plant && AQ.Sex.has(d);
   L.variantProgress = () => {
     const all = AQ.data.creatures.filter(L.hasVariant);
     return { got: all.filter((d) => logOf(d.id).variant).length, total: all.length };

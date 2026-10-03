@@ -140,7 +140,8 @@ browsers won't let a page save pictures made from file:// images.
   `debug.timeSkip: true` and press **N** in the sea to jump ahead `clock.skipHours`.
 - **Rare colour variants.** A baby born in a tank has a small chance (`breeding.variantChance`, 4%) to
   be a rare colour variant (✦). Only bred babies, never wild ones. The log's VARIANTS tab lists every
-  species that can have one (every animal) and which ones you've bred, with a count.
+  species that can have one (every animal that can breed: plants and sexless species can't) and
+  which ones you've bred, with a count.
 - **Aquarium.** One tank per biome, and a creature can only live in its own biome's tank.
   Nothing ever dies and nothing is punished:
   - **Tank vibe (0-5 stars):** decor variety and amount, biome-themed pieces, plants, being fed
