@@ -5,7 +5,7 @@ AQ.Input = (function () {
   const down = new Set();
   const pressed = new Set();   // pressed this frame
   const released = new Set();
-  const mouse = { x: 0, y: 0, down: [false, false, false], pressed: [false, false, false], released: [false, false, false], inside: false, wheel: 0 };
+  const mouse = { x: 0, y: 0, down: [false, false, false], pressed: [false, false, false], released: [false, false, false], inside: false, wheel: 0, wheelPx: 0 };
   let canvas = null;
   let enabled = true;
 
@@ -35,7 +35,12 @@ AQ.Input = (function () {
       mouse.down[e.button] = false;
     });
     canvas.addEventListener('contextmenu', (e) => e.preventDefault());
-    canvas.addEventListener('wheel', (e) => { mouse.wheel += Math.sign(e.deltaY); e.preventDefault(); }, { passive: false });
+    canvas.addEventListener('wheel', (e) => {
+      mouse.wheel += Math.sign(e.deltaY);
+      // the actual distance too (lines / pages -> px), for smooth scrolling with trackpads and wheels alike
+      mouse.wheelPx += e.deltaY * (e.deltaMode === 1 ? 16 : e.deltaMode === 2 ? 400 : 1);
+      e.preventDefault();
+    }, { passive: false });
   }
 
   function updateMouse(e) {
@@ -49,7 +54,7 @@ AQ.Input = (function () {
   function endFrame() {
     pressed.clear(); released.clear();
     mouse.pressed = [false, false, false]; mouse.released = [false, false, false];
-    mouse.wheel = 0;
+    mouse.wheel = 0; mouse.wheelPx = 0;
   }
 
   const any = (codes, set) => codes.some((c) => set.has(c));

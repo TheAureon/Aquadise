@@ -4,7 +4,7 @@ var AQ = (typeof AQ !== 'undefined') ? AQ : {};
 
 AQ.Aquarium = (function () {
   const U = AQ.U, R = U.R, F = () => AQ.Font;
-  const A = { biome: null, fish: [], food: [], bubbles: [], holding: null, tray: 'decor', trayScroll: 0, t: 0, hover: null, ui: [],
+  const A = { biome: null, fish: [], food: [], bubbles: [], holding: null, tray: 'decor', trayScroll: 0, trayPos: 0, t: 0, hover: null, ui: [],
     photo: { on: false, paused: false, icons: true, frame: null, caption: false, flash: 0, preview: null, previewT: 0, ui: [] } };
   const TANK = { x: 4, y: 16, w: 312, h: 130, waterTop: 22, sandTop: 126, bottom: 145 };
   const SIZE_RANK = { tiny: 0, small: 1, medium: 2, mediumlong: 2, wide: 2, tall: 2, large: 3, widelarge: 3, huge: 4 };
@@ -102,7 +102,7 @@ AQ.Aquarium = (function () {
     note(`New decoration unlocked: ${dd.name}!`, '#ffe08a', 5);
     for (let i = 0; i < 9; i++) AQ.FX.sparkle(R.range(30, 290), R.range(40, 110), i % 2 ? '#fff3b0' : '#ffd25a', 6);
     for (let i = 0; i < 5; i++) AQ.FX.sparkle(88 + i * 8, 6, '#fff3b0', 4);
-    A.tray = 'decor'; A.trayScroll = 0;
+    A.tray = 'decor'; A.trayScroll = 0; A.trayPos = 0;
     AQ.Audio.play('unlock');
     AQ.Audio.play('fanfare', { delay: 0.6 });
     if (AQ.Music) AQ.Music.stinger('reward');
@@ -433,7 +433,12 @@ AQ.Aquarium = (function () {
     const items = trayItems();
     const perPage = Math.floor((308 - 50) / CELL);
     A.trayScroll = U.clamp(A.trayScroll, 0, Math.max(0, items.length - perPage));
-    items.slice(A.trayScroll, A.trayScroll + perPage).forEach((it, i) => ui.push(Object.assign({ x: 50 + i * CELL, y: TRAY_Y, w: CELL - 2, h: 29 }, it)));
+    // the tray slides: items sit at their place minus the eased scroll, clipped to the strip
+    const off = Math.round(A.trayPos * CELL), clip = { x0: 50, x1: 50 + perPage * CELL - 2 };
+    items.forEach((it, i) => {
+      const x = 50 + i * CELL - off;
+      if (x + CELL - 2 > clip.x0 && x < clip.x1) ui.push(Object.assign({ x, y: TRAY_Y, w: CELL - 2, h: 29, clipX: clip }, it));
+    });
     return ui;
   }
   function trayItems() {
@@ -488,11 +493,13 @@ AQ.Aquarium = (function () {
     if (I.wasPressed('KeyX')) flipIt(tank);
     if (A.clearArm > 0) A.clearArm -= dt;
     for (let i = A.notes.length - 1; i >= 0; i--) if ((A.notes[i].t += dt) > A.notes[i].life) A.notes.splice(i, 1);
-    if (m.wheel) A.trayScroll += m.wheel;
+    if (m.wheelPx) { A.trayScroll += m.wheelPx / 80; A.trayIdle = 0; }  // ~one item per wheel notch, smooth on trackpads
+    else if ((A.trayIdle = (A.trayIdle || 0) + dt) > 0.12) A.trayScroll = Math.round(A.trayScroll);   // then settle on a whole item
+    { const k = 1 - Math.exp(-dt * 16); A.trayPos += (A.trayScroll - A.trayPos) * k; if (Math.abs(A.trayScroll - A.trayPos) < 0.02) A.trayPos = A.trayScroll; }
     if ((I.wasPressed('Escape') || m.pressed[2]) && A.holding) { cancelHold(); }
 
     A.hover = null;
-    for (const r of A.ui) if (hit(r, m)) A.hover = r;
+    for (const r of A.ui) if (hit(r, m) && (!r.clipX || (m.x >= r.clipX.x0 && m.x < r.clipX.x1))) A.hover = r;
 
     if (m.pressed[0]) {
       const r = A.hover;
@@ -599,10 +606,10 @@ AQ.Aquarium = (function () {
         break;
       case 'log': AQ.LogUI.open(game, 'aquarium'); break;
       case 'back': A.close(game); break;
-      case 'tray_decor': A.tray = 'decor'; A.trayScroll = 0; break;
-      case 'tray_fish': A.tray = 'fish'; A.trayScroll = 0; break;
-      case 'tray_left': A.trayScroll -= 3; break;
-      case 'tray_right': A.trayScroll += 3; break;
+      case 'tray_decor': A.tray = 'decor'; A.trayScroll = 0; A.trayPos = 0; break;
+      case 'tray_fish': A.tray = 'fish'; A.trayScroll = 0; A.trayPos = 0; break;
+      case 'tray_left': A.trayScroll = Math.round(A.trayScroll) - 3; break;
+      case 'tray_right': A.trayScroll = Math.round(A.trayScroll) + 3; break;
       case 'item':
         if (r.locked) { note(`Reach ${r.need} stars in this tank to unlock ${r.name}.`, '#ffcf8a'); break; }
         if (A.fresh) delete A.fresh[r.ref];
@@ -1379,6 +1386,7 @@ AQ.Aquarium = (function () {
     for (const r of A.ui) {
       const hover = A.hover === r;
       if (r.id === 'item' || r.id === 'fish') {
+        g.save(); g.beginPath(); g.rect(r.clipX.x0, r.y, r.clipX.x1 - r.clipX.x0, r.h); g.clip();
         g.fillStyle = hover ? '#24506b' : (A.holding && A.holding.id === r.ref && r.id === 'item') ? '#2e7d96' : '#132b40';
         g.fillRect(r.x, r.y, r.w, r.h);
         const e = AQ.Assets.entry(r.key);
@@ -1399,6 +1407,7 @@ AQ.Aquarium = (function () {
         if (r.id === 'fish' && r.sex) F().draw(g, AQ.Sex.SYMBOL[r.sex], r.x + 2, r.y + 2, AQ.Sex.COLOR[r.sex], { shadow: false });
         if (r.id === 'fish' && r.variant) F().draw(g, '✦', r.x + r.w - 7, r.y + 2, '#ffd25a', { shadow: false });
         if (r.id === 'fish') F().draw(g, r.where === 'tank' ? 'IN' : 'OUT', r.x + r.w / 2, r.y + 23, r.where === 'tank' ? '#7ef0c0' : '#a8b8c8', { align: 'center' });
+        g.restore();
       } else if (r.id !== 'stars') button(g, r, hover);
     }
     const items = trayItems();

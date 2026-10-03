@@ -3,13 +3,15 @@ var AQ = (typeof AQ !== 'undefined') ? AQ : {};
 
 AQ.LogUI = (function () {
   const U = AQ.U, F = () => AQ.Font;
-  const L = { from: 'play', tab: 'species', biomeIdx: 0, sel: 0, scroll: 0, vsel: 0, vscroll: 0, nsel: 0, nscroll: 0, entry: null, ui: [] };
+  const L = { from: 'play', tab: 'species', biomeIdx: 0, sel: 0, scroll: 0, vsel: 0, vscroll: 0, nsel: 0, nscroll: 0, entry: null, ui: [],
+    sy: 0, vsy: 0, nsy: 0 };   // scroll / vscroll / nscroll: target offsets in px; sy / vsy / nsy: the eased offsets drawn
   const TABS = [['species', 'SPECIES', 42], ['variants', 'VARIANTS', 46], ['notes', 'NOTES', 34]];
   // one look for every tab: header bar (title, tabs, bottles, close), a context row, the content, a footer hint
   const C = { bg: '#06101c', bar: '#0b1a2c', line: '#1c3a52', panel: '#0d2236', title: '#ffe9a8', text: '#d8eef8', dim: '#8aa4b8', info: '#9fd3ee', hint: '#4f6f86', good: '#7ef0c0', warn: '#ffcf8a', gold: '#ffd25a' };
   const COLS = 5, CELL_H = 47, HEAD_H = 10, VIEW_H = 94;            // species grid area (y 30..124)
   const VCOLS = 4, VROW_H = 33, VVIEW_H = 110;                      // variants cards area (y 30..140)
   const NROW_H = 10, NVIEW_H = 134;                                  // notes list (left column, y 30..164)
+  const WHEEL = 0.3;                                                 // px scrolled per px of wheel / trackpad movement
   const sil = new Map();
   const CAT_LABEL = { fish: 'Fish', gastropod: 'Gastropod', crustacean: 'Crustacean', amphibian: 'Amphibian', cephalopod: 'Cephalopod', reptile: 'Reptile', mammal: 'Mammal', plant: 'Plant' };
   const logOf = (id) => (AQ.State.log || {})[id] || {};
@@ -78,14 +80,20 @@ AQ.LogUI = (function () {
     });
     return rows;
   }
-  const fitFrom = (rows, start, view) => {
-    let h = 0, n = 0;
-    for (let r = start; r < rows.length && h + rows[r].h <= view; r++) { h += rows[r].h; n++; }
-    if (n > 1 && start + n < rows.length && rows[start + n - 1].type === 'head') n--;     // never strand a heading at the bottom
-    return n;
-  };
-  const maxScroll = (rows, view) => { for (let s = 0; s < rows.length; s++) if (s + fitFrom(rows, s, view) >= rows.length) return s; return 0; };
-  // move the selection one cell row up/down (same column), scrolling so it (and its heading) stays visible
+  // Lists scroll by pixels: the target offset moves in steps (wheel, keys, arrows) and the drawn
+  // offset glides after it, so rows slide in and out under a clip instead of jumping.
+  const tops = (rows) => { const t = []; let y = 0; rows.forEach((r) => { t.push(y); y += r.h; }); t.push(y); return t; };
+  const maxScroll = (rows, view) => Math.max(0, tops(rows)[rows.length] - view);
+  // scroll just enough that entry `sel` (and the heading right above it) is in view
+  function reveal(rows, sel, scroll, view) {
+    const r = rows.findIndex((row) => row.type === 'cells' && row.items.some((it) => it.i === sel));
+    if (r < 0) return scroll;
+    const t = tops(rows), top = r > 0 && rows[r - 1].type === 'head' ? t[r - 1] : t[r], bottom = t[r] + rows[r].h;
+    if (top < scroll) scroll = top;
+    if (bottom > scroll + view) scroll = bottom - view;
+    return U.clamp(scroll, 0, maxScroll(rows, view));
+  }
+  // move the selection one cell row up/down (same column), scrolling so it stays visible
   function stepRows(rows, sel, scroll, d, view) {
     const r0 = rows.findIndex((r) => r.type === 'cells' && r.items.some((it) => it.i === sel));
     let r = r0 + d;
@@ -93,9 +101,17 @@ AQ.LogUI = (function () {
     if (r0 < 0 || r < 0 || r >= rows.length) return [sel, scroll];
     const col = rows[r0].items.findIndex((it) => it.i === sel);
     sel = rows[r].items[Math.min(col, rows[r].items.length - 1)].i;
-    if (r < scroll) scroll = r > 0 && rows[r - 1].type === 'head' ? r - 1 : r;
-    while (r >= scroll + fitFrom(rows, scroll, view)) scroll++;
-    return [sel, scroll];
+    return [sel, reveal(rows, sel, scroll, view)];
+  }
+  // lay out the rows visible at offset `cur` inside the band top..top+view; place(row, y) adds items
+  function placeRows(ui, rows, cur, top, view, place) {
+    const t = tops(rows), off = Math.round(cur), clip = { y0: top, y1: top + view };
+    rows.forEach((row, r) => {
+      const y = top + t[r] - off;
+      if (y + row.h <= top || y >= top + view) return;
+      const n = ui.length; place(row, y);
+      for (let k = n; k < ui.length; k++) ui[k].clip = clip;
+    });
   }
 
   // ---------------------------------------------------------------- open / close
@@ -105,7 +121,7 @@ AQ.LogUI = (function () {
     game.state = 'log';
     const here = from === 'aquarium' ? AQ.Aquarium.biome : from === 'title' || game.scene !== 'world' ? 'tide_pools' : AQ.World.biomeAt(game.player.x, game.player.y).id;
     L.biomeIdx = Math.max(0, biomes().findIndex((b) => b.id === here));
-    L.sel = 0; L.scroll = 0; L.entry = null;
+    L.sel = 0; L.scroll = 0; L.sy = 0; L.entry = null;
   };
   L.close = function (game) {
     AQ.Audio.play('log_close');
@@ -122,15 +138,7 @@ AQ.LogUI = (function () {
     L.scroll = reveal(rowsOf(list), L.sel, L.scroll, VIEW_H);
     AQ.Audio.play('menu_move');
   }
-  // scroll just enough that entry `sel` (and its heading) is on screen
-  function reveal(rows, sel, scroll, view) {
-    const r = rows.findIndex((row) => row.type === 'cells' && row.items.some((it) => it.i === sel));
-    if (r < 0) return scroll;
-    if (r < scroll) scroll = r > 0 && rows[r - 1].type === 'head' ? r - 1 : r;
-    while (r >= scroll + fitFrom(rows, scroll, view)) scroll++;
-    return U.clamp(scroll, 0, maxScroll(rows, view));
-  }
-  function setBiome(k) { const n = biomes().length; L.biomeIdx = (L.biomeIdx + k + n) % n; L.sel = 0; L.scroll = 0; AQ.Audio.play('page_turn'); }
+  function setBiome(k) { const n = biomes().length; L.biomeIdx = (L.biomeIdx + k + n) % n; L.sel = 0; L.scroll = 0; L.sy = 0; AQ.Audio.play('page_turn'); }
 
   // ---------------------------------------------------------------- layout
   function layout() {
@@ -151,37 +159,28 @@ AQ.LogUI = (function () {
       biomes().forEach((bb, k) => ui.push({ id: 'dot', k, b: bb, x: 119 + k * 7, y: 17, w: 7, h: 10 }));
       const rows = rowsOf(list), maxS = maxScroll(rows, VIEW_H);
       L.scroll = U.clamp(L.scroll, 0, maxS);
-      let y = 30;
-      for (let r = L.scroll, n = fitFrom(rows, L.scroll, VIEW_H); r < L.scroll + n; r++) {
-        const row = rows[r];
+      placeRows(ui, rows, L.sy, 30, VIEW_H, (row, y) => {
         if (row.type === 'head') ui.push({ id: 'head', x: 8, y, w: 302, h: HEAD_H - 2, label: row.label, count: row.count });
         else row.items.forEach((it, c) => ui.push({ id: 'cell', i: it.i, d: it.d, x: 8 + c * 61, y, w: 58, h: CELL_H - 3 }));
-        y += row.h;
-      }
+      });
       if (L.scroll > 0) ui.push({ id: 'up', x: 311, y: 30, w: 8, h: 9, label: '' });
       if (L.scroll < maxS) ui.push({ id: 'down', x: 311, y: 115, w: 8, h: 9, label: '' });
     } else if (L.tab === 'variants') {
       const rows = variantRows(), maxS = maxScroll(rows, VVIEW_H);
       L.vscroll = U.clamp(L.vscroll, 0, maxS);
-      let y = 30;
-      for (let r = L.vscroll, n = fitFrom(rows, L.vscroll, VVIEW_H); r < L.vscroll + n; r++) {
-        const row = rows[r];
+      placeRows(ui, rows, L.vsy, 30, VVIEW_H, (row, y) => {
         if (row.type === 'head') ui.push({ id: 'head', x: 8, y, w: 302, h: HEAD_H - 2, label: row.label, count: row.count });
         else row.items.forEach((it, c) => ui.push({ id: 'vcell', i: it.i, d: it.d, x: 8 + c * 76, y, w: 74, h: VROW_H - 3 }));
-        y += row.h;
-      }
+      });
       if (L.vscroll > 0) ui.push({ id: 'up', x: 311, y: 30, w: 8, h: 9, label: '' });
       if (L.vscroll < maxS) ui.push({ id: 'down', x: 311, y: 131, w: 8, h: 9, label: '' });
     } else if (L.tab === 'notes') {
       const rows = noteRows(), maxS = maxScroll(rows, NVIEW_H);
       L.nscroll = U.clamp(L.nscroll, 0, maxS);
-      let y = 30;
-      for (let r = L.nscroll, n = fitFrom(rows, L.nscroll, NVIEW_H); r < L.nscroll + n; r++) {
-        const row = rows[r];
+      placeRows(ui, rows, L.nsy, 30, NVIEW_H, (row, y) => {
         if (row.type === 'head') ui.push({ id: 'head', x: 8, y, w: 104, h: HEAD_H - 2, label: row.label, count: row.count });
         else ui.push({ id: 'ncell', i: row.items[0].i, d: row.items[0].d, x: 8, y, w: 104, h: NROW_H - 2 });
-        y += row.h;
-      }
+      });
       if (L.nscroll > 0) ui.push({ id: 'up', x: 114, y: 30, w: 8, h: 9, label: '' });
       if (L.nscroll < maxS) ui.push({ id: 'down', x: 114, y: 155, w: 8, h: 9, label: '' });
     }
@@ -191,6 +190,12 @@ AQ.LogUI = (function () {
   // ---------------------------------------------------------------- update
   L.update = function (dt, game) {
     const I = AQ.Input, m = I.mouse;
+    // the drawn offsets glide toward their targets
+    const k = 1 - Math.exp(-dt * 16);
+    for (const [cur, to] of [['sy', 'scroll'], ['vsy', 'vscroll'], ['nsy', 'nscroll']]) {
+      L[cur] += (L[to] - L[cur]) * k;
+      if (Math.abs(L[to] - L[cur]) < 0.4) L[cur] = L[to];
+    }
     L.ui = layout();
     if (L.entry) {                                                    // a species' full entry page
       L.hover = L.ui.find((r) => m.x >= r.x && m.y >= r.y && m.x < r.x + r.w && m.y < r.y + r.h);
@@ -214,23 +219,23 @@ AQ.LogUI = (function () {
       if (side && n) { L.sel = U.clamp(L.sel + side, 0, n - 1); L.scroll = reveal(rows, L.sel, L.scroll, VIEW_H); }
       if (I.wasPressed('ArrowUp', 'KeyW')) [L.sel, L.scroll] = stepRows(rows, L.sel, L.scroll, -1, VIEW_H);
       if (I.wasPressed('ArrowDown', 'KeyS')) [L.sel, L.scroll] = stepRows(rows, L.sel, L.scroll, 1, VIEW_H);
-      if (m.wheel) L.scroll = U.clamp(L.scroll + Math.sign(m.wheel), 0, maxScroll(rows, VIEW_H));
+      if (m.wheelPx) L.scroll = U.clamp(L.scroll + m.wheelPx * WHEEL, 0, maxScroll(rows, VIEW_H));
       const cur = entries(biomes()[L.biomeIdx])[L.sel];
       if (I.wasPressed('Enter', 'Space') && cur) openEntry(cur);
     } else if (L.tab === 'notes') {
       const rows = noteRows();
       if (I.wasPressed('ArrowUp', 'KeyW')) [L.nsel, L.nscroll] = stepRows(rows, L.nsel, L.nscroll, -1, NVIEW_H);
       if (I.wasPressed('ArrowDown', 'KeyS')) [L.nsel, L.nscroll] = stepRows(rows, L.nsel, L.nscroll, 1, NVIEW_H);
-      if (m.wheel) L.nscroll = U.clamp(L.nscroll + Math.sign(m.wheel), 0, maxScroll(rows, NVIEW_H));
+      if (m.wheelPx) L.nscroll = U.clamp(L.nscroll + m.wheelPx * WHEEL, 0, maxScroll(rows, NVIEW_H));
     } else if (L.tab === 'variants') {
       const rows = variantRows(), n = rows.reduce((a, r) => a + (r.items ? r.items.length : 0), 0);
       if (side && n) { L.vsel = U.clamp(L.vsel + side, 0, n - 1); L.vscroll = reveal(rows, L.vsel, L.vscroll, VVIEW_H); }
       if (I.wasPressed('ArrowUp', 'KeyW')) [L.vsel, L.vscroll] = stepRows(rows, L.vsel, L.vscroll, -1, VVIEW_H);
       if (I.wasPressed('ArrowDown', 'KeyS')) [L.vsel, L.vscroll] = stepRows(rows, L.vsel, L.vscroll, 1, VVIEW_H);
-      if (m.wheel) L.vscroll = U.clamp(L.vscroll + Math.sign(m.wheel), 0, maxScroll(rows, VVIEW_H));
+      if (m.wheelPx) L.vscroll = U.clamp(L.vscroll + m.wheelPx * WHEEL, 0, maxScroll(rows, VVIEW_H));
     }
     L.ui = layout();
-    L.hover = L.ui.find((r) => m.x >= r.x && m.y >= r.y && m.x < r.x + r.w && m.y < r.y + r.h);
+    L.hover = L.ui.find((r) => m.x >= r.x && m.y >= r.y && m.x < r.x + r.w && m.y < r.y + r.h && (!r.clip || (m.y >= r.clip.y0 && m.y < r.clip.y1)));
     const moved = m.x !== L.mx || m.y !== L.my || m.pressed[0];   // the mouse only takes over when it moves
     const moved2 = L.hover && L.hover.id === 'cell' && L.hover.i !== L.sel;   // this click is only selecting it
     if (L.hover && moved && L.hover.id === 'cell') L.sel = L.hover.i;
@@ -245,8 +250,8 @@ AQ.LogUI = (function () {
       if (h.id === 'next') setBiome(1);
       if (h.id === 'dot' && h.k !== L.biomeIdx) setBiome(h.k - L.biomeIdx);
       const k = L.tab === 'species' ? 'scroll' : L.tab === 'variants' ? 'vscroll' : 'nscroll';
-      if (h.id === 'up') L[k]--;
-      if (h.id === 'down') L[k]++;
+      if (h.id === 'up') L[k] = Math.max(0, L[k] - 30);
+      if (h.id === 'down') L[k] += 30;                                  // clamped by layout()
       if (h.id === 'close') L.close(game);
     }
   };
@@ -320,6 +325,15 @@ AQ.LogUI = (function () {
     if (L.entry) { drawEntry(g, L.entry); return; }
     for (const r of L.ui) {
       if (r.id === 'tab' || r.id === 'close') continue;
+      if (r.clip) { g.save(); g.beginPath(); g.rect(0, r.clip.y0, 320, r.clip.y1 - r.clip.y0); g.clip(); drawItem(g, r); g.restore(); }
+      else drawItem(g, r);
+    }
+    if (L.tab === 'species') drawSpecies(g);
+    else if (L.tab === 'variants') drawVariants(g);
+    else drawNotes(g);
+  };
+  function drawItem(g, r) {
+    {
       if (r.id === 'up' || r.id === 'down') arrows(g, r);
       else if (r.id === 'head') heading(g, r);
       else if (r.id === 'cell') drawCell(g, r);
@@ -328,10 +342,7 @@ AQ.LogUI = (function () {
       else if (r.id === 'dot') drawDot(g, r);
       else AQ.Aquarium.button(g, r, L.hover === r);
     }
-    if (L.tab === 'species') drawSpecies(g);
-    else if (L.tab === 'variants') drawVariants(g);
-    else drawNotes(g);
-  };
+  }
 
   // one dot per biome: the current one is big and bright, finished biomes are green
   function drawDot(g, r) {
