@@ -28,7 +28,7 @@ npx http-server -c-1 .      # or: python3 -m http.server
 | interact (beam up/down, open a tank) | E                         |
 | climb a ladder      | W / S (or Up / Down) on a ladder         |
 | building: whole-view toggle | V                                |
-| collection log      | L                                        |
+| collection log      | L (Left/Right: tabs, Q/E: biome, Up/Down or wheel: scroll) |
 | map                 | M                                        |
 | pause / home / reset | Esc                                     |
 | help overlay        | H                                        |
@@ -49,6 +49,10 @@ Click a creature for its info card. Hover the stars for what's helping and what'
 - **Catching.** Creatures react to how close and how fast you are. Sneak, or drop bait to lure
   them out, then net them. Each species uses a reusable catch behaviour (hides, darts, schools,
   camouflage, timing windows, patrols, needs coaxing, and so on). The log lists a tip for every species.
+- **Collection log tabs:** SPECIES (each biome's species, families grouped under a heading),
+  VARIANTS (every rare colour variant, grouped by biome, with a "VARIANTS n/total" count) and NOTES
+  (field notes from message bottles). Left/Right arrows or a click switch tabs; Q/E or the < >
+  buttons switch biome. All counts are worked out from the data.
 - **Tide Pools are dry land** (merged from the Milestone 2 prototype): you walk and jump on the
   shore and only swim once the water is deep enough to submerge you. Shallow pools are splashed
   through and deep ones can be swum in. Tap a pool with the net to try for a Glasswinged Minnow.
@@ -106,7 +110,8 @@ Click a creature for its info card. Hover the stars for what's helping and what'
   `active: 'night'` only come out at night and fade away at dawn. Testing: set
   `debug.timeSkip: true` and press **N** in the sea to jump ahead `clock.skipHours`.
 - **Rare colour variants.** A baby born in a tank has a small chance (`breeding.variantChance`, 4%) to
-  be a rare colour variant (✦). Only bred babies, never wild ones. The log has a ✦ slot per species.
+  be a rare colour variant (✦). Only bred babies, never wild ones. The log's VARIANTS tab lists every
+  species that can have one (every animal) and which ones you've bred, with a count.
 - **Aquarium.** One tank per biome, and a creature can only live in its own biome's tank.
   Nothing ever dies and nothing is punished:
   - **Tank vibe (0-5 stars):** decor variety and amount, biome-themed pieces, plants, being fed

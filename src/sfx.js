@@ -141,6 +141,10 @@ var AQ = (typeof AQ !== 'undefined') ? AQ : {};
     H.noise(c, o, t, { f: 4000, f2: 1600, q: 0.8, a: 0.03, d: 0.14, v: 0.05 });
     return H.bell(c, o, t + 0.06, m(81), 0.03, 0.4) + 0.06;
   }, { important: true });
+  reg('page_turn', 'menus', 'PAGE TURN', (c, o, t) => {
+    H.noise(c, o, t, { f: 1800, f2: 3600, q: 0.7, a: 0.03, d: 0.12, v: 0.06 });      // paper swish
+    return H.noise(c, o, t + 0.09, { ft: 'lowpass', f: 600, a: 0.005, d: 0.05, v: 0.04 }) + 0.09;   // soft settle
+  }, { minGap: 0.08, important: true });
   reg('toast', 'menus', 'TOAST BLIP', (c, o, t) => H.bell(c, o, t, m(91), 0.025, 0.25), { minGap: 0.35 });
 
   // ---------------------------------------------------------------- upgrades (after the chest jingle)
