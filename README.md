@@ -28,7 +28,7 @@ npx http-server -c-1 .      # or: python3 -m http.server
 | interact (beam up/down, open a tank) | E                         |
 | climb a ladder      | W / S (or Up / Down) on a ladder         |
 | building: whole-view toggle | V                                |
-| collection log      | L (Left/Right: tabs, Q/E: biome, Up/Down or wheel: scroll, Enter: open entry, Esc: close) |
+| collection log      | L (Left/Right: tabs, WASD or Up/Down: move, Q/E or the dots: biome, wheel: scroll, Enter: open entry, then Left/Right: prev/next species, Esc: back / close) |
 | map                 | M                                        |
 | pause / home / reset | Esc                                     |
 | help overlay        | H                                        |
