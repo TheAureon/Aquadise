@@ -146,6 +146,12 @@ var AQ = (typeof AQ !== 'undefined') ? AQ : {};
     H.noise(c, o, t, { ft: 'highpass', f: 2500, a: 0.002, d: 0.03, v: 0.05 });
     return run(c, o, t + 0.1, [88, 95, 100], 0.07, 0.045, 1.1) + 0.1;                       // glass chime
   }, { important: true, minGap: 0.3 });
+  reg('shutter', 'aquarium', 'CAMERA SHUTTER', (c, o, t) => {
+    H.noise(c, o, t, { ft: 'highpass', f: 2800, a: 0.001, d: 0.025, v: 0.09 });          // click
+    H.tone(c, o, t + 0.005, { type: 'triangle', f: 900, f2: 500, d: 0.04, v: 0.04 });
+    H.noise(c, o, t + 0.07, { ft: 'highpass', f: 3200, a: 0.001, d: 0.02, v: 0.06 });     // the blades close
+    return H.noise(c, o, t + 0.03, { f: 1500, q: 0.8, a: 0.02, d: 0.08, v: 0.03 }) + 0.05;   // soft whirr
+  }, { important: true, minGap: 0.2 });
   reg('page_turn', 'menus', 'PAGE TURN', (c, o, t) => {
     H.noise(c, o, t, { f: 1800, f2: 3600, q: 0.7, a: 0.03, d: 0.12, v: 0.06 });      // paper swish
     return H.noise(c, o, t + 0.09, { ft: 'lowpass', f: 600, a: 0.005, d: 0.05, v: 0.04 }) + 0.09;   // soft settle

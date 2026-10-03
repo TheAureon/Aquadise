@@ -41,6 +41,18 @@ it to remove it. **X** flips the held or hovered piece, **Z** moves it in front 
 Click a creature for its info card. Hover the stars for what's helping and what's missing. The
 **FISH** tray moves creatures between the tank and storage.
 
+**Photo mode** (tank screen: the PHOTO button or **P**): the buttons, trays, hints and info cards
+hide and a camera frame shows. **Space** or a click in the tank takes a picture: a shutter sound, a
+quick white flash, and a PNG downloads at 3x the game's pixels (nearest-neighbour, no blurring), named
+like `Aquadise-TidePools-2026-10-03.png`, with a small "Saved!" preview. **Z** freezes the creatures
+so you can pose a shot, **I** hides or shows hearts and mood icons, **F** cycles the frame (none,
+pixel border, polaroid) and **C** turns the caption (tank name, stars, date) on for the first two
+(the polaroid always has one). **P** or **Esc** leaves. Works on every tank, predator tanks included.
+Tuning: `AQ.TUNING.photo` (key, scale, default frame, flash, preview time). When the game is opened
+straight from disk (file://) the sprites load from `assets/sprites-embedded.js` (kept in sync by
+`tools/gen-placeholders.js`, or run `node tools/embed-sprites.js` after replacing art), because
+browsers won't let a page save pictures made from file:// images.
+
 ## How it plays
 
 - **Title screen (home):** the world drifts by behind the logo. Continue, New Game (asks to
@@ -199,6 +211,7 @@ src/hill.js           the hill scene with the UFO and its beam
 src/station.js        the aquarium building in space (tanks on the walls, directory, beam pad)
 src/ui.js             collection log, map, pause
 src/bottles.js        message bottles: deterministic, reachable placement, pickup, glint
+assets/sprites-embedded.js   base64 copy of the sprites for file:// (tools/embed-sprites.js)
 src/audio.js          audio engine: mixer, voice limit, underwater filter, settings, file mapping
 src/sfx.js            every sound effect recipe (registered by id)
 src/ambience.js       the looping place sounds + their crossfading director

@@ -4,9 +4,10 @@ var AQ = (typeof AQ !== 'undefined') ? AQ : {};
 
 AQ.Aquarium = (function () {
   const U = AQ.U, R = U.R, F = () => AQ.Font;
-  const A = { biome: null, fish: [], food: [], bubbles: [], holding: null, tray: 'decor', trayScroll: 0, t: 0, hover: null, ui: [] };
+  const A = { biome: null, fish: [], food: [], bubbles: [], holding: null, tray: 'decor', trayScroll: 0, t: 0, hover: null, ui: [],
+    photo: { on: false, paused: false, icons: true, frame: null, caption: false, flash: 0, preview: null, previewT: 0, ui: [] } };
   const TANK = { x: 4, y: 16, w: 312, h: 130, waterTop: 22, sandTop: 126, bottom: 145 };
-  const SIZE_RANK = { tiny: 0, small: 1, medium: 2, wide: 2, tall: 2, large: 3, widelarge: 3, huge: 4 };
+  const SIZE_RANK = { tiny: 0, small: 1, medium: 2, mediumlong: 2, wide: 2, tall: 2, large: 3, widelarge: 3, huge: 4 };
   const TRAY_Y = 149, CELL = 26;
 
   const styleOf = (id) => Object.assign({}, AQ.data.tankStyles.default, AQ.data.tankStyles[id] || {});
@@ -415,12 +416,13 @@ AQ.Aquarium = (function () {
     ui.push({ id: 'prev', x: 2, y: 2, w: 9, h: 10, label: '<' });
     ui.push({ id: 'next', x: 72, y: 2, w: 9, h: 10, label: '>' });
     ui.push({ id: 'stars', x: 84, y: 2, w: 40, h: 10, label: '' });
-    ui.push({ id: 'tanks', x: 158, y: 2, w: 28, h: 10, label: 'TANKS' });
-    ui.push({ id: 'undo', x: 188, y: 2, w: 22, h: 10, label: 'UNDO', off: !A.undo.length });
-    ui.push({ id: 'clear', x: 212, y: 2, w: 28, h: 10, label: A.clearArm > 0 ? 'SURE?' : 'CLEAR', warn: A.clearArm > 0 });
-    ui.push({ id: 'feed', x: 248, y: 2, w: 22, h: 10, label: 'FEED' });
-    ui.push({ id: 'log', x: 272, y: 2, w: 18, h: 10, label: 'LOG' });
-    ui.push({ id: 'back', x: 292, y: 2, w: 26, h: 10, label: A.returnTo === 'title' ? 'HOME' : 'BACK' });
+    ui.push({ id: 'photo', x: 147, y: 2, w: 26, h: 10, label: 'PHOTO' });
+    ui.push({ id: 'tanks', x: 175, y: 2, w: 27, h: 10, label: 'TANKS' });
+    ui.push({ id: 'undo', x: 204, y: 2, w: 22, h: 10, label: 'UNDO', off: !A.undo.length });
+    ui.push({ id: 'clear', x: 228, y: 2, w: 26, h: 10, label: A.clearArm > 0 ? 'SURE?' : 'CLEAR', warn: A.clearArm > 0 });
+    ui.push({ id: 'feed', x: 256, y: 2, w: 20, h: 10, label: 'FEED' });
+    ui.push({ id: 'log', x: 278, y: 2, w: 16, h: 10, label: 'LOG' });
+    ui.push({ id: 'back', x: 296, y: 2, w: 22, h: 10, label: A.returnTo === 'title' ? 'HOME' : 'BACK' });
     ui.push({ id: 'tray_decor', x: 4, y: TRAY_Y, w: 34, h: 10, label: 'DECOR', on: A.tray === 'decor' });
     ui.push({ id: 'tray_fish', x: 4, y: TRAY_Y + 11, w: 34, h: 10, label: 'FISH', on: A.tray === 'fish' });
     ui.push({ id: 'tray_left', x: 40, y: TRAY_Y, w: 8, h: 29, label: '<' });
@@ -466,9 +468,11 @@ AQ.Aquarium = (function () {
 
   A.update = function (dt, game) {
     const I = AQ.Input, m = I.mouse, tank = AQ.Collection.tank(A.biome);
+    if (A.photo.on) { updatePhoto(dt, game, tank); return; }
     A.t += dt;
     if (A.view === 'overview') { updateOverview(dt, game); return; }
     if (I.wasPressed('KeyT')) { openOverview(); return; }
+    if (I.wasPressed(AQ.TUNING.photo.key)) { enterPhoto(); return; }
     A.ui = layout();
     if (I.wasPressed('Escape') && A.card && !A.holding) A.card = null;
     else if (I.wasPressed('Tab') || (I.wasPressed('Escape') && !A.holding)) { A.close(game); return; }
@@ -505,6 +509,11 @@ AQ.Aquarium = (function () {
       if (d) { removeDecor(tank, d, true); }
     }
 
+    simulate(dt, tank);
+  };
+
+  // the tank's life: vibe, creatures, food, bubbles, effects (frozen while a photo is being posed)
+  function simulate(dt, tank) {
     A.vibeT -= dt;
     if (A.vibeT <= 0) A.refreshVibe();
     if (tank.creatures.length !== A.fish.length) {
@@ -525,7 +534,7 @@ AQ.Aquarium = (function () {
     if (R.chance(dt * 1.5)) A.bubbles.push({ x: R.range(10, 310), y: TANK.bottom - 2, vy: -R.range(10, 18), p: R() * 6 });
     for (let i = A.bubbles.length - 1; i >= 0; i--) { const b = A.bubbles[i]; b.y += b.vy * dt; b.x += Math.sin(A.t * 4 + b.p) * 4 * dt; if (b.y < TANK.waterTop + 1) A.bubbles.splice(i, 1); }
     AQ.FX.update(dt, { water: () => true });
-  };
+  }
 
   function switchTank(dir) {
     const list = biomes();
@@ -577,6 +586,7 @@ AQ.Aquarium = (function () {
       case 'prev': switchTank(-1); break;
       case 'next': switchTank(1); break;
       case 'feed': feed(); break;
+      case 'photo': enterPhoto(); break;
       case 'stars': break;
       case 'undo': undo(tank); break;
       case 'tanks': openOverview(); break;
@@ -736,6 +746,15 @@ AQ.Aquarium = (function () {
   A.draw = function (g, game) {
     if (A.view === 'overview') { drawOverview(g); return; }
     const b = AQ.Tanks.get(A.biome), tank = AQ.Collection.tank(A.biome);
+    if (A.photo.on) { drawScene(g, b, tank, A.photo.icons); drawPhotoUI(g, b, tank); return; }
+    drawScene(g, b, tank, true);
+    drawShaker(g);
+    A.drawRest(g, b, tank);
+  };
+
+  // The tank itself: water, light, decor, creatures, bubbles and the glass frame. No interface, so it
+  // is also what a photo captures. icons = mood icons, hearts and sparkles (photo mode can hide them).
+  function drawScene(g, b, tank, icons) {
     const st = styleOf(b.id);
     g.fillStyle = '#0b1a2c'; g.fillRect(0, 0, 320, 180);
     g.drawImage(backdrop(b), TANK.x, TANK.y);
@@ -780,9 +799,9 @@ AQ.Aquarium = (function () {
         const moving = Math.hypot(f.vx, f.vy) > 5 || f.walking, asleep = f.state === 'sleep';
         const chompX = f.chomp > 0 && Math.sin(f.chomp * 40) > 0 ? f.facing : 0;
         AQ.Assets.draw(g, f.key, moving && !asleep ? 'move' : 'idle', f.x + (f.shake && f.stress ? 1 : 0) + chompX, f.y - (f.peck || 0) - Math.round(f.hop || 0), { t: asleep ? f.t * 0.25 : f.t, flip: f.facing < 0, alpha: f.stress ? 0.8 : 1 });
-        moodIcon(g, f);
-        if (A.card === f.uid) selectMark(g, f);
-        if ((f.state === 'sleep' || (f.state === 'rest' && (f.def.category === 'mammal' || f.def.category === 'reptile'))) && !f.stress) F().draw(g, 'z', f.x + 4, f.y - f.r - 6 - Math.round((A.t * 4) % 4), '#e8f4ff');
+        if (icons) moodIcon(g, f);
+        if (A.card === f.uid && !A.photo.on) selectMark(g, f);
+        if (icons && (f.state === 'sleep' || (f.state === 'rest' && (f.def.category === 'mammal' || f.def.category === 'reptile'))) && !f.stress) F().draw(g, 'z', f.x + 4, f.y - f.r - 6 - Math.round((A.t * 4) % 4), '#e8f4ff');
       }
     }
     // food
@@ -790,7 +809,7 @@ AQ.Aquarium = (function () {
     // bubbles
     g.fillStyle = 'rgba(230,250,255,0.8)';
     A.bubbles.forEach((b) => g.fillRect(Math.round(b.x), Math.round(b.y), 1, 1));
-    AQ.FX.draw(g);
+    if (icons) AQ.FX.draw(g);                       // hearts, sparkles, crumbs
     drawParticles(g, st.particles);
     if (st.dark > 0) drawDarkness(g, st, tank);
     // soft vignette in the tank corners
@@ -808,8 +827,8 @@ AQ.Aquarium = (function () {
     g.beginPath(); g.moveTo(TANK.x + 20, TANK.y); g.lineTo(TANK.x + 34, TANK.y); g.lineTo(TANK.x + 4, TANK.y + 40); g.lineTo(TANK.x, TANK.y + 40); g.fill();
     g.beginPath(); g.moveTo(TANK.x + 40, TANK.y); g.lineTo(TANK.x + 44, TANK.y); g.lineTo(TANK.x + 14, TANK.y + 40); g.lineTo(TANK.x + 10, TANK.y + 40); g.fill();
     g.restore();
-
-    drawShaker(g);
+  }
+  A.drawRest = function (g, b, tank) {
     // ghost of held item
     const m = AQ.Input.mouse;
     if (A.holding && inTank(m)) {
@@ -826,6 +845,149 @@ AQ.Aquarium = (function () {
     if (cf) drawCard(g, cf); else A.card = null;
     drawBars(g, tank, b);
   };
+
+  // ---------------------------------------------------------------- photo mode
+  // PHOTO (or P): the interface hides, a camera frame shows, and Space / a click takes a picture,
+  // saved as a crisp PNG download. Freeze pauses the creatures; hearts and mood icons can be hidden;
+  // three frame styles (none, pixel border, polaroid with a caption).
+  const FRAMES = ['NONE', 'BORDER', 'POLAROID'];
+  const pcfg = () => AQ.TUNING.photo;
+  function enterPhoto() {
+    putBack(); A.card = null;
+    Object.assign(A.photo, { on: true, flash: 0 });
+    if (A.photo.frame == null) A.photo.frame = pcfg().defaultFrame;
+    AQ.Audio.play('menu_select');
+  }
+  function exitPhoto() { A.photo.on = false; A.photo.paused = false; AQ.Audio.play('menu_select'); }
+  function photoUI() {
+    const P = A.photo, ui = [];
+    const add = (id, label, w, on) => ui.push({ id, label, w, h: 10, y: 2, on });
+    add('p_exit', 'EXIT', 22);
+    add('p_freeze', P.paused ? 'FROZEN' : 'FREEZE', 32, P.paused);
+    add('p_icons', P.icons ? 'ICONS ON' : 'ICONS OFF', 40, P.icons);
+    add('p_frame', 'FRAME: ' + FRAMES[P.frame], 66);
+    add('p_caption', P.frame === 2 ? 'CAPTION: ON' : P.caption ? 'CAPTION: ON' : 'CAPTION: OFF', 52, P.frame === 2 || P.caption);
+    add('p_snap', 'SNAP', 26);
+    let x = 4; ui.forEach((r) => { r.x = x; x += r.w + 3; });
+    return ui;
+  }
+  function updatePhoto(dt, game, tank) {
+    const I = AQ.Input, m = I.mouse, P = A.photo;
+    P.flash = Math.max(0, P.flash - dt);
+    P.previewT = Math.max(0, P.previewT - dt);
+    if (!P.paused) { A.t += dt; simulate(dt, tank); }
+    P.ui = photoUI();
+    P.hover = P.ui.find((r) => hit(r, m));
+    if (I.wasPressed('Escape', pcfg().key)) { exitPhoto(); return; }
+    const act = (id) => {
+      if (id === 'p_exit') exitPhoto();
+      else if (id === 'p_freeze') P.paused = !P.paused;
+      else if (id === 'p_icons') P.icons = !P.icons;
+      else if (id === 'p_frame') P.frame = (P.frame + 1) % FRAMES.length;
+      else if (id === 'p_caption') { if (P.frame !== 2) P.caption = !P.caption; }
+      else if (id === 'p_snap') snap(tank);
+      if (id !== 'p_snap' && id !== 'p_exit') AQ.Audio.play('menu_move');
+    };
+    if (I.wasPressed('KeyZ')) act('p_freeze');
+    if (I.wasPressed('KeyI')) act('p_icons');
+    if (I.wasPressed('KeyF')) act('p_frame');
+    if (I.wasPressed('KeyC')) act('p_caption');
+    if (I.wasPressed('Space')) act('p_snap');
+    if (m.pressed[0]) { if (P.hover) act(P.hover.id); else if (inTank(m)) act('p_snap'); }
+  }
+  const dateText = () => { const d = new Date(), z = (n) => String(n).padStart(2, '0'); return `${d.getFullYear()}-${z(d.getMonth() + 1)}-${z(d.getDate())}`; };
+  // The picture: the tank (rim included), framed in the chosen style, scaled up crisply.
+  function composePhoto(b, tank) {
+    const P = A.photo, src = document.createElement('canvas');
+    src.width = 320; src.height = 180;
+    const sg = src.getContext('2d'); sg.imageSmoothingEnabled = false;
+    drawScene(sg, b, tank, P.icons);
+    const cx = TANK.x - 3, cy = TANK.y - 3, cw = TANK.w + 6, ch = TANK.h + 6;
+    const name = (b.short || b.name), stars = A.vibe ? A.vibe.stars : 0, date = dateText();
+    const pad = P.frame === 0 ? [0, 0, 0] : P.frame === 1 ? [5, 5, 5] : [10, 10, 30];   // side, top, bottom
+    const W = cw + pad[0] * 2, H = ch + pad[1] + pad[2];
+    const c = document.createElement('canvas'); c.width = W; c.height = H;
+    const g = c.getContext('2d'); g.imageSmoothingEnabled = false;
+    if (P.frame === 1) {                                              // simple pixel border
+      g.fillStyle = '#0b1a2c'; g.fillRect(0, 0, W, H);
+      g.fillStyle = '#7fb6cc'; g.fillRect(2, 2, W - 4, 1); g.fillRect(2, H - 3, W - 4, 1); g.fillRect(2, 2, 1, H - 4); g.fillRect(W - 3, 2, 1, H - 4);
+    } else if (P.frame === 2) {                                       // polaroid
+      g.fillStyle = '#f6f3ea'; g.fillRect(0, 0, W, H);
+      g.fillStyle = '#d9d3c4'; g.fillRect(0, H - 1, W, 1); g.fillRect(W - 1, 0, 1, H);
+    }
+    g.drawImage(src, cx, cy, cw, ch, pad[0], pad[1], cw, ch);
+    if (P.frame === 2) {
+      F().draw(g, name.toUpperCase(), pad[0] + 2, ch + pad[1] + 6, '#3a3a44', { shadow: false });
+      drawStars(g, Math.round(W / 2 - 20), ch + pad[1] + 5, stars);
+      F().draw(g, date, W - pad[0] - 2, ch + pad[1] + 6, '#6a6a74', { align: 'right', shadow: false });
+      F().draw(g, 'AQUADISE', W - pad[0] - 2, ch + pad[1] + 16, '#9a9488', { align: 'right', shadow: false });
+    } else if (P.caption) {                                           // optional caption strip
+      const y = pad[1] + ch - 13;
+      g.fillStyle = 'rgba(5,14,26,0.72)'; g.fillRect(pad[0] + 3, y, cw - 6, 10);
+      F().draw(g, name.toUpperCase(), pad[0] + 6, y + 3, '#ffe9a8', { shadow: false });
+      drawStars(g, Math.round(pad[0] + cw / 2 - 20), y + 2, stars);
+      F().draw(g, date, pad[0] + cw - 6, y + 3, '#cfe8ff', { align: 'right', shadow: false });
+    }
+    const k = pcfg().scale, out = document.createElement('canvas');
+    out.width = W * k; out.height = H * k;
+    const og = out.getContext('2d'); og.imageSmoothingEnabled = false;
+    og.drawImage(c, 0, 0, W * k, H * k);
+    return { out, small: c, name, date };
+  }
+  A.composePhoto = () => composePhoto(AQ.Tanks.get(A.biome), AQ.Collection.tank(A.biome));
+  function snap(tank) {
+    const P = A.photo, b = AQ.Tanks.get(A.biome);
+    AQ.Audio.play('shutter');
+    P.flash = pcfg().flashSeconds;
+    let shot;
+    try { shot = composePhoto(b, tank); } catch (e) { note('The photo could not be taken.', '#ffb08a'); return; }
+    const file = `Aquadise-${shot.name.replace(/[^A-Za-z0-9]/g, '')}-${shot.date}.png`;
+    const done = (ok) => {
+      P.preview = shot.small; P.previewT = ok ? pcfg().previewSeconds : 0;
+      P.saved = ok ? 'SAVED!' : 'COULD NOT SAVE';
+      if (!ok) { P.previewT = pcfg().previewSeconds; }
+      A.lastPhoto = { file, ok, w: shot.out.width, h: shot.out.height };
+    };
+    try {
+      shot.out.toBlob((blob) => {
+        if (!blob) { done(false); return; }
+        const a = document.createElement('a');
+        a.href = URL.createObjectURL(blob); a.download = file;
+        document.body.appendChild(a); a.click();
+        setTimeout(() => { URL.revokeObjectURL(a.href); a.remove(); }, 2000);
+        done(true);
+      }, 'image/png');
+    } catch (e) { done(false); }     // e.g. a browser that won't export these images
+  }
+  function drawPhotoUI(g, b, tank) {
+    const P = A.photo, t = A.t;
+    // dim everything outside the tank, then the camera frame: viewfinder corners + a recording dot
+    g.fillStyle = 'rgba(4,10,20,0.85)';
+    g.fillRect(0, 0, 320, TANK.y - 3); g.fillRect(0, TANK.y + TANK.h + 3, 320, 180 - TANK.y - TANK.h - 3);
+    const x0 = TANK.x + 4, y0 = TANK.y + 4, x1 = TANK.x + TANK.w - 5, y1 = TANK.y + TANK.h - 5, L = 10;
+    g.fillStyle = 'rgba(255,255,255,0.85)';
+    for (const [x, y, dx, dy] of [[x0, y0, 1, 1], [x1, y0, -1, 1], [x0, y1, 1, -1], [x1, y1, -1, -1]]) {
+      g.fillRect(Math.min(x, x + dx * L), y, L, 1); g.fillRect(x, Math.min(y, y + dy * L), 1, L);
+    }
+    if (Math.floor(t * 2) % 2 && !P.paused) { g.fillStyle = '#ff5a6a'; g.fillRect(x1 - 12, y0 + 3, 3, 3); }
+    if (P.paused) F().draw(g, 'FROZEN', x1 - 4, y0 + 5, '#9fe8ff', { align: 'right' });
+    F().draw(g, FRAMES[P.frame] + (P.frame !== 2 && P.caption ? ' + CAPTION' : ''), x0 + 4, y0 + 5, 'rgba(255,255,255,0.8)');
+    // the toolbar + key hints (never in the picture)
+    for (const r of P.ui) button(g, r, P.hover === r);
+    F().draw(g, 'SPACE / CLICK: SNAP     Z: FREEZE     I: HEARTS + MOOD ICONS', 8, 153, '#8fb6cc');
+    F().draw(g, 'F: FRAME STYLE     C: CAPTION     P / ESC: LEAVE PHOTO MODE', 8, 162, '#8fb6cc');
+    F().draw(g, `PHOTOS SAVE AS PNG DOWNLOADS (${pcfg().scale}X PIXELS)`, 8, 171, '#5f7f96');
+    // after a shot: a tiny preview with "Saved!"
+    if (P.previewT > 0 && P.preview) {
+      const pw = 64, ph = Math.round(P.preview.height * pw / P.preview.width), px = 320 - pw - 6, py = 180 - ph - 4;
+      g.globalAlpha = Math.min(1, P.previewT * 3);
+      g.fillStyle = '#0b1a2c'; g.fillRect(px - 2, py - 10, pw + 4, ph + 12);
+      g.save(); g.imageSmoothingEnabled = true; g.drawImage(P.preview, px, py, pw, ph); g.restore();
+      F().draw(g, P.saved || 'SAVED!', px + pw / 2, py - 8, P.saved === 'SAVED!' ? '#8ff0b0' : '#ffb08a', { align: 'center' });
+      g.globalAlpha = 1;
+    }
+    if (P.flash > 0) { g.fillStyle = `rgba(255,255,255,${(P.flash / pcfg().flashSeconds * 0.9).toFixed(3)})`; g.fillRect(0, 0, 320, 180); }
+  }
 
   // ---------------------------------------------------------------- creature info card
   function selectMark(g, f) {
@@ -1206,7 +1368,7 @@ AQ.Aquarium = (function () {
     g.fillStyle = '#0b1a2c'; g.fillRect(0, 0, 320, 14);
     F().draw(g, (b.short || b.name), 42, 4, '#ffe9a8', { align: 'center' });
     if (A.vibe) drawStars(g, 84, 3, A.vibe.stars);
-    F().draw(g, `${tank.creatures.length}/${AQ.TUNING.tank.capacity}`, 128, 4, '#8fb6cc');
+    F().draw(g, `${tank.creatures.length}/${AQ.TUNING.tank.capacity}`, 126, 4, '#8fb6cc');
     // tray
     g.fillStyle = '#0b1a2c'; g.fillRect(0, TRAY_Y - 1, 320, 32);
     for (const r of A.ui) {

@@ -189,6 +189,15 @@ AQ.TUNING = {
     zoomMargin: 10            // space (px) kept around the building when zoomed out
   },       // ladder climbing speed in the aquarium building (px/s)
 
+  // ---- photo mode on the tank screen (PHOTO button or the key below)
+  photo: {
+    key: 'KeyP',              // enter / leave photo mode
+    scale: 3,                 // saved PNG is this many times the game's pixels (crisp, no blurring)
+    defaultFrame: 2,          // 0 = no frame, 1 = pixel border, 2 = polaroid with a caption
+    flashSeconds: 0.25,       // the white camera flash
+    previewSeconds: 2.5       // how long the little "Saved!" preview stays
+  },
+
   // ---- message bottles (one per species, holding its field notes; see src/bottles.js, data/lore.js)
   bottles: {
     pickupRadius: 12,         // how close (px) you get to pick one up

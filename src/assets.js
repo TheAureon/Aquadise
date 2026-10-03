@@ -15,7 +15,10 @@ AQ.Assets = (function () {
         console.warn('[assets] missing sprite', entry.file);
         sprites[key] = { img: fallback(entry), entry }; done++; resolve();
       };
-      img.src = 'assets/' + entry.file;
+      // opened from disk (file://): use the embedded copy (assets/sprites-embedded.js) so canvases
+      // stay exportable (tank photos); over http the PNG files load as usual
+      const emb = location.protocol === 'file:' && AQ.spriteData && AQ.spriteData[entry.file];
+      img.src = emb ? 'data:image/png;base64,' + emb : 'assets/' + entry.file;
     })));
   }
 

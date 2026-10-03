@@ -151,3 +151,9 @@ The player sheet also has row 7 `climb` (2 frames @ 6 fps), shown while on a lad
 The hill's shape comes from `AQ.TUNING.hill`, and the building's layout from `data/scenes.js`, so the
 art only supplies textures and props.
 
+## Embedded copy for file://
+
+`assets/sprites-embedded.js` holds a base64 copy of every sprite in the manifest. The game only uses
+it when `index.html` is opened straight from disk (file://), so tank photos can be saved there
+(browsers block saving canvases drawn from file:// images). `tools/gen-placeholders.js` refreshes it
+automatically; after replacing PNGs by hand, run `node tools/embed-sprites.js`.
