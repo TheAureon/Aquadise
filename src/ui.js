@@ -19,7 +19,8 @@ AQ.LogUI = (function () {
   const biomes = () => {
     const order = ['tide_pools', 'coral', 'ruins', 'open_ocean', 'vents', 'trench', 'kelp', 'mangrove', 'ice', 'cave', 'lush_cave'];
     const all = AQ.World.biomes.slice();
-    return all.sort((a, b) => (order.indexOf(a.id) + 99) % 99 - (order.indexOf(b.id) + 99) % 99);
+    // special tanks (Starfall) get a page of their own, after the sea biomes
+    return all.sort((a, b) => (order.indexOf(a.id) + 99) % 99 - (order.indexOf(b.id) + 99) % 99).concat(AQ.data.specialTanks || []);
   };
   // a biome's species, with each family (AQ.data.families) kept together where its first member is
   const entries = (b) => {
@@ -371,6 +372,7 @@ AQ.LogUI = (function () {
       F().draw(g, has ? d.name.toUpperCase() : '???', 9, 131, has ? C.title : C.dim);
       const tags = [CAT_LABEL[d.category] || d.category, d.is_plant ? 'harvest' : '', d.requires_upgraded_net ? 'needs net lv2' : '',
         d.active === 'night' || d.bloom === 'night' ? 'night only' : d.active === 'day' ? 'day only' : '',
+        d.event === 'star' ? 'falling stars only' : d.event === 'shower' ? 'meteor showers only' : '',
         d.requires_depth ? 'needs depth ' + d.requires_depth : '', d.rare ? 'rare' : '', d.hostile ? 'hostile' : '', d.draft ? 'draft' : ''].filter(Boolean).join(' - ');
       F().draw(g, tags.toUpperCase(), 311, 131, C.info, { align: 'right' });
       const tip = (d.active === 'night' ? 'Comes out at night. ' : d.bloom === 'night' ? 'Opens at night. ' : d.active === 'day' ? 'Only out by day. ' : '') + (d.requires_depth ? `Lives deep: needs the depth upgrade (level ${d.requires_depth}). ` : '') + (d.hint || '');
@@ -506,6 +508,7 @@ AQ.LogUI = (function () {
   // and the Field Notes on the right; < > browse the biome's species
   function drawEntry(g, d) {
     const has = AQ.Collection.has(d.id), lg = logOf(d.id), biome = (biomes().find((b) => b.id === d.biome) || {}).name || '';
+    const bottleIn = (biomes().find((b) => b.id === (d.bottle || d.biome)) || {}).name || biome;   // where its message bottle lies
     const list = entries(biomes()[L.biomeIdx]);
     g.fillStyle = C.panel; g.fillRect(4, 17, 312, 149);
     // portrait
@@ -535,7 +538,7 @@ AQ.LogUI = (function () {
     else {
       AQ.Assets.draw(g, 'misc.bottle', 'idle', X + W / 2, 108, { t: performance.now() / 1000, alpha: 0.5 });
       F().draw(g, 'NOT FOUND YET', X + W / 2, 116, C.dim, { align: 'center' });
-      wrap(`A message bottle somewhere in the ${biome} holds these notes.`, Math.floor(W / 4)).forEach((l, i) => F().draw(g, l, X + W / 2, 126 + i * 8, C.hint, { align: 'center', shadow: false }));
+      wrap(`A message bottle somewhere in the ${bottleIn} holds these notes.`, Math.floor(W / 4)).forEach((l, i) => F().draw(g, l, X + W / 2, 126 + i * 8, C.hint, { align: 'center', shadow: false }));
     }
     footer(g, [['LEFT/RIGHT', 'PREV / NEXT SPECIES'], ['ESC', 'BACK TO THE LIST']]);
   }

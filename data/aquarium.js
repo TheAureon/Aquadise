@@ -1,4 +1,5 @@
-// Aquarium tanks: per-tank looks (tankStyles) and the predator tanks (predatorTanks).
+// Aquarium tanks: per-tank looks (tankStyles), the predator tanks (predatorTanks) and special tanks
+// that aren't a sea biome (specialTanks: Starfall, home of the falling-star creatures).
 // Per-tank aquarium looks. Every field is optional; missing ones fall back to `default`.
 // top/deep:  water gradient colours (top of tank -> sand)
 // shafts:    strength of the swaying light shafts from the lid (0 = none)
@@ -6,6 +7,8 @@
 // dark:      how dark the tank is (0..1). In dark tanks, decor with a `glow` colour lights it up.
 // particles: motes | snow (slow falling flakes) | embers (warm rising sparks) | fireflies | spores
 // lamp:      colour of the LED strip in the lid
+// glow:      optional soft colour glowing up from the middle of the tank (Starfall)
+// particles: ...also 'stars' (drifting, twinkling star motes)
 var AQ = (typeof AQ !== 'undefined') ? AQ : {};
 AQ.data = AQ.data || {};
 
@@ -22,6 +25,7 @@ AQ.data.tankStyles = {
   mangrove:   { top: '#b4cc8a', deep: '#33452a', shafts: 0.07, caustics: 0.14, dark: 0.05, particles: 'spores', lamp: '#e8f0a0' },
   ice:        { top: '#eefcff', deep: '#4f9ccc', shafts: 0.11, caustics: 0.32, particles: 'snow', lamp: '#ffffff' },
   lush_cave:  { top: '#5a7a6a', deep: '#141e2a', shafts: 0.03, caustics: 0.06, dark: 0.32, particles: 'fireflies', lamp: '#ffc0f0' },
+  starfall:   { top: '#2c2a6e', deep: '#0a0a26', shafts: 0.02, caustics: 0.05, dark: 0.3, particles: 'stars', lamp: '#c8b8ff', glow: '#6f5fd8' },
   // predator tanks (4th floor)
   pred_reef:  { top: '#9fe2e8', deep: '#1f5f8a', shafts: 0.07, caustics: 0.24, dark: 0.08, lamp: '#ffb0a0' },
   pred_open:  { top: '#7fc8ea', deep: '#0f3478', shafts: 0.09, caustics: 0.2, lamp: '#bfe0ff' },
@@ -53,4 +57,10 @@ AQ.data.predatorTanks = [
   { id: 'pred_swamp', tiny: 'SWAMP', name: 'Swamp Hunters', short: 'Swamp Hunters', members: ['dwarf_croc', 'bankside_monitor'],
     themes: ['mangrove'], theme: 'mangrove', water: '#5c7a3a',
     palette: { top: ['#6e5a3c', '#5c4b32', '#4a3c29'], rock: ['#4e4234', '#41372b', '#342c23'] } }
+];
+
+// Tanks that aren't a sea biome. Same fields as a predator tank (palette = sand/rock colours).
+AQ.data.specialTanks = [
+  { id: 'starfall', tiny: 'STARFALL', name: 'Starfall', short: 'Starfall', themes: ['starfall'], theme: 'starfall', water: '#1c1650',
+    palette: { top: ['#5a5480', '#4a4470', '#3a3660'], rock: ['#3a3458', '#2e2a48', '#24203a'] } }
 ];

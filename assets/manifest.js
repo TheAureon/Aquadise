@@ -10879,6 +10879,492 @@ AQ.manifest = {
     13
    ]
   },
+  "creature.starfall_minnow": {
+   "file": "sprites/creatures/starfall_minnow.png",
+   "fw": 12,
+   "fh": 12,
+   "anchor": [
+    6,
+    6
+   ],
+   "anims": {
+    "idle": {
+     "row": 0,
+     "frames": 4,
+     "fps": 5
+    },
+    "move": {
+     "row": 1,
+     "frames": 4,
+     "fps": 10
+    }
+   },
+   "vis": [
+    2,
+    2,
+    9,
+    10
+   ]
+  },
+  "creature.starfall_minnow.v": {
+   "file": "sprites/creatures/starfall_minnow_v.png",
+   "fw": 12,
+   "fh": 12,
+   "anchor": [
+    6,
+    6
+   ],
+   "anims": {
+    "idle": {
+     "row": 0,
+     "frames": 4,
+     "fps": 5
+    },
+    "move": {
+     "row": 1,
+     "frames": 4,
+     "fps": 10
+    }
+   },
+   "vis": [
+    2,
+    2,
+    9,
+    10
+   ]
+  },
+  "creature.starfall_minnow.v.m": {
+   "file": "sprites/creatures/starfall_minnow_v_m.png",
+   "fw": 12,
+   "fh": 12,
+   "anchor": [
+    6,
+    6
+   ],
+   "anims": {
+    "idle": {
+     "row": 0,
+     "frames": 4,
+     "fps": 5
+    },
+    "move": {
+     "row": 1,
+     "frames": 4,
+     "fps": 10
+    }
+   },
+   "vis": [
+    2,
+    2,
+    9,
+    10
+   ]
+  },
+  "creature.starfall_minnow.baby.v": {
+   "file": "sprites/creatures/starfall_minnow_baby_v.png",
+   "fw": 12,
+   "fh": 12,
+   "anchor": [
+    6,
+    6
+   ],
+   "anims": {
+    "idle": {
+     "row": 0,
+     "frames": 4,
+     "fps": 5
+    },
+    "move": {
+     "row": 1,
+     "frames": 4,
+     "fps": 10
+    }
+   },
+   "vis": [
+    3,
+    3,
+    9,
+    9
+   ]
+  },
+  "creature.starfall_minnow.baby": {
+   "file": "sprites/creatures/starfall_minnow_baby.png",
+   "fw": 12,
+   "fh": 12,
+   "anchor": [
+    6,
+    6
+   ],
+   "anims": {
+    "idle": {
+     "row": 0,
+     "frames": 4,
+     "fps": 5
+    },
+    "move": {
+     "row": 1,
+     "frames": 4,
+     "fps": 10
+    }
+   },
+   "vis": [
+    3,
+    3,
+    9,
+    9
+   ]
+  },
+  "creature.starfall_minnow.m": {
+   "file": "sprites/creatures/starfall_minnow_m.png",
+   "fw": 12,
+   "fh": 12,
+   "anchor": [
+    6,
+    6
+   ],
+   "anims": {
+    "idle": {
+     "row": 0,
+     "frames": 4,
+     "fps": 5
+    },
+    "move": {
+     "row": 1,
+     "frames": 4,
+     "fps": 10
+    }
+   },
+   "vis": [
+    2,
+    2,
+    9,
+    10
+   ]
+  },
+  "creature.aerolite_crab": {
+   "file": "sprites/creatures/aerolite_crab.png",
+   "fw": 16,
+   "fh": 16,
+   "anchor": [
+    8,
+    8
+   ],
+   "anims": {
+    "idle": {
+     "row": 0,
+     "frames": 4,
+     "fps": 5
+    },
+    "move": {
+     "row": 1,
+     "frames": 4,
+     "fps": 10
+    }
+   },
+   "vis": [
+    2,
+    4,
+    14,
+    12
+   ]
+  },
+  "creature.aerolite_crab.v": {
+   "file": "sprites/creatures/aerolite_crab_v.png",
+   "fw": 16,
+   "fh": 16,
+   "anchor": [
+    8,
+    8
+   ],
+   "anims": {
+    "idle": {
+     "row": 0,
+     "frames": 4,
+     "fps": 5
+    },
+    "move": {
+     "row": 1,
+     "frames": 4,
+     "fps": 10
+    }
+   },
+   "vis": [
+    2,
+    4,
+    14,
+    12
+   ]
+  },
+  "creature.aerolite_crab.v.m": {
+   "file": "sprites/creatures/aerolite_crab_v_m.png",
+   "fw": 16,
+   "fh": 16,
+   "anchor": [
+    8,
+    8
+   ],
+   "anims": {
+    "idle": {
+     "row": 0,
+     "frames": 4,
+     "fps": 5
+    },
+    "move": {
+     "row": 1,
+     "frames": 4,
+     "fps": 10
+    }
+   },
+   "vis": [
+    2,
+    4,
+    14,
+    12
+   ]
+  },
+  "creature.aerolite_crab.baby.v": {
+   "file": "sprites/creatures/aerolite_crab_baby_v.png",
+   "fw": 16,
+   "fh": 16,
+   "anchor": [
+    8,
+    8
+   ],
+   "anims": {
+    "idle": {
+     "row": 0,
+     "frames": 4,
+     "fps": 5
+    },
+    "move": {
+     "row": 1,
+     "frames": 4,
+     "fps": 10
+    }
+   },
+   "vis": [
+    2,
+    4,
+    13,
+    12
+   ]
+  },
+  "creature.aerolite_crab.baby": {
+   "file": "sprites/creatures/aerolite_crab_baby.png",
+   "fw": 16,
+   "fh": 16,
+   "anchor": [
+    8,
+    8
+   ],
+   "anims": {
+    "idle": {
+     "row": 0,
+     "frames": 4,
+     "fps": 5
+    },
+    "move": {
+     "row": 1,
+     "frames": 4,
+     "fps": 10
+    }
+   },
+   "vis": [
+    2,
+    4,
+    13,
+    12
+   ]
+  },
+  "creature.aerolite_crab.m": {
+   "file": "sprites/creatures/aerolite_crab_m.png",
+   "fw": 16,
+   "fh": 16,
+   "anchor": [
+    8,
+    8
+   ],
+   "anims": {
+    "idle": {
+     "row": 0,
+     "frames": 4,
+     "fps": 5
+    },
+    "move": {
+     "row": 1,
+     "frames": 4,
+     "fps": 10
+    }
+   },
+   "vis": [
+    2,
+    4,
+    14,
+    12
+   ]
+  },
+  "creature.comet_ray": {
+   "file": "sprites/creatures/comet_ray.png",
+   "fw": 48,
+   "fh": 24,
+   "anchor": [
+    24,
+    12
+   ],
+   "anims": {
+    "idle": {
+     "row": 0,
+     "frames": 4,
+     "fps": 5
+    },
+    "move": {
+     "row": 1,
+     "frames": 4,
+     "fps": 10
+    }
+   },
+   "vis": [
+    1,
+    2,
+    46,
+    19
+   ]
+  },
+  "creature.comet_ray.v": {
+   "file": "sprites/creatures/comet_ray_v.png",
+   "fw": 48,
+   "fh": 24,
+   "anchor": [
+    24,
+    12
+   ],
+   "anims": {
+    "idle": {
+     "row": 0,
+     "frames": 4,
+     "fps": 5
+    },
+    "move": {
+     "row": 1,
+     "frames": 4,
+     "fps": 10
+    }
+   },
+   "vis": [
+    1,
+    2,
+    46,
+    19
+   ]
+  },
+  "creature.comet_ray.v.m": {
+   "file": "sprites/creatures/comet_ray_v_m.png",
+   "fw": 48,
+   "fh": 24,
+   "anchor": [
+    24,
+    12
+   ],
+   "anims": {
+    "idle": {
+     "row": 0,
+     "frames": 4,
+     "fps": 5
+    },
+    "move": {
+     "row": 1,
+     "frames": 4,
+     "fps": 10
+    }
+   },
+   "vis": [
+    1,
+    2,
+    46,
+    19
+   ]
+  },
+  "creature.comet_ray.baby.v": {
+   "file": "sprites/creatures/comet_ray_baby_v.png",
+   "fw": 48,
+   "fh": 24,
+   "anchor": [
+    24,
+    12
+   ],
+   "anims": {
+    "idle": {
+     "row": 0,
+     "frames": 4,
+     "fps": 5
+    },
+    "move": {
+     "row": 1,
+     "frames": 4,
+     "fps": 10
+    }
+   },
+   "vis": [
+    1,
+    4,
+    42,
+    17
+   ]
+  },
+  "creature.comet_ray.baby": {
+   "file": "sprites/creatures/comet_ray_baby.png",
+   "fw": 48,
+   "fh": 24,
+   "anchor": [
+    24,
+    12
+   ],
+   "anims": {
+    "idle": {
+     "row": 0,
+     "frames": 4,
+     "fps": 5
+    },
+    "move": {
+     "row": 1,
+     "frames": 4,
+     "fps": 10
+    }
+   },
+   "vis": [
+    1,
+    4,
+    42,
+    17
+   ]
+  },
+  "creature.comet_ray.m": {
+   "file": "sprites/creatures/comet_ray_m.png",
+   "fw": 48,
+   "fh": 24,
+   "anchor": [
+    24,
+    12
+   ],
+   "anims": {
+    "idle": {
+     "row": 0,
+     "frames": 4,
+     "fps": 5
+    },
+    "move": {
+     "row": 1,
+     "frames": 4,
+     "fps": 10
+    }
+   },
+   "vis": [
+    1,
+    2,
+    46,
+    19
+   ]
+  },
   "decor.pebble_rock": {
    "file": "sprites/decor/pebble_rock.png",
    "fw": 16,
@@ -12461,6 +12947,94 @@ AQ.manifest = {
     1,
     12,
     15
+   ]
+  },
+  "decor.stardust_patch": {
+   "file": "sprites/decor/stardust_patch.png",
+   "fw": 16,
+   "fh": 16,
+   "anchor": [
+    8,
+    15
+   ],
+   "anims": {
+    "idle": {
+     "row": 0,
+     "frames": 1,
+     "fps": 1
+    }
+   },
+   "vis": [
+    1,
+    6,
+    14,
+    15
+   ]
+  },
+  "decor.meteorite_rock": {
+   "file": "sprites/decor/meteorite_rock.png",
+   "fw": 24,
+   "fh": 24,
+   "anchor": [
+    12,
+    23
+   ],
+   "anims": {
+    "idle": {
+     "row": 0,
+     "frames": 1,
+     "fps": 1
+    }
+   },
+   "vis": [
+    1,
+    6,
+    22,
+    23
+   ]
+  },
+  "decor.crater_bowl": {
+   "file": "sprites/decor/crater_bowl.png",
+   "fw": 32,
+   "fh": 16,
+   "anchor": [
+    16,
+    15
+   ],
+   "anims": {
+    "idle": {
+     "row": 0,
+     "frames": 1,
+     "fps": 1
+    }
+   },
+   "vis": [
+    1,
+    7,
+    30,
+    15
+   ]
+  },
+  "decor.star_lantern": {
+   "file": "sprites/decor/star_lantern.png",
+   "fw": 16,
+   "fh": 32,
+   "anchor": [
+    8,
+    31
+   ],
+   "anims": {
+    "idle": {
+     "row": 0,
+     "frames": 1,
+     "fps": 1
+    }
+   },
+   "vis": [
+    4,
+    5,
+    12,
+    31
    ]
   }
  }

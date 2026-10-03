@@ -1,7 +1,8 @@
 // The tank registry: every tank in the aquarium building, biome tanks and predator tanks alike.
 // A tank "def" looks like a biome (id, name, short, palette, water, index, dark) so the tank screen,
 // the building, the vibe and the overview treat them all the same.
-//   AQ.Tanks.list()          all tanks, in building order (ground floor first, left to right)
+//   AQ.Tanks.list()          all tanks, in building order (ground floor first, left to right): biome tanks,
+//                            special tanks (data/aquarium.js specialTanks, e.g. Starfall) and predator tanks
 //   AQ.Tanks.get(id)         one tank def
 //   AQ.Tanks.forCreature(d)  which tank a creature lives in (predators -> their predator tank)
 //   AQ.Tanks.themesOf(id)    biomes whose decor/plants count as "on theme" for that tank
@@ -17,6 +18,10 @@ AQ.Tanks = (function () {
     AQ.World.biomes.forEach((b) => { defs[b.id] = Object.assign(b, { kind: 'biome', themes: [b.id] }); });
     (AQ.data.predatorTanks || []).forEach((p, i) => {
       defs[p.id] = Object.assign({ kind: 'predator', index: 40 + i, dark: (AQ.data.tankStyles[p.id] || {}).dark || 0 }, p, { themes: [p.id].concat(p.themes || []) });
+    });
+    // special tanks that aren't a sea biome (Starfall)
+    (AQ.data.specialTanks || []).forEach((p, i) => {
+      defs[p.id] = Object.assign({ kind: 'special', index: 60 + i, dark: (AQ.data.tankStyles[p.id] || {}).dark || 0 }, p, { themes: [p.id].concat((p.themes || []).filter((t) => t !== p.id)) });
     });
     // building order from the slots in data/scenes.js; any tank without a slot goes at the end
     const slots = (AQ.data.station && AQ.data.station.tanks) || [];

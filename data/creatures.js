@@ -367,7 +367,27 @@ AQ.data.creatures = [
   { id: 'firefly_frog', voice: 'glow_chime', likes: ['roots', 'plant'], name: 'Firefly Frog', biome: 'mangrove', category: 'amphibian', catch_behavior: 'lure', active: 'night',
     params: { decoyDist: 11, decoyColor: '#f0ff8a', alpha: 0.55, glow: 28 },
     sprite_size: 'small', color: '#4a6a3a', accent: '#e8ff7a', art: { shape: 'frog', glow: true }, light: { r: 12, color: '#e8ff8a' },
-    spawn: { n: 2, at: 'floor' }, hint: 'Glows at night. Its bright "firefly" is a decoy on a stalk - net the dim frog sitting just beside it.' }
+    spawn: { n: 2, at: 'floor' }, hint: 'Glows at night. Its bright "firefly" is a decoy on a stalk - net the dim frog sitting just beside it.' },
+
+  // ------------------------------------------------------------------ Starfall (night events only)
+  // No wild spawn: `event` creatures only appear where a falling star lands (src/starfall.js).
+  // event: 'star' = any falling star, 'shower' = only during meteor showers. Their tank is Starfall.
+  // bottle: the sea biome their message bottle lies in (they have no biome of their own in the sea).
+  { id: 'starfall_minnow', likes: ['stardust', 'light'], name: 'Starfall Minnow', biome: 'starfall', category: 'fish', catch_behavior: 'dart',
+    event: 'star', bottle: 'open_ocean', light: { r: 20, color: '#cfe4ff' },
+    params: { alertR: 44, runTime: [0.7, 1.1], pauseTime: [1.4, 2.2], runSpeed: 60, erratic: true },
+    sprite_size: 'tiny', color: '#d8ecff', accent: '#fff3a8', art: { shape: 'fish', starry: true },
+    hint: 'Falls into the sea with a shooting star, a few at a time. Darts off when startled: net one while it pauses.' },
+  { id: 'aerolite_crab', likes: ['meteorite', 'hideout'], name: 'Aerolite Crab', biome: 'starfall', category: 'crustacean', catch_behavior: 'wary',
+    event: 'star', bottle: 'tide_pools', light: { r: 16, color: '#ffd8a8' },
+    params: { reaction: 'hide', pry: true, alertR: 46, speed: 6, wanderR: 22 },
+    sprite_size: 'small', color: '#6e6a74', accent: '#ffb86a', art: { shape: 'crab', rocky: true },
+    hint: 'Lands with a falling star on the shore or sand. Sneak up (hold Shift); if it tucks into its shell, hold the net to pry it out.' },
+  { id: 'comet_ray', likes: ['stardust', 'arch'], name: 'Comet Ray', biome: 'starfall', category: 'fish', catch_behavior: 'curious',
+    event: 'shower', bottle: 'coral', light: { r: 30, color: '#b8d8ff' },
+    params: { approachR: 130, keepDist: 26 },
+    sprite_size: 'widelarge', color: '#3a4a8a', accent: '#bfe8ff', art: { shape: 'ray' },
+    hint: 'Only rides in on a meteor shower, and rarely. Curious: swing when it stops to look at you (?).' },
 ];
 
 // Families: species that belong together (the log groups them under one heading). A family with

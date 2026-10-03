@@ -858,6 +858,12 @@ AQ.Aquarium = (function () {
     if (icons) AQ.FX.draw(g);                       // hearts, sparkles, crumbs
     drawParticles(g, st.particles);
     if (st.dark > 0) drawDarkness(g, st, tank);
+    if (st.glow) {                                  // a faint glow welling up from the middle of the tank (Starfall)
+      const c = U.hex(st.glow), cx = TANK.x + TANK.w / 2, cy = TANK.y + TANK.h * 0.62, pulse = 0.14 + 0.04 * Math.sin(A.t * 0.7);
+      const rg = g.createRadialGradient(cx, cy, 0, cx, cy, TANK.w * 0.5);
+      rg.addColorStop(0, `rgba(${c[0]},${c[1]},${c[2]},${pulse.toFixed(3)})`); rg.addColorStop(1, `rgba(${c[0]},${c[1]},${c[2]},0)`);
+      g.save(); g.globalCompositeOperation = 'lighter'; g.fillStyle = rg; g.fillRect(TANK.x, TANK.y, TANK.w, TANK.h); g.restore();
+    }
     // soft vignette in the tank corners
     for (let i = 0; i < 6; i++) {
       g.fillStyle = `rgba(4,16,30,${(0.12 - i * 0.018).toFixed(3)})`;
@@ -1100,7 +1106,7 @@ AQ.Aquarium = (function () {
       AQ.Assets.draw(g, f.key, 'idle', 0, e.anchor[1] - e.fh / 2, { t: A.t });
       g.restore();
     }
-    const tx = x + 33, b = AQ.World.biomeById[f.def.biome];
+    const tx = x + 33, b = AQ.World.biomeById[f.def.biome] || AQ.Tanks.get(f.def.biome);
     F().draw(g, f.def.name.toUpperCase(), tx, y + 4, '#ffe9a8', { shadow: false });
     if (f.sex) F().draw(g, AQ.Sex.SYMBOL[f.sex], tx + F().width(f.def.name.toUpperCase()) + 3, y + 4, AQ.Sex.COLOR[f.sex], { shadow: false });
     if (f.variant) F().draw(g, '✦ RARE COLOR', tx + F().width(f.def.name.toUpperCase()) + (f.sex ? 11 : 3), y + 4, '#ffd25a', { shadow: false });
@@ -1115,7 +1121,7 @@ AQ.Aquarium = (function () {
       lx += F().width(w) + 4;
     });
     F().draw(g, 'FROM:', tx, y + 28, '#8fb6cc', { shadow: false });
-    F().draw(g, ((b && b.name) || f.def.biome).toUpperCase(), tx + 24, y + 28, '#cfe8ff', { shadow: false });
+    F().draw(g, (f.def.event ? (f.def.event === 'shower' ? 'METEOR SHOWERS' : 'FALLING STARS') : ((b && b.name) || f.def.biome)).toUpperCase(), tx + 24, y + 28, '#cfe8ff', { shadow: false });
     F().draw(g, 'SEX:', x + 4, y + 35, '#8fb6cc', { shadow: false });
     const sexTxt = f.sex ? `${AQ.Sex.NAME[f.sex]} ${AQ.Sex.SYMBOL[f.sex]}` : 'NONE';
     F().draw(g, sexTxt, x + 24, y + 35, f.sex ? AQ.Sex.COLOR[f.sex] : '#cfe8ff', { shadow: false });
@@ -1265,6 +1271,15 @@ AQ.Aquarium = (function () {
         g.fillStyle = Math.sin(A.t * 6 + i) > 0 ? '#ffb070' : '#ff7a3a'; g.globalAlpha = 0.45 + (i % 3) * 0.15;
         g.fillRect(Math.round(x), Math.round(y), 1, 1); g.globalAlpha = 1;
       }
+    } else if (kind === 'stars') {
+      // star motes: slow drifting specks that twinkle, a few with tiny cross glints
+      for (let i = 0; i < 30; i++) {
+        const x = TANK.x + ((i * 61 + A.t * (1.2 + (i % 3) * 0.5) + Math.sin(A.t * 0.3 + i) * 5 + 400) % TANK.w), y = top + ((i * 43 + Math.sin(A.t * 0.2 + i * 1.7) * 6 + 400) % H);
+        const tw = 0.5 + 0.5 * Math.sin(A.t * (1.5 + (i % 4) * 0.6) + i * 2.3);
+        g.fillStyle = i % 5 === 0 ? `rgba(255,243,176,${(0.3 + tw * 0.6).toFixed(2)})` : `rgba(220,226,255,${(0.2 + tw * 0.5).toFixed(2)})`;
+        g.fillRect(Math.round(x), Math.round(y), 1, 1);
+        if (i % 7 === 0 && tw > 0.8) { g.fillStyle = 'rgba(220,226,255,0.35)'; g.fillRect(Math.round(x) - 1, Math.round(y), 3, 1); g.fillRect(Math.round(x), Math.round(y) - 1, 1, 3); }
+      }
     } else if (kind === 'fireflies') {
       for (let i = 0; i < 12; i++) {
         const x = TANK.x + TANK.w / 2 + Math.sin(A.t * 0.23 * (1 + i % 3) + i * 2.1) * TANK.w * 0.44, y = top + 6 + (Math.sin(A.t * 0.31 + i * 1.3) * 0.5 + 0.5) * (H - 12);
@@ -1361,6 +1376,7 @@ AQ.Aquarium = (function () {
       else if (theme === 'ice') { const h = r.range(14, 40); for (let y = 0; y < h; y++) { const w = (1 - y / h) * 5; for (let i = -w; i <= w; i++) set(Math.round(x + i), base - y, [205, 235, 248], 70); } }
       else if (theme === 'vents') { const h = r.range(12, 30); for (let y = 0; y < h; y++) { const w = 2 + (1 - y / h) * 4; for (let i = -w; i <= w; i++) set(Math.round(x + i), base - y, sil, 100); } }
       else if (theme === 'mangrove') { const reach = r.range(10, 24); stroke(x, base - 60, x - reach, base, 90); stroke(x, base - 60, x + reach, base, 90); stroke(x, base - 60, x, base - 100, 90); }
+      else if (theme === 'starfall') { const R2 = r.range(5, 11); for (let a = Math.PI; a < Math.PI * 2; a += 0.1) stroke(x - R2, base, x + Math.cos(a) * R2, base + Math.sin(a) * R2 * 0.5, 70); }
       else if (theme === 'ruins') { const h = r.range(14, 34); for (let y = 0; y < h; y++) for (let i = -2; i <= 2; i++) set(Math.round(x + i), base - y, sil, 90); }
       else { const h = r.range(8, 24); for (let y = 0; y < h; y++) set(Math.round(x), base - y, sil, 80); }
     }

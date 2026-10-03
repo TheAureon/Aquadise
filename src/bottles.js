@@ -78,8 +78,9 @@ AQ.Bottles = (function () {
     B.list = [];
     for (const d of AQ.data.creatures) {
       if (!AQ.data.lore || !AQ.data.lore[d.id]) continue;
-      const pool = all[d.biome] || [];
-      if (!pool.length) { console.warn('[bottles] no reachable spot in', d.biome, 'for', d.id); continue; }
+      const where = d.bottle || d.biome;            // creatures with no sea biome (Starfall) name one with `bottle`
+      const pool = all[where] || [];
+      if (!pool.length) { console.warn('[bottles] no reachable spot in', where, 'for', d.id); continue; }
       let h = seed0; for (const ch of d.id) h = (h * 31 + ch.charCodeAt(0)) >>> 0;
       const rng = U.rng(h);
       // mostly on the seabed / shore, sometimes floating (cfg().floatShare), when the biome has both

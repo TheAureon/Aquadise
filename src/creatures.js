@@ -13,6 +13,7 @@ AQ.Creatures = (function () {
       C.defs[def.id] = def;
       def.params = def.params || {};
       def.spriteKey = (def.is_plant ? 'plant.' : 'creature.') + def.id;
+      if (def.event) continue;                    // falling-star creatures: no wild spawn (src/starfall.js places them)
       if (!AQ.World.biomeById[def.biome]) { console.warn('[creatures] unknown biome', def.biome, def.id); continue; }
       // a family with shared slots (AQ.data.families): its members take turns, picked by weight
       const fam = def.family && fams[def.family];

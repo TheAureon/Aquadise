@@ -117,6 +117,23 @@ row. Floating pieces (`kind: 'float'`, like the buoy and lily pad) hang from the
 `data/decorations.js` sets how many pixels of the sprite dip below the waterline. Pieces with a `glow`
 colour light up dark tanks around them, so leave their bright parts bright.
 
+## Starfall (falling-star creatures and their tank)
+
+These follow every rule above (sizes, rows, anchors, ♂ / juvenile / rare-variant sheets); they're
+listed here because their placeholder shapes are new.
+
+| key | size class | placeholder | notes |
+|---|---|---|---|
+| `creature.starfall_minnow` | tiny (12 × 12) | `fish` + `starry` | pale, with a row of tiny belly lamps that twinkle frame to frame |
+| `creature.aerolite_crab` | small (16 × 16) | `crab` + `rocky` | a pitted grey space-rock shell with faint warm (orange) cracks |
+| `creature.comet_ray` | widelarge (48 × 24) | `ray` (new) | wide flapping wings, small head, star spots; a long thin tail ending in a white glowing tip (keep the tail inside the frame) |
+| `decor.stardust_patch` | small (16 × 16) | `stardust` | a low mound of dark sand with glinting specks (`glow`) |
+| `decor.meteorite_rock` | medium (24 × 24) | `meteorite` | dark pitted rock with glowing orange cracks (`glow`) |
+| `decor.crater_bowl` | wide (32 × 16) | `crater` | a shallow crater: raised rim, dark hollow (a hideout) |
+| `decor.star_lantern` | tall (16 × 32) | `starlantern` | a slim post with a glowing five-point star on top (`glow`) |
+
+The creatures glow in the sea (`light` in `data/creatures.js`), so keep their bright parts bright.
+
 ## Using a different layout
 
 If a generated sheet needs a different frame size or frame count, edit its entry in

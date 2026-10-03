@@ -2,7 +2,7 @@
 // kind:    floor (sits on the sand) | float (hangs at the water top; `hang` = px it dips below the surface)
 // tags:    what the piece "is" - creatures' likes (data/creatures.js) refer to these tags.
 //          rock shell coral kelp plant wood metal arch pillar hideout perch light ice crystal roots
-//          treasure vent bubbles
+//          treasure vent bubbles meteorite stardust
 // biomes:  tanks it matches for the vibe "theme" bonus (omit = fits anywhere, no bonus)
 // unlock:  { biome | tank, tier } - unlocked when that biome's (or predator) tank first reaches the star count for that tier
 //          (tiers 1/2/3 = AQ.TUNING.aquarium.unlockStars in config.js; `stars: n` overrides). Omit = always.
@@ -108,5 +108,10 @@ AQ.data.decorations = [
   { id: 'glow_crystals', name: 'Glow Crystals', kind: 'floor', sprite_size: 'medium', color: '#5fe0b0', accent: '#d0fff0', art: { shape: 'crystals' }, tags: ['crystal', 'light'], glow: '#a0ffd8', biomes: ['pred_cave'], unlock: { tank: 'pred_cave', tier: 3 } },
   { id: 'basking_log', name: 'Basking Log', kind: 'floor', sprite_size: 'wide', color: '#6e5236', accent: '#7d8f3c', art: { shape: 'log' }, tags: ['wood', 'perch', 'hideout'], biomes: ['pred_swamp'], unlock: { tank: 'pred_swamp', tier: 1 } },
   { id: 'reed_clump', name: 'Reed Clump', kind: 'floor', sprite_size: 'medium', color: '#7d8f3c', accent: '#c8b070', art: { shape: 'tuft' }, tags: ['plant', 'roots'], biomes: ['pred_swamp'], unlock: { tank: 'pred_swamp', tier: 2 } },
-  { id: 'swamp_lantern', name: 'Swamp Lantern', kind: 'floor', sprite_size: 'small', color: '#5a4a3a', accent: '#ffd890', art: { shape: 'lantern', metal: '#4a3a2a' }, tags: ['light'], glow: '#ffd890', biomes: ['pred_swamp'], unlock: { tank: 'pred_swamp', tier: 3 } }
+  { id: 'swamp_lantern', name: 'Swamp Lantern', kind: 'floor', sprite_size: 'small', color: '#5a4a3a', accent: '#ffd890', art: { shape: 'lantern', metal: '#4a3a2a' }, tags: ['light'], glow: '#ffd890', biomes: ['pred_swamp'], unlock: { tank: 'pred_swamp', tier: 3 } },
+  // Starfall tank: one free piece, three that unlock at its tiers
+  { id: 'stardust_patch', name: 'Stardust Patch', kind: 'floor', sprite_size: 'small', color: '#3a3460', accent: '#fff3b0', art: { shape: 'stardust' }, tags: ['stardust'], glow: '#d8d0ff', biomes: ['starfall'] },
+  { id: 'meteorite_rock', name: 'Meteorite Rock', kind: 'floor', sprite_size: 'medium', color: '#4a4650', accent: '#ff9a5a', art: { shape: 'meteorite' }, tags: ['meteorite', 'rock', 'perch'], glow: '#ffb070', biomes: ['starfall'], unlock: { tank: 'starfall', tier: 1 } },
+  { id: 'crater_bowl', name: 'Crater Bowl', kind: 'floor', sprite_size: 'wide', color: '#5a5668', accent: '#b8b0d8', art: { shape: 'crater' }, tags: ['meteorite', 'hideout', 'rock'], biomes: ['starfall'], unlock: { tank: 'starfall', tier: 2 } },
+  { id: 'star_lantern', name: 'Star Lantern', kind: 'floor', sprite_size: 'tall', color: '#3a3a5a', accent: '#fff3a8', art: { shape: 'starlantern' }, tags: ['light', 'pillar'], glow: '#fff1a8', biomes: ['starfall'], unlock: { tank: 'starfall', tier: 3 } }
 ];

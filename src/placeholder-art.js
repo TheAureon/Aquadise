@@ -124,6 +124,10 @@
     if (o.fan) { p.tri([cx - 2, cy + 1], [cx - 7, cy + h * 0.9 + wig], [cx + 2, cy + h * 0.7], o.a); p.tri([cx - 4, cy - h / 2], [cx + 4, cy - h / 2], [cx - 2, cy - h * 1.2], o.a); }
     p.shade();
     if (o.wing) { p.line(cx - 1, cy, cx - 6, cy - h * 0.8 - wig, alpha(WHITE, 200)); p.line(cx, cy, cx - 5, cy - h * 0.7 - wig, alpha(WHITE, 160)); }
+    if (o.starry) {                     // a row of tiny belly lamps + a twinkle on the tail (Starfall Minnow)
+      for (let i = -1; i <= 1; i++) p.set(Math.round(cx + i * len * 0.2), Math.round(cy + h * 0.28), (o.frame + i + 3) % 4 === 0 ? WHITE : o.a);
+      p.set(Math.round(tailX - tailL * 0.8), Math.round(cy + wig * 0.5), o.frame % 2 ? WHITE : o.a);
+    }
     if (o.blackEye) { const ex = Math.round(cx + len * 0.27), ey = Math.round(cy - h * 0.12); p.rect(ex, ey, W >= 20 ? 2 : 1, W >= 20 ? 2 : 1, BLACK); }
     else if (!o.eyeless) eye(p, Math.round(cx + len * 0.27), Math.round(cy - h * 0.12), W >= 20);
     p.outline();
@@ -167,6 +171,11 @@
     p.shade();
     p.line(cx - 2, cy - ry, cx - 2, cy - ry - 2, o.c); p.line(cx + 2, cy - ry, cx + 2, cy - ry - 2, o.c);
     p.set(cx - 2, cy - ry - 3, BLACK); p.set(cx + 2, cy - ry - 3, BLACK);
+    if (o.rocky) {                      // a pitted space-rock shell with faint glowing cracks (Aerolite Crab)
+      p.ellipse(cx, cy - ry * 0.55, rx * 0.95, ry * 1.25, mix(o.c, WHITE, 0.08));
+      [[-0.45, -0.5], [0.3, -0.75], [0.05, -0.15], [0.55, -0.25]].forEach(([u, v]) => p.set(Math.round(cx + u * rx), Math.round(cy + v * ry * 1.4), mul(o.c, 0.62)));
+      p.line(cx - rx * 0.5, cy - ry * 0.3, cx - rx * 0.05, cy - ry * 0.9, o.a); p.set(Math.round(cx + rx * 0.25), Math.round(cy - ry * 0.4), o.a);
+    }
     if (o.bell) {
       // a bell-shaped shell with a little hollow (and a tiny clapper)
       const top = cy - ry - H * 0.24, bw = rx * 0.75;
@@ -754,6 +763,65 @@
 
   // ---------- new creatures (day & night update) ----------
   // Seahorse-like: upright curled body, long snout, flowing ribbon mane.
+  // A ray seen from the side-ish: wide flat wings that flap slowly, a small head and a long glowing
+  // comet tail trailing behind (Comet Ray). Faces right like every creature.
+  S.ray = function (p, o) {
+    const W = p.w, H = p.h, ph = o.t * Math.PI * 2, flap = Math.sin(ph) * (o.moving ? 3 : 1.6);
+    const cx = W * 0.6, cy = H * 0.5, bw = W * 0.24, bh = H * 0.16;
+    // the long tail: a thin line that fades to a glowing tip
+    const tail = hex('#bfe8ff');
+    for (let i = 0; i < W * 0.5; i++) {
+      const x = cx - bw - i, y = cy + Math.sin(ph + i * 0.25) * (i / (W * 0.5)) * 1.5;
+      p.set(x, y, i < W * 0.12 ? mul(o.c, 0.9) : mix(o.c, tail, Math.min(1, i / (W * 0.4))));
+    }
+    p.circle(cx - bw - W * 0.5, cy + Math.sin(ph + W * 0.125) * 1.5, 1, WHITE);
+    // wings (up and down) and the body disc
+    p.tri([cx - bw * 0.6, cy], [cx + bw * 0.5, cy], [cx - bw * 0.1, cy - H * 0.36 - flap], o.c);
+    p.tri([cx - bw * 0.6, cy], [cx + bw * 0.5, cy], [cx - bw * 0.1, cy + H * 0.3 + flap * 0.6], mul(o.c, 0.85));
+    p.ellipse(cx, cy, bw, bh, o.c);
+    p.ellipse(cx + 1, cy + bh * 0.4, bw - 2, bh * 0.45, mix(o.c, WHITE, 0.35));
+    p.ellipse(cx + bw * 0.85, cy, bw * 0.35, bh * 0.75, mul(o.c, 1.08));           // head
+    p.shade();
+    for (let i = 0; i < 4; i++) p.set(Math.round(cx - bw * 0.5 + i * bw * 0.35), Math.round(cy - bh * 0.3), (o.frame + i) % 4 === 0 ? WHITE : o.a);   // star spots
+    eye(p, Math.round(cx + bw * 0.95), Math.round(cy - bh * 0.25), W >= 20);
+    p.outline();
+  };
+  // ---- Starfall tank decor
+  S.stardust = function (p, o) {                // a low mound of dark sand sprinkled with glinting dust
+    const W = p.w, H = p.h, r = mkRand(7);
+    p.ellipse(W / 2, H - 2.5, W * 0.45, 2.6, o.c);
+    p.shade(0.2); p.outline();
+    for (let i = 0; i < 10; i++) { const x = Math.round(W * 0.15 + r() * W * 0.7), y = Math.round(H - 2 - r() * 3); if (p.a(x, y)) p.set(x, y, i % 3 ? o.a : WHITE); }
+    p.set(Math.round(W * 0.35), H - 7, o.a); p.set(Math.round(W * 0.62), H - 8, WHITE); p.set(Math.round(W * 0.5), H - 10, alpha(o.a, 180));
+  };
+  S.meteorite = function (p, o) {               // a dark pitted space rock with warm glowing cracks
+    const W = p.w, H = p.h, r = mkRand(13);
+    p.ellipse(W / 2, H * 0.66, W * 0.4, H * 0.32, o.c);
+    p.ellipse(W * 0.42, H * 0.52, W * 0.24, H * 0.22, mul(o.c, 1.08));
+    p.shade(0.22);
+    for (let i = 0; i < 7; i++) { const x = Math.round(W * 0.2 + r() * W * 0.6), y = Math.round(H * 0.45 + r() * H * 0.4); if (p.a(x, y) && p.a(x + 1, y)) { p.set(x, y, mul(o.c, 0.65)); p.set(x + 1, y, mul(o.c, 0.8)); } }
+    p.line(W * 0.3, H * 0.62, W * 0.48, H * 0.78, o.a); p.line(W * 0.48, H * 0.78, W * 0.62, H * 0.66, mul(o.a, 0.85));
+    p.set(Math.round(W * 0.66), H * 0.5, o.a);
+    p.outline();
+  };
+  S.crater = function (p, o) {                  // a shallow crater bowl: a raised rim with a dark hollow
+    const W = p.w, H = p.h;
+    p.ellipse(W / 2, H - 4, W * 0.46, H * 0.3, o.c);
+    p.shade(0.25); p.outline();
+    p.ellipse(W / 2, H - 5, W * 0.3, H * 0.14, mul(o.c, 0.45));
+    p.ellipse(W / 2, H - 4.5, W * 0.24, H * 0.08, mul(o.c, 0.32));
+    for (const u of [0.22, 0.5, 0.78]) p.set(Math.round(W * u), Math.round(H - 4 - H * 0.26), o.a);
+  };
+  S.starlantern = function (p, o) {             // a slim post holding a glowing five-point star
+    const W = p.w, H = p.h, cx = Math.floor(W / 2), metal = o.c;
+    p.rect(cx - 3, H - 2, 6, 2, metal); p.rect(cx, H * 0.4, 1, H * 0.6, metal);
+    const sy = Math.round(H * 0.28), star = o.a;
+    p.rect(cx - 1, sy - 1, 3, 3, star); p.set(cx, sy - 3, star); p.set(cx, sy - 2, star);
+    p.set(cx - 3, sy, star); p.set(cx - 2, sy, star); p.set(cx + 2, sy, star); p.set(cx + 3, sy, star);
+    p.set(cx - 2, sy + 2, star); p.set(cx + 2, sy + 2, star); p.set(cx - 2, sy + 3, star); p.set(cx + 2, sy + 3, star);
+    p.outline(0.3);
+    p.set(cx, sy, WHITE);
+  };
   S.seahorse = function (p, o) {
     const W = p.w, H = p.h, ph = o.t * Math.PI * 2;
     const spine = [[0.56, 0.24], [0.52, 0.34], [0.48, 0.45], [0.5, 0.57], [0.55, 0.67], [0.52, 0.77], [0.44, 0.83], [0.38, 0.78], [0.41, 0.71]];

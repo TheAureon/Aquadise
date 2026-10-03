@@ -128,6 +128,20 @@ browsers won't let a page save pictures made from file:// images.
   The hill and the building are their own scenes and never appear on the world map. The game
   saves which scene you're in. Caught creatures still go straight to their tank. (The old Tab
   shortcut is a test-only setting: `AQ.TUNING.debug.tabOpensAquarium`, off by default.)
+- **Starfall tank and its three creatures.** The building's 3rd floor has a new tank, STARFALL: deep
+  indigo water, drifting twinkling star motes and a faint glow welling up from the middle. It's in every
+  list of tanks (the DIRECTORY / TANKS overview, the whole-building view, Q/E switching, vibe tooltips,
+  photo mode). Four themed decorations: Stardust Patch (always available), Meteorite Rock, Crater Bowl
+  and Star Lantern (unlock at its 1st, 2nd and 3rd star tiers). Its creatures have no wild spawn; they
+  only appear through night events (falling stars and meteor showers):
+  - **Starfall Minnow** (fish, darts): tiny and glowing, in small groups where a star lands in water.
+  - **Aerolite Crab** (crustacean, wary): a shell like a space rock, where a star lands on the shore or sand.
+  - **Comet Ray** (fish, curious): larger, with a glowing tail; only during meteor showers, the rarest.
+  They follow the same rules as everything else (♂/♀, breeding, rare variants, likes, moods, photo
+  mode). The log gives them their own STARFALL page with "FALLING STARS ONLY" / "METEOR SHOWERS ONLY"
+  tags. Each has field notes in a message bottle: the minnow's on the Open Ocean seabed, the crab's
+  on the Tide Pools shore, the ray's on the Coral Reef seabed (set by `bottle` in `data/creatures.js`).
+  Data: `AQ.data.specialTanks` + `tankStyles.starfall` (data/aquarium.js), the creatures' `event` field.
 - **Predator wing.** The building's 4th floor holds 5 predator tanks (Reef, Open-Water, Deep, Cave
   and Swamp Hunters). Every creature marked `predator` lives there instead of in its biome's tank;
   the grouping is data in `data/aquarium.js` (`predatorTanks`). Each floor has 5 tank slots

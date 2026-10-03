@@ -462,5 +462,21 @@ AQ.data.lore = {
     'It comes out only at night, when its light is most visible.',
     'Insects and small fish are drawn to the light, then snapped up by the frog beside it.',
     'Eggs are laid in quiet water among the roots, and the tadpoles glow faintly too.',
-    'Odd fact: the decoy is so convincing that other frogs sometimes try to eat it.'] }
+    'Odd fact: the decoy is so convincing that other frogs sometimes try to eat it.'] },
+  // ---------------------------------------------------------------- Starfall (falling stars)
+  starfall_minnow: { title: 'The Little Lights from Above', sci: 'Astrichthys minutus', lines: [
+    '{name} glows from a row of tiny lamps along its belly, soft enough to hide it against the stars.',
+    'Shoals ride the cold wake of a falling star down into the sea, feeding on the specks it scatters.',
+    'They lay clear, glimmering eggs on floating weed; the fry hatch already faintly lit.',
+    'Odd fact: a shoal flickers in step, like one small constellation turning over.'] },
+  aerolite_crab: { title: 'The Stone That Walked Ashore', sci: 'Meteorocarcinus lapis', lines: [
+    '{name} grows a pitted grey shell, scorched-looking at the edges, that passes for a fallen pebble.',
+    'It turns up where a star has struck the shore and picks warm grit from the fresh crater.',
+    'Females carry their amber eggs beneath the tail until the young scatter into the tide.',
+    'Odd fact: its shell holds a little of the day\'s warmth, and glows faintly long after dark.'] },
+  comet_ray: { title: 'The Tail of the Shower', sci: 'Cometobatis caudalux', lines: [
+    '{name} flies through the water on wide, slow wings, trailing a long tail that glows like a comet.',
+    'It sweeps up drifting specks of stardust in the shallows on nights when the sky is busiest.',
+    'It lays a few dark, leathery egg cases that rest on the sand until the pups slip out.',
+    'Odd fact: it is curious about lights, and will turn to look at a lantern held still.'] },
 };
