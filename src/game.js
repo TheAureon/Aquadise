@@ -95,6 +95,10 @@ AQ.Game = (function () {
       if (AQ.Starfall) AQ.Starfall.update(dt, G);   // falling stars + meteor showers: on schedule wherever you are
       if (!frozen) {
         if (AQ.TUNING.debug.timeSkip && I.wasPressed(AQ.TUNING.debug.timeSkipKey)) { AQ.Clock.set(AQ.Clock.hour() + AQ.TUNING.clock.skipHours); AQ.HUD.toast(`Time skip: ${AQ.HUD.clockText()}`, '#cfe8ff'); }
+        if (AQ.TUNING.debug.starKeys && AQ.Starfall) {
+          if (I.wasPressed(AQ.TUNING.debug.fallStarKey) && !AQ.Starfall.fall(G)) AQ.HUD.toast('No free spot for a star right now.', '#cfe8ff');
+          if (I.wasPressed(AQ.TUNING.debug.showerKey)) AQ.Starfall.startShower(G);
+        }
         if (I.wasPressed('KeyH')) { AQ.HUD.showHelp = true; AQ.HUD.helpT = AQ.HUD.helpT > 0 ? 0 : 12; }
         if (I.wasPressed('KeyM')) { if (inWorld) G.state = G.state === 'map' ? 'play' : 'map'; else AQ.HUD.toast('The map only shows the sea.', '#cfe8ff'); }
         if (I.wasPressed('Tab') && AQ.Aquarium && AQ.TUNING.debug.tabOpensAquarium) { AQ.Aquarium.open(G); I.endFrame(); return; }

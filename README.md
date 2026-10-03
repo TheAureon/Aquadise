@@ -97,7 +97,8 @@ browsers won't let a page save pictures made from file:// images.
   researcher's notes on its species (`data/lore.js`): an epithet, an invented scientific name and a
   few lines of biology. The species' name only appears once you've caught it ("this creature"
   until then). Read them on a species' entry page (ENTER or click in the SPECIES tab, in its Field
-  Notes section) or in the NOTES tab, grouped by biome. The log header shows "BOTTLES FOUND n/total".
+  Notes section) or in the NOTES tab, grouped by biome. The log header shows "BOTTLES FOUND n/total". Pickup toasts (and every other toast)
+  sit just above the controls hint at the bottom of the screen while it is showing, never on top of it.
   Placement is the same every time (seeded), never inside terrain, and every bottle can be reached
   without any upgrade (checked with the sea scene's own "can the player be here" test and a flood
   fill from the start that stops at the level-0 depth limit). Tuning: `AQ.TUNING.bottles`
@@ -151,6 +152,9 @@ browsers won't let a page save pictures made from file:// images.
   - Tuning: `AQ.TUNING.starfall` (star / shower chances, catch-up, stars per shower, Comet Ray chance,
     when in the night they fall, water vs shore, group size, how long they wait and fade, distances,
     the light column, chime volume).
+  - Testing: set `debug.starKeys: true` in config.js; then (any time, even by day) **G** makes a
+    star fall right now and **J** starts a meteor shower right now (2-4 stars over the next ~20 s).
+    The keys are `debug.fallStarKey` / `debug.showerKey`.
 - **Starfall tank and its three creatures.** The building's 3rd floor has a new tank, STARFALL: deep
   indigo water, drifting twinkling star motes and a faint glow welling up from the middle. It's in every
   list of tanks (the DIRECTORY / TANKS overview, the whole-building view, Q/E switching, vibe tooltips,

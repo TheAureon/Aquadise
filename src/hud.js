@@ -85,10 +85,11 @@ AQ.HUD = (function () {
     }
     if (game.player.sneaking) { ctx.globalAlpha = 0.8; F.draw(ctx, 'SNEAKING', 4, 34, '#9fe8ff', { shadow: SH }); ctx.globalAlpha = 1; }
     // toasts: at most two, newest at the bottom
-    const shown = H.toasts.slice(-2);
+    const shown = H.toasts.slice(-2), helpOn = H.showHelp && H.helpT > 0;
+    const base = helpOn ? vh - 28 : vh - 20;                     // above the controls hint while it's showing
     shown.forEach((t, i) => {
       ctx.globalAlpha = Math.min(1, t.t * 5, (t.life - t.t) * 2.5);
-      F.draw(ctx, t.text, vw / 2, vh - 20 - (shown.length - 1 - i) * 8, t.color, { align: 'center', shadow: SH });
+      F.draw(ctx, t.text, vw / 2, base - (shown.length - 1 - i) * 8, t.color, { align: 'center', shadow: SH });
       ctx.globalAlpha = 1;
     });
     // help (first moments only, or when H is pressed)

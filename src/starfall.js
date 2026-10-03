@@ -39,7 +39,19 @@ AQ.Starfall = (function () {
     return (((AQ.Clock.hour() - start) % 24) + 24) % 24 / len;
   }
   SF.plan = () => st().plan;
-  SF.showerTonight = () => { const p = st().plan; return !!(p && p.shower && EVENING(AQ.Clock.phase())); };
+  SF.showerTonight = () => { const p = st().plan; return !!(p && p.shower && (EVENING(AQ.Clock.phase()) || SF.forcedUntil > SF.t)); };
+  SF.forcedUntil = 0;
+  // TESTING (debug.starKeys): a meteor shower right now, even by day. The sky gets busy for a while and
+  // 2-4 stars fall over the next ~20 seconds. Tonight's real plan carries on afterwards as normal.
+  SF.startShower = function (game) {
+    const c = cfg(), s = st(), n = R.int(c.showerStars[0], c.showerStars[1]);
+    s.plan = Object.assign(s.plan || { night: s.night, falls: [] }, { shower: true, announced: true });
+    SF.forcedUntil = SF.t + 90;
+    tell('The sky is full of falling stars tonight', game);
+    if (AQ.Music) AQ.Music.stinger('shower');
+    for (let i = 0; i < n; i++) SF.queue.push(SF.t + 2 + i * R.range(4, 7));
+  };
+  SF.queue = [];
   SF.waiting = () => st().landings.filter((L) => wantCount(L) > 0);
   const wantCount = (L) => Object.values(L.want).reduce((a, b) => a + b, 0);
 
@@ -164,6 +176,8 @@ AQ.Starfall = (function () {
         else if (phase === 'dawn' || phase === 'day') f.done = true;
       }
     }
+    // stars queued by the testing shower key
+    for (let i = SF.queue.length - 1; i >= 0; i--) if (SF.t >= SF.queue[i]) { SF.queue.splice(i, 1); SF.fall(game, { shower: true }); }
     // the falling streaks touch down
     for (let i = SF.falls.length - 1; i >= 0; i--) {
       const f = SF.falls[i]; f.t += dt;

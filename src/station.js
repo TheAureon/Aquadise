@@ -273,7 +273,8 @@ AQ.Station = (function () {
     }
     if (St.mode === 'walk' && !AQ.Transition.active) {
       const F = AQ.Font, txt = `${cfg.zoomKey.replace('Key', '')}: ${St.zoomedOut() ? 'FOLLOW ROBOT' : 'SEE ALL TANKS'}`;
-      ctx.globalAlpha = 0.75; F.draw(ctx, txt, 316, 172, '#cfe8ff', { align: 'right', shadow: 'rgba(4,12,24,0.85)' }); ctx.globalAlpha = 1;
+      const helpOn = AQ.HUD.showHelp && AQ.HUD.helpT > 0;              // above the controls hint while it's showing
+      ctx.globalAlpha = 0.75; F.draw(ctx, txt, 316, helpOn ? 158 : 172, '#cfe8ff', { align: 'right', shadow: 'rgba(4,12,24,0.85)' }); ctx.globalAlpha = 1;
     }
   };
   function drawPrompt(ctx, P, left, top, z) {

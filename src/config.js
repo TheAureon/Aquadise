@@ -130,7 +130,10 @@ AQ.TUNING = {
   debug: {
     tabOpensAquarium: false,  // TESTING ONLY: true lets Tab open the tank screen from anywhere (the old shortcut)
     timeSkip: false,          // TESTING ONLY: true lets you press N in the sea to skip ahead clock.skipHours
-    timeSkipKey: 'KeyN'
+    timeSkipKey: 'KeyN',
+    starKeys: false,          // TESTING ONLY: true adds two keys (any time, even by day):
+    fallStarKey: 'KeyG',      //   G = a star falls right now
+    showerKey: 'KeyJ'         //   J = a meteor shower starts right now (2-4 stars over the next ~20 seconds)
   },
   interactKeys: ['KeyE'],     // "interact" (beam up/down, open a tank, use the directory)
 

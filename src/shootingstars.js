@@ -63,7 +63,8 @@ AQ.ShootingStars = (function () {
     }
     if (game.scene !== 'world' && game.scene !== 'hill') return;
     // the sky: only at night, rarer near dusk / dawn
-    const n = S.night();
+    const forced = AQ.Starfall && AQ.Starfall.forcedUntil > AQ.Starfall.t;          // testing shower key: even by day
+    const n = forced ? 1 : S.night();
     if (n <= 0) { S.timer = Math.max(S.timer, 3); return; }
     const shower = AQ.Starfall && AQ.Starfall.showerTonight(), boost = shower ? AQ.TUNING.starfall.showerSkyBoost : 1;
     S.timer -= dt * n * boost;
