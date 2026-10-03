@@ -262,7 +262,9 @@ AQ.Music = (function () {
   M.update = function (dt, game) {
     if (!A.ready || !game) return;
     const want = M.wanted(game);
-    if (A.settle(M, M.current && M.current.key, want, dt, !!M.test || game.scene !== 'world' || game.state === 'title')) {
+    // biome-to-biome changes while swimming settle first; anything else (title, aquarium, scenes) switches at once
+    const roaming = game.scene === 'world' && (game.state === 'play' || game.state === 'map' || game.state === 'pause');
+    if (A.settle(M, M.current && M.current.key, want, dt, !!M.test || !roaming)) {
       const fade = cfg().crossfadeSeconds;
       if (M.current) { stopPiece(M.current, fade); }
       M.current = startPiece(want, M.current ? fade : 2);

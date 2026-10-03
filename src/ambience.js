@@ -100,7 +100,7 @@ AQ.Ambience = (function () {
   B.update = function (dt, game) {
     if (!A.ready || !game) return;
     const want = B.wanted(game);
-    if (A.settle(B, B.current ? B.current.id : null, want, dt, !!B.test || game.scene !== 'world')) {
+    if (A.settle(B, B.current ? B.current.id : null, want, dt, !!B.test || game.scene !== 'world' || game.state === 'aquarium')) {
       const fade = cfg().crossfadeSeconds;
       if (B.current) stopBed(B.current, fade);
       B.current = want ? startBed(want, B.current ? fade : 2) : null;

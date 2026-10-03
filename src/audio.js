@@ -127,7 +127,7 @@ AQ.Audio = (function () {
     // the same sound fired many times in a blink plays once
     const t = A.ctx.currentTime, min = s.minGap != null ? s.minGap : 0.05;
     if (A.last[id] && t - A.last[id] < min) return;
-    if (A.voices >= cfg().maxVoices && !s.important) return;
+    if (A.voices >= cfg().maxVoices && !s.important && !opts.important) return;
     A.last[id] = t;
     try {
       const out = A.ctx.createGain(); out.gain.value = opts.vol != null ? opts.vol : 1;

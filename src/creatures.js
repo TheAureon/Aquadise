@@ -163,6 +163,15 @@ AQ.Creatures = (function () {
 
   // ---------------------------------------------------------------- update
   const ctx = {};
+  // Safety net: a visible swimmer that somehow ended up inside rock (a knock, a leap) is moved to
+  // the nearest open water instead of staying stuck there.
+  function unstick(c) {
+    const W = AQ.World;
+    for (let r = 2; r <= 40; r += 2) for (let a = 0; a < 16; a++) {
+      const x = c.x + Math.cos(a / 16 * Math.PI * 2) * r, y = c.y + Math.sin(a / 16 * Math.PI * 2) * r;
+      if (W.water(x, y)) { c.x = x; c.y = y; c.vx = c.vy = 0; c.target = null; return; }
+    }
+  }
   C.update = function (dt, game) {
     const P = game.player, simR = AQ.TUNING.creatures.simRadius;
     ctx.P = P; ctx.noise = P.noise(); ctx.bait = AQ.Catching ? AQ.Catching.bait : null;
@@ -176,6 +185,7 @@ AQ.Creatures = (function () {
       c.t += dt; c.iconT -= dt; c.hitCD -= dt;
       c.bhv.update(c, ctx, dt);
       if (c.def.active && AQ.Clock && !AQ.Clock.activeFor(c.def)) leave(c, dt);
+      if (c.movement === 'swim' && !c.hidden && AQ.World.solid(c.x, c.y)) unstick(c);
       c.alpha += (c.targetAlpha - c.alpha) * Math.min(1, dt * (c.leaving ? 1 : 5));
       if (c.hostileActive && c.hitCD <= 0 && ctx.dist < c.r + 7) {
         const k = AQ.TUNING.knockback[c.def.knockback === 'strong' ? 'strong' : 'light'];

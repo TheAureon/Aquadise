@@ -17,7 +17,11 @@ AQ.Chests = (function () {
     const biomes = AQ.World.biomes;
     for (let tries = 0; tries < 30; tries++) {
       const b = R.pick(biomes);
-      const spot = AQ.Creatures.findSpot({ id: 'chest', biome: b.id, is_plant: true, spriteKey: 'chest', spawn: {} }, 'floor');
+      // never deeper than you can currently dive (DEEP upgrade), or the chest would be out of reach
+      const U2 = AQ.TUNING.upgrades, lvl = (game.upgrades && game.upgrades.depth) || 0;
+      const lim = U2.depthLimitY[Math.min(lvl, U2.depthLimitY.length - 1)];
+      const sp = lim != null ? { y: [0, lim - 8] } : {};
+      const spot = AQ.Creatures.findSpot({ id: 'chest', biome: b.id, is_plant: true, spriteKey: 'chest', spawn: sp }, 'floor');
       if (!spot) continue;
       const P = game.player;
       if (!initial && Math.hypot(spot[0] - P.x, spot[1] - P.y) < T().minPlayerDist) continue;

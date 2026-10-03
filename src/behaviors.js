@@ -30,8 +30,11 @@ AQ.Behaviors = (function () {
     const W = AQ.World;
     // a water creature that ended up in the air (after a leap, a knock, a respawn) falls back in
     if (!c.allowAir && W.air(c.x, c.y)) {
-      c.vy = Math.max(c.vy, 0) + 260 * dt; c.y += c.vy * dt; c.x += c.vx * dt * 0.5;
-      if (W.solid(c.x, c.y)) c.y -= c.vy * dt;
+      c.vy = Math.max(c.vy, 0) + 260 * dt;
+      // fall, but never into rock or ice (check each direction on its own)
+      const fx = c.x + c.vx * dt * 0.5, fy = c.y + c.vy * dt;
+      if (!W.solid(fx, c.y)) c.x = fx; else c.vx *= -0.3;
+      if (!W.solid(c.x, fy)) c.y = fy; else c.vy = 0;
       return;
     }
     const nx = c.x + c.vx * dt, ny = c.y + c.vy * dt;
