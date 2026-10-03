@@ -27,6 +27,7 @@ AQ.Aquarium = (function () {
     }
     A.prevState = 'play';
     A.undo = []; A.notes = []; A.view = 'tank';
+    A.shaker = null; A.card = null; A.clearArm = 0; A.courtC = null; A.holding = null;
     A.photo.on = false; A.photo.paused = false; A.photo.previewT = 0;   // always arrive in the normal view
     AQ.FX.list.length = 0;
     A.rebuild();
@@ -43,7 +44,8 @@ AQ.Aquarium = (function () {
   A.refreshVibe = function () {
     const before = A.vibe && A.vibeOf === A.biome ? A.vibe.stars : null;
     A.vibe = AQ.Vibe.evaluate(A.biome); A.vibeOf = A.biome;
-    if (before != null && Math.floor(A.vibe.stars) > Math.floor(before)) AQ.Audio.play('star');   // a whole new star A.vibeT = AQ.TUNING.aquarium.recomputeEvery;
+    if (before != null && Math.floor(A.vibe.stars) > Math.floor(before)) AQ.Audio.play('star');   // a whole new star
+    A.vibeT = AQ.TUNING.aquarium.recomputeEvery;
     A.fish.forEach(updateMood);
     A.fish.forEach(setAge);
     A.courtPair = new Set(AQ.Breeding.courting(AQ.Collection.tank(A.biome)) || []);
@@ -540,9 +542,9 @@ AQ.Aquarium = (function () {
   function switchTank(dir) {
     const list = biomes();
     const i = list.findIndex((b) => b.id === A.biome);
+    putBack();                                   // a carried piece goes back into the tank it came from
     A.biome = list[(i + dir + list.length) % list.length].id;
-    putBack();
-    A.fish = []; A.shaker = null; A.card = null; A.undo = []; A.clearArm = 0; A.rebuild();
+    A.fish = []; A.shaker = null; A.card = null; A.undo = []; A.clearArm = 0; A.courtC = null; A.rebuild();
   }
   // Feeding: a little shaker tips over the lid and sprinkles pellets as it slides along.
   function feed() {
@@ -610,7 +612,7 @@ AQ.Aquarium = (function () {
         break;
       case 'fish': {
         const from = r.where === 'tank' ? tank.creatures : tank.storage, to = r.where === 'tank' ? tank.storage : tank.creatures;
-        if (r.where === 'storage' && tank.creatures.length >= AQ.TUNING.tank.capacity) { note(`Tank full (${AQ.TUNING.tank.capacity}). Move one to storage first.`, '#ffd56b'); break; }
+        if (r.where === 'storage' && AQ.Breeding.occupancy(tank) >= AQ.TUNING.tank.capacity) { note((tank.eggs || []).length && tank.creatures.length < AQ.TUNING.tank.capacity ? 'No room: eggs are about to hatch here.' : `Tank full (${AQ.TUNING.tank.capacity}). Move one to storage first.`, '#ffd56b'); break; }
         const i = from.findIndex((e) => e.uid === r.uid);
         if (i >= 0) to.push(from.splice(i, 1)[0]);
         A.rebuild(); AQ.Save && AQ.Save.dirty();
@@ -632,6 +634,8 @@ AQ.Aquarium = (function () {
   function zOf(d) { return d.layer === 'back' ? d.y - 1000 : d.layer === 'front' ? d.y + 1000 : d.y; }
   function place(tank, m) {
     const h = A.holding, pl = placement(h);
+    // repeat placements keep holding the piece, so the cap is checked here too
+    if (!h.fromTank && tank.decor.length >= AQ.TUNING.tank.decorCapacity) { note('This tank is full of decorations.', '#ffd56b'); A.holding = null; return; }
     if (h.kind === 'plant' && !h.fromTank) {
       if (!(AQ.State.plants[h.id] > 0)) { A.holding = null; return; }
       AQ.State.plants[h.id]--;
@@ -1131,7 +1135,7 @@ AQ.Aquarium = (function () {
       if (A.ovHover != null) {
         A.view = 'tank';
         A.biome = A.overview[A.ovHover].b.id;
-        A.fish = []; A.shaker = null; A.undo = []; A.clearArm = 0; A.rebuild();
+        A.fish = []; A.shaker = null; A.card = null; A.undo = []; A.clearArm = 0; A.courtC = null; A.rebuild();
       }
     }
     AQ.FX.update(dt, { water: () => true });
