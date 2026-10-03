@@ -3,7 +3,8 @@ var AQ = (typeof AQ !== 'undefined') ? AQ : {};
 
 AQ.LogUI = (function () {
   const U = AQ.U, F = () => AQ.Font;
-  const L = { from: 'play', biomeIdx: 0, sel: 0, ui: [] };
+  const L = { from: 'play', biomeIdx: 0, sel: 0, scroll: 0, ui: [] };
+  const COLS = 5, ROWS = 2;   // cells shown at once; a biome with more creatures scrolls
   const sil = new Map();
   const CAT_LABEL = { fish: 'Fish', gastropod: 'Gastropod', crustacean: 'Crustacean', amphibian: 'Amphibian', cephalopod: 'Cephalopod', reptile: 'Reptile', mammal: 'Mammal', plant: 'Plant' };
 
@@ -20,7 +21,7 @@ AQ.LogUI = (function () {
     game.state = 'log';
     const here = from === 'aquarium' ? AQ.Aquarium.biome : from === 'title' || game.scene !== 'world' ? 'tide_pools' : AQ.World.biomeAt(game.player.x, game.player.y).id;
     L.biomeIdx = Math.max(0, biomes().findIndex((b) => b.id === here));
-    L.sel = 0;
+    L.sel = 0; L.scroll = 0;
   };
   L.close = function (game) {
     AQ.Audio.play('log_close');
@@ -33,7 +34,14 @@ AQ.LogUI = (function () {
     ui.push({ id: 'prev', x: 8, y: 16, w: 10, h: 10, label: '<' });
     ui.push({ id: 'next', x: 152, y: 16, w: 10, h: 10, label: '>' });
     ui.push({ id: 'close', x: 270, y: 3, w: 46, h: 10, label: 'CLOSE' });
-    list.forEach((d, i) => ui.push({ id: 'cell', i, d, x: 8 + (i % 5) * 61, y: 30 + Math.floor(i / 5) * 47, w: 58, h: 44 }));
+    const rows = Math.ceil(list.length / COLS);
+    L.scroll = U.clamp(L.scroll, 0, Math.max(0, rows - ROWS));
+    list.forEach((d, i) => {
+      const row = Math.floor(i / COLS) - L.scroll;
+      if (row >= 0 && row < ROWS) ui.push({ id: 'cell', i, d, x: 8 + (i % COLS) * 61, y: 30 + row * 47, w: 58, h: 44 });
+    });
+    if (L.scroll > 0) ui.push({ id: 'up', x: 290, y: 17, w: 12, h: 9, label: '' });
+    if (L.scroll < rows - ROWS) ui.push({ id: 'down', x: 304, y: 17, w: 12, h: 9, label: '' });
     return ui;
   }
 
@@ -41,13 +49,23 @@ AQ.LogUI = (function () {
     const I = AQ.Input, m = I.mouse, n = biomes().length;
     L.ui = layout();
     if (I.wasPressed('Escape', 'KeyL')) { L.close(game); return; }
-    if (I.wasPressed('KeyQ', 'ArrowLeft', 'KeyA')) { L.biomeIdx = (L.biomeIdx + n - 1) % n; L.sel = 0; }
-    if (I.wasPressed('KeyE', 'ArrowRight', 'KeyD')) { L.biomeIdx = (L.biomeIdx + 1) % n; L.sel = 0; }
+    if (I.wasPressed('KeyQ', 'ArrowLeft', 'KeyA')) { L.biomeIdx = (L.biomeIdx + n - 1) % n; L.sel = 0; L.scroll = 0; }
+    if (I.wasPressed('KeyE', 'ArrowRight', 'KeyD')) { L.biomeIdx = (L.biomeIdx + 1) % n; L.sel = 0; L.scroll = 0; }
+    // more creatures than fit: scroll with the mouse wheel, Up/Down (W/S) or the little arrows
+    const count = entries(biomes()[L.biomeIdx]).length, rows = Math.ceil(count / COLS);
+    const step = (d) => { L.sel = U.clamp(L.sel + d * COLS, 0, count - 1); const r = Math.floor(L.sel / COLS); if (r < L.scroll) L.scroll = r; if (r >= L.scroll + ROWS) L.scroll = r - ROWS + 1; };
+    if (I.wasPressed('ArrowUp', 'KeyW')) step(-1);
+    if (I.wasPressed('ArrowDown', 'KeyS')) step(1);
+    if (m.wheel) L.scroll = U.clamp(L.scroll + Math.sign(m.wheel), 0, Math.max(0, rows - ROWS));
+    L.ui = layout();
     L.hover = L.ui.find((r) => m.x >= r.x && m.y >= r.y && m.x < r.x + r.w && m.y < r.y + r.h);
-    if (L.hover && L.hover.id === 'cell') L.sel = L.hover.i;
+    if (L.hover && L.hover.id === 'cell' && (m.x !== L.mx || m.y !== L.my || m.pressed[0])) L.sel = L.hover.i;   // follow the mouse only when it moves
+    L.mx = m.x; L.my = m.y;
     if (m.pressed[0] && L.hover) {
-      if (L.hover.id === 'prev') { L.biomeIdx = (L.biomeIdx + n - 1) % n; L.sel = 0; }
-      if (L.hover.id === 'next') { L.biomeIdx = (L.biomeIdx + 1) % n; L.sel = 0; }
+      if (L.hover.id === 'prev') { L.biomeIdx = (L.biomeIdx + n - 1) % n; L.sel = 0; L.scroll = 0; }
+      if (L.hover.id === 'next') { L.biomeIdx = (L.biomeIdx + 1) % n; L.sel = 0; L.scroll = 0; }
+      if (L.hover.id === 'up') L.scroll--;
+      if (L.hover.id === 'down') L.scroll++;
       if (L.hover.id === 'close') L.close(game);
     }
   };
@@ -81,6 +99,12 @@ AQ.LogUI = (function () {
     const got = list.filter((d) => AQ.Collection.has(d.id)).length, done = list.filter((d) => AQ.Sex.complete(d)).length;
     F().draw(g, `${b.name} ${got}/${list.length}`, 85, 18, done === list.length ? '#7ef0c0' : '#e8fbff', { align: 'center' });
     for (const r of L.ui) {
+      if (r.id === 'up' || r.id === 'down') {
+        AQ.Aquarium.button(g, r, L.hover === r);
+        g.fillStyle = '#e8fbff';                                    // little triangle arrow
+        for (let k = 0; k < 3; k++) g.fillRect(r.x + 6 - k, r.id === 'up' ? r.y + 3 + k : r.y + 5 - k, k * 2 + 1, 1);
+        continue;
+      }
       if (r.id !== 'cell') { AQ.Aquarium.button(g, r, L.hover === r); continue; }
       const d = r.d, has = AQ.Collection.has(d.id), sel = r.i === L.sel;
       g.fillStyle = sel ? '#24506b' : '#132b40'; g.fillRect(r.x, r.y, r.w, r.h);
@@ -126,7 +150,7 @@ AQ.LogUI = (function () {
       }
       wrap('Tip: ' + (d.active === 'night' ? 'Comes out at night. ' : d.bloom === 'night' ? 'Opens at night. ' : d.active === 'day' ? 'Only out by day. ' : '') + (d.requires_depth ? `Lives deep: needs the depth upgrade (level ${d.requires_depth}). ` : '') + (d.hint || ''), 75).slice(0, has && AQ.Sex.has(d) ? 3 : 4).forEach((l, i) => F().draw(g, l, 10, 140 + i * 8, '#d8eef8'));
     }
-    F().draw(g, 'Q/E OR ARROWS: BIOME   ESC: CLOSE', 160, 173, '#5f7f96', { align: 'center' });
+    F().draw(g, list.length > COLS * ROWS ? 'Q/E: BIOME   UP/DOWN OR WHEEL: SCROLL   ESC: CLOSE' : 'Q/E OR ARROWS: BIOME   ESC: CLOSE', 160, 173, '#5f7f96', { align: 'center' });
   };
   return L;
 })();
