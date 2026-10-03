@@ -8,7 +8,7 @@ AQ.LogUI = (function () {
   // one look for every tab: header bar (title, tabs, bottles, close), a context row, the content, a footer hint
   const C = { bg: '#06101c', bar: '#0b1a2c', line: '#1c3a52', panel: '#0d2236', title: '#ffe9a8', text: '#d8eef8', dim: '#8aa4b8', info: '#9fd3ee', hint: '#4f6f86', good: '#7ef0c0', warn: '#ffcf8a', gold: '#ffd25a' };
   const COLS = 5, CELL_H = 47, HEAD_H = 10, VIEW_H = 94;            // species grid area (y 30..124)
-  const VCOLS = 3, VROW_H = 14, VVIEW_H = 122;                      // variants list area (y 30..152)
+  const VCOLS = 4, VROW_H = 33, VVIEW_H = 110;                      // variants cards area (y 30..140)
   const NROW_H = 10, NVIEW_H = 134;                                  // notes list (left column, y 30..164)
   const sil = new Map();
   const CAT_LABEL = { fish: 'Fish', gastropod: 'Gastropod', crustacean: 'Crustacean', amphibian: 'Amphibian', cephalopod: 'Cephalopod', reptile: 'Reptile', mammal: 'Mammal', plant: 'Plant' };
@@ -78,7 +78,12 @@ AQ.LogUI = (function () {
     });
     return rows;
   }
-  const fitFrom = (rows, start, view) => { let h = 0, n = 0; for (let r = start; r < rows.length && h + rows[r].h <= view; r++) { h += rows[r].h; n++; } return n; };
+  const fitFrom = (rows, start, view) => {
+    let h = 0, n = 0;
+    for (let r = start; r < rows.length && h + rows[r].h <= view; r++) { h += rows[r].h; n++; }
+    if (n > 1 && start + n < rows.length && rows[start + n - 1].type === 'head') n--;     // never strand a heading at the bottom
+    return n;
+  };
   const maxScroll = (rows, view) => { for (let s = 0; s < rows.length; s++) if (s + fitFrom(rows, s, view) >= rows.length) return s; return 0; };
   // move the selection one cell row up/down (same column), scrolling so it (and its heading) stays visible
   function stepRows(rows, sel, scroll, d, view) {
@@ -162,11 +167,11 @@ AQ.LogUI = (function () {
       for (let r = L.vscroll, n = fitFrom(rows, L.vscroll, VVIEW_H); r < L.vscroll + n; r++) {
         const row = rows[r];
         if (row.type === 'head') ui.push({ id: 'head', x: 8, y, w: 302, h: HEAD_H - 2, label: row.label, count: row.count });
-        else row.items.forEach((it, c) => ui.push({ id: 'vcell', i: it.i, d: it.d, x: 6 + c * 102, y, w: 100, h: VROW_H - 2 }));
+        else row.items.forEach((it, c) => ui.push({ id: 'vcell', i: it.i, d: it.d, x: 8 + c * 76, y, w: 74, h: VROW_H - 3 }));
         y += row.h;
       }
       if (L.vscroll > 0) ui.push({ id: 'up', x: 311, y: 30, w: 8, h: 9, label: '' });
-      if (L.vscroll < maxS) ui.push({ id: 'down', x: 311, y: 143, w: 8, h: 9, label: '' });
+      if (L.vscroll < maxS) ui.push({ id: 'down', x: 311, y: 131, w: 8, h: 9, label: '' });
     } else if (L.tab === 'notes') {
       const rows = noteRows(), maxS = maxScroll(rows, NVIEW_H);
       L.nscroll = U.clamp(L.nscroll, 0, maxS);
@@ -388,30 +393,57 @@ AQ.LogUI = (function () {
     else if (L.hover === r) outline(g, r, '#2f6684');
   }
 
-  // VARIANTS tab: every species with a rare colour variant slot, grouped by biome
+  // VARIANTS tab: every species that can have a rare colour, as "normal -> rare" cards grouped by
+  // biome. The rare colour stays a gold "?" until one is bred; the panel says what to do next.
+  // where a species stands on the way to its rare colour, and the next step
+  function variantStatus(d) {
+    const lg = logOf(d.id), name = d.name.toUpperCase();
+    if (lg.variant) return { stage: 4, head: `✦ ${name}: RARE COLOR BRED!`, next: 'YOU HAVE ONE. LOOK FOR IT IN ITS TANK.' };
+    if (!AQ.Collection.has(d.id)) return { stage: 0, head: '???: NOT DISCOVERED YET', next: 'CATCH ONE FIRST. ITS RARE COLOR CAN ONLY BE BRED, NEVER CAUGHT.' };
+    if (!(lg.m && lg.f)) return { stage: 1, head: `${name}: NOT BRED YET`, next: `STEP 1: CATCH A ${lg.m ? 'FEMALE ♀' : 'MALE ♂'} TOO, SO YOU HAVE A PAIR.` };
+    const tid = AQ.Tanks.forCreature(d), t = AQ.Tanks.get(tid), tank = AQ.Collection.tank(tid), tn = t ? (t.short || t.name).toUpperCase() : 'ITS';
+    const here = tank.creatures.filter((e) => e.id === d.id);
+    const paired = here.some((e) => e.sex === 'm') && here.some((e) => e.sex === 'f');
+    const odds = Math.round(1 / AQ.TUNING.breeding.variantChance);
+    if (!paired) return { stage: 2, head: `${name}: NOT BRED YET`, next: `STEP 2: PUT A ♂ AND A ♀ TOGETHER IN THE ${tn} TANK.` };
+    return { stage: 3, head: `${name}: A PAIR LIVES IN THE ${tn} TANK ♥`, next: `KEEP THE TANK HAPPY (${AQ.TUNING.breeding.minStars}+ STARS) AND FED. ABOUT 1 BABY IN ${odds} IS A RARE COLOR.` };
+  }
   function drawVariants(g) {
     const vp = L.variantProgress();
-    F().draw(g, 'RARE COLORS - ONLY BABIES BRED IN A TANK', 6, 19, C.dim);
+    F().draw(g, 'BREED A PAIR IN A TANK: NOW AND THEN A BABY IS A RARE COLOR', 6, 19, C.dim);
     F().draw(g, `${vp.got}/${vp.total}`, 316, 19, C.gold, { align: 'right' });
-    F().draw(g, 'VARIANTS', 316 - F().width(`${vp.got}/${vp.total}`) - 4, 19, C.hint, { align: 'right', shadow: false });
-    // the selected entry
+    F().draw(g, '✦', 316 - F().width(`${vp.got}/${vp.total}`) - 4, 19, C.gold, { align: 'right', shadow: false });
+    // the selected species: where it stands and the next step
     const rows = variantRows(), it = rows.flatMap((r) => r.items || []).find((x) => x.i === L.vsel);
-    g.fillStyle = C.panel; g.fillRect(4, 154, 312, 12); g.fillStyle = C.line; g.fillRect(4, 154, 312, 1);
+    g.fillStyle = C.panel; g.fillRect(4, 142, 312, 24); g.fillStyle = C.line; g.fillRect(4, 142, 312, 1);
     if (it) {
-      const d = it.d, has = AQ.Collection.has(d.id), v = logOf(d.id).variant;
-      const txt = v ? `✦ ${d.name.toUpperCase()}: RARE COLOR BRED` : has ? `${d.name.toUpperCase()}: NOT BRED YET` : '???: NOT DISCOVERED YET';
-      F().draw(g, txt, 9, 158, v ? C.gold : has ? C.text : C.dim);
+      const st = variantStatus(it.d);
+      F().draw(g, st.head, 9, 146, st.stage === 4 ? C.gold : st.stage ? C.title : C.dim);
+      wrap(st.next, 75).slice(0, 2).forEach((l, i) => F().draw(g, l, 9, 154 + i * 7, st.stage === 4 ? C.good : C.text));
     }
     footer(g, [['WASD', 'MOVE'], ['WHEEL', 'SCROLL'], ['LEFT/RIGHT', 'TABS'], ['ESC', 'CLOSE']]);
   }
   function drawVariantCell(g, r) {
-    const d = r.d, has = AQ.Collection.has(d.id), v = logOf(d.id).variant, sel = r.i === L.vsel;
-    g.fillStyle = sel ? '#1f4862' : v ? '#2a2a1c' : has ? '#132b40' : '#0f2335'; g.fillRect(r.x, r.y, r.w, r.h);
-    if (v) { g.fillStyle = 'rgba(255,210,90,0.5)'; g.fillRect(r.x, r.y, 1, r.h); }
-    const vkey = 'creature.' + d.id + '.v';
-    drawIcon(g, v && AQ.Assets.entry(vkey) ? vkey : keyOf(d), r.x + 8, r.y + r.h / 2, 14, 10, has);
-    F().draw(g, fitText(has ? d.name.toUpperCase() : '???', r.w - 27), r.x + 17, r.y + 3, v ? '#ffe9a8' : has ? '#c3dfec' : '#5a7a90', { shadow: false });
-    F().draw(g, '✦', r.x + r.w - 8, r.y + 3, v ? '#ffd25a' : '#2c4a5e', { shadow: false });
+    const d = r.d, has = AQ.Collection.has(d.id), sel = r.i === L.vsel, st = variantStatus(d), bred = st.stage === 4;
+    g.fillStyle = sel ? '#1f4862' : bred ? '#2a2a1c' : has ? '#132b40' : '#0f2335'; g.fillRect(r.x, r.y, r.w, r.h);
+    // normal colour  >  rare colour
+    const wy = r.y + 2, ww = 30, wh = 17, nx = r.x + 2, vx = r.x + r.w - ww - 2;
+    g.fillStyle = has ? '#18364e' : '#112739'; g.fillRect(nx, wy, ww, wh);
+    drawIcon(g, keyOf(d), nx + ww / 2, wy + wh / 2, ww - 4, wh - 3, has, 2);
+    F().draw(g, '>', r.x + r.w / 2, wy + 6, bred ? C.gold : '#4f6f86', { align: 'center', shadow: false });
+    g.fillStyle = bred ? '#3a3420' : '#141f2a'; g.fillRect(vx, wy, ww, wh);
+    const vkey = keyOf(d) + '.v';
+    if (bred) drawIcon(g, AQ.Assets.entry(vkey) ? vkey : keyOf(d), vx + ww / 2, wy + wh / 2, ww - 4, wh - 3, true, 2);
+    else {
+      // not bred yet: the box shows what's missing (the panel below spells it out)
+      const lg = logOf(d.id), mid = vx + ww / 2;
+      if (st.stage === 1) F().draw(g, lg.m ? '♀' : '♂', mid, wy + 6, AQ.Sex.COLOR[lg.m ? 'f' : 'm'], { align: 'center', shadow: false });
+      else if (st.stage === 2) { F().draw(g, '♂', mid - 3, wy + 6, AQ.Sex.COLOR.m, { align: 'center', shadow: false }); F().draw(g, '♀', mid + 3, wy + 6, AQ.Sex.COLOR.f, { align: 'center', shadow: false }); }
+      else if (st.stage === 3) F().draw(g, '♥', mid, wy + 6 - (Math.floor(performance.now() / 400) % 2), '#ff9fc0', { align: 'center', shadow: false });
+      else F().draw(g, '?', mid, wy + 6, '#5a5030', { align: 'center', shadow: false });
+    }
+    outline(g, { x: vx, y: wy, w: ww, h: wh }, bred ? '#ffd25a' : st.stage === 3 && Math.floor(performance.now() / 500) % 2 ? '#a08a40' : '#3a3420');
+    F().draw(g, fitText(has ? d.name.toUpperCase() : '???', r.w - 4), r.x + r.w / 2, r.y + 22, bred ? '#ffe9a8' : has ? (sel ? '#ffffff' : C.text) : '#5a7a90', { align: 'center', shadow: false });
     if (sel) outline(g, r, '#5fc6d9');
     else if (L.hover === r) outline(g, r, '#2f6684');
   }
