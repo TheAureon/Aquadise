@@ -35,8 +35,10 @@ npx http-server -c-1 .      # or: python3 -m http.server
 | mute / unmute sound | O (anywhere)                             |
 
 In the aquarium: **Q/E** switch tanks, **F** feeds, **T** (or TANKS) shows every tank at a glance.
-Click a tray item, then click in the tank to place it. Click a placed item to move it, and right-click
-it to remove it. **X** flips the held or hovered piece, **Z** moves it in front of / behind everything,
+Drag a tray item into the tank (or click it, then click in the tank). Drag a placed item to move it;
+right-click or **Delete** removes it. Tray pieces show ♥ when a creature in the tank loves them and a
+green dot when they suit the tank's theme (best ones first; hover for details). While carrying a piece,
+a toolbar offers FLIP, LAYER, PUT BACK and REMOVE. **X** flips the held or hovered piece, **Z** moves it in front of / behind everything,
 **U** (or UNDO, Ctrl+Z) undoes the last decor change, and CLEAR (click twice) empties the tank's decor.
 Click a creature for its info card. Hover the stars for what's helping and what's missing. The
 **FISH** tray moves creatures between the tank and storage.

@@ -27,7 +27,7 @@ AQ.Aquarium = (function () {
     }
     A.prevState = 'play';
     A.undo = []; A.notes = []; A.view = 'tank';
-    A.shaker = null; A.card = null; A.clearArm = 0; A.courtC = null; A.holding = null;
+    A.shaker = null; A.card = null; A.clearArm = 0; A.courtC = null; A.holding = null; A.drag = null;
     A.photo.on = false; A.photo.paused = false; A.photo.previewT = 0;   // always arrive in the normal view
     AQ.FX.list.length = 0;
     A.rebuild();
@@ -430,6 +430,13 @@ AQ.Aquarium = (function () {
     ui.push({ id: 'tray_fish', x: 4, y: TRAY_Y + 11, w: 34, h: 10, label: 'FISH', on: A.tray === 'fish' });
     ui.push({ id: 'tray_left', x: 40, y: TRAY_Y, w: 8, h: 29, label: '<' });
     ui.push({ id: 'tray_right', x: 308, y: TRAY_Y, w: 8, h: 29, label: '>' });
+    // carrying a piece: a small toolbar at the top of the tank (everything the keys do, by mouse)
+    if (A.holding) {
+      const h = A.holding, bar = [['h_flip', 'FLIP (X)', 36], ['h_layer', 'LAYER: ' + LAYER_NAME[h.layer] + ' (Z)', 78]];
+      if (h.fromTank) bar.push(['h_back', 'PUT BACK', 38], ['h_remove', 'REMOVE', 32]); else bar.push(['h_stop', 'DONE', 26]);
+      let x = 160 - (bar.reduce((a, b) => a + b[2] + 3, 0) - 3) / 2;
+      bar.forEach(([id, label, w]) => { ui.push({ id, label, x: Math.round(x), y: TANK.y + 2, w, h: 10, warn: id === 'h_remove' }); x += w + 3; });
+    }
     const items = trayItems();
     const perPage = Math.floor((308 - 50) / CELL);
     A.trayScroll = U.clamp(A.trayScroll, 0, Math.max(0, items.length - perPage));
@@ -444,16 +451,24 @@ AQ.Aquarium = (function () {
   function trayItems() {
     const out = [];
     if (A.tray === 'decor') {
-      const themes = AQ.Tanks.themesOf(A.biome);
-      const rank = (d) => (d.biomes && d.biomes.some((x) => themes.indexOf(x) >= 0) ? 0 : !d.biomes ? 1 : 2);
-      AQ.data.decorations.map((d, i) => [d, i]).sort((a, b) => rank(a[0]) - rank(b[0]) || a[1] - b[1])
-        .forEach(([d]) => {
-          // locked pieces: this tank's show as a goal; other biomes' stay hidden until unlocked
-          const locked = !AQ.Vibe.isUnlocked(d);
-          if (locked && (d.unlock.tank || d.unlock.biome) !== A.biome) return;
-          out.push({ id: 'item', kind: 'decor', ref: d.id, key: 'decor.' + d.id, name: d.name, count: Infinity, locked, need: locked ? AQ.Vibe.unlockStars(d) : 0, fresh: !!(A.fresh && A.fresh[d.id]) });
-        });
-      Object.entries(AQ.State.plants).forEach(([id, n]) => { const d = defOf(id); if (d && n > 0) out.push({ id: 'item', kind: 'plant', ref: id, key: 'plant.' + id, name: d.name, count: n }); });
+      // each piece knows who in this tank loves it and whether it suits the tank's theme
+      const tank = AQ.Collection.tank(A.biome), living = tank.creatures.map((e) => defOf(e.id)).filter(Boolean);
+      const info = (type, id) => {
+        const item = { type, id }, tags = AQ.Vibe.tagsOf(item);
+        const loved = [...new Set(living.filter((c) => (c.likes || []).some((l) => tags.indexOf(l) >= 0)).map((c) => c.name))];
+        return { loved, theme: AQ.Vibe.matchesTheme(item, A.biome), tags };
+      };
+      const all = [];
+      AQ.data.decorations.forEach((d, i) => {
+        // locked pieces: this tank's show as a goal; other biomes' stay hidden until unlocked
+        const locked = !AQ.Vibe.isUnlocked(d);
+        if (locked && (d.unlock.tank || d.unlock.biome) !== A.biome) return;
+        all.push(Object.assign({ id: 'item', kind: 'decor', ref: d.id, key: 'decor.' + d.id, name: d.name, count: Infinity, locked, need: locked ? AQ.Vibe.unlockStars(d) : 0, fresh: !!(A.fresh && A.fresh[d.id]), order: i }, info('decor', d.id)));
+      });
+      Object.entries(AQ.State.plants).forEach(([id, n], i) => { const d = defOf(id); if (d && n > 0) all.push(Object.assign({ id: 'item', kind: 'plant', ref: id, key: 'plant.' + id, name: d.name, count: n, order: -100 + i }, info('plant', id))); });
+      // best first: loved, then on theme; plants before decor; locked goals at the end
+      const score = (it) => (it.locked ? 100 : 0) - (it.loved.length ? 4 : 0) - (it.theme ? 2 : 0) - (it.fresh ? 8 : 0);
+      all.sort((a, b) => score(a) - score(b) || a.order - b.order).forEach((it) => out.push(it));
     } else {
       const tank = AQ.Collection.tank(A.biome);
       const sx = (e) => (e.sex ? ' ' + AQ.Sex.SYMBOL[e.sex] : '');
@@ -511,12 +526,25 @@ AQ.Aquarium = (function () {
           const f = fishAt(m);
           A.card = f ? f.uid : null;
           const d = !f && decorAt(tank, m);
-          if (d) pickUp(tank, d);
+          if (d) { pickUp(tank, d); A.drag = { x: m.x, y: m.y }; }
         }
       }
     } else if (m.pressed[2] && !A.holding && inTank(m)) {
       const d = decorAt(tank, m);
       if (d) { removeDecor(tank, d, true); }
+    }
+
+    if (A.drag && !m.down[0]) {
+      const moved = Math.hypot(m.x - A.drag.x, m.y - A.drag.y) > 4;
+      A.drag = null;
+      if (moved && A.holding) {
+        if (inTank(m) && !(A.hover && A.hover.id && A.hover.id.startsWith('h_'))) { const fromTray = !A.holding.fromTank; place(tank, m); if (fromTray) A.holding = null; }
+        else if (A.holding.fromTank) putBack(); else A.holding = null;
+      }
+    }
+    if (I.wasPressed('Delete', 'Backspace')) {
+      if (A.holding) cancelHold();
+      else { const d = inTank(m) && decorAt(tank, m); if (d) removeDecor(tank, d); }
     }
 
     simulate(dt, tank);
@@ -551,7 +579,7 @@ AQ.Aquarium = (function () {
     const i = list.findIndex((b) => b.id === A.biome);
     putBack();                                   // a carried piece goes back into the tank it came from
     A.biome = list[(i + dir + list.length) % list.length].id;
-    A.fish = []; A.shaker = null; A.card = null; A.undo = []; A.clearArm = 0; A.courtC = null; A.rebuild();
+    A.fish = []; A.shaker = null; A.card = null; A.undo = []; A.clearArm = 0; A.courtC = null; A.drag = null; A.trayScroll = 0; A.trayPos = 0; A.rebuild();
   }
   // Feeding: a little shaker tips over the lid and sprinkles pellets as it slides along.
   function feed() {
@@ -606,6 +634,11 @@ AQ.Aquarium = (function () {
         break;
       case 'log': AQ.LogUI.open(game, 'aquarium'); break;
       case 'back': A.close(game); break;
+      case 'h_flip': flipIt(tank); break;
+      case 'h_layer': cycleLayer(tank); break;
+      case 'h_back': putBack(); AQ.Audio.play('place'); break;
+      case 'h_remove': cancelHold(); AQ.Audio.play('clear'); break;
+      case 'h_stop': A.holding = null; break;
       case 'tray_decor': A.tray = 'decor'; A.trayScroll = 0; A.trayPos = 0; break;
       case 'tray_fish': A.tray = 'fish'; A.trayScroll = 0; A.trayPos = 0; break;
       case 'tray_left': A.trayScroll = Math.round(A.trayScroll) - 3; break;
@@ -616,6 +649,7 @@ AQ.Aquarium = (function () {
         if (tank.decor.length >= AQ.TUNING.tank.decorCapacity) { note('This tank is full of decorations.', '#ffd56b'); break; }
         if (A.holding) cancelHold();
         A.holding = { kind: r.kind, id: r.ref, key: r.key };
+        A.drag = { x: AQ.Input.mouse.x, y: AQ.Input.mouse.y };          // drag it straight into the tank, or click then click
         break;
       case 'fish': {
         const from = r.where === 'tank' ? tank.creatures : tank.storage, to = r.where === 'tank' ? tank.storage : tank.creatures;
@@ -843,9 +877,21 @@ AQ.Aquarium = (function () {
   A.drawRest = function (g, b, tank) {
     // ghost of held item
     const m = AQ.Input.mouse;
-    if (A.holding && inTank(m)) {
-      const pl = placement(A.holding);
-      AQ.Assets.draw(g, A.holding.key, 'idle', m.x, placeY(pl.kind, m.y, pl.hang), { alpha: 0.6, t: A.t, flip: !!A.holding.flip });
+    if (A.holding && inTank(m) && !(A.hover && A.hover.id && A.hover.id.startsWith('h_'))) {
+      const pl = placement(A.holding), gx = Math.round(U.clamp(m.x, TANK.x + 6, TANK.x + TANK.w - 6)), gy = placeY(pl.kind, m.y, pl.hang);
+      const full = !A.holding.fromTank && tank.decor.length >= AQ.TUNING.tank.decorCapacity;
+      // where it will land: a soft shadow on the sand (or a line on the surface for floating pieces)
+      const e = AQ.Assets.entry(A.holding.key), hw = e ? Math.max(3, Math.round(((e.vis ? e.vis[2] - e.vis[0] : e.fw) + 1) / 2)) : 5;
+      g.fillStyle = full ? 'rgba(255,90,90,0.5)' : 'rgba(255,255,255,0.35)'; g.fillRect(gx - hw, pl.kind === 'float' ? TANK.waterTop + 1 : gy, hw * 2, 1);
+      AQ.Assets.draw(g, A.holding.key, 'idle', gx, gy, { alpha: full ? 0.3 : 0.7, t: A.t, flip: !!A.holding.flip });
+      if (full) tip(g, 'THIS TANK IS FULL OF DECORATIONS', gx, gy - 30, '#ff9a8a');
+    }
+    // the placed piece under the mouse: corner brackets, so it's clear what a click will pick up
+    const hd = !A.holding && inTank(m) && !fishAt(m) && decorAt(tank, m);
+    if (hd) {
+      const gm = geo(hd), x0 = Math.round(gm.cx - gm.half) - 2, x1 = Math.round(gm.cx + gm.half) + 1, y0 = Math.round(gm.top) - 2, y1 = Math.round(gm.top + gm.h) + 1;
+      g.fillStyle = '#ffe9a8';
+      for (const [x, y, dx, dy] of [[x0, y0, 1, 1], [x1, y0, -1, 1], [x0, y1, 1, -1], [x1, y1, -1, -1]]) { g.fillRect(Math.min(x, x + dx * 3), y, 3, 1); g.fillRect(x, Math.min(y, y + dy * 3), 1, 3); }
     }
     // hover tooltip on creatures
     if (!A.holding && inTank(m)) {
@@ -1366,6 +1412,23 @@ AQ.Aquarium = (function () {
     g.globalAlpha = 1;
   }
   A.tip = tip;
+  // hovering a tray piece: a little card just above it with why it's good here
+  function itemCard(g, it) {
+    const lines = [[it.name.toUpperCase(), '#ffe9a8']];
+    if (it.locked) lines.push([`REACH ${it.need} STARS IN THIS TANK TO UNLOCK`, '#ffcf8a']);
+    else {
+      if (it.loved.length) lines.push(['♥ LOVED BY ' + it.loved.slice(0, 2).join(', ').toUpperCase() + (it.loved.length > 2 ? ` +${it.loved.length - 2}` : ''), '#ff9fc0']);
+      if (it.theme) lines.push(['FITS THIS TANK\'S THEME', '#7ef0c0']);
+      const tg = it.tags.filter((t) => t !== 'plant');
+      if (tg.length) lines.push([tg.map((t) => t.replace(/_/g, ' ')).join(', ').toUpperCase(), '#8fb6cc']);
+      lines.push([it.kind === 'plant' ? `${it.count} IN STOCK - CLICK OR DRAG INTO THE TANK` : 'CLICK OR DRAG INTO THE TANK', '#cfe8ff']);
+    }
+    const w = Math.max(...lines.map((l) => F().width(l[0]))) + 8, h = lines.length * 7 + 5;
+    const x = U.clamp(Math.round(it.x + it.w / 2 - w / 2), 2, 318 - w), y = TRAY_Y - h - 3;
+    g.fillStyle = 'rgba(6,18,34,0.94)'; g.fillRect(x, y, w, h);
+    g.fillStyle = '#5fc6d9'; g.fillRect(x, y, w, 1);
+    lines.forEach(([t, c], i) => F().draw(g, t, x + 4, y + 3 + i * 7, c, { shadow: false }));
+  }
 
   function button(g, r, hover) {
     g.fillStyle = r.warn ? (hover ? '#a8503a' : '#8a3f2e') : r.on ? '#2e7d96' : hover && !r.off ? '#24506b' : '#16334a';
@@ -1403,6 +1466,8 @@ AQ.Aquarium = (function () {
           const txt = String(r.need); F().draw(g, txt, r.x + r.w / 2 - 4, r.y + 22, '#ffd25a', { align: 'center', shadow: false });
           miniStar(g, r.x + r.w / 2 - 3 + Math.ceil(F().width(txt) / 2), r.y + 22);
         }
+        if (r.id === 'item' && !r.locked && r.loved && r.loved.length) F().draw(g, '♥', r.x + 2, r.y + 2, '#ff9fc0', { shadow: false });
+        if (r.id === 'item' && !r.locked && r.theme) { g.fillStyle = '#7ef0c0'; g.fillRect(r.x + r.w - 4, r.y + 2, 2, 2); }
         if (r.fresh && Math.floor(A.t * 3) % 2 === 0) F().draw(g, 'NEW', r.x + r.w / 2, r.y + 1, '#ffe08a', { align: 'center' });
         if (r.id === 'fish' && r.sex) F().draw(g, AQ.Sex.SYMBOL[r.sex], r.x + 2, r.y + 2, AQ.Sex.COLOR[r.sex], { shadow: false });
         if (r.id === 'fish' && r.variant) F().draw(g, '✦', r.x + r.w - 7, r.y + 2, '#ffd25a', { shadow: false });
@@ -1411,16 +1476,20 @@ AQ.Aquarium = (function () {
       } else if (r.id !== 'stars') button(g, r, hover);
     }
     const items = trayItems();
+    if (A.tray === 'decor') { const full = tank.decor.length >= AQ.TUNING.tank.decorCapacity; F().draw(g, `${tank.decor.length}/${AQ.TUNING.tank.decorCapacity}`, 21, TRAY_Y + 23, full ? '#ffcf8a' : '#5f7f96', { align: 'center', shadow: false }); }
+    else F().draw(g, `${tank.storage.length} OUT`, 21, TRAY_Y + 23, '#5f7f96', { align: 'center', shadow: false });
     if (!items.length) F().draw(g, A.tray === 'fish' ? 'NO CREATURES FROM THIS BIOME YET' : 'NOTHING HERE YET', 178, TRAY_Y + 12, '#8aa4b8', { align: 'center' });
     if (A.hover && A.hover.id === 'stars' && A.vibe) { vibeTooltip(g, A.vibe); return; }
     // hints
-    if (A.hover && (A.hover.id === 'item' || A.hover.id === 'fish')) {
-      const hv = A.hover;
-      tip(g, hv.id === 'fish' ? `${hv.name}: CLICK TO MOVE ${hv.where === 'tank' ? 'TO STORAGE' : 'INTO TANK'}` : hv.locked ? `${hv.name}: REACH ${hv.need} STARS IN THIS TANK TO UNLOCK` : `${hv.name}: CLICK, THEN CLICK IN TANK`, hv.x + 12, TANK.waterTop + 4, hv.locked ? '#ffcf8a' : '#fff');
-    } else if (A.holding) tip(g, 'CLICK: PLACE   X: FLIP   Z: FRONT/BACK   RIGHT CLICK: STOP', 160, TANK.waterTop + 4, '#ffe9a8');
+    if (A.hover && A.hover.id === 'item') itemCard(g, A.hover);
+    else if (A.hover && A.hover.id === 'fish') tip(g, `${A.hover.name}: CLICK TO MOVE ${A.hover.where === 'tank' ? 'TO STORAGE' : 'INTO TANK'}`, A.hover.x + 12, TANK.y + 4, '#fff');
+    else if (A.holding) { if (!(A.notes || []).length) tip(g, A.drag ? 'LET GO IN THE TANK TO PLACE IT' : 'CLICK IN THE TANK TO PLACE   (OR DRAG)', 160, TANK.y + 15, '#ffe9a8'); }
     else if (!tank.creatures.length && !tank.decor.length) tip(g, 'CATCH CREATURES FROM THIS BIOME TO FILL THIS TANK', 160, 70, '#ffffff');
     else if (inTank(AQ.Input.mouse) && fishAt(AQ.Input.mouse)) { if (!A.card) tip(g, 'CLICK A CREATURE TO LEARN ABOUT IT', 160, TANK.waterTop + 4, '#cfe8ff'); }
-    else if (inTank(AQ.Input.mouse) && decorAt(tank, AQ.Input.mouse)) tip(g, 'CLICK: MOVE   RIGHT CLICK: REMOVE   X: FLIP   Z: FRONT/BACK', 160, TANK.waterTop + 4, '#cfe8ff');
+    else if (inTank(AQ.Input.mouse) && decorAt(tank, AQ.Input.mouse)) {
+      const d = decorAt(tank, AQ.Input.mouse), nm = (d.type === 'plant' ? defOf(d.id) : decorDef(d.id)).name.toUpperCase();
+      tip(g, `${nm}:  DRAG TO MOVE   RIGHT CLICK: REMOVE   X: FLIP   Z: LAYER`, 160, TANK.y + 4, '#cfe8ff');
+    }
     else if (A.hover && A.hover.id === 'undo') tip(g, 'UNDO LAST DECOR CHANGE (U)', 160, TANK.waterTop + 4, '#cfe8ff');
     else if (A.hover && A.hover.id === 'clear') tip(g, 'REMOVE ALL DECOR FROM THIS TANK', 160, TANK.waterTop + 4, '#cfe8ff');
     // notices (tank full, cleared, unlocks...)
