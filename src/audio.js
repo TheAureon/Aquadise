@@ -133,7 +133,7 @@ AQ.Audio = (function () {
       const out = A.ctx.createGain(); out.gain.value = opts.vol != null ? opts.vol : 1;
       let node = out;
       if (opts.pan && A.ctx.createStereoPanner) { const p = A.ctx.createStereoPanner(); p.pan.value = Math.max(-1, Math.min(1, opts.pan)); out.connect(p); node = p; }
-      node.connect(s.bus === 'music' ? A.musicBus : A.sfxBus);
+      node.connect(s.bus === 'music' ? A.musicBus : s.bus === 'amb' ? A.ambBus : A.sfxBus);
       const dur = (rec ? playBuffer(rec, out, t + 0.01 + (opts.delay || 0)) : s.fn(A.ctx, out, t + 0.01 + (opts.delay || 0), opts) || 1) + (opts.delay || 0);
       A.voice(dur);
       setTimeout(() => { try { node.disconnect(); out.disconnect(); } catch (e) {} }, (dur + 0.5) * 1000);

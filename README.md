@@ -100,6 +100,12 @@ browsers won't let a page save pictures made from file:// images.
   without any upgrade (checked with the sea scene's own "can the player be here" test and a flood
   fill from the start that stops at the level-0 depth limit). Tuning: `AQ.TUNING.bottles`
   (pickup radius, glint, glow, spacing, share floating at the surface).
+- **Distant seagulls:** wherever the sky shows (the sea surface, the Tide Pools shore and the hill),
+  a small flock of 1-4 tiny V-shaped gulls now and then drifts slowly across, flapping between two
+  wing frames and moving less than the camera so they feel far away. Day, dawn and dusk only (they
+  fade away at night), tinted to suit the sky; scenery only. A very faint, rate-limited gull cry plays
+  as a flock passes, through the ambience volume (and mute). Tuning: `AQ.TUNING.gulls` (how often,
+  most flocks at once, flock size, speed, parallax, flap speed, cry volume and gap).
 - **No fail state.** Hostile creatures only knock you back. Air is unlimited.
 - **Progression** comes only from chests: a bigger net (3 levels) and faster swimming (3 levels).
   Six chests exist at a time, and they despawn and respawn around the world.
@@ -210,6 +216,7 @@ src/miniworld.js      small collision maps for side scenes (ladders, one-way pla
 src/hill.js           the hill scene with the UFO and its beam
 src/station.js        the aquarium building in space (tanks on the walls, directory, beam pad)
 src/ui.js             collection log, map, pause
+src/gulls.js          distant seagull flocks in the sky (sea + hill)
 src/bottles.js        message bottles: deterministic, reachable placement, pickup, glint
 assets/sprites-embedded.js   base64 copy of the sprites for file:// (tools/embed-sprites.js)
 src/audio.js          audio engine: mixer, voice limit, underwater filter, settings, file mapping

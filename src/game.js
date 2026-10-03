@@ -100,6 +100,7 @@ AQ.Game = (function () {
         if (I.wasPressed('Escape')) { if (G.state === 'map') G.state = 'play'; else { G.state = 'pause'; I.endFrame(); return; } }
       }
       AQ.Scenes.cur(G).update(dt, G, frozen ? NO_INPUT : I);
+      if (AQ.Gulls) AQ.Gulls.update(dt, G);         // distant seagulls in the sky (sea + hill)
       AQ.HUD.update(dt, G);
       if (AQ.Save) AQ.Save.tick(dt, G);
     } else if (G.state === 'aquarium') {
@@ -141,6 +142,7 @@ AQ.Game = (function () {
     }
     AQ.Render.background(cam);
     if (G.state === 'title') AQ.Title.drawBack(ctx);
+    else if (AQ.Gulls) AQ.Gulls.draw(ctx, G);       // far behind everything, just after the sky
     AQ.Terrain.draw(ctx, cam);
     ctx.save();
     ctx.translate(-cam.left(), -cam.top());

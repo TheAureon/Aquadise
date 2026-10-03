@@ -134,6 +134,7 @@ AQ.Hill = (function () {
     // the painted sunset fades in over everything at dawn and dusk
     const art = AQ.Assets.sprites['bg.hill_sky'];
     if (art && tw > 0.02) { ctx.globalAlpha = Math.min(1, tw * 1.3); ctx.drawImage(art.img, 0, 0); ctx.globalAlpha = 1; }
+    if (AQ.Gulls) AQ.Gulls.draw(ctx, AQ.Game, sky);   // distant seagulls
   }
 
   H.drawBeam = function (ctx, x, y0, y1, alpha) {

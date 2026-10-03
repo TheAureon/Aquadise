@@ -189,6 +189,18 @@ AQ.TUNING = {
     zoomMargin: 10            // space (px) kept around the building when zoomed out
   },       // ladder climbing speed in the aquarium building (px/s)
 
+  // ---- distant seagulls in the sky (sea surface, Tide Pools shore, the hill); day, dawn + dusk only
+  gulls: {
+    everySeconds: [35, 80],   // a new flock now and then, after this many seconds (random in the range)
+    maxFlocks: 2,             // most flocks in the sky at once
+    flockSize: [1, 4],        // birds per flock
+    speed: [5, 9],            // how fast they drift across the sky (screen px/s): slow and far away
+    parallax: 0.12,           // how much they shift with the camera (small = far away)
+    flapSeconds: 0.7,         // time per wing frame (slow flaps)
+    cryVolume: 0.6,           // their faint cry, on top of the ambience volume
+    cryMinGap: 25             // at most one cry every this many seconds
+  },
+
   // ---- photo mode on the tank screen (PHOTO button or the key below)
   photo: {
     key: 'KeyP',              // enter / leave photo mode

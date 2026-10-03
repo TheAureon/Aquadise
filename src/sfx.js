@@ -152,6 +152,17 @@ var AQ = (typeof AQ !== 'undefined') ? AQ : {};
     H.noise(c, o, t + 0.07, { ft: 'highpass', f: 3200, a: 0.001, d: 0.02, v: 0.06 });     // the blades close
     return H.noise(c, o, t + 0.03, { f: 1500, q: 0.8, a: 0.02, d: 0.08, v: 0.03 }) + 0.05;   // soft whirr
   }, { important: true, minGap: 0.2 });
+  // a very faint, far-off gull cry as a flock passes: played through the AMBIENCE bus (ambience
+  // volume + mute apply), rate-limited by AQ.TUNING.gulls.cryMinGap
+  reg('gull_far', 'world', 'DISTANT GULLS', (c, o, t) => {
+    const n = 1 + Math.floor(Math.random() * 2);
+    for (let i = 0; i < n; i++) {
+      const f = 1350 + Math.random() * 250;
+      H.tone(c, o, t + i * 0.34, { type: 'triangle', f, f2: f * 0.7, glide: 0.24, a: 0.03, d: 0.24, v: 0.035, lp: 2200 });
+      H.tone(c, o, t + i * 0.34 + 0.12, { type: 'triangle', f: f * 0.95, f2: f * 0.68, glide: 0.18, a: 0.02, d: 0.16, v: 0.02, lp: 2000 });
+    }
+    return 0.4 + n * 0.34;
+  }, { bus: 'amb', minGap: AQ.TUNING.gulls.cryMinGap });
   reg('page_turn', 'menus', 'PAGE TURN', (c, o, t) => {
     H.noise(c, o, t, { f: 1800, f2: 3600, q: 0.7, a: 0.03, d: 0.12, v: 0.06 });      // paper swish
     return H.noise(c, o, t + 0.09, { ft: 'lowpass', f: 600, a: 0.005, d: 0.05, v: 0.04 }) + 0.09;   // soft settle
