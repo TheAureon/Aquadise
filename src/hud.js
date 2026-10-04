@@ -85,7 +85,7 @@ AQ.HUD = (function () {
     }
     if (game.player.sneaking) { ctx.globalAlpha = 0.8; F.draw(ctx, 'SNEAKING', 4, 34, '#9fe8ff', { shadow: SH }); ctx.globalAlpha = 1; }
     // toasts: at most two, newest at the bottom
-    const shown = H.toasts.slice(-2), helpOn = H.showHelp && H.helpT > 0;
+    const shown = game.state === 'pause' ? [] : H.toasts.slice(-2), helpOn = H.showHelp && H.helpT > 0;   // (paused: the pause screen speaks)
     const base = helpOn ? vh - 28 : vh - 20;                     // above the controls hint while it's showing
     shown.forEach((t, i) => {
       ctx.globalAlpha = Math.min(1, t.t * 5, (t.life - t.t) * 2.5);
@@ -93,7 +93,7 @@ AQ.HUD = (function () {
       ctx.globalAlpha = 1;
     });
     // help (first moments only, or when H is pressed)
-    if (H.showHelp && H.helpT > 0) {
+    if (H.showHelp && H.helpT > 0 && game.state !== 'pause') {
       ctx.globalAlpha = Math.min(1, H.helpT) * 0.9;
       const lines = AQ.data.tutorial.helpLines.map(AQ.Keys.fill);    // data/tutorial.js; key names from the bindings
       lines.forEach((l, i) => F.draw(ctx, l, vw / 2, vh - 15 + i * 7, '#d8f3ff', { align: 'center', shadow: SH }));

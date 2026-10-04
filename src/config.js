@@ -341,5 +341,6 @@ AQ.TUNING = {
     muteKey: 'KeyO'           // quick mute / unmute, anywhere
   },
 
-  save: { key: 'aquadise.save.v1', autosaveEvery: 10 }
+  save: { key: 'aquadise.save.v1', autosaveEvery: 10 },
+  saveFile: { maxImportBytes: 5000000 },   // IMPORT SAVE refuses files bigger than this (a normal save is a few KB)
 };

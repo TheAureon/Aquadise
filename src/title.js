@@ -29,8 +29,13 @@ AQ.Title = (function () {
     items.push({ id: 'controls', label: 'CONTROLS', icon: 'pad' });
     items.push({ id: 'guide', label: 'GUIDE', icon: 'book' });
     items.push({ id: 'sound', label: 'SOUND', icon: 'note' });
-    const y0 = 80 - (items.length - 4) * 6;
-    return items.map((it, i) => Object.assign(it, { x: 108, y: y0 + i * 14, w: 104, h: 11 }));
+    const rows = items.length + 1, y0 = 80 - (rows - 4) * 6;
+    items.forEach((it, i) => Object.assign(it, { x: 108, y: y0 + i * 14, w: 104, h: 11 }));
+    // save files share the last row: EXPORT SAVE | IMPORT SAVE (src/savefile.js)
+    const yl = y0 + items.length * 14;
+    items.push({ id: 'export', label: 'EXPORT SAVE', x: 108, y: yl, w: 51, h: 11, half: true });
+    items.push({ id: 'import', label: 'IMPORT SAVE', x: 161, y: yl, w: 51, h: 11, half: true });
+    return items;
   }
 
   // ---------------------------------------------------------------- update
@@ -66,6 +71,7 @@ AQ.Title = (function () {
     if (T.diverT < 16 && R.chance(dt * 3)) T.bubbles.push({ x: diverX() + 6, y: diverY() - 3, v: R.range(8, 14), r: 1, p: R() * 6 });
 
     T.items = menu();
+    if (AQ.SaveFile && AQ.SaveFile.update(game)) return;        // a save-file panel (import / recovery) is up
     if (T.panel === 'sound') {
       AQ.SoundUI.update(game, () => { T.panel = null; }, () => AQ.SoundTest.open(game, 'title'));
       return;
@@ -100,6 +106,8 @@ AQ.Title = (function () {
     else if (it.id === 'log') { AQ.LogUI.open(game, 'title'); }
     else if (it.id === 'controls') T.panel = 'controls';
     else if (it.id === 'guide') AQ.Guide.open(game, 'title');
+    else if (it.id === 'export') AQ.SaveFile.exportSave(game);
+    else if (it.id === 'import') AQ.SaveFile.pickImport(game);
     else if (it.id === 'sound') { T.panel = 'sound'; AQ.SoundUI.open(); }
   }
   function start(game) {
@@ -255,13 +263,16 @@ AQ.Title = (function () {
       pill(g, it, on ? 'rgba(14,52,82,0.88)' : 'rgba(8,28,48,0.55)', on ? '#6ef0ef' : null);
       if (!on) { g.fillStyle = 'rgba(180,230,245,0.18)'; g.fillRect(it.x + 1, it.y, it.w - 2, 1); }
       const nudge = on ? Math.round(Math.sin(T.t * 5)) : 0;
-      icon(g, it.icon, it.x + 5 + nudge, it.y + 2, on ? '#6ef0ef' : '#7fb6cc');
-      F().draw(g, it.label, it.x + it.w / 2 + 5, it.y + 3, on ? '#ffffff' : '#c3dfec', { align: 'center', shadow: on ? false : SH });
+      if (it.icon) icon(g, it.icon, it.x + 5 + nudge, it.y + 2, on ? '#6ef0ef' : '#7fb6cc');
+      F().draw(g, it.label, it.x + it.w / 2 + (it.icon ? 5 : 0), it.y + 3, on ? '#ffffff' : '#c3dfec', { align: 'center', shadow: on ? false : SH });
     });
     const c = AQ.Collection.progress();
     F().draw(g, `${c.discovered}/${c.total} FOUND  ${c.complete} COMPLETE`, 316, 172, '#7fa4ba', { align: 'right', shadow: SH });
     F().draw(g, 'ARROWS + ENTER OR CLICK', 4, 172, '#7fa4ba', { shadow: SH });
+    const warn = AQ.SaveFile && AQ.SaveFile.statusLine();
+    if (warn) F().draw(g, warn, 160, 164, '#ffcf8a', { align: 'center', shadow: SH });
     T.drawFade(g);
+    if (AQ.SaveFile) AQ.SaveFile.draw(g);
   };
   // scene cross-fade (dips to a deep-sea blue between tour stops)
   T.drawFade = function (g) {

@@ -1,13 +1,57 @@
 // Save/load: one localStorage slot, autosaved every few seconds and when leaving the aquarium/page.
+// Safety: before the save is overwritten the previous good one is kept as a backup (key + '.backup').
+// If the save can't be read, nothing overwrites it until the player chooses (restore the backup or start
+// fresh; src/savefile.js shows the choice). If the browser blocks storage the game keeps running unsaved
+// and says so (export still works). Files (export / import) live in src/savefile.js.
+// Format: { game: 'aquadise', v: VERSION, savedAt, state, scene, player }. v1 saves (no `game`) still load.
 var AQ = (typeof AQ !== 'undefined') ? AQ : {};
 
 AQ.Save = (function () {
-  const S = { t: 0, isDirty: false };
+  const S = { t: 0, isDirty: false, VERSION: 2, blocked: false, failed: false, status: 'none', backup: null };
   const key = () => AQ.TUNING.save.key;
+  const backupKey = () => key() + '.backup';
+  const ls = () => { try { return window.localStorage; } catch (e) { return null; } };   // access itself can throw (blocked storage)
 
-  S.load = function () {
-    try { const raw = localStorage.getItem(key()); return raw ? JSON.parse(raw) : null; } catch (e) { return null; }
+  // Is this parsed object a save this build can load? (also used for imported files)
+  S.check = function (d) {
+    if (!d || typeof d !== 'object' || Array.isArray(d)) return 'notsave';
+    if (d.game != null && d.game !== 'aquadise') return 'notsave';
+    if (d.game == null && d.v !== 1) return 'notsave';                         // only the original v1 saves had no `game`
+    if (typeof d.v !== 'number' || d.v < 1 || Math.floor(d.v) !== d.v) return 'damaged';
+    if (d.v > S.VERSION) return 'newer';
+    const st = d.state, obj = (o) => o == null || (typeof o === 'object' && !Array.isArray(o));
+    if (!st || typeof st !== 'object' || Array.isArray(st)) return 'damaged';
+    if (!['collection', 'plants', 'tanks', 'upgrades', 'unlocks', 'tankBest', 'settings', 'log', 'flags', 'bottles', 'clock', 'starfall', 'tutorial'].every((k) => obj(st[k]))) return 'damaged';
+    if (st.collection && Object.values(st.collection).some((n) => typeof n !== 'number')) return 'damaged';
+    if (st.tanks && Object.values(st.tanks).some((t) => !t || typeof t !== 'object' || (t.creatures != null && !Array.isArray(t.creatures)))) return 'damaged';
+    if (st.clock && st.clock.hour != null && typeof st.clock.hour !== 'number') return 'damaged';
+    return 'ok';
   };
+  // JSON without prototype tricks (a save is plain data)
+  S.parse = (text) => JSON.parse(text, (k, v) => (k === '__proto__' || k === 'constructor' || k === 'prototype' ? undefined : v));
+  function read(k) {
+    const store = ls();
+    if (!store) return { status: 'blockedread' };
+    let raw = null;
+    try { raw = store.getItem(k); } catch (e) { return { status: 'blockedread' }; }
+    if (raw == null) return { status: 'none' };
+    try { const d = S.parse(raw); return S.check(d) === 'ok' ? { status: 'ok', data: d, raw } : { status: 'corrupt', raw }; } catch (e) { return { status: 'corrupt', raw }; }
+  }
+  // Boot: the save, or null. An unreadable save blocks saving until the player decides (S.blocked).
+  S.load = function () {
+    const main = read(key());
+    S.status = main.status;
+    if (main.status === 'ok') return main.data;
+    if (main.status === 'corrupt') {
+      S.blocked = true;                                                       // never overwrite it without asking
+      const b = read(backupKey());
+      S.backup = b.status === 'ok' ? b.data : null;
+    }
+    if (main.status === 'blockedread') S.failed = true;
+    return null;
+  };
+  // the current game as a save object (also what EXPORT SAVE writes)
+  S.snapshot = (game) => ({ game: 'aquadise', v: S.VERSION, savedAt: new Date().toISOString(), state: AQ.State, scene: game.scene || 'world', player: { x: Math.round(game.player.x), y: Math.round(game.player.y) } });
   S.apply = function (data, game) {
     if (!data || !data.state) return;
     const st = data.state;
@@ -39,10 +83,40 @@ AQ.Save = (function () {
     if (data.player) { game.player.x = data.player.x; game.player.y = data.player.y; }
   };
   S.save = function (game) {
+    if (S.blocked || S.wiped) return false;                                     // an unreadable save waits for the player's choice
+    const store = ls();
     try {
-      localStorage.setItem(key(), JSON.stringify({ v: 1, state: AQ.State, scene: game.scene || 'world', player: { x: Math.round(game.player.x), y: Math.round(game.player.y) } }));
+      if (!store) throw new Error('no storage');
+      // keep the previous good save as a backup before writing the new one
+      const prev = store.getItem(key());
+      if (prev) { try { if (S.check(S.parse(prev)) === 'ok') store.setItem(backupKey(), prev); } catch (e) { /* unreadable: never copied over the backup */ } }
+      store.setItem(key(), JSON.stringify(S.snapshot(game)));
       S.isDirty = false;
-    } catch (e) { /* storage unavailable: play continues unsaved */ }
+      if (S.failed) { S.failed = false; if (AQ.HUD) AQ.HUD.toast('Saving works again.', '#8ff0b0', 3); }
+      return true;
+    } catch (e) {
+      // storage blocked or full (e.g. private browsing): play continues unsaved, with a friendly note once
+      if (!S.failed && AQ.HUD) AQ.HUD.toast('Progress can\'t be saved right now. EXPORT SAVE still works.', '#ffcf8a', 5);
+      S.failed = true;
+      return false;
+    }
+  };
+  // write a validated save object as the save (import / restore): the old save becomes the backup
+  S.writeRaw = function (data) {
+    const store = ls();
+    if (!store) return false;
+    try {
+      const prev = store.getItem(key());
+      if (prev) { try { if (S.check(S.parse(prev)) === 'ok') store.setItem(backupKey(), prev); else store.setItem(key() + '.unreadable', prev); } catch (e) { store.setItem(key() + '.unreadable', prev); } }
+      store.setItem(key(), JSON.stringify(data));
+      return true;
+    } catch (e) { return false; }
+  };
+  // the player chose to start fresh instead of restoring: the unreadable save is kept aside, never lost
+  S.setAsideUnreadable = function () {
+    const store = ls();
+    try { const raw = store && store.getItem(key()); if (raw) store.setItem(key() + '.unreadable', raw); store && store.removeItem(key()); } catch (e) {}
+    S.blocked = false;
   };
   S.dirty = () => { S.isDirty = true; };
 
@@ -84,7 +158,7 @@ AQ.Save = (function () {
     if (S.t >= AQ.TUNING.save.autosaveEvery) { S.t = 0; S.save(game); }
   };
   S.reset = function () {
-    try { localStorage.removeItem(key()); } catch (e) {}
+    try { const store = ls(); store && store.removeItem(key()); } catch (e) {}
     window.onbeforeunload = null;
     S.wiped = true;
     location.reload();
