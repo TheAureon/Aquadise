@@ -16,7 +16,7 @@ var AQ = (typeof AQ !== 'undefined') ? AQ : {};
 
 AQ.Starfall = (function () {
   const U = AQ.U, R = U.R;
-  const SF = { falls: [], t: 0 };
+  const SF = { falls: [], glows: [], t: 0 };
   const cfg = () => AQ.TUNING.starfall;
   const st = () => (AQ.State.starfall = AQ.State.starfall || { night: 0, lastStar: 0, phase: null, plan: null, landings: [] });
   const EVENING = (p) => p === 'dusk' || p === 'night';
@@ -94,7 +94,7 @@ AQ.Starfall = (function () {
     // in the sea you see it come down; anywhere else it simply lands (and is waiting when you return)
     if (game.scene === 'world' && game.state !== 'aquarium') {
       const dir = R.chance(0.5) ? 1 : -1, ty = spot.kind === 'float' ? W.sea : spot.ground && spot.kind === 'floor' ? W.sea : spot.y - 2;
-      SF.falls.push({ L, x0: spot.x - dir * 120, y0: W.sea - 120, x1: spot.x, y1: ty, t: 0, dur: c.fallSeconds });
+      SF.falls.push({ L, x0: spot.x - dir * 120, y0: W.sea - 120, x1: spot.x, y1: ty, t: 0, dur: c.fallSeconds / (AQ.U.calm() ? AQ.TUNING.calm.streakSpeed : 1) });
       AQ.Audio.play('star_whoosh', { vol: AQ.TUNING.shootingStars.soundVolume });
     } else land(L, game);
     tell(`A shooting star fell near the ${where}!`, game);
@@ -114,8 +114,12 @@ AQ.Starfall = (function () {
       const d = Math.hypot(P.x - L.x, P.y - L.y), c = cfg();
       AQ.Audio.play('star_land', { vol: c.chimeVolume * (d < c.nearChime ? 1 : 0.45) });
       const by = L.kind === 'float' ? W.sea : L.y - 2;
-      for (let i = 0; i < 14; i++) AQ.FX.sparkle(L.x + R.range(-10, 10), by - R.range(0, 12), i % 3 ? '#fff6dc' : '#bfe0ff', 6);
-      AQ.FX.puff(L.x, by, L.kind === 'float' ? 'rgba(220,240,255,0.8)' : 'rgba(230,220,200,0.7)', 10);
+      if (AQ.U.calm()) SF.glows.push({ x: L.x, y: by, t: 0 });          // REDUCE FLASHING: a gentle glow, no burst
+      else {
+        for (let i = 0; i < 14; i++) AQ.FX.sparkle(L.x + R.range(-10, 10), by - R.range(0, 12), i % 3 ? '#fff6dc' : '#bfe0ff', 6);
+        AQ.FX.puff(L.x, by, L.kind === 'float' ? 'rgba(220,240,255,0.8)' : 'rgba(230,220,200,0.7)', 10);
+        if (AQ.Tips) AQ.Tips.event('flash');
+      }
       if (L.kind !== 'shore') AQ.Audio.play('splash_in', { vol: 0.5 });
     } else AQ.Audio.play('star_land', { vol: cfg().chimeVolume * 0.4 });
     spawn(L);
@@ -180,6 +184,7 @@ AQ.Starfall = (function () {
     }
     // stars queued by the testing shower key
     for (let i = SF.queue.length - 1; i >= 0; i--) if (SF.t >= SF.queue[i]) { SF.queue.splice(i, 1); SF.fall(game, { shower: true }); }
+    for (let i = SF.glows.length - 1; i >= 0; i--) if ((SF.glows[i].t += dt) > AQ.TUNING.calm.landGlowSeconds) SF.glows.splice(i, 1);
     // the falling streaks touch down
     for (let i = SF.falls.length - 1; i >= 0; i--) {
       const f = SF.falls[i]; f.t += dt;
@@ -225,16 +230,25 @@ AQ.Starfall = (function () {
       // motes drifting up the column
       for (let k = 0; k < 6; k++) { const yy = base - ((SF.t * 18 + k * 43 + L.x) % hgt); ctx.fillStyle = `rgba(255,255,255,${(a * 2 * (1 - (base - yy) / hgt)).toFixed(3)})`; ctx.fillRect(Math.round(x + Math.sin(SF.t + k) * 2), Math.round(yy), 1, 1); }
     }
+    // REDUCE FLASHING landings: a soft glow that swells and fades
+    for (const gw of SF.glows) {
+      const k = gw.t / AQ.TUNING.calm.landGlowSeconds, a = Math.sin(k * Math.PI) * AQ.TUNING.calm.landGlowAlpha, r = 10 + 26 * k;
+      const rg = ctx.createRadialGradient(gw.x - l, gw.y - t, 0, gw.x - l, gw.y - t, r);
+      rg.addColorStop(0, `rgba(216,228,255,${a.toFixed(3)})`); rg.addColorStop(1, 'rgba(216,228,255,0)');
+      ctx.fillStyle = rg; ctx.fillRect(gw.x - l - r, gw.y - t - r, r * 2, r * 2);
+    }
     ctx.restore();
     // falling streaks: a bright head with a long trail, from the sky down to the spot
+    const calmK = AQ.U.calm() ? AQ.TUNING.calm.streakAlpha : 1;
     for (const f of SF.falls) {
       const k = Math.min(1, f.t / f.dur), e = k * (0.6 + 0.4 * k), hx = f.x0 + (f.x1 - f.x0) * e, hy = f.y0 + (f.y1 - f.y0) * e;
       const dx = f.x1 - f.x0, dy = f.y1 - f.y0, d = Math.hypot(dx, dy), ux = dx / d, uy = dy / d;
       for (let i = 0; i < 34; i++) {
-        ctx.fillStyle = `rgba(255,246,220,${(0.95 * (1 - i / 34)).toFixed(3)})`;
+        ctx.fillStyle = `rgba(255,246,220,${(0.95 * calmK * (1 - i / 34)).toFixed(3)})`;
         ctx.fillRect(Math.round(hx - ux * i - l), Math.round(hy - uy * i - t), 1, 1);
       }
-      ctx.fillStyle = '#ffffff'; ctx.fillRect(Math.round(hx - l) - 1, Math.round(hy - t), 3, 1); ctx.fillRect(Math.round(hx - l), Math.round(hy - t) - 1, 1, 3);
+      if (calmK === 1) { ctx.fillStyle = '#ffffff'; ctx.fillRect(Math.round(hx - l) - 1, Math.round(hy - t), 3, 1); ctx.fillRect(Math.round(hx - l), Math.round(hy - t) - 1, 1, 3); }
+      else { ctx.fillStyle = 'rgba(255,246,220,0.6)'; ctx.fillRect(Math.round(hx - l), Math.round(hy - t), 1, 1); }
     }
   };
   // light for the lighting pass, so a landing glows in the dark sea
@@ -244,7 +258,7 @@ AQ.Starfall = (function () {
   // map (M): a sparkling star at each waiting landing
   SF.drawMap = function (g, ox, oy, S, time) {
     for (const L of SF.waiting()) {
-      const x = Math.round(ox + L.x / S), y = Math.round(oy + (L.kind === 'float' ? AQ.World.sea : L.y) / S), on = Math.floor(time * 3 + L.x) % 2;
+      const x = Math.round(ox + L.x / S), y = Math.round(oy + (L.kind === 'float' ? AQ.World.sea : L.y) / S), on = AQ.U.calm() ? 1 : Math.floor(time * 3 + L.x) % 2;
       g.fillStyle = 'rgba(4,12,24,0.8)'; g.fillRect(x - 3, y + 1, 7, 1); g.fillRect(x + 1, y - 2, 1, 7);
       g.fillStyle = on ? '#ffffff' : '#d8e4ff';
       g.fillRect(x - 3, y, 7, 1); g.fillRect(x, y - 3, 1, 7); g.fillRect(x - 1, y - 1, 3, 3);
@@ -255,13 +269,13 @@ AQ.Starfall = (function () {
   SF.drawHud = function (ctx, x, y, time) {
     let cx = x;
     if (SF.waiting().length) {
-      const c = Math.floor(time * 2) % 2 ? '#fff6dc' : '#d8e4ff';
+      const c = AQ.U.calm() || Math.floor(time * 2) % 2 ? '#fff6dc' : '#d8e4ff';
       ctx.fillStyle = 'rgba(4,12,24,0.75)'; ctx.fillRect(cx + 1, y + 3, 5, 1); ctx.fillRect(cx + 3, y + 1, 1, 5);
       ctx.fillStyle = c; ctx.fillRect(cx, y + 2, 5, 1); ctx.fillRect(cx + 2, y, 1, 5); ctx.fillRect(cx + 1, y + 1, 3, 3);
       cx -= 8;
     }
     if (SF.showerTonight()) {
-      const tw = Math.floor(time * 3) % 3;
+      const tw = AQ.U.calm() ? 1 : Math.floor(time * 3) % 3;
       ctx.fillStyle = '#fff3b0';
       ctx.fillRect(cx + 2, y + (tw === 0 ? 0 : 1), 1, 1); ctx.fillRect(cx, y + 4, 1, 1); ctx.fillRect(cx + 4, y + 3 + (tw === 1 ? 1 : 0), 1, 1);
       if (tw === 2) { ctx.fillRect(cx + 1, y + 2, 1, 1); ctx.fillRect(cx + 3, y + 2, 1, 1); }

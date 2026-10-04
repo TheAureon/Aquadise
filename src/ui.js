@@ -457,7 +457,7 @@ AQ.LogUI = (function () {
       else if (st.stage === 3) F().draw(g, '♥', mid, wy + 6 - (Math.floor(performance.now() / 400) % 2), '#ff9fc0', { align: 'center', shadow: false });
       else F().draw(g, '?', mid, wy + 6, '#5a5030', { align: 'center', shadow: false });
     }
-    outline(g, { x: vx, y: wy, w: ww, h: wh }, bred ? '#ffd25a' : st.stage === 3 && Math.floor(performance.now() / 500) % 2 ? '#a08a40' : '#3a3420');
+    outline(g, { x: vx, y: wy, w: ww, h: wh }, bred ? '#ffd25a' : st.stage === 3 && (AQ.U.calm() || Math.floor(performance.now() / 500) % 2) ? '#a08a40' : '#3a3420');
     F().draw(g, fitText(has ? d.name.toUpperCase() : '???', r.w - 4), r.x + r.w / 2, r.y + 22, bred ? '#ffe9a8' : has ? (sel ? '#ffffff' : C.text) : '#5a7a90', { align: 'center', shadow: false });
     if (sel) outline(g, r, '#5fc6d9');
     else if (L.hover === r) outline(g, r, '#2f6684');
@@ -577,7 +577,7 @@ AQ.MapUI = (function () {
       if (AQ.Chests) for (const c of AQ.Chests.list) { g.fillStyle = '#ffd56b'; g.fillRect(Math.round(ox + c.x / S) - 1, Math.round(oy + c.y / S) - 1, 2, 2); }
       if (AQ.Starfall) AQ.Starfall.drawMap(g, ox, oy, S, game.time);
       const P = game.player;
-      if (Math.floor(game.time * 4) % 2) { g.fillStyle = '#ff5a7a'; g.fillRect(Math.round(ox + P.x / S) - 1, Math.round(oy + P.y / S) - 1, 3, 3); }
+      if (AQ.U.calm() || Math.floor(game.time * 4) % 2) { g.fillStyle = '#ff5a7a'; g.fillRect(Math.round(ox + P.x / S) - 1, Math.round(oy + P.y / S) - 1, 3, 3); }
       F().draw(g, 'YOU', ox + P.x / S, oy + P.y / S + 4, '#ff9fb0', { align: 'center' });
       const fallen = AQ.Starfall && AQ.Starfall.waiting().length;
       F().draw(g, `GOLD = CHESTS${fallen ? '   SPARKLE = FALLEN STAR' : ''}   M / ESC: CLOSE`, 160, 160, '#8aa4b8', { align: 'center' });

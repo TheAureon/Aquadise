@@ -174,7 +174,7 @@ AQ.Player = (function () {
   };
 
   Player.prototype.draw = function (ctx) {
-    const blink = this.stun > 0 && Math.floor(this.t * 20) % 2;
+    const blink = this.stun > 0 && !AQ.U.calm() && Math.floor(this.t * 20) % 2;     // (REDUCE FLASHING: no blinking)
     AQ.Assets.draw(ctx, 'player', this.anim, this.x, this.y, { t: this.anim === 'climb' ? this.climbT || 0 : this.t, flip: this.facing < 0, alpha: blink ? 0.5 : 1 });
   };
 

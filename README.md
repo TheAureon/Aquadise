@@ -161,6 +161,16 @@ browsers won't let a page save pictures made from file:// images.
   bottles; photo mode; sound and settings. A page (or line) about a feature the build doesn't have is
   left out. Text: `data/tutorial.js` (guide); key names and numbers like the day length or the
   rare-color odds are filled in live from the bindings and config.js (`{k:...}`, `{c:...}`, `{inv:...}`).
+- **REDUCE FLASHING.** In the Sound settings (pause menu or title), saved with your other settings.
+  When it's on: the photo camera flash becomes a faint, slow fade instead of a white flash; shooting
+  stars, the underwater glow and falling stars are dimmer and slower (and meteor-shower skies calmer);
+  a falling star lands with a soft glow instead of a sparkle burst; the UFO beam, its lights and the
+  beam pad hold still instead of animating and pulsing (and the station beam eases up instead of
+  jumping bright); scene fades are smooth instead of stepped; and fast blinking is held steady: your
+  stun blink, the firefly frog's flickering decoy, the map's "you" dot and star marker, the HUD star,
+  the meteor-shower sparkle, tank nervous drops, the photo REC dot, NEW labels, the selected-creature
+  marker and the Variants outline. A one-time tip mentions it the first time a flash plays; the
+  Guide's Sound page too. Tuning: `AQ.TUNING.calm`.
 - **Key bindings in one place:** `AQ.TUNING.keys` in config.js (plus `interactKeys`, `audio.muteKey`,
   `photo.key`, `station.zoomKey`). The game reads them, and the help line, the title's CONTROLS panel
   and every tip show key names from them (`src/keys.js`), so changing a key changes the text too.

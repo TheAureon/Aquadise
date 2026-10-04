@@ -142,7 +142,7 @@ AQ.Hill = (function () {
   H.drawBeam = function (ctx, x, y0, y1, alpha) {
     const s = AQ.Assets.sprites['misc.beam'], B = AQ.TUNING.beam;
     if (!s) return;
-    const e = s.entry, f = Math.floor(AQ.Render.t * e.anims.idle.fps) % e.anims.idle.frames;
+    const e = s.entry, f = AQ.U.calm() ? 0 : Math.floor(AQ.Render.t * e.anims.idle.fps) % e.anims.idle.frames;   // (REDUCE FLASHING: held still)
     ctx.save();
     ctx.globalCompositeOperation = 'lighter';
     ctx.globalAlpha = alpha;
@@ -165,14 +165,14 @@ AQ.Hill = (function () {
     ctx.save(); ctx.translate(-left, -top);
     // UFO + beam
     const uy = G.ufoY + Math.sin(t * 1.2) * 2;
-    const pulse = B.glow * (0.85 + 0.15 * Math.sin(t * 3));
+    const pulse = B.glow * (AQ.U.calm() ? 0.85 : 0.85 + 0.15 * Math.sin(t * 3));
     H.drawBeam(ctx, G.beamX, uy + 6, G.top + 2, pulse);
     ctx.save(); ctx.globalCompositeOperation = 'lighter'; ctx.globalAlpha = pulse * 0.5;      // soft pool of light on the grass
     ctx.fillStyle = '#c8c0ff'; ctx.beginPath(); ctx.ellipse(G.beamX, G.top + 1, B.width / 2 + 3, 3, 0, 0, Math.PI * 2); ctx.fill(); ctx.restore();
     ctx.fillStyle = '#e8fbff';
     for (const m of H.motes) { ctx.globalAlpha = Math.sin(m.t / m.life * Math.PI) * 0.8; ctx.fillRect(Math.round(m.x), Math.round(m.y), 1, 1); }
     ctx.globalAlpha = 1;
-    AQ.Assets.draw(ctx, 'misc.ufo', 'idle', G.beamX, uy, { t });
+    AQ.Assets.draw(ctx, 'misc.ufo', 'idle', G.beamX, uy, AQ.U.calm() ? { frame: 0 } : { t });      // its chase lights hold still with REDUCE FLASHING
     AQ.FX.draw(ctx);
     ctx.restore();
     const P = game.player;

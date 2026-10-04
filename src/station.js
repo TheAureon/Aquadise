@@ -306,10 +306,12 @@ AQ.Station = (function () {
     ctx.restore();
     tanks.forEach((tk) => drawTank(ctx, tk));
     AQ.Assets.draw(ctx, 'misc.console', 'idle', L.console.x, L.floors[0], { t });
-    AQ.Assets.draw(ctx, 'misc.beampad', 'idle', L.pad.x, L.floors[0] + 2, { t });
+    AQ.Assets.draw(ctx, 'misc.beampad', 'idle', L.pad.x, L.floors[0] + 2, AQ.U.calm() ? { frame: 0 } : { t });
     // the pad's idle shimmer, brighter while beaming
     const beaming = St.mode !== 'walk';
-    AQ.Hill.drawBeam(ctx, L.pad.x, L.floors[0] - 60, L.floors[0], (beaming ? 0.75 : 0.18) * AQ.TUNING.beam.glow * (0.85 + 0.15 * Math.sin(t * 3)));
+    // REDUCE FLASHING: the beam eases up instead of jumping bright, and doesn't pulse
+    St.beamK = U.approach(St.beamK || 0.18, beaming ? (AQ.U.calm() ? 0.45 : 0.75) : 0.18, AQ.U.calm() ? 0.02 : 1);
+    AQ.Hill.drawBeam(ctx, L.pad.x, L.floors[0] - 60, L.floors[0], St.beamK * AQ.TUNING.beam.glow * (AQ.U.calm() ? 0.85 : 0.85 + 0.15 * Math.sin(t * 3)));
     // the player (fades in / out while beaming)
     const a = St.mode === 'beamin' ? U.clamp(St.t / 0.8, 0, 1) : St.mode === 'beamout' ? U.clamp(1 - St.t / 0.5, 0, 1) : 1;
     ctx.globalAlpha = a; P.draw(ctx); ctx.globalAlpha = 1;

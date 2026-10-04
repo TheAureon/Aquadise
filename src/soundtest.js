@@ -6,9 +6,9 @@ var AQ = (typeof AQ !== 'undefined') ? AQ : {};
 AQ.SoundUI = (function () {
   const F = () => AQ.Font, A = AQ.Audio;
   const S = { sel: 0, ui: [] };
-  const BOX = { x: 64, y: 34, w: 192, h: 142 };
-  const ROWS = ['music', 'sfx', 'mute', 'hints', 'resettips', 'test', 'back'];
-  const Y = { music: 49, sfx: 61, mute: 74, hints: 97, resettips: 110, test: 127, back: 141 };   // row positions
+  const BOX = { x: 64, y: 30, w: 192, h: 148 };
+  const ROWS = ['music', 'sfx', 'mute', 'hints', 'resettips', 'flashing', 'test', 'back'];
+  const Y = { music: 44, sfx: 56, mute: 68, hints: 93, resettips: 105, flashing: 117, test: 133, back: 146 };   // row positions
 
   S.open = function () { S.sel = 0; };
   function layout() {
@@ -23,6 +23,8 @@ AQ.SoundUI = (function () {
     const hints = !AQ.Tips || AQ.Tips.hintsOn();
     ui.push({ id: 'hints', row: 'hints', x: 132, y: Y.hints, w: 88, h: 10, label: hints ? 'HINTS ON' : 'HINTS OFF' });
     ui.push({ id: 'resettips', row: 'resettips', x: 132, y: Y.resettips, w: 88, h: 10, label: S.resetDone > 0 ? 'TIPS RESET!' : 'RESET TIPS' });
+    // REDUCE FLASHING: softer camera flash, dimmer / slower stars, no fast blinking (AQ.U.calm())
+    ui.push({ id: 'flashing', row: 'flashing', x: 132, y: Y.flashing, w: 88, h: 10, label: AQ.U.calm() ? 'REDUCED' : 'NORMAL', on: AQ.U.calm() });
     ui.push({ id: 'test', row: 'test', x: 110, y: Y.test, w: 100, h: 11, label: 'SOUND TEST' });
     ui.push({ id: 'back', row: 'back', x: 110, y: Y.back, w: 100, h: 11, label: 'BACK' });
     return ui;
@@ -35,6 +37,7 @@ AQ.SoundUI = (function () {
   function activate(id, game, onBack, onTest) {
     if (id === 'mute') { A.toggleMute(); A.play('menu_select'); }
     else if (id === 'hints') { AQ.Tips.setHints(!AQ.Tips.hintsOn()); A.play('menu_select'); AQ.Save && AQ.Save.dirty(); }
+    else if (id === 'flashing') { AQ.State.settings = AQ.State.settings || {}; AQ.State.settings.reduceFlashing = !AQ.U.calm(); A.play('menu_select'); AQ.Save && AQ.Save.dirty(); }
     else if (id === 'resettips') { AQ.Tips.reset(); S.resetDone = 2; A.play('menu_select'); AQ.Save && AQ.Save.dirty(); }
     else if (id === 'test') { A.play('menu_select'); onTest(); }
     else if (id === 'back') { A.play('menu_select'); AQ.Save && AQ.Save.save(game); onBack(); }
@@ -66,9 +69,9 @@ AQ.SoundUI = (function () {
     g.fillStyle = 'rgba(6,20,38,0.94)'; g.fillRect(BOX.x, BOX.y, BOX.w, BOX.h);
     g.fillStyle = 'rgba(110,240,239,0.6)'; g.fillRect(BOX.x, BOX.y, BOX.w, 1); g.fillRect(BOX.x, BOX.y + BOX.h - 1, BOX.w, 1);
     F().draw(g, 'SOUND', 160, BOX.y + 4, '#6ef0ef', { align: 'center', shadow: false });
-    F().draw(g, 'HINTS', 80, Y.hints - 10, '#6ef0ef', { shadow: false });
+    F().draw(g, 'OPTIONS', 80, Y.hints - 10, '#6ef0ef', { shadow: false });
     g.fillStyle = 'rgba(110,240,239,0.25)'; g.fillRect(104, Y.hints - 8, 136, 1);
-    const label = { music: ['MUSIC', Y.music + 2], sfx: ['EFFECTS', Y.sfx + 2], mute: ['MUTE', Y.mute + 3], hints: ['TIPS', Y.hints + 3], resettips: ['SEE AGAIN', Y.resettips + 3] };
+    const label = { music: ['MUSIC', Y.music + 2], sfx: ['EFFECTS', Y.sfx + 2], mute: ['MUTE', Y.mute + 3], hints: ['TIPS', Y.hints + 3], resettips: ['SEE AGAIN', Y.resettips + 3], flashing: ['FLASHING', Y.flashing + 3] };
     for (const k in label) F().draw(g, label[k][0], 80, label[k][1], ROWS[S.sel] === k ? '#ffffff' : '#9fd3ee', { shadow: false });
     const selRow = ROWS[S.sel], arrowY = Y[selRow] + (selRow === 'music' || selRow === 'sfx' ? 2 : 3);
     F().draw(g, '>', selRow === 'test' || selRow === 'back' ? 102 : 73, arrowY, '#6ef0ef', { shadow: false });
@@ -76,7 +79,7 @@ AQ.SoundUI = (function () {
       if (r.bar != null) {
         for (let i = 0; i < 10; i++) { g.fillStyle = i < Math.round(r.bar * 10) ? (st.mute ? '#5f7a8c' : '#6ef0ef') : '#16334a'; g.fillRect(r.x + i * 6 + 1, r.y + 2, 5, 5); }
         F().draw(g, `${Math.round(r.bar * 100)}%`, 238, r.y + 2, '#c3dfec', { align: 'right', shadow: false });
-      } else AQ.Aquarium.button(g, Object.assign({}, r, { on: ROWS[S.sel] === r.row && !r.warn }), S.hover === r);
+      } else AQ.Aquarium.button(g, Object.assign({}, r, { on: (ROWS[S.sel] === r.row || r.on) && !r.warn }), S.hover === r);
     }
     F().draw(g, `${AQ.Keys.name('mute')}: QUICK MUTE ANYWHERE`, 160, BOX.y + BOX.h - 10, '#7fa4ba', { align: 'center', shadow: false });
   };

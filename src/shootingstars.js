@@ -24,8 +24,9 @@ AQ.ShootingStars = (function () {
     return AQ.World.sea - AQ.Camera.top() - 6;
   }
   function make(x, y, dir) {
-    const c = cfg(), a = R.range(c.angle[0], c.angle[1]) * Math.PI / 180, sp = R.range(c.speed[0], c.speed[1]);
-    return { x, y, vx: Math.cos(a) * sp * dir, vy: Math.sin(a) * sp, t: 0, life: R.range(c.life[0], c.life[1]), trail: R.range(c.trail[0], c.trail[1]), col: R.pick(c.colors) };
+    const c = cfg(), a = R.range(c.angle[0], c.angle[1]) * Math.PI / 180, calm = AQ.U.calm(), slow = calm ? AQ.TUNING.calm.streakSpeed : 1;
+    const sp = R.range(c.speed[0], c.speed[1]) * slow;
+    return { x, y, vx: Math.cos(a) * sp * dir, vy: Math.sin(a) * sp, t: 0, life: R.range(c.life[0], c.life[1]) / slow, trail: R.range(c.trail[0], c.trail[1]), col: R.pick(c.colors) };
   }
   function whoosh(dir) { AQ.Audio.play('star_whoosh', { vol: cfg().soundVolume, pan: dir * 0.3 }); }
 
@@ -37,6 +38,7 @@ AQ.ShootingStars = (function () {
     else if (game.scene === 'world') S.glows.push({ x: dir > 0 ? -40 : 360, dir, t: 0, life: R.range(1.4, 2.2), y: R.range(20, 70) });
     else return;
     if (!opts.quiet) whoosh(dir);
+    if (!AQ.U.calm() && AQ.Tips) AQ.Tips.event('flash');
   };
 
   S.update = function (dt, game) {
@@ -66,14 +68,15 @@ AQ.ShootingStars = (function () {
     const forced = AQ.Starfall && AQ.Starfall.forcedUntil > AQ.Starfall.t;          // testing shower key: even by day
     const n = forced ? 1 : S.night();
     if (n <= 0) { S.timer = Math.max(S.timer, 3); return; }
-    const shower = AQ.Starfall && AQ.Starfall.showerTonight(), boost = shower ? AQ.TUNING.starfall.showerSkyBoost : 1;
+    const shower = AQ.Starfall && AQ.Starfall.showerTonight(), boost = shower ? AQ.TUNING.starfall.showerSkyBoost * (AQ.U.calm() ? 0.5 : 1) : 1;
     S.timer -= dt * n * boost;
     if (S.timer <= 0) { S.timer = R.range(c.everySeconds[0], c.everySeconds[1]); S.spawn(game, { quiet: shower && R.chance(0.6) }); }
   };
 
   // a streak: bright head pixel, a short trail fading behind it, fading in and out over its life
   function streak(ctx, s, ox, oy, alpha) {
-    const k = Math.sin(Math.min(1, s.t / s.life) * Math.PI) * alpha;
+    const calm = AQ.U.calm();
+    const k = Math.sin(Math.min(1, s.t / s.life) * Math.PI) * alpha * (calm ? AQ.TUNING.calm.streakAlpha : 1);
     if (k <= 0.01) return;
     const sp = Math.hypot(s.vx, s.vy), ux = s.vx / sp, uy = s.vy / sp, col = U.hex(s.col);
     for (let i = 0; i < s.trail; i++) {
@@ -82,6 +85,7 @@ AQ.ShootingStars = (function () {
       ctx.fillRect(Math.round(s.x - ux * i + ox), Math.round(s.y - uy * i + oy), 1, 1);
     }
     ctx.fillStyle = `rgba(255,255,255,${k.toFixed(3)})`; ctx.fillRect(Math.round(s.x + ox), Math.round(s.y + oy), 1, 1);
+    if (calm) return;                                       // no bright halo with REDUCE FLASHING
     ctx.fillStyle = `rgba(${col[0]},${col[1]},${col[2]},${(k * 0.35).toFixed(3)})`;          // a tiny soft halo round the head
     ctx.fillRect(Math.round(s.x + ox) - 1, Math.round(s.y + oy), 3, 1); ctx.fillRect(Math.round(s.x + ox), Math.round(s.y + oy) - 1, 1, 3);
   }
@@ -100,7 +104,7 @@ AQ.ShootingStars = (function () {
     if (fade <= 0) return;
     ctx.save(); ctx.globalCompositeOperation = 'lighter';
     for (const g of S.glows) {
-      const a = Math.sin(Math.min(1, g.t / g.life) * Math.PI) * fade;
+      const a = Math.sin(Math.min(1, g.t / g.life) * Math.PI) * fade * (AQ.U.calm() ? AQ.TUNING.calm.streakAlpha : 1);
       const rg = ctx.createRadialGradient(g.x, g.y, 0, g.x, g.y, 70);
       rg.addColorStop(0, `rgba(200,230,255,${a.toFixed(3)})`); rg.addColorStop(1, 'rgba(200,230,255,0)');
       ctx.fillStyle = rg; ctx.fillRect(g.x - 70, g.y - 70, 140, 140);

@@ -253,6 +253,16 @@ AQ.TUNING = {
     soundMinGap: 4            // at most one whoosh every this many seconds
   },
 
+  // REDUCE FLASHING (the setting is in Pause / title > SOUND): how much gentler things get when it's on
+  calm: {
+    photoFlashSeconds: 1.2,   // the camera flash becomes this long, soft fade...
+    photoFlashAlpha: 0.25,    // ...that never gets brighter than this (normal: a quick 0.9 white flash)
+    streakAlpha: 0.5,         // shooting stars and falling stars: this much as bright...
+    streakSpeed: 0.6,         // ...and this much as fast
+    landGlowSeconds: 2.4,     // a falling star's landing: a soft glow that swells and fades over this long
+    landGlowAlpha: 0.22       //   (instead of the sparkle burst)
+  },
+
   // One-time tips (src/tips.js; the text is in data/tutorial.js). Never blocking: any key or click closes one.
   tips: {
     baseSeconds: 4,           // how long a tip stays at least...

@@ -108,8 +108,8 @@ AQ.data.tutorial = {
       'Pause ({k:pause}) > SOUND: music and effects volume, mute and a SOUND TEST.',
       '{k:mute} mutes or unmutes anywhere.',
       'HINTS turns the tips on or off; RESET TIPS shows them all again.',
-      'Pause > TUTORIAL starts the guided dive again any time.',
-      'Your progress saves by itself.'] }
+      'REDUCE FLASHING softens the camera flash, falling stars and blinking lights.',
+      'Pause > TUTORIAL starts the guided dive again any time. Progress saves by itself.'] }
   ],
 
   // the CONTROLS panel on the title screen: [what, keys]
@@ -173,6 +173,9 @@ AQ.data.tutorial = {
     { id: 'baby', on: ['baby'], where: 'any', needs: 'Breeding', known: ['bred'], icon: 'ui:3', lines: [
       'A baby! It grows up over time.',
       'Now and then one is born a rare color (✦).'] },
+    { id: 'flashing', on: ['flash'], where: 'any', icon: 'ui:6', lines: [
+      'Bright flashes or blinking lights bothering you?',
+      'Turn on REDUCE FLASHING in Pause > SOUND (or on the title).'] },
     { id: 'bumped', on: ['bumped'], where: 'play', known: ['bumped'], icon: 'ui:0', lines: [
       'Just a bump! Nothing in the sea can hurt you.',
       'Some creatures only nudge you back a little.'] }

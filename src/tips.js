@@ -5,7 +5,7 @@
 // mid-netting, in photo mode or in a menu (pause, map, log, sound test, title). It stays a few seconds
 // (longer for longer text) and goes away on any key press or click (Esc and clicks on the box are used up).
 // Seen tips are saved (AQ.State.tutorial.seen); HINTS off in the sound settings hides them all.
-// Events: noticed bait catch logClosed chest heavy evening bottle starfall shower ufo station tank
+// Events: noticed bait catch logClosed chest heavy evening bottle starfall shower ufo station tank flash
 //         tankstar unlock pair court baby bumped
 var AQ = (typeof AQ !== 'undefined') ? AQ : {};
 
@@ -97,7 +97,8 @@ AQ.Tips = (function () {
     const tip = T.queue.splice(i, 1)[0];
     // key names filled in from the bindings, then wrapped to the box (a long key name never spills out)
     const room = c.maxWidth - (tip.icon ? 24 : 10) - 10, lines = [];
-    tip.lines.forEach((l) => wrapPx(AQ.Keys.fill(l).toUpperCase(), room).forEach((w) => lines.push(w)));
+    // the tip's lines flow together as one short paragraph, wrapped to the box (no orphaned words)
+    wrapPx(tip.lines.map((l) => AQ.Keys.fill(l)).join(' ').toUpperCase(), room).forEach((w) => lines.push(w));
     const chars = lines.join('').length;
     T.cur = { tip, lines, t: 0, life: U.clamp(c.baseSeconds + chars * c.perChar, c.baseSeconds, c.maxSeconds) };
     st().seen[tip.id] = true;                 // seen once it shows (never repeats, even after a reload)

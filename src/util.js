@@ -28,6 +28,8 @@ AQ.U = (function () {
     return r;
   };
   U.R = U.rng(Date.now() & 0xffffffff);   // non-deterministic gameplay rng
+  // REDUCE FLASHING (Sound settings): flashes, bursts and fast blinking are softened or held steady
+  U.calm = () => !!(AQ.State && AQ.State.settings && AQ.State.settings.reduceFlashing);
   U.rangeOf = (v, r) => (Array.isArray(v) ? (r || U.R).range(v[0], v[1]) : v);
 
   // Hash-based value noise
