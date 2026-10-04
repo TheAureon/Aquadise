@@ -592,9 +592,9 @@ AQ.PauseUI = (function () {
     const I = AQ.Input, m = I.mouse;
     if (P.panel === 'sound') { AQ.SoundUI.update(game, () => { P.panel = null; }, () => AQ.SoundTest.open(game, 'pause')); return; }
     P.confirm = Math.max(0, P.confirm - dt);
-    const rows = [['resume', 'RESUME'], ['help', 'SHOW CONTROLS'], ['tutorial', AQ.Dive && AQ.Dive.active() ? 'RESTART TUTORIAL' : 'TUTORIAL'], ['sound', 'SOUND'], ['home', 'HOME']];
-    P.ui = rows.map(([id, label], i) => ({ id, x: 110, y: 50 + i * 16, w: 100, h: 13, label }));
-    P.ui.push({ id: 'reset', x: 110, y: 50 + rows.length * 16 + 8, w: 100, h: 13, label: P.confirm > 0 ? 'CLICK AGAIN TO WIPE' : 'RESET SAVE' });
+    const rows = [['resume', 'RESUME'], ['help', 'SHOW CONTROLS'], ['guide', 'GUIDE'], ['tutorial', AQ.Dive && AQ.Dive.active() ? 'RESTART TUTORIAL' : 'TUTORIAL'], ['sound', 'SOUND'], ['home', 'HOME']];
+    P.ui = rows.map(([id, label], i) => ({ id, x: 110, y: 42 + i * 15, w: 100, h: 12, label }));
+    P.ui.push({ id: 'reset', x: 110, y: 42 + rows.length * 15 + 6, w: 100, h: 12, label: P.confirm > 0 ? 'CLICK AGAIN TO WIPE' : 'RESET SAVE' });
     if (I.wasPressed('Escape')) { game.state = 'play'; return; }
     const prev = P.hover;
     P.hover = P.ui.find((r) => m.x >= r.x && m.y >= r.y && m.x < r.x + r.w && m.y < r.y + r.h);
@@ -603,6 +603,7 @@ AQ.PauseUI = (function () {
       AQ.Audio.play('menu_select');
       if (P.hover.id === 'resume') game.state = 'play';
       if (P.hover.id === 'help') { AQ.HUD.helpT = 12; game.state = 'play'; }
+      if (P.hover.id === 'guide') AQ.Guide.open(game, 'pause');
       if (P.hover.id === 'tutorial') { game.state = 'play'; if (game.scene !== 'world') AQ.HUD.toast('The guided dive starts when you are back in the sea.', '#cfe8ff', 4); AQ.Dive.start(game); }
       if (P.hover.id === 'sound') { P.panel = 'sound'; AQ.SoundUI.open(); }
       if (P.hover.id === 'home') { AQ.Save.save(game); AQ.Title.open(game); }
@@ -612,9 +613,9 @@ AQ.PauseUI = (function () {
   P.draw = function (g) {
     g.fillStyle = 'rgba(4,12,24,0.75)'; g.fillRect(0, 0, 320, 180);
     if (P.panel === 'sound') { AQ.SoundUI.draw(g); return; }
-    F().draw(g, 'PAUSED', 160, 38, '#ffe9a8', { align: 'center' });
+    F().draw(g, 'PAUSED', 160, 30, '#ffe9a8', { align: 'center' });
     for (const r of P.ui) AQ.Aquarium.button(g, r, P.hover === r);
-    F().draw(g, 'PROGRESS SAVES AUTOMATICALLY', 160, 160, '#8aa4b8', { align: 'center' });
+    F().draw(g, 'PROGRESS SAVES AUTOMATICALLY', 160, 154, '#8aa4b8', { align: 'center' });
   };
   return P;
 })();

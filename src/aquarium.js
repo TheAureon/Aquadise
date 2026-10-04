@@ -954,11 +954,11 @@ AQ.Aquarium = (function () {
       else if (id === 'p_snap') snap(tank);
       if (id !== 'p_snap' && id !== 'p_exit') AQ.Audio.play('menu_move');
     };
-    if (I.wasPressed('KeyZ')) act('p_freeze');
-    if (I.wasPressed('KeyI')) act('p_icons');
-    if (I.wasPressed('KeyF')) act('p_frame');
-    if (I.wasPressed('KeyC')) act('p_caption');
-    if (I.wasPressed('Space')) act('p_snap');
+    if (AQ.Keys.pressed('photoFreeze')) act('p_freeze');
+    if (AQ.Keys.pressed('photoIcons')) act('p_icons');
+    if (AQ.Keys.pressed('photoFrame')) act('p_frame');
+    if (AQ.Keys.pressed('photoCaption')) act('p_caption');
+    if (AQ.Keys.pressed('photoSnap')) act('p_snap');
     if (m.pressed[0]) { if (P.hover) act(P.hover.id); else if (inTank(m)) act('p_snap'); }
   }
   const dateText = () => { const d = new Date(), z = (n) => String(n).padStart(2, '0'); return `${d.getFullYear()}-${z(d.getMonth() + 1)}-${z(d.getDate())}`; };
@@ -1040,8 +1040,8 @@ AQ.Aquarium = (function () {
     F().draw(g, FRAMES[P.frame] + (P.frame !== 2 && P.caption ? ' + CAPTION' : ''), x0 + 4, y0 + 5, 'rgba(255,255,255,0.8)');
     // the toolbar + key hints (never in the picture)
     for (const r of P.ui) button(g, r, P.hover === r);
-    F().draw(g, 'SPACE / CLICK: SNAP     Z: FREEZE     I: HEARTS + MOOD ICONS', 8, 153, '#8fb6cc');
-    F().draw(g, 'F: FRAME STYLE     C: CAPTION     P / ESC: LEAVE PHOTO MODE', 8, 162, '#8fb6cc');
+    F().draw(g, AQ.Keys.fill('{k:photoSnap} / CLICK: SNAP     {k:photoFreeze}: FREEZE     {k:photoIcons}: HEARTS + MOOD ICONS'), 8, 153, '#8fb6cc');
+    F().draw(g, AQ.Keys.fill('{k:photoFrame}: FRAME STYLE     {k:photoCaption}: CAPTION     {k:photo} / ESC: LEAVE PHOTO MODE'), 8, 162, '#8fb6cc');
     F().draw(g, `PHOTOS SAVE AS PNG DOWNLOADS (${pcfg().scale}X PIXELS)`, 8, 171, '#5f7f96');
     // after a shot: a tiny preview with "Saved!"
     if (P.previewT > 0 && P.preview) {

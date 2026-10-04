@@ -108,6 +108,7 @@ AQ.Game = (function () {
         if (AQ.Keys.pressed('map')) { if (inWorld) G.state = G.state === 'map' ? 'play' : 'map'; else AQ.HUD.toast('The map only shows the sea.', '#cfe8ff'); }
         if (I.wasPressed('Tab') && AQ.Aquarium && AQ.TUNING.debug.tabOpensAquarium) { AQ.Aquarium.open(G); I.endFrame(); return; }
         if (AQ.Keys.pressed('log') && AQ.LogUI) { AQ.LogUI.open(G); I.endFrame(); return; }
+        if (AQ.Keys.pressed('guide') && AQ.Guide) { AQ.Guide.open(G, 'play'); I.endFrame(); return; }
         if (AQ.Keys.pressed('pause')) { if (G.state === 'map') G.state = 'play'; else { G.state = 'pause'; I.endFrame(); return; } }
       }
       AQ.Scenes.cur(G).update(dt, G, frozen ? NO_INPUT : I);
@@ -128,6 +129,8 @@ AQ.Game = (function () {
       AQ.Title.update(dt, G);
     } else if (G.state === 'soundtest') {
       AQ.SoundTest.update(dt, G);
+    } else if (G.state === 'guide') {
+      AQ.Guide.update(dt, G);
     }
     if (AQ.SoundDirector) AQ.SoundDirector.update(dt, G);
     AQ.Transition.update(dt);
@@ -148,7 +151,7 @@ AQ.Game = (function () {
       else if (AQ.Tips) AQ.Tips.draw(ctx, G);
       return;
     }
-    const title = G.state === 'title' || (G.state === 'log' && AQ.LogUI.from === 'title');
+    const title = G.state === 'title' || (G.state === 'log' && AQ.LogUI.from === 'title') || (G.state === 'guide' && AQ.Guide.from === 'title');
     if (!title && G.scene !== 'world') {
       // side scenes draw themselves; overlays go on top as usual
       AQ.Scenes.cur(G).draw(ctx, G);
@@ -182,10 +185,11 @@ AQ.Game = (function () {
     if (!title && AQ.Dive) AQ.Dive.drawWorld(ctx, G);                      // the guided dive's glowing marker
     AQ.Render.heavyHaze(G.player.heavy || 0);
     AQ.Terrain.drawGlow(ctx, cam);
-    if (title) { if (G.state === 'log') AQ.LogUI.draw(ctx, G); else AQ.Title.draw(ctx, G); return; }
+    if (title) { if (G.state === 'log') AQ.LogUI.draw(ctx, G); else if (G.state === 'guide') AQ.Guide.draw(ctx); else AQ.Title.draw(ctx, G); return; }
     drawOverlays(ctx);
   }
   function drawOverlays(ctx) {
+    if (G.state === 'guide') { AQ.Guide.draw(ctx); return; }              // the book covers the HUD (no text underneath)
     AQ.HUD.draw(ctx, G);
     if (G.state === 'play' && AQ.Tips) AQ.Tips.draw(ctx, G);
     if (G.state === 'play' && AQ.Dive) AQ.Dive.draw(ctx, G);

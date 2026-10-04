@@ -27,6 +27,7 @@ AQ.Title = (function () {
     items.push({ id: 'aquarium', label: 'AQUARIUM', icon: 'fish' });
     items.push({ id: 'log', label: 'COLLECTION', icon: 'book' });
     items.push({ id: 'controls', label: 'CONTROLS', icon: 'pad' });
+    items.push({ id: 'guide', label: 'GUIDE', icon: 'book' });
     items.push({ id: 'sound', label: 'SOUND', icon: 'note' });
     const y0 = 80 - (items.length - 4) * 6;
     return items.map((it, i) => Object.assign(it, { x: 108, y: y0 + i * 14, w: 104, h: 11 }));
@@ -98,6 +99,7 @@ AQ.Title = (function () {
     } else if (it.id === 'aquarium') { AQ.Aquarium.open(game, 'title'); }
     else if (it.id === 'log') { AQ.LogUI.open(game, 'title'); }
     else if (it.id === 'controls') T.panel = 'controls';
+    else if (it.id === 'guide') AQ.Guide.open(game, 'title');
     else if (it.id === 'sound') { T.panel = 'sound'; AQ.SoundUI.open(); }
   }
   function start(game) {

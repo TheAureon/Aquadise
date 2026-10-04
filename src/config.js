@@ -161,7 +161,11 @@ AQ.TUNING = {
     log: ['KeyL'], map: ['KeyM'], help: ['KeyH'], pause: ['Escape'],
     // in a tank
     feed: ['KeyF'], tanks: ['KeyT'], undo: ['KeyU'], flip: ['KeyX'], layer: ['KeyZ'],
-    prevTank: ['KeyQ', 'ArrowLeft'], nextTank: ['KeyE', 'ArrowRight']
+    prevTank: ['KeyQ', 'ArrowLeft'], nextTank: ['KeyE', 'ArrowRight'],
+    // in photo mode
+    photoSnap: ['Space'], photoFreeze: ['KeyZ'], photoIcons: ['KeyI'], photoFrame: ['KeyF'], photoCaption: ['KeyC'],
+    // the GUIDE (field-guide book): from the help line, pause menu or title
+    guide: ['KeyI']
   },
 
   transition: {               // the fade-to-black used for every scene change
