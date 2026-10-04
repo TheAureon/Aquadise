@@ -118,7 +118,7 @@ AQ.TUNING = {
   // ---- day and night (one clock for the whole game: the sea and the hill's sky follow it; it keeps running in the station)
   clock: {
     dayMinutes: 6,            // real minutes for one full day + night
-    startHour: 5,             // a new game (and an older save) starts here: the beginning of the day (dawn)
+    startHour: 10,            // a new game starts here: mid-morning, so the first view is bright (saves keep their own time)
     dawnHour: 5, dawnHours: 1.5,   // dawn starts at 5:00 and takes 1.5 game hours to become full day
     duskHour: 18.5, duskHours: 1.5, // dusk starts at 18:30 and takes 1.5 game hours to become night
     nightBelow: 0.35,         // night-only creatures come out when daylight drops below this

@@ -218,7 +218,8 @@ browsers won't let a page save pictures made from file:// images.
   is nervous and there's room. Then an egg appears (a baby for mammals) and later hatches; babies
   grow up over `breeding.growMinutes`. It all runs on real time, wherever you are in the game. The
   log marks species you've bred with a ♥. Nothing requires it.
-- **Day and night.** The sea has a calm clock (`clock.dayMinutes`, 6 real minutes per day by default)
+- **Day and night.** A new game starts in the bright mid-morning (10:00, `clock.startHour`); saves keep
+  their own time. The sea has a calm clock (`clock.dayMinutes`, 6 real minutes per day by default)
   with dawn, day, dusk and night; nights are darker and bluer near the surface, while deep and cave
   areas look the same as before. The HUD shows a sun, sunrise or moon. Creatures with
   `active: 'night'` only come out at night and fade away at dawn. Testing: set

@@ -1269,9 +1269,9 @@
   // (8 x 8, 4 frames), both a pale warm gold.
   S.uimarker = function (p, o) {
     const W = p.w, c = W / 2, r = 4.5 + [0, 0.8, 1.6, 0.8][o.frame], col = hex('#fff1b0');
+    // a dark edge just outside and inside the bright ring, so it reads on bright sand and sky as well as at night
+    for (const rr of [r - 1, r + 1]) for (let a = 0; a < Math.PI * 2; a += 0.05) p.set(c + Math.cos(a) * rr - 0.5, c + Math.sin(a) * rr - 0.5, [40, 34, 24, 170]);
     for (let a = 0; a < Math.PI * 2; a += 0.05) p.set(c + Math.cos(a) * r - 0.5, c + Math.sin(a) * r - 0.5, col);
-    const r2 = r + 1.6;
-    for (let a = 0; a < Math.PI * 2; a += 0.08) p.set(c + Math.cos(a) * r2 - 0.5, c + Math.sin(a) * r2 - 0.5, [255, 241, 176, 110]);
   };
   S.uiarrow = function (p, o) {
     const dy = [0, 1, 2, 1][o.frame], col = hex('#fff1b0');
