@@ -28,7 +28,7 @@ AQ.Title = (function () {
     items.push({ id: 'log', label: 'COLLECTION', icon: 'book' });
     items.push({ id: 'controls', label: 'CONTROLS', icon: 'pad' });
     items.push({ id: 'guide', label: 'GUIDE', icon: 'book' });
-    items.push({ id: 'sound', label: 'SOUND', icon: 'note' });
+    items.push({ id: 'sound', label: 'SETTINGS', icon: 'note' });
     const rows = items.length + 1, y0 = 80 - (rows - 4) * 6;
     items.forEach((it, i) => Object.assign(it, { x: 108, y: y0 + i * 14, w: 104, h: 11 }));
     // save files share the last row: EXPORT SAVE | IMPORT SAVE (src/savefile.js)

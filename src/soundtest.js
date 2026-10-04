@@ -5,40 +5,62 @@ var AQ = (typeof AQ !== 'undefined') ? AQ : {};
 
 AQ.SoundUI = (function () {
   const F = () => AQ.Font, A = AQ.Audio;
-  const S = { sel: 0, ui: [] };
-  const BOX = { x: 64, y: 30, w: 192, h: 148 };
-  const ROWS = ['music', 'sfx', 'mute', 'hints', 'resettips', 'flashing', 'test', 'back'];
-  const Y = { music: 44, sfx: 56, mute: 68, hints: 93, resettips: 105, flashing: 117, test: 133, back: 146 };   // row positions
-
+  // The SETTINGS panel (title screen + pause menu), in tabs: SOUND, OPTIONS, TOUCH. Everything is saved
+  // with the game (AQ.State.settings / the audio settings).
+  const S = { sel: 0, ui: [], tab: 'sound' };
+  const BOX = { x: 52, y: 22, w: 216, h: 154 };
+  const TABS = [['sound', 'SOUND'], ['options', 'OPTIONS'], ['touch', 'TOUCH']];
+  const set = () => (AQ.State.settings = AQ.State.settings || {});
+  const touchMode = () => set().touchControls || 'auto';
+  // the rows of each tab: bar (a volume), btn (a toggle / cycle, `value` is its label), wide (an action)
+  function rows() {
+    const st = A.settings();
+    if (S.tab === 'sound') return [
+      { id: 'music', kind: 'bar', label: 'MUSIC', bar: st.music }, { id: 'sfx', kind: 'bar', label: 'EFFECTS', bar: st.sfx },
+      { id: 'mute', kind: 'btn', label: 'MUTE', value: st.mute ? 'MUTED' : 'SOUND ON', warn: st.mute },
+      { id: 'test', kind: 'wide', value: 'SOUND TEST' }];
+    if (S.tab === 'options') return [
+      { id: 'hints', kind: 'btn', label: 'TIPS', value: !AQ.Tips || AQ.Tips.hintsOn() ? 'HINTS ON' : 'HINTS OFF' },
+      { id: 'resettips', kind: 'btn', label: 'SEE AGAIN', value: S.resetDone > 0 ? 'TIPS RESET!' : 'RESET TIPS' },
+      { id: 'flashing', kind: 'btn', label: 'FLASHING', value: AQ.U.calm() ? 'REDUCED' : 'NORMAL', on: AQ.U.calm() }];
+    return [
+      { id: 'touchmode', kind: 'btn', label: 'TOUCH CONTROLS', value: touchMode().toUpperCase() },
+      { id: 'swap', kind: 'btn', label: 'SIDES', value: set().swapSides ? 'SWAPPED' : 'NORMAL', on: !!set().swapSides }].concat(S.extraTouchRows ? S.extraTouchRows() : []);
+  }
+  const order = () => ['tabs'].concat(rows().map((r) => r.id), ['back']);
   S.open = function () { S.sel = 0; };
   function layout() {
-    const st = A.settings(), ui = [];
-    [['music', Y.music], ['sfx', Y.sfx]].forEach(([k, y]) => {
-      ui.push({ id: k + '-', row: k, x: 132, y, w: 10, h: 9, label: '-' });
-      ui.push({ id: k + '+', row: k, x: 210, y, w: 10, h: 9, label: '+' });
-      ui.push({ id: k + 'bar', row: k, x: 145, y, w: 62, h: 9, bar: st[k] });
+    const ui = [];
+    TABS.forEach(([id, label], i) => ui.push({ id: 'tab:' + id, row: 'tabs', x: BOX.x + 10 + i * 66, y: BOX.y + 14, w: 64, h: 11, label, on: S.tab === id }));
+    rows().forEach((r, i) => {
+      const y = BOX.y + 34 + i * 15;
+      if (r.kind === 'bar') {
+        ui.push({ id: r.id + '-', row: r.id, x: 146, y, w: 10, h: 9, label: '-' });
+        ui.push({ id: r.id + '+', row: r.id, x: 224, y, w: 10, h: 9, label: '+' });
+        ui.push({ id: r.id + 'bar', row: r.id, x: 159, y, w: 62, h: 9, bar: r.bar });
+      } else if (r.kind === 'wide') ui.push({ id: r.id, row: r.id, x: 110, y, w: 100, h: 11, label: r.value });
+      else ui.push({ id: r.id, row: r.id, x: 146, y, w: 106, h: 10, label: r.value, warn: r.warn, on2: r.on });
+      ui.push({ id: 'label:' + r.id, row: r.id, label: r.label, y, text: true });
     });
-    ui.push({ id: 'mute', row: 'mute', x: 132, y: Y.mute, w: 88, h: 10, label: st.mute ? 'MUTED' : 'SOUND ON', warn: st.mute });
-    // tutorial tips (src/tips.js): on / off, and show them all again
-    const hints = !AQ.Tips || AQ.Tips.hintsOn();
-    ui.push({ id: 'hints', row: 'hints', x: 132, y: Y.hints, w: 88, h: 10, label: hints ? 'HINTS ON' : 'HINTS OFF' });
-    ui.push({ id: 'resettips', row: 'resettips', x: 132, y: Y.resettips, w: 88, h: 10, label: S.resetDone > 0 ? 'TIPS RESET!' : 'RESET TIPS' });
-    // REDUCE FLASHING: softer camera flash, dimmer / slower stars, no fast blinking (AQ.U.calm())
-    ui.push({ id: 'flashing', row: 'flashing', x: 132, y: Y.flashing, w: 88, h: 10, label: AQ.U.calm() ? 'REDUCED' : 'NORMAL', on: AQ.U.calm() });
-    ui.push({ id: 'test', row: 'test', x: 110, y: Y.test, w: 100, h: 11, label: 'SOUND TEST' });
-    ui.push({ id: 'back', row: 'back', x: 110, y: Y.back, w: 100, h: 11, label: 'BACK' });
+    ui.push({ id: 'back', row: 'back', x: 110, y: BOX.y + BOX.h - 22, w: 100, h: 11, label: 'BACK' });
     return ui;
   }
   function nudge(row, dir) {
+    if (row === 'tabs') { const i = TABS.findIndex((t) => t[0] === S.tab); S.tab = TABS[(i + dir + TABS.length) % TABS.length][0]; A.play('menu_move'); return; }
     if (row !== 'music' && row !== 'sfx') return;
     A.setVolume(row, A.settings()[row] + dir * 0.1);
     A.play('menu_move');
   }
   function activate(id, game, onBack, onTest) {
-    if (id === 'mute') { A.toggleMute(); A.play('menu_select'); }
-    else if (id === 'hints') { AQ.Tips.setHints(!AQ.Tips.hintsOn()); A.play('menu_select'); AQ.Save && AQ.Save.dirty(); }
-    else if (id === 'flashing') { AQ.State.settings = AQ.State.settings || {}; AQ.State.settings.reduceFlashing = !AQ.U.calm(); A.play('menu_select'); AQ.Save && AQ.Save.dirty(); }
-    else if (id === 'resettips') { AQ.Tips.reset(); S.resetDone = 2; A.play('menu_select'); AQ.Save && AQ.Save.dirty(); }
+    const dirty = () => { A.play('menu_select'); AQ.Save && AQ.Save.dirty(); };
+    if (id.startsWith('tab:')) { S.tab = id.slice(4); A.play('menu_move'); }
+    else if (id === 'mute') { A.toggleMute(); A.play('menu_select'); }
+    else if (id === 'hints') { AQ.Tips.setHints(!AQ.Tips.hintsOn()); dirty(); }
+    else if (id === 'flashing') { set().reduceFlashing = !AQ.U.calm(); dirty(); }
+    else if (id === 'resettips') { AQ.Tips.reset(); S.resetDone = 2; dirty(); }
+    else if (id === 'touchmode') { const m = ['auto', 'on', 'off'], i = m.indexOf(touchMode()); set().touchControls = m[(i + 1) % 3]; if (AQ.Touch) AQ.Touch.refresh(); dirty(); }
+    else if (id === 'swap') { set().swapSides = !set().swapSides; dirty(); }
+    else if (S.activateExtra && S.activateExtra(id, game, dirty)) { /* handled by a later addition */ }
     else if (id === 'test') { A.play('menu_select'); onTest(); }
     else if (id === 'back') { A.play('menu_select'); AQ.Save && AQ.Save.save(game); onBack(); }
     else if (/[-+]$/.test(id)) nudge(id.slice(0, -1), id.endsWith('+') ? 1 : -1);
@@ -48,40 +70,42 @@ AQ.SoundUI = (function () {
     const I = AQ.Input, m = I.mouse;
     S.resetDone = Math.max(0, (S.resetDone || 0) - 1 / 60);
     S.ui = layout();
+    const ord = order();
+    if (S.sel >= ord.length) S.sel = ord.length - 1;
     if (I.rawPressed('Escape')) { AQ.Save && AQ.Save.save(game); A.play('menu_select'); onBack(); return; }
-    if (I.rawPressed('ArrowUp', 'KeyW')) { S.sel = (S.sel + ROWS.length - 1) % ROWS.length; A.play('menu_move'); }
-    if (I.rawPressed('ArrowDown', 'KeyS')) { S.sel = (S.sel + 1) % ROWS.length; A.play('menu_move'); }
-    if (I.rawPressed('ArrowLeft', 'KeyA')) nudge(ROWS[S.sel], -1);
-    if (I.rawPressed('ArrowRight', 'KeyD')) nudge(ROWS[S.sel], 1);
-    S.hover = S.ui.find((r) => m.x >= r.x && m.y >= r.y && m.x < r.x + r.w && m.y < r.y + r.h);
-    if (S.hover && (m.x !== S.mx || m.y !== S.my)) S.sel = ROWS.indexOf(S.hover.row);
+    if (I.rawPressed('ArrowUp', 'KeyW')) { S.sel = (S.sel + ord.length - 1) % ord.length; A.play('menu_move'); }
+    if (I.rawPressed('ArrowDown', 'KeyS')) { S.sel = (S.sel + 1) % ord.length; A.play('menu_move'); }
+    if (I.rawPressed('ArrowLeft', 'KeyA')) nudge(ord[S.sel], -1);
+    if (I.rawPressed('ArrowRight', 'KeyD')) nudge(ord[S.sel], 1);
+    S.hover = S.ui.find((r) => !r.text && m.x >= r.x && m.y >= r.y && m.x < r.x + r.w && m.y < r.y + r.h);
+    if (S.hover && (m.x !== S.mx || m.y !== S.my)) S.sel = Math.max(0, ord.indexOf(S.hover.row));
     S.mx = m.x; S.my = m.y;
     if (m.pressed[0] && S.hover) {
       if (S.hover.bar != null) { A.setVolume(S.hover.row, (m.x - S.hover.x + 3) / S.hover.w); A.play('menu_move'); }
       else activate(S.hover.id, game, onBack, onTest);
     } else if (I.rawPressed('Enter', 'Space')) {
-      const row = ROWS[S.sel];
-      if (row !== 'music' && row !== 'sfx') activate(row, game, onBack, onTest);
+      const row = ord[S.sel];
+      if (row === 'tabs') nudge('tabs', 1);
+      else if (row !== 'music' && row !== 'sfx') activate(row, game, onBack, onTest);
     }
   };
   S.draw = function (g) {
-    const st = A.settings();
-    g.fillStyle = 'rgba(6,20,38,0.94)'; g.fillRect(BOX.x, BOX.y, BOX.w, BOX.h);
+    const st = A.settings(), ord = order(), selRow = ord[S.sel];
+    g.fillStyle = 'rgba(6,20,38,0.95)'; g.fillRect(BOX.x, BOX.y, BOX.w, BOX.h);
     g.fillStyle = 'rgba(110,240,239,0.6)'; g.fillRect(BOX.x, BOX.y, BOX.w, 1); g.fillRect(BOX.x, BOX.y + BOX.h - 1, BOX.w, 1);
-    F().draw(g, 'SOUND', 160, BOX.y + 4, '#6ef0ef', { align: 'center', shadow: false });
-    F().draw(g, 'OPTIONS', 80, Y.hints - 10, '#6ef0ef', { shadow: false });
-    g.fillStyle = 'rgba(110,240,239,0.25)'; g.fillRect(104, Y.hints - 8, 136, 1);
-    const label = { music: ['MUSIC', Y.music + 2], sfx: ['EFFECTS', Y.sfx + 2], mute: ['MUTE', Y.mute + 3], hints: ['TIPS', Y.hints + 3], resettips: ['SEE AGAIN', Y.resettips + 3], flashing: ['FLASHING', Y.flashing + 3] };
-    for (const k in label) F().draw(g, label[k][0], 80, label[k][1], ROWS[S.sel] === k ? '#ffffff' : '#9fd3ee', { shadow: false });
-    const selRow = ROWS[S.sel], arrowY = Y[selRow] + (selRow === 'music' || selRow === 'sfx' ? 2 : 3);
-    F().draw(g, '>', selRow === 'test' || selRow === 'back' ? 102 : 73, arrowY, '#6ef0ef', { shadow: false });
+    F().draw(g, 'SETTINGS', 160, BOX.y + 4, '#6ef0ef', { align: 'center', shadow: false });
+    g.fillStyle = 'rgba(110,240,239,0.25)'; g.fillRect(BOX.x + 8, BOX.y + 28, BOX.w - 16, 1);
     for (const r of S.ui) {
+      if (r.text) { F().draw(g, r.label, 66, r.y + (rows().find((x) => x.id === r.row).kind === 'bar' ? 2 : 3), selRow === r.row ? '#ffffff' : '#9fd3ee', { shadow: false }); continue; }
       if (r.bar != null) {
         for (let i = 0; i < 10; i++) { g.fillStyle = i < Math.round(r.bar * 10) ? (st.mute ? '#5f7a8c' : '#6ef0ef') : '#16334a'; g.fillRect(r.x + i * 6 + 1, r.y + 2, 5, 5); }
-        F().draw(g, `${Math.round(r.bar * 100)}%`, 238, r.y + 2, '#c3dfec', { align: 'right', shadow: false });
-      } else AQ.Aquarium.button(g, Object.assign({}, r, { on: (ROWS[S.sel] === r.row || r.on) && !r.warn }), S.hover === r);
+        F().draw(g, `${Math.round(r.bar * 100)}%`, 258, r.y + 2, '#c3dfec', { align: 'right', shadow: false });
+      } else if (r.row === 'tabs') AQ.Aquarium.button(g, r, S.hover === r || (selRow === 'tabs' && r.on));   // the open tab is lit
+      else AQ.Aquarium.button(g, Object.assign({}, r, { on: (r.on || r.on2 || selRow === r.row) && !r.warn }), S.hover === r);
     }
-    F().draw(g, `${AQ.Keys.name('mute')}: QUICK MUTE ANYWHERE`, 160, BOX.y + BOX.h - 10, '#7fa4ba', { align: 'center', shadow: false });
+    if (selRow !== 'tabs' && selRow !== 'back') { const r = S.ui.find((u) => u.text && u.row === selRow); if (r) F().draw(g, '>', 59, r.y + 3, '#6ef0ef', { shadow: false }); }
+    const foot = S.tab === 'sound' ? `${AQ.Keys.name('mute')}: QUICK MUTE ANYWHERE` : S.tab === 'touch' ? (AQ.Touch && AQ.Touch.active() ? 'TOUCH CONTROLS ARE ON' : 'TOUCH CONTROLS ARE OFF RIGHT NOW') : 'SAVED WITH YOUR GAME';
+    F().draw(g, foot, 160, BOX.y + BOX.h - 8, '#7fa4ba', { align: 'center', shadow: false });
   };
   return S;
 })();

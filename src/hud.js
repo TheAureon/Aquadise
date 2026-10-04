@@ -95,7 +95,7 @@ AQ.HUD = (function () {
     // help (first moments only, or when H is pressed)
     if (H.showHelp && H.helpT > 0 && game.state !== 'pause') {
       ctx.globalAlpha = Math.min(1, H.helpT) * 0.9;
-      const lines = AQ.data.tutorial.helpLines.map(AQ.Keys.fill);    // data/tutorial.js; key names from the bindings
+      const tut = AQ.data.tutorial, lines = (AQ.Touch && AQ.Touch.active() && tut.touchHelpLines ? tut.touchHelpLines : tut.helpLines).map(AQ.Keys.fill);    // data/tutorial.js; key names from the bindings
       lines.forEach((l, i) => F.draw(ctx, l, vw / 2, vh - 15 + i * 7, '#d8f3ff', { align: 'center', shadow: SH }));
       ctx.globalAlpha = 1;
     }

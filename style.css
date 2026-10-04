@@ -1,8 +1,25 @@
 :root { --px: 4px; --ink: #e8fbff; --panel: rgba(8, 22, 40, 0.92); --edge: #5fc6d9; --gold: #ffd56b; }
 * { box-sizing: border-box; }
 html, body { margin: 0; height: 100%; background: #04101e; overflow: hidden; }
+/* touch screens: no scrolling / zooming / rubber-banding, no text selection or long-press callouts */
+html, body { touch-action: none; overscroll-behavior: none; -webkit-user-select: none; user-select: none;
+  -webkit-touch-callout: none; -webkit-tap-highlight-color: transparent; -webkit-text-size-adjust: 100%; }
+body { position: fixed; inset: 0; }
 body { font-family: "Press Start 2P", ui-monospace, "Courier New", monospace; color: var(--ink); }
-#stage { position: fixed; inset: 0; display: flex; align-items: center; justify-content: center; }
+/* the game is centred inside the safe area (clear of notches and the home bar) */
+#stage { position: fixed; inset: 0; display: flex; align-items: center; justify-content: center;
+  padding: env(safe-area-inset-top) env(safe-area-inset-right) env(safe-area-inset-bottom) env(safe-area-inset-left); }
+#safe-probe { position: fixed; visibility: hidden; pointer-events: none; width: 0; height: 0;
+  padding: env(safe-area-inset-top) env(safe-area-inset-right) env(safe-area-inset-bottom) env(safe-area-inset-left); }
+/* touch controls: their own canvas over everything, never catching the pointer (src/touch.js reads the window) */
+#touch { position: fixed; left: 0; top: 0; pointer-events: none; z-index: 5; }
+/* "rotate your device" (touch, portrait) */
+#rotate { position: fixed; inset: 0; z-index: 20; display: none; flex-direction: column; align-items: center; justify-content: center;
+  gap: 16px; background: #06142a; color: #7fe3f0; font-size: 16px; letter-spacing: 2px; text-align: center; padding: 24px; }
+#rotate .small { font-size: 11px; color: #8fb6cc; letter-spacing: 0; }
+#rotate .phone { width: 34px; height: 56px; border: 4px solid #7fe3f0; border-radius: 6px; animation: aq-turn 2.4s ease-in-out infinite; }
+@keyframes aq-turn { 0%, 30% { transform: rotate(0deg); } 60%, 100% { transform: rotate(-90deg); } }
+#loading { z-index: 10; }
 #game {
   image-rendering: pixelated; image-rendering: crisp-edges;
   display: block; background: #06142a; cursor: crosshair;

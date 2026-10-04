@@ -2,7 +2,12 @@
 <html lang="en">
 <head>
   <meta charset="utf-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <!-- touch screens: no zooming, use the whole screen (round corners / notches: see safe areas in style.css) -->
+  <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no, viewport-fit=cover">
+  <meta name="apple-mobile-web-app-capable" content="yes">
+  <meta name="mobile-web-app-capable" content="yes">
+  <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+  <meta name="format-detection" content="telephone=no">
   <title>Aquadise</title>
   <link rel="stylesheet" href="style.css">
 </head>
@@ -10,6 +15,9 @@
   <div id="stage">
     <canvas id="game" width="320" height="180"></canvas>
     <div id="ui"></div>
+    <canvas id="touch"></canvas>
+    <div id="rotate"><div class="phone"></div><div>ROTATE YOUR DEVICE</div><div class="small">Aquadise plays sideways (landscape).</div></div>
+    <div id="safe-probe"></div>
     <div id="loading"><div class="logo">AQUADISE</div><div id="loading-text">Loading...</div></div>
   </div>
 
@@ -74,6 +82,7 @@
   <script src="src/hud.js"></script>
   <script src="src/title.js"></script>
   <script src="src/soundtest.js"></script>
+  <script src="src/touch.js"></script>
   <script src="src/sounddirector.js"></script>
   <script src="src/game.js"></script>
 </body>

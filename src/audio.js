@@ -97,6 +97,7 @@ AQ.Audio = (function () {
     const go = () => { init(); if (A.ctx && A.ctx.state === 'suspended' && !document.hidden) A.ctx.resume().catch(() => {}); };
     window.addEventListener('pointerdown', go, true);
     window.addEventListener('keydown', go, true);
+    window.addEventListener('touchend', go, true);       // iOS only lets sound start from a touch's end
     document.addEventListener('visibilitychange', () => {
       if (!A.ctx) return;
       if (document.hidden) A.ctx.suspend().catch(() => {}); else A.ctx.resume().catch(() => {});

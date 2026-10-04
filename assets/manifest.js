@@ -243,6 +243,50 @@ AQ.manifest = {
     11
    ]
   },
+  "ui.touch": {
+   "file": "sprites/ui/touch.png",
+   "fw": 16,
+   "fh": 16,
+   "anchor": [
+    8,
+    8
+   ],
+   "anims": {
+    "idle": {
+     "row": 0,
+     "frames": 12,
+     "fps": 1
+    }
+   },
+   "vis": [
+    0,
+    0,
+    15,
+    14
+   ]
+  },
+  "ui.stick": {
+   "file": "sprites/ui/stick.png",
+   "fw": 32,
+   "fh": 32,
+   "anchor": [
+    16,
+    16
+   ],
+   "anims": {
+    "idle": {
+     "row": 0,
+     "frames": 2,
+     "fps": 1
+    }
+   },
+   "vis": [
+    0,
+    0,
+    30,
+    30
+   ]
+  },
   "misc.bottle": {
    "file": "sprites/scene/bottle.png",
    "fw": 12,

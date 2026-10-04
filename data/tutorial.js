@@ -24,6 +24,11 @@ AQ.data.tutorial = {
     'MOVE {k:move}  JUMP {k:jump}  SNEAK {k:sneak}  NET {k:net} (HOLD TO PRY)',
     'BAIT {k:bait}  INTERACT {k:interact}  LOG {k:log}  MAP {k:map}  GUIDE {k:guide}  MUTE {k:mute}'
   ],
+  // ...and with the touch controls on (src/touch.js): the same line, for fingers
+  touchHelpLines: [
+    'STICK: MOVE   JUMP   SNEAK (TAP ON / OFF)',
+    'TAP: NET (HOLD TO PRY)   BAIT   HAND: INTERACT   MENU: LOG, MAP, GUIDE'
+  ],
 
   // The optional guided first dive (src/dive.js). Offered once on NEW GAME (a fresh save); restart it any
   // time from the pause menu (TUTORIAL). Each step completes when you actually do it; the step ids are

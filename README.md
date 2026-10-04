@@ -35,6 +35,29 @@ npx http-server -c-1 .      # or: python3 -m http.server
 | help overlay        | H                                        |
 | mute / unmute sound | O (anywhere)                             |
 
+### Touch screens (phones, tablets)
+
+Touch controls turn on by themselves with the first touch (**SETTINGS > TOUCH > TOUCH CONTROLS**:
+AUTO / ON / OFF, saved). Hold the device sideways: in portrait a "Rotate your device" screen shows and
+the game waits. The game fills the screen (keeping its shape, clear of notches and the home bar),
+and the controls sit in the black side bars where there's room, or over the game's edges:
+
+| action | touch |
+|---|---|
+| swim / walk / climb ladders | the joystick: put a thumb down anywhere in the lower part of the left side and slide (it appears under your thumb; a small push does nothing) |
+| jump | **JUMP** (up arrow), or push the joystick far up on land |
+| sneak | **SNEAK** (footprints) turns it on / off; it lights up and SNEAKING shows in the HUD |
+| net | tap the game where you want to swing; keep the finger down after the swing to pry. A quick tap in the joystick area swings there too |
+| drop bait | **BAIT** (sea only) |
+| interact (beam up/down, a tank, the directory) | **INTERACT** (a hand) shows up whenever the game shows a prompt |
+| log, map, guide, help, mute, pause, settings | **MENU** (top corner) opens a panel with all of them |
+
+Keyboard and mouse keep working at the same time. **SWAP SIDES** (same settings tab) puts the
+joystick on the right and the buttons on the left. The controls fade when you haven't touched them
+for a few seconds. Sizes, positions, fading and the joystick's feel are in `AQ.TUNING.touch`. To try
+them on a computer, set `AQ.TUNING.debug.forceTouch: true`: the controls show and the mouse acts as a
+finger (drag in the joystick area, click the buttons).
+
 In the aquarium: **Q/E** switch tanks, **F** feeds, **T** (or TANKS) shows every tank at a glance.
 Drag a tray item into the tank (or click it, then click in the tank). Drag a placed item to move it;
 right-click or **Delete** removes it. Tray pieces show ♥ when a creature in the tank loves them and a
@@ -161,7 +184,7 @@ browsers won't let a page save pictures made from file:// images.
   bottles; photo mode; sound and settings. A page (or line) about a feature the build doesn't have is
   left out. Text: `data/tutorial.js` (guide); key names and numbers like the day length or the
   rare-color odds are filled in live from the bindings and config.js (`{k:...}`, `{c:...}`, `{inv:...}`).
-- **REDUCE FLASHING.** In the Sound settings (pause menu or title), saved with your other settings.
+- **REDUCE FLASHING.** In SETTINGS > OPTIONS (pause menu or title), saved with your other settings.
   When it's on: the photo camera flash becomes a faint, slow fade instead of a white flash; shooting
   stars, the underwater glow and falling stars are dimmer and slower (and meteor-shower skies calmer);
   a falling star lands with a soft glow instead of a sparkle burst; the UFO beam, its lights and the
@@ -342,7 +365,8 @@ src/sfx.js            every sound effect recipe (registered by id)
 src/ambience.js       the looping place sounds + their crossfading director
 src/music.js          generative music engine + director (pieces in data/music.js)
 src/sounddirector.js  per-frame sound hooks: steps, splashes, beam, chimes, creature voices
-src/soundtest.js      SOUND settings panel and the SOUND TEST screen
+src/soundtest.js      the SETTINGS panel (SOUND / OPTIONS / TOUCH tabs) and the SOUND TEST screen
+src/touch.js          touch controls: pointers, joystick, on-screen buttons, MENU panel, rotate screen
 data/lore.js          field notes, one per species (found in message bottles)
 data/tutorial.js      tutorial text: help line, controls panel, one-time tips, guided dive, Guide pages
 data/music.js         music pieces, scales, motif, creature voice map, audio file mapping

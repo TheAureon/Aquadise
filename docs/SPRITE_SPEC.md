@@ -143,6 +143,16 @@ The creatures glow in the sea (`light` in `data/creatures.js`), so keep their br
 | `ui.marker` | 16 × 16 | 4 @ 5 fps (a pulse) | centre | the guided dive's glowing ring around the thing to do: a thin pale-gold ring with a soft dark edge on both sides (so it reads on bright sand and in the dark), growing and shrinking a little |
 | `ui.arrow` | 8 × 8 | 4 @ 5 fps (a bob) | centre | the small pale-gold arrow pointing down at the marker (or at you, for "drop bait") |
 
+## Touch controls
+
+Drawn big (about 50-80 screen pixels across), at whole-pixel scale, semi-transparent over the game or
+in the black side bars, so keep shapes bold and simple with a dark outline.
+
+| key | frame | frames | anchor | notes |
+|---|---|---|---|---|
+| `ui.touch` | 16 × 16 | 12 (one picture per frame, drawn by frame number) | centre | frame 0 is the round button base (a dark see-through disc with a pale rim), drawn under every icon; icons: 1 jump (up arrow), 2 bait (a pellet), 3 sneak (footprints), 4 interact (an open hand), 5 menu (three bars), 6 close (x), 7 back (arrow), 8 view (an eye), 9 shutter (a camera), 10 left, 11 right. Icons in pale white (interact in warm yellow), inside the rim. |
+| `ui.stick` | 32 × 32 | 2 | centre | the joystick: 0 the ring (thin pale rim, faint dark fill, four small direction dots), 1 the knob (a pale blue ball, half the ring's size) |
+
 The tip box itself is drawn in code (a dark navy panel with a warm yellow top edge and a small ×).
 
 ## Using a different layout

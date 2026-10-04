@@ -1279,6 +1279,42 @@
     p.rect(p.w / 2 - 1, dy, 2, 3, col);
     p.outline(0.35);
   };
+  // Touch controls (screen buttons, drawn big and semi-transparent). ui.touch, 16 x 16: frame 0 is the
+  // round button base, the rest are icons drawn on top of it: 1 jump, 2 bait, 3 sneak, 4 interact,
+  // 5 menu, 6 close, 7 back, 8 view, 9 shutter, 10 left, 11 right. ui.stick, 32 x 32: 0 ring, 1 knob.
+  S.uitouch = function (p, o) {
+    const f = o.frame, Wh = hex('#eaf8ff'), Y = hex('#ffe9a8'), c = 7.5;
+    if (f === 0) {
+      p.ellipse(c, c, 7.4, 7.4, [8, 24, 44, 150]);
+      for (let a = 0; a < Math.PI * 2; a += 0.04) p.set(c + Math.cos(a) * 7 , c + Math.sin(a) * 7, [190, 240, 255, 230]);
+      for (let a = 0; a < Math.PI * 2; a += 0.04) p.set(c + Math.cos(a) * 6, c + Math.sin(a) * 6, [20, 50, 80, 200]);
+      return;
+    }
+    if (f === 1) { p.tri([c, 3], [3.5, 9], [12.5, 9], Wh); p.rect(6, 9, 4, 4, Wh); }                         // up arrow
+    else if (f === 2) { p.circle(c, 9, 3, hex('#f2b27a')); p.circle(c - 1, 8, 1, hex('#ffe0c0')); p.rect(7, 3, 2, 3, hex('#f2b27a')); }   // a bait pellet
+    else if (f === 3) { p.ellipse(5.5, 9.5, 1.8, 2.8, Wh); p.ellipse(10, 6, 1.8, 2.8, Wh); p.set(5, 5, Wh); p.set(10, 2, Wh); }   // footprints
+    else if (f === 4) { p.rect(4, 6, 8, 7, Y); p.rect(5, 3, 1, 4, Y); p.rect(7, 2, 1, 5, Y); p.rect(9, 3, 1, 4, Y); p.rect(11, 4, 1, 3, Y); }   // an open hand
+    else if (f === 5) { for (let i = 0; i < 3; i++) p.rect(4, 4 + i * 3, 8, 2, Wh); }                       // three bars
+    else if (f === 6) { for (let i = 0; i < 7; i++) { p.rect(4 + i, 4 + i, 2, 1, Wh); p.rect(10 - i, 4 + i, 2, 1, Wh); } }   // x
+    else if (f === 7) { p.tri([3, c], [8, 3], [8, 12], Wh); p.rect(8, 6, 5, 3, Wh); }                       // back arrow
+    else if (f === 8) { p.ellipse(c, c, 5, 3, Wh); p.circle(c, c, 1.8, [20, 50, 80, 255]); }                 // an eye (view)
+    else if (f === 9) { p.rect(3, 5, 10, 7, Wh); p.rect(6, 4, 4, 1, Wh); p.circle(c, 8.5, 2, [20, 50, 80, 255]); }   // a camera
+    else if (f === 10) p.tri([4, c], [10, 3], [10, 12], Wh);                                                  // left
+    else p.tri([11, c], [5, 3], [5, 12], Wh);                                                                // right
+    p.outline(0.35);
+  };
+  S.uistick = function (p, o) {
+    const c = 15.5;
+    if (o.frame === 0) {
+      p.ellipse(c, c, 15, 15, [8, 24, 44, 90]);
+      for (let a = 0; a < Math.PI * 2; a += 0.02) p.set(c + Math.cos(a) * 14.5, c + Math.sin(a) * 14.5, [190, 240, 255, 200]);
+      for (const a of [0, Math.PI / 2, Math.PI, Math.PI * 1.5]) p.set(c + Math.cos(a) * 11, c + Math.sin(a) * 11, [190, 240, 255, 160]);   // four little direction dots
+    } else {
+      p.ellipse(c, c, 8, 8, [150, 225, 245, 220]);
+      p.ellipse(c - 1.5, c - 1.5, 5, 5, [215, 248, 255, 235]);
+      for (let a = 0; a < Math.PI * 2; a += 0.03) p.set(c + Math.cos(a) * 8, c + Math.sin(a) * 8, [20, 50, 80, 230]);
+    }
+  };
   S.beampad = function (p, o) {
     const W = p.w, H = p.h, cx = W / 2, metal = hex('#8a96a6');
     p.ellipse(cx, H - 4, W / 2 - 1, 3.6, metal);

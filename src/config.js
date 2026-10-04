@@ -135,7 +135,35 @@ AQ.TUNING = {
     fallStarKey: 'KeyG',      //   G = a star falls right now
     showerKey: 'KeyJ',        //   J = a meteor shower starts right now (2-4 stars over the next ~20 seconds)
     tutorialReset: false,     // TESTING ONLY: true adds a key that restarts the guided dive and marks every tip unseen
-    tutorialResetKey: 'KeyR'  //   R = restart the guided dive + reset all tips
+    tutorialResetKey: 'KeyR', //   R = restart the guided dive + reset all tips
+    forceTouch: false         // TESTING ONLY: true shows the touch controls and makes the mouse act as a finger
+  },                          //   (drag in the stick zone = joystick, click the on-screen buttons), to try them on a PC
+  // Touch controls (src/touch.js). Sizes are in screen pixels (CSS px), so they stay finger-sized on any
+  // screen; fractions are of the window. The settings (TOUCH CONTROLS auto/on/off, SWAP SIDES) live in
+  // the SETTINGS panel and are saved with the game.
+  touch: {
+    buttonVmin: 0.16,         // button size as a fraction of the window's shorter side...
+    minButtonPx: 48,          // ...never smaller than this (a comfortable fingertip)
+    maxButtonPx: 84,          // ...or bigger than this
+    gapPx: 10,                // space between buttons
+    marginPx: 12,             // space from the screen edge (on top of the safe area: notches, home bar)
+    menuScale: 0.75,          // the MENU button is a bit smaller than the others
+    menuGameRect: [296, 24, 22, 20],   // where MENU goes (game px: x, y, w, h) when the side bar is too narrow for it
+    stickRadiusVmin: 0.15,    // joystick ring radius, as a fraction of the shorter side
+    minStickRadiusPx: 44,
+    maxStickRadiusPx: 80,
+    deadZone: 0.18,           // fraction of the radius that does nothing (no drift from a resting thumb)
+    upThreshold: 0.7,         // push the stick this far up (fraction) to also "press up" (jump on land, like W)
+    stickZoneW: 0.45,         // the joystick works anywhere in this much of the screen width (its side)...
+    stickZoneTop: 0.3,        // ...below this fraction of the height
+    idleFadeAfter: 3,         // seconds without touching the controls before they fade...
+    fadeSeconds: 0.6,         // ...over this long...
+    idleAlpha: 0.28,          // ...down to this opacity
+    activeAlpha: 0.75,        // opacity while you're using them
+    pressedAlpha: 0.95,       // a button being held
+    interactLinger: 0.25,     // seconds the INTERACT button stays after its prompt goes (no flicker at the edge)
+    tapSeconds: 0.22,         // a touch in the joystick zone this quick...
+    tapSlopPx: 12             // ...that moved less than this is a tap on the game instead (swings the net there)
   },
   // The guided first dive (src/dive.js; the text is in data/tutorial.js).
   dive: {

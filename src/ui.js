@@ -593,7 +593,7 @@ AQ.PauseUI = (function () {
     if (P.panel === 'sound') { AQ.SoundUI.update(game, () => { P.panel = null; }, () => AQ.SoundTest.open(game, 'pause')); return; }
     P.confirm = Math.max(0, P.confirm - dt);
     if (AQ.SaveFile && AQ.SaveFile.update(game)) return;        // a save-file panel (import confirm, messages) is up
-    const rows = [['resume', 'RESUME'], ['help', 'SHOW CONTROLS'], ['guide', 'GUIDE'], ['tutorial', AQ.Dive && AQ.Dive.active() ? 'RESTART TUTORIAL' : 'TUTORIAL'], ['sound', 'SOUND'], ['files'], ['home', 'HOME']];
+    const rows = [['resume', 'RESUME'], ['help', 'SHOW CONTROLS'], ['guide', 'GUIDE'], ['tutorial', AQ.Dive && AQ.Dive.active() ? 'RESTART TUTORIAL' : 'TUTORIAL'], ['sound', 'SETTINGS'], ['files'], ['home', 'HOME']];
     P.ui = [];
     rows.forEach(([id, label], i) => {
       const y = 38 + i * 14;

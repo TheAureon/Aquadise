@@ -20,9 +20,11 @@ AQ.Game = (function () {
     canvas.width = AQ.TUNING.view.w; canvas.height = AQ.TUNING.view.h;
     AQ.Camera.w = canvas.width; AQ.Camera.h = canvas.height;
     AQ.Input.attach(canvas);
-    AQ.Audio.attach();                          // sound starts on the first click / key press
+    AQ.Audio.attach();                          // sound starts on the first click / key press / touch
     AQ.Render.init(canvas);
+    if (AQ.Touch) AQ.Touch.attach(canvas);      // touch controls (src/touch.js)
     fit(); window.addEventListener('resize', fit);
+    if (window.visualViewport) window.visualViewport.addEventListener('resize', fit);
 
     setLoading('Loading sprites...');
     await AQ.Assets.load((p) => setLoading(`Loading sprites... ${Math.round(p * 100)}%`));
@@ -60,13 +62,19 @@ AQ.Game = (function () {
   function setLoading(t) { const el = document.getElementById('loading-text'); if (el) el.textContent = t; }
   const frame = () => new Promise((r) => requestAnimationFrame(() => setTimeout(r, 0)));
 
+  // Scale the 320 x 180 game to the window. Keyboard + mouse: whole-number steps (crisp pixels).
+  // Touch: the biggest size that fits inside the safe area (phones have small screens), keeping the shape.
   function fit() {
     const canvas = document.getElementById('game');
     const vw = AQ.TUNING.view.w, vh = AQ.TUNING.view.h;
-    const s = Math.max(1, Math.floor(Math.min(window.innerWidth / vw, window.innerHeight / vh)));
-    canvas.style.width = vw * s + 'px'; canvas.style.height = vh * s + 'px';
+    const sf = (AQ.Touch && AQ.Touch.safe) || { t: 0, r: 0, b: 0, l: 0 };
+    const aw = window.innerWidth - sf.l - sf.r, ah = window.innerHeight - sf.t - sf.b;
+    const fill = Math.min(aw / vw, ah / vh);
+    const s = AQ.Touch && AQ.Touch.active() ? Math.max(0.5, fill) : Math.max(1, Math.floor(fill));
+    canvas.style.width = Math.floor(vw * s) + 'px'; canvas.style.height = Math.floor(vh * s) + 'px';
     document.documentElement.style.setProperty('--px', s + 'px');
   }
+  G.fit = fit;
 
   function loop(ts) {
     const dt = Math.min(0.1, (ts - last) / 1000 || 0);
@@ -76,6 +84,7 @@ AQ.Game = (function () {
     // Safety net: an error in one frame is logged, but never stops the game (or leaves it stuck on
     // a black transition screen).
     try {
+      if (AQ.Touch && AQ.Touch.portrait) { acc = 0; AQ.Input.endFrame(); }   // "rotate your device" is up: the game waits
       while (acc >= STEP && n < 6) { update(STEP); acc -= STEP; n++; }
       if (n === 6) acc = 0;
       draw();
@@ -91,8 +100,11 @@ AQ.Game = (function () {
     const I = AQ.Input;
     G.time += dt;
     AQ.Render.t = G.time;
+    if (AQ.Touch) AQ.Touch.update(dt, G);
 
-    if (G.state === 'play' || G.state === 'map') {
+    if (AQ.Touch && AQ.Touch.updateMenu(G)) {
+      // the touch MENU panel is open: the game waits underneath
+    } else if (G.state === 'play' || G.state === 'map') {
       const frozen = AQ.Transition.blocking(), inWorld = G.scene === 'world';
       AQ.Clock.update(dt);                         // one day/night clock for everywhere (the sea, the hill, the station)
       if (AQ.Starfall) AQ.Starfall.update(dt, G);   // falling stars + meteor showers: on schedule wherever you are
@@ -142,6 +154,7 @@ AQ.Game = (function () {
   function draw() {
     drawScene();
     AQ.Transition.draw(AQ.Render.ctx);
+    if (AQ.Touch) AQ.Touch.drawOverlay(G);     // the on-screen touch controls (their own canvas, screen px)
   }
   function drawScene() {
     const ctx = AQ.Render.ctx, cam = AQ.Camera;
@@ -197,6 +210,7 @@ AQ.Game = (function () {
     if (G.state === 'map') AQ.MapUI.draw(ctx, G);
     if (G.state === 'log') AQ.LogUI.draw(ctx, G);
     if (G.state === 'pause') AQ.PauseUI.draw(ctx, G);
+    if (AQ.Touch) AQ.Touch.drawGame(ctx);             // the touch MENU panel
   }
 
   function targetDarkness() {
