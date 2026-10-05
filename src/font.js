@@ -2,34 +2,11 @@
 var AQ = (typeof AQ !== 'undefined') ? AQ : {};
 
 AQ.Font = (function () {
-  const G = {
-    A: ['.#.', '#.#', '###', '#.#', '#.#'], B: ['##.', '#.#', '##.', '#.#', '##.'], C: ['.##', '#..', '#..', '#..', '.##'],
-    D: ['##.', '#.#', '#.#', '#.#', '##.'], E: ['###', '#..', '##.', '#..', '###'], F: ['###', '#..', '##.', '#..', '#..'],
-    G: ['.##', '#..', '#.#', '#.#', '.##'], H: ['#.#', '#.#', '###', '#.#', '#.#'], I: ['###', '.#.', '.#.', '.#.', '###'],
-    J: ['..#', '..#', '..#', '#.#', '.#.'], K: ['#.#', '#.#', '##.', '#.#', '#.#'], L: ['#..', '#..', '#..', '#..', '###'],
-    M: ['#.#', '###', '###', '#.#', '#.#'], N: ['##.', '#.#', '#.#', '#.#', '#.#'], O: ['.#.', '#.#', '#.#', '#.#', '.#.'],
-    P: ['##.', '#.#', '##.', '#..', '#..'], Q: ['.#.', '#.#', '#.#', '##.', '.##'], R: ['##.', '#.#', '##.', '#.#', '#.#'],
-    S: ['.##', '#..', '.#.', '..#', '##.'], T: ['###', '.#.', '.#.', '.#.', '.#.'], U: ['#.#', '#.#', '#.#', '#.#', '###'],
-    V: ['#.#', '#.#', '#.#', '#.#', '.#.'], W: ['#.#', '#.#', '###', '###', '#.#'], X: ['#.#', '#.#', '.#.', '#.#', '#.#'],
-    Y: ['#.#', '#.#', '.#.', '.#.', '.#.'], Z: ['###', '..#', '.#.', '#..', '###'],
-    0: ['###', '#.#', '#.#', '#.#', '###'], 1: ['.#.', '##.', '.#.', '.#.', '###'], 2: ['##.', '..#', '.#.', '#..', '###'],
-    3: ['##.', '..#', '.#.', '..#', '##.'], 4: ['#.#', '#.#', '###', '..#', '..#'], 5: ['###', '#..', '##.', '..#', '##.'],
-    6: ['.##', '#..', '###', '#.#', '###'], 7: ['###', '..#', '.#.', '.#.', '.#.'], 8: ['###', '#.#', '###', '#.#', '###'],
-    9: ['###', '#.#', '###', '..#', '##.'],
-    '.': ['...', '...', '...', '...', '.#.'], ',': ['...', '...', '...', '.#.', '#..'], '!': ['.#.', '.#.', '.#.', '...', '.#.'],
-    '?': ['##.', '..#', '.#.', '...', '.#.'], ':': ['...', '.#.', '...', '.#.', '...'], ';': ['...', '.#.', '...', '.#.', '#..'], '-': ['...', '...', '###', '...', '...'],
-    '+': ['...', '.#.', '###', '.#.', '...'], '/': ['..#', '..#', '.#.', '#..', '#..'], '(': ['.#.', '#..', '#..', '#..', '.#.'],
-    ')': ['.#.', '..#', '..#', '..#', '.#.'], "'": ['.#.', '.#.', '...', '...', '...'], '%': ['#.#', '..#', '.#.', '#..', '#.#'],
-    '<': ['..#', '.#.', '#..', '.#.', '..#'], '>': ['#..', '.#.', '..#', '.#.', '#..'], '[': ['##.', '#..', '#..', '#..', '##.'],
-    ']': ['.##', '..#', '..#', '..#', '.##'], '=': ['...', '###', '...', '###', '...'], '*': ['#.#', '.#.', '#.#', '...', '...'],
-    '#': ['#.#', '###', '#.#', '###', '#.#'], '&': ['.#.', '#.#', '.#.', '#.#', '.##'], '^': ['.#.', '#.#', '...', '...', '...'],
-    '~': ['...', '.##', '##.', '...', '...'], '"': ['#.#', '#.#', '...', '...', '...'],
-    '♥': ['...', '#.#', '###', '.#.', '...'], // heart
-    '♂': ['..###', '...##', '###.#', '#.#..', '###..'], // male (5 wide)
-    '♀': ['.###.', '.#.#.', '.###.', '..#..', '.###.'], // female (5 wide)
-    '✦': ['..#..', '.###.', '#####', '.###.', '..#..'], // rare colour variant (5 wide)
-    ' ': ['...', '...', '...', '...', '...']
-  };
+  // the character table lives in data/glyphs.js (add glyphs there); anything missing draws as a small box
+  const BOXKEY = '\u0000box';
+  const G = Object.assign({}, AQ.data.glyphs, { [BOXKEY]: ['###', '#.#', '#.#', '#.#', '###'] });
+  const known = (ch) => G[ch] !== undefined && ch !== BOXKEY;
+  const unknown = new Set();               // characters drawn that have no glyph yet (tools/check-game.js lists them)
   // most glyphs are 3 wide; a few (♂ ♀) are wider - each glyph advances by its own width + 1
   const GW = 5, GH = 5, LINE = 7;
   const gw = (k) => (G[k] ? G[k][0].length : 3);
@@ -54,11 +31,13 @@ AQ.Font = (function () {
     return a;
   }
 
-  function width(str) { let w = 0; for (const ch of String(str).toUpperCase()) w += adv(ch); return Math.max(0, w - 1); }
+  // upper case with the current language's rules (English: the same as toUpperCase)
+  const upper = (s) => { try { return String(s).toLocaleUpperCase(AQ.Lang ? AQ.Lang.locale() : 'en'); } catch (e) { return String(s).toUpperCase(); } };
+  function width(str) { let w = 0; for (const ch of upper(str)) w += adv(ch); return Math.max(0, w - 1); }
 
   // opts: { align: 'left'|'center'|'right', shadow: color|false }
   function draw(ctx, str, x, y, color = '#fff', opts = {}) {
-    str = String(str).toUpperCase();
+    str = upper(str);
     const lines = str.split('\n');
     lines.forEach((line, li) => {
       let w = width(line);
@@ -72,11 +51,13 @@ AQ.Font = (function () {
     const a = atlas(color);
     let cx = x;
     for (const ch of line) {
-      const gi = a.index[ch];
-      if (gi !== undefined) ctx.drawImage(a.canvas, gi * GW, 0, gw(ch), GH, cx, y, gw(ch), GH);
+      // a character the font doesn't have yet draws as a small box (never nothing, never an error)
+      const k = known(ch) ? ch : BOXKEY, gi = a.index[k];
+      if (k === BOXKEY) unknown.add(ch);
+      if (gi !== undefined) ctx.drawImage(a.canvas, gi * GW, 0, gw(k), GH, cx, y, gw(k), GH);
       cx += adv(ch);
     }
   }
 
-  return { draw, width, LINE, GH };
+  return { draw, width, LINE, GH, has: known, unknown };
 })();

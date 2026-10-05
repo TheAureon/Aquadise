@@ -1036,7 +1036,9 @@ AQ.Aquarium = (function () {
     if (AQ.Keys.pressed('photoSnap')) act('p_snap');
     if (m.pressed[0]) { if (P.hover) act(P.hover.id); else if (inTank(m)) act('p_snap'); }
   }
-  const dateText = () => { const d = new Date(), z = (n) => String(n).padStart(2, '0'); return `${d.getFullYear()}-${z(d.getMonth() + 1)}-${z(d.getDate())}`; };
+  // the caption's date in the language's own format; file names always use plain ASCII YYYY-MM-DD
+  const dateText = () => AQ.Lang.date(new Date());
+  const isoDate = () => { const d = new Date(), z = (n) => String(n).padStart(2, '0'); return `${d.getFullYear()}-${z(d.getMonth() + 1)}-${z(d.getDate())}`; };
   // The picture: the tank (rim included), framed in the chosen style, scaled up crisply.
   function composePhoto(b, tank) {
     const P = A.photo, src = document.createElement('canvas');
@@ -1084,7 +1086,7 @@ AQ.Aquarium = (function () {
     if (!AQ.U.calm() && AQ.Tips) AQ.Tips.event('flash');
     let shot;
     try { shot = composePhoto(b, tank); } catch (e) { note('The photo could not be taken.', '#ffb08a'); return; }
-    const file = `Aquadise-${shot.name.replace(/[^A-Za-z0-9]/g, '')}-${shot.date}.png`;
+    const file = `Aquadise-${AQ.Tanks.fileName(b)}-${isoDate()}.png`;   // plain ASCII whatever the language
     const done = (ok) => {
       P.preview = shot.small; P.previewT = ok ? pcfg().previewSeconds : 0;
       P.saved = ok ? 'SAVED!' : 'COULD NOT SAVE';

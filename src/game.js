@@ -42,6 +42,7 @@ AQ.Game = (function () {
     const start = AQ.data.world.playerStart;
     G.player = new AQ.Player(start[0], start[1]);
     if (save) AQ.Save.apply(save, G);
+    AQ.Lang.refresh();                          // the saved LANGUAGE, else the browser's (if we have it), else English
     // a brand-new game has tutorial progress from the start, so its saves are never mistaken for an older save
     if (!AQ.State.tutorial) AQ.State.tutorial = { seen: {} };
     G.upgrades = AQ.State.upgrades;

@@ -22,7 +22,8 @@ AQ.SoundUI = (function () {
     if (S.tab === 'options') return [
       { id: 'hints', kind: 'btn', label: 'TIPS', value: !AQ.Tips || AQ.Tips.hintsOn() ? 'HINTS ON' : 'HINTS OFF' },
       { id: 'resettips', kind: 'btn', label: 'SEE AGAIN', value: S.resetDone > 0 ? 'TIPS RESET!' : 'RESET TIPS' },
-      { id: 'flashing', kind: 'btn', label: 'FLASHING', value: AQ.U.calm() ? 'REDUCED' : 'NORMAL', on: AQ.U.calm() }];
+      { id: 'flashing', kind: 'btn', label: 'FLASHING', value: AQ.U.calm() ? 'REDUCED' : 'NORMAL', on: AQ.U.calm() },
+      { id: 'language', kind: 'btn', label: AQ.t('settings.language'), value: AQ.Lang.name(AQ.Lang.code), off: AQ.Lang.available().length < 2 }];
     return [
       { id: 'touchmode', kind: 'btn', label: 'TOUCH CONTROLS', value: touchMode().toUpperCase() },
       { id: 'swap', kind: 'btn', label: 'SIDES', value: set().swapSides ? 'SWAPPED' : 'NORMAL', on: !!set().swapSides }].concat(S.extraTouchRows ? S.extraTouchRows() : []);
@@ -39,7 +40,7 @@ AQ.SoundUI = (function () {
         ui.push({ id: r.id + '+', row: r.id, x: 224, y, w: 10, h: 9, label: '+' });
         ui.push({ id: r.id + 'bar', row: r.id, x: 159, y, w: 62, h: 9, bar: r.bar });
       } else if (r.kind === 'wide') ui.push({ id: r.id, row: r.id, x: 110, y, w: 100, h: 11, label: r.value });
-      else ui.push({ id: r.id, row: r.id, x: 146, y, w: 106, h: 10, label: r.value, warn: r.warn, on2: r.on });
+      else ui.push({ id: r.id, row: r.id, x: 146, y, w: 106, h: 10, label: r.value, warn: r.warn, on2: r.on, off: r.off });
       ui.push({ id: 'label:' + r.id, row: r.id, label: r.label, y, text: true });
     });
     ui.push({ id: 'back', row: 'back', x: 110, y: BOX.y + BOX.h - 22, w: 100, h: 11, label: 'BACK' });
@@ -57,6 +58,10 @@ AQ.SoundUI = (function () {
     else if (id === 'mute') { A.toggleMute(); A.play('menu_select'); }
     else if (id === 'hints') { AQ.Tips.setHints(!AQ.Tips.hintsOn()); dirty(); }
     else if (id === 'flashing') { set().reduceFlashing = !AQ.U.calm(); dirty(); }
+    else if (id === 'language') {                 // the next language that exists (only the ones with a file)
+      const list = AQ.Lang.available(), next = list[(list.indexOf(AQ.Lang.code) + 1) % list.length];
+      if (list.length > 1) { set().language = AQ.Lang.set(next); dirty(); }
+    }
     else if (id === 'resettips') { AQ.Tips.reset(); S.resetDone = 2; dirty(); }
     else if (id === 'touchmode') { const m = ['auto', 'on', 'off'], i = m.indexOf(touchMode()); set().touchControls = m[(i + 1) % 3]; if (AQ.Touch) AQ.Touch.refresh(); dirty(); }
     else if (id === 'swap') { set().swapSides = !set().swapSides; dirty(); }
@@ -190,7 +195,7 @@ AQ.SoundTest = (function () {
       F().draw(g, (on ? '> ' : '') + r.label, r.x + 3, r.y + 1, on ? '#ffffff' : '#c3dfec', { shadow: false });
     }
     const kind = TABS[T.tab][0];
-    if (cur) F().draw(g, `ID: ${cur.key}${A.hasRecording(cur.key) ? '  (RECORDING)' : ''}${kind === 'sfx' ? '' : kind === 'amb' ? '  (LOOPS - CLICK AGAIN TO STOP)' : cur.stinger ? '  (PLAYS OVER THE MUSIC)' : '  (CLICK AGAIN TO STOP)'}`, 8, 162, '#8fb6cc');
+    if (cur) F().draw(g, `ID: ${cur.key.replace(/_/g, ' ')}${A.hasRecording(cur.key) ? '  (RECORDING)' : ''}${kind === 'sfx' ? '' : kind === 'amb' ? '  (LOOPS - CLICK AGAIN TO STOP)' : cur.stinger ? '  (PLAYS OVER THE MUSIC)' : '  (CLICK AGAIN TO STOP)'}`, 8, 162, '#8fb6cc');
     F().draw(g, 'CLICK / ENTER: PLAY   Q/E: SWITCH LIST   ESC: BACK', 160, 172, '#5f7f96', { align: 'center' });
   };
   return T;

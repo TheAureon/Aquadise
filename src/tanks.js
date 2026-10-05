@@ -41,6 +41,8 @@ AQ.Tanks = (function () {
     const F = AQ.Font, opts = [(d.short || d.name).toUpperCase(), T.tinyName(d)];
     return opts.find((t) => F.width(t) <= px) || opts[opts.length - 1];
   };
+  // a tank's name for file names: plain ASCII letters and digits (from the English name), e.g. TidePools
+  T.fileName = (d) => String(d.fileName || d.short || d.name || d.id).replace(/[^A-Za-z0-9]/g, '') || d.id;
   T.isPredatorTank = (id) => { const d = T.get(id); return !!d && d.kind === 'predator'; };
   T.isNursery = (id) => { const d = T.get(id); return !!d && !!d.nursery; };
   T.themesOf = (id) => { const d = T.get(id); return d ? d.themes : [id]; };

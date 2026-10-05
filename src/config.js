@@ -136,6 +136,8 @@ AQ.TUNING = {
     showerKey: 'KeyJ',        //   J = a meteor shower starts right now (2-4 stars over the next ~20 seconds)
     tutorialReset: false,     // TESTING ONLY: true adds a key that restarts the guided dive and marks every tip unseen
     tutorialResetKey: 'KeyR', //   R = restart the guided dive + reset all tips
+    pseudoLanguage: false,    // TESTING ONLY: true adds the PSEUDO language to SETTINGS > OPTIONS > LANGUAGE (every text
+                              //   longer and in [!! brackets !!], to spot untranslated text and layout problems)
     fastNursery: false,       // TESTING ONLY: true makes breeding take seconds instead of minutes (the numbers below),
     fastNurserySeconds: { court: 5, egg: 6, grow: 25, cooldown: 4, check: 1 },   // so the whole nursery can be tried quickly
     forceTouch: false         // TESTING ONLY: true shows the touch controls and makes the mouse act as a finger
