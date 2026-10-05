@@ -25,13 +25,13 @@ AQ.Keys = (function () {
   K.down = (action) => AQ.Input.isDown(...keyCodes(action)) || buttons(action).some((b) => AQ.Input.mouse.down[b]);
 
   // a readable name for one key code
-  const NAMES = { Space: 'SPACE', Escape: 'ESC', Enter: 'ENTER', Tab: 'TAB', Backspace: 'BACKSPACE', Delete: 'DEL',
-    ArrowUp: 'UP', ArrowDown: 'DOWN', ArrowLeft: 'LEFT', ArrowRight: 'RIGHT', Mouse0: 'LEFT CLICK', Mouse1: 'MIDDLE CLICK', Mouse2: 'RIGHT CLICK' };
+  // (names: key.<code> in data/lang/; letters and digits are shown as they are)
+  const NAMED = ['Space', 'Escape', 'Enter', 'Tab', 'Backspace', 'Delete', 'ArrowUp', 'ArrowDown', 'ArrowLeft', 'ArrowRight', 'Mouse0', 'Mouse1', 'Mouse2'];
   K.codeName = function (code) {
-    if (NAMES[code]) return NAMES[code];
+    if (NAMED.indexOf(code) >= 0) return AQ.t(`key.${code}`);
     if (/^Key/.test(code)) return code.slice(3);
     if (/^Digit/.test(code)) return code.slice(5);
-    if (/^(Shift|Control|Alt|Meta)(Left|Right)$/.test(code)) return code.replace(/(Left|Right)$/, '').replace('Control', 'CTRL').replace('Meta', 'CMD').toUpperCase();
+    if (/^(Shift|Control|Alt|Meta)(Left|Right)$/.test(code)) return AQ.t(`key.${code.replace(/(Left|Right)$/, '')}`);
     return code.toUpperCase();
   };
   K.name = function (action) {
@@ -40,7 +40,7 @@ AQ.Keys = (function () {
       const first = ['up', 'left', 'down', 'right'].map((d) => K.codeName(K.list(d)[0] || ''));
       return first.every((n) => n.length === 1) ? first.join('') : first.join('/');
     }
-    if (action === 'arrows') return ['up', 'left', 'down', 'right'].every((d) => K.list(d).some((c) => /^Arrow/.test(c))) ? 'ARROWS' : '';
+    if (action === 'arrows') return ['up', 'left', 'down', 'right'].every((d) => K.list(d).some((c) => /^Arrow/.test(c))) ? AQ.t('key.arrows') : '';
     const out = [];
     for (const c of K.list(action)) { const n = K.codeName(c); if (out.indexOf(n) < 0) out.push(n); }
     return out.join(' / ');

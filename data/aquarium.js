@@ -41,22 +41,23 @@ AQ.data.tankStyles = {
 // group falls back to the group whose `themes` include its biome, then to the first group.
 //   themes:  biomes whose decor/plants count as "on theme" for this tank (vibe theme bonus, tray order)
 //   theme:   which biome-style silhouettes to paint in the tank backdrop
-//   tiny:    shortest label (used when names must squeeze, e.g. the zoomed-out building)
+//   (names: tank.<id>.name / .short / .tiny in data/lang/en.js; tiny = the shortest label, used when names
+//   must squeeze, e.g. the zoomed-out building)
 //   palette: sand (top) and rock colours, like a biome palette; water: tint colour
 AQ.data.predatorTanks = [
-  { id: 'pred_reef', tiny: 'REEF', name: 'Reef Hunters', short: 'Reef Hunters', members: ['coral_viper', 'wreck_eel'],
+  { id: 'pred_reef', members: ['coral_viper', 'wreck_eel'],
     themes: ['coral', 'ruins'], theme: 'coral', water: '#2f9ab8',
     palette: { top: ['#e8d6a8', '#d6c08e', '#c0a878'], rock: ['#a88a72', '#8d725d', '#725c4a'] } },
-  { id: 'pred_open', tiny: 'OPEN SEA', name: 'Open-Water Hunters', short: 'Open Water', members: ['reeftooth'],
+  { id: 'pred_open', members: ['reeftooth'],
     themes: ['open_ocean'], theme: 'open_ocean', water: '#1f5fa8',
     palette: { top: ['#6d7c88', '#5d6b78', '#4f5c68'], rock: ['#46525e', '#3c4652', '#323b46'] } },
-  { id: 'pred_deep', tiny: 'DEEP', name: 'Deep Hunters', short: 'Deep Hunters', members: ['lanternjaw', 'trenchmaw'],
+  { id: 'pred_deep', members: ['lanternjaw', 'trenchmaw'],
     themes: ['trench', 'vents'], theme: 'vents', water: '#050c1c',
     palette: { top: ['#2c3448', '#252c3d', '#1e2433'], rock: ['#1b2130', '#161b27', '#11151f'] } },
-  { id: 'pred_cave', tiny: 'CAVE', name: 'Cave Hunters', short: 'Cave Hunters', members: ['cave_crawler'],
+  { id: 'pred_cave', members: ['cave_crawler'],
     themes: ['cave', 'lush_cave'], theme: 'ruins', water: '#1c3550',
     palette: { top: ['#56606b', '#4a535d', '#3f4750'], rock: ['#3e444d', '#343941', '#2a2e35'] } },
-  { id: 'pred_swamp', tiny: 'SWAMP', name: 'Swamp Hunters', short: 'Swamp Hunters', members: ['dwarf_croc', 'bankside_monitor'],
+  { id: 'pred_swamp', members: ['dwarf_croc', 'bankside_monitor'],
     themes: ['mangrove'], theme: 'mangrove', water: '#5c7a3a',
     palette: { top: ['#6e5a3c', '#5c4b32', '#4a3c29'], rock: ['#4e4234', '#41372b', '#342c23'] } }
 ];
@@ -64,8 +65,8 @@ AQ.data.predatorTanks = [
 // Tanks that aren't a sea biome. Same fields as a predator tank (palette = sand/rock colours).
 // nursery: true marks the Universal Nursery (src/nursery.js): every bred egg and baby goes there.
 AQ.data.specialTanks = [
-  { id: 'nursery', nursery: true, tiny: 'NURSERY', name: 'Universal Nursery', short: 'Nursery', themes: ['nursery'], theme: 'nursery', water: '#e8b8c8',
+  { id: 'nursery', nursery: true, themes: ['nursery'], theme: 'nursery', water: '#e8b8c8',
     palette: { top: ['#f8ead0', '#eedcbc', '#e0caa4'], rock: ['#e8ccd8', '#d4b4c4', '#c09cb0'] } },
-  { id: 'starfall', tiny: 'STARFALL', name: 'Starfall', short: 'Starfall', themes: ['starfall'], theme: 'starfall', water: '#1c1650',
+  { id: 'starfall', themes: ['starfall'], theme: 'starfall', water: '#1c1650',
     palette: { top: ['#5a5480', '#4a4470', '#3a3660'], rock: ['#3a3458', '#2e2a48', '#24203a'] } }
 ];

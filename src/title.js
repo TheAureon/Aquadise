@@ -22,19 +22,19 @@ AQ.Title = (function () {
   }
   function menu() {
     const items = [];
-    if (hasProgress()) items.push({ id: 'continue', label: 'CONTINUE', icon: 'play' });
-    items.push({ id: 'new', label: T.confirmNew > 0 ? 'START OVER? CLICK AGAIN' : 'NEW GAME', icon: 'plus' });
-    items.push({ id: 'aquarium', label: 'AQUARIUM', icon: 'fish' });
-    items.push({ id: 'log', label: 'COLLECTION', icon: 'book' });
-    items.push({ id: 'controls', label: 'CONTROLS', icon: 'pad' });
-    items.push({ id: 'guide', label: 'GUIDE', icon: 'book' });
-    items.push({ id: 'sound', label: 'SETTINGS', icon: 'note' });
+    if (hasProgress()) items.push({ id: 'continue', label: AQ.t('title.continue'), icon: 'play' });
+    items.push({ id: 'new', label: AQ.t(T.confirmNew > 0 ? 'title.newConfirm' : 'title.new'), icon: 'plus' });
+    items.push({ id: 'aquarium', label: AQ.t('title.aquarium'), icon: 'fish' });
+    items.push({ id: 'log', label: AQ.t('title.collection'), icon: 'book' });
+    items.push({ id: 'controls', label: AQ.t('title.controls'), icon: 'pad' });
+    items.push({ id: 'guide', label: AQ.t('title.guide'), icon: 'book' });
+    items.push({ id: 'sound', label: AQ.t('title.settings'), icon: 'note' });
     const rows = items.length + 1, y0 = 80 - (rows - 4) * 6;
     items.forEach((it, i) => Object.assign(it, { x: 108, y: y0 + i * 14, w: 104, h: 11 }));
     // save files share the last row: EXPORT SAVE | IMPORT SAVE (src/savefile.js)
     const yl = y0 + items.length * 14;
-    items.push({ id: 'export', label: 'EXPORT SAVE', x: 108, y: yl, w: 51, h: 11, half: true });
-    items.push({ id: 'import', label: 'IMPORT SAVE', x: 161, y: yl, w: 51, h: 11, half: true });
+    items.push({ id: 'export', label: AQ.t('ui.exportSave'), x: 108, y: yl, w: 51, h: 11, half: true });
+    items.push({ id: 'import', label: AQ.t('ui.importSave'), x: 161, y: yl, w: 51, h: 11, half: true });
     return items;
   }
 
@@ -119,15 +119,7 @@ AQ.Title = (function () {
 
   // ---------------------------------------------------------------- logo
   // Hand-made 5x7 logo glyphs (the HUD font is too small to scale up nicely).
-  const LOGO = {
-    A: ['.###.', '#...#', '#...#', '#####', '#...#', '#...#', '#...#'],
-    Q: ['.###.', '#...#', '#...#', '#...#', '#.#.#', '#..#.', '.##.#'],
-    U: ['#...#', '#...#', '#...#', '#...#', '#...#', '#...#', '.###.'],
-    D: ['####.', '#...#', '#...#', '#...#', '#...#', '#...#', '####.'],
-    I: ['#####', '..#..', '..#..', '..#..', '..#..', '..#..', '#####'],
-    S: ['.####', '#....', '#....', '.###.', '....#', '....#', '####.'],
-    E: ['#####', '#....', '#....', '####.', '#....', '#....', '#####']
-  };
+  const LOGO = AQ.data.logoGlyphs;                 // the logo's big letters (data/glyphs.js)
   const RAMP = ['#f2feff', '#d8faff', '#b6f2fb', '#94e8f4', '#74dcec', '#5bcde2', '#4ab9d4'];
   function buildLogo(text, px) {
     const cols = text.length * 6 - 1, W = cols * px + 4, H = 7 * px + 4;
@@ -142,7 +134,8 @@ AQ.Title = (function () {
     return { c, mask };
   }
   function logo(g, x, y) {
-    if (!T.logo) T.logo = buildLogo('AQUADISE', 3);
+    const name = AQ.t('game.name');                 // (a letter with no logo glyph is left as a gap)
+    if (!T.logo || T.logoText !== name) { T.logo = buildLogo(name, 3); T.logoText = name; }
     const { c, mask } = T.logo, lx = Math.round(x - c.width / 2), ly = Math.round(y);
     g.drawImage(c, lx, ly);
     // a highlight sweeps across the letters every few seconds
@@ -241,7 +234,7 @@ AQ.Title = (function () {
     if (T.diverT < 16) AQ.Assets.draw(g, 'player', 'swim', diverX(), diverY(), { t: T.t });
 
     logo(g, 160, 14 + Math.round(Math.sin(T.t * 1.4) * 1.5));
-    F().draw(g, 'A COZY DIVE INTO AN UNDERWATER WORLD', 160, 47, '#e2f7ff', { align: 'center', shadow: SH });
+    F().draw(g, AQ.t('title.tagline'), 160, 47, '#e2f7ff', { align: 'center', shadow: SH });
     // little wave divider
     for (let x = 128; x < 192; x++) {
       const y = 57 + Math.round(Math.sin(x * 0.5 + T.t * 3) * 1);
@@ -253,7 +246,7 @@ AQ.Title = (function () {
     if (T.panel === 'controls') {
       const box = { x: 40, y: 66, w: 240, h: 100 };
       pill(g, box, 'rgba(6,20,38,0.92)', 'rgba(110,240,239,0.6)');
-      F().draw(g, 'CONTROLS', 160, 71, '#6ef0ef', { align: 'center', shadow: false });
+      F().draw(g, AQ.t('title.controls'), 160, 71, '#6ef0ef', { align: 'center', shadow: false });
       const rows = AQ.data.tutorial.controls.map(([a, b]) => [a, AQ.Keys.fill(b)]);   // data/tutorial.js, keys from the bindings
       rows.forEach(([a, b], i) => { F().draw(g, a, 50, 82 + i * 9, '#9fd3ee', { shadow: false }); F().draw(g, b, 270, 82 + i * 9, '#ffffff', { align: 'right', shadow: false }); });
       return;
@@ -267,8 +260,8 @@ AQ.Title = (function () {
       F().draw(g, it.label, it.x + it.w / 2 + (it.icon ? 5 : 0), it.y + 3, on ? '#ffffff' : '#c3dfec', { align: 'center', shadow: on ? false : SH });
     });
     const c = AQ.Collection.progress();
-    F().draw(g, `${c.discovered}/${c.total} FOUND  ${c.complete} COMPLETE`, 316, 172, '#7fa4ba', { align: 'right', shadow: SH });
-    F().draw(g, 'ARROWS + ENTER OR CLICK', 4, 172, '#7fa4ba', { shadow: SH });
+    F().draw(g, AQ.t('title.progress', { n: c.discovered, total: c.total, done: c.complete }), 316, 172, '#7fa4ba', { align: 'right', shadow: SH });
+    F().draw(g, AQ.t('title.howTo'), 4, 172, '#7fa4ba', { shadow: SH });
     const warn = AQ.SaveFile && AQ.SaveFile.statusLine();
     if (warn) F().draw(g, warn, 160, 164, '#ffcf8a', { align: 'center', shadow: SH });
     T.drawFade(g);

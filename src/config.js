@@ -169,7 +169,7 @@ AQ.TUNING = {
     tapSeconds: 0.22,         // a touch in the joystick zone this quick...
     tapSlopPx: 12             // ...that moved less than this is a tap on the game instead (swings the net there)
   },
-  // The guided first dive (src/dive.js; the text is in data/tutorial.js).
+  // The guided first dive (src/dive.js; the text is dive.* in data/lang/en.js).
   dive: {
     niceSeconds: 1.1,         // the little "NICE!" after a step before the next one shows
     moveDistance: 40,         // px you walk for the "move" step
@@ -300,7 +300,7 @@ AQ.TUNING = {
     landGlowAlpha: 0.22       //   (instead of the sparkle burst)
   },
 
-  // One-time tips (src/tips.js; the text is in data/tutorial.js). Never blocking: any key or click closes one.
+  // One-time tips (src/tips.js; the text is tip.* in data/lang/en.js). Never blocking: any key or click closes one.
   tips: {
     baseSeconds: 4,           // how long a tip stays at least...
     perChar: 0.045,           // ...plus this much per character of text...
@@ -344,7 +344,7 @@ AQ.TUNING = {
     previewSeconds: 2.5       // how long the little "Saved!" preview stays
   },
 
-  // ---- message bottles (one per species, holding its field notes; see src/bottles.js, data/lore.js)
+  // ---- message bottles (one per species, holding its field notes; see src/bottles.js; the notes are lore.* in data/lang/en.js)
   bottles: {
     pickupRadius: 12,         // how close (px) you get to pick one up
     glintPerSecond: 1.2,      // how often a bottle sparkles while it's on screen

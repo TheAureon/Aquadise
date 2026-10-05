@@ -8,7 +8,7 @@
   <meta name="mobile-web-app-capable" content="yes">
   <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
   <meta name="format-detection" content="telephone=no">
-  <title>Aquadise</title>
+  <title></title>
   <link rel="stylesheet" href="style.css">
 </head>
 <body>
@@ -16,14 +16,15 @@
     <canvas id="game" width="320" height="180"></canvas>
     <div id="ui"></div>
     <canvas id="touch"></canvas>
-    <div id="rotate"><div class="phone"></div><div>ROTATE YOUR DEVICE</div><div class="small">Aquadise plays sideways (landscape).</div></div>
+    <div id="rotate"><div class="phone"></div><div data-t="touch.rotate"></div><div class="small" data-t="touch.rotateSmall"></div></div>
     <div id="safe-probe"></div>
-    <div id="loading"><div class="logo">AQUADISE</div><div id="loading-text">Loading...</div></div>
+    <div id="loading"><div class="logo" data-t="game.name"></div><div id="loading-text" data-t="game.loading"></div></div>
   </div>
 
   <!-- languages first: every text the player sees comes from these (data/lang/, src/lang.js) -->
   <script src="src/lang.js"></script>
   <script src="data/lang/en.js"></script>
+  <script>AQ.Lang.refresh(); AQ.Lang.fillPage();</script>   <!-- the page's own text (title, loading, rotate screen) -->
 
   <!-- data (edit these to add biomes / creatures / decorations) -->
   <script src="src/config.js"></script>
@@ -35,8 +36,8 @@
   <script src="data/aquarium.js"></script>
   <script src="data/scenes.js"></script>
   <script src="data/music.js"></script>
-  <script src="data/lore.js"></script>
   <script src="data/tutorial.js"></script>
+  <script src="src/langdata.js"></script>          <!-- the data files' text, from data/lang/ -->
   <script src="assets/manifest.js"></script>
   <script src="assets/sprites-embedded.js"></script>
   <script src="assets/audio/embedded.js"></script>

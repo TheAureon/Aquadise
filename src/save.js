@@ -95,11 +95,11 @@ AQ.Save = (function () {
       if (prev) { try { if (S.check(S.parse(prev)) === 'ok') store.setItem(backupKey(), prev); } catch (e) { /* unreadable: never copied over the backup */ } }
       store.setItem(key(), JSON.stringify(S.snapshot(game)));
       S.isDirty = false;
-      if (S.failed) { S.failed = false; if (AQ.HUD) AQ.HUD.toast('Saving works again.', '#8ff0b0', 3); }
+      if (S.failed) { S.failed = false; if (AQ.HUD) AQ.HUD.toast(AQ.t('save.worksAgain'), '#8ff0b0', 3); }
       return true;
     } catch (e) {
       // storage blocked or full (e.g. private browsing): play continues unsaved, with a friendly note once
-      if (!S.failed && AQ.HUD) AQ.HUD.toast('Progress can\'t be saved right now. EXPORT SAVE still works.', '#ffcf8a', 5);
+      if (!S.failed && AQ.HUD) AQ.HUD.toast(AQ.t('save.cantSaveToast'), '#ffcf8a', 5);
       S.failed = true;
       return false;
     }

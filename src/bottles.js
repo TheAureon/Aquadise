@@ -1,4 +1,4 @@
-// Message bottles: one per species, each holding that species' field notes (data/lore.js).
+// Message bottles: one per species, each holding that species' field notes (lore.<id>.* in data/lang/en.js).
 // They sit on the seabed, on the Tide Pools shore or float at the surface, always in their species'
 // biome, and glint softly so they can be found. Swim (or walk) into one to pick it up, like a chest.
 // Found bottles are saved (AQ.State.bottles) and never come back.
@@ -20,7 +20,7 @@ AQ.Bottles = (function () {
     return { found: ids.filter((id) => B.isFound(id)).length, total: ids.length };
   };
   // the note's text with {name} filled in: the real name once caught, "this creature" until then
-  B.text = (id, s) => s.replace(/\{name\}/g, AQ.Collection.has(id) ? AQ.Creatures.defs[id] ? AQ.Creatures.defs[id].name : id : 'this creature');
+  B.text = (id, s) => s.replace(/\{name\}/g, AQ.Collection.has(id) ? AQ.Creatures.defs[id] ? AQ.Creatures.defs[id].name : id : AQ.t('lore.thisCreature'));
 
   // ---------------------------------------------------------------- reachability (level 0)
   // Coarse grid (CELL px) of places the player can be, flood-filled from the start. Air only counts
@@ -119,8 +119,8 @@ AQ.Bottles = (function () {
     AQ.Audio.play('bottle');
     if (AQ.Tips) AQ.Tips.event('bottle');
     const d = AQ.Creatures.defs[b.id], p = B.progress();
-    AQ.HUD.toast(`Message in a bottle! Field notes on ${AQ.Collection.has(b.id) ? d.name : 'a mystery creature'} (L)`, '#ffe9a8', 4);
-    AQ.HUD.toast(`Bottles found ${p.found}/${p.total}`, '#cfe8ff', 3);
+    AQ.HUD.toast(AQ.Collection.has(b.id) ? AQ.t('bottle.found', { name: d.name, key: AQ.Keys.name('log') }) : AQ.t('bottle.foundMystery', { key: AQ.Keys.name('log') }), '#ffe9a8', 4);
+    AQ.HUD.toast(AQ.t('bottle.count', { n: p.found, total: p.total }), '#cfe8ff', 3);
     AQ.Save && AQ.Save.dirty();
   }
   // floating bottles bob on the swell; the others rest on the ground

@@ -7,7 +7,7 @@ AQ.Sex = (function () {
   const S = {};
   S.SYMBOL = { m: '♂', f: '♀' };
   S.COLOR = { m: '#7fd0ff', f: '#ff9fc0' };
-  S.NAME = { m: 'MALE', f: 'FEMALE' };
+  S.NAME = { get m() { return AQ.t('sex.m'); }, get f() { return AQ.t('sex.f'); } };
 
   // does this species come in two sexes?
   S.has = (def) => !!def && !def.is_plant && def.sexes !== 'none';

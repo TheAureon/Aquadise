@@ -47,7 +47,7 @@ AQ.Starfall = (function () {
     const c = cfg(), s = st(), n = R.int(c.showerStars[0], c.showerStars[1]);
     s.plan = Object.assign(s.plan || { night: s.night, falls: [] }, { shower: true, announced: true });
     SF.forcedUntil = SF.t + 90;
-    tell('The sky is full of falling stars tonight', game);
+    tell(AQ.t('starfall.shower'), game);
     if (AQ.Music) AQ.Music.stinger('shower');
     for (let i = 0; i < n; i++) SF.queue.push(SF.t + 2 + i * R.range(4, 7));
   };
@@ -90,14 +90,14 @@ AQ.Starfall = (function () {
     const L = { id: U.uid(), x: spot.x, y: spot.y, kind: spot.kind, biome: biome ? biome.id : null, left: c.lingerMinutes * 60, total: c.lingerMinutes * 60, want, landed: false };
     s.landings.push(L);
     s.lastStar = s.night;
-    const where = biome ? biome.name : 'the sea';
+
     // in the sea you see it come down; anywhere else it simply lands (and is waiting when you return)
     if (game.scene === 'world' && game.state !== 'aquarium') {
       const dir = R.chance(0.5) ? 1 : -1, ty = spot.kind === 'float' ? W.sea : spot.ground && spot.kind === 'floor' ? W.sea : spot.y - 2;
       SF.falls.push({ L, x0: spot.x - dir * 120, y0: W.sea - 120, x1: spot.x, y1: ty, t: 0, dur: c.fallSeconds / (AQ.U.calm() ? AQ.TUNING.calm.streakSpeed : 1) });
       AQ.Audio.play('star_whoosh', { vol: AQ.TUNING.shootingStars.soundVolume });
     } else land(L, game);
-    tell(`A shooting star fell near the ${where}!`, game);
+    tell(biome ? AQ.t('starfall.fell', { place: biome.name }) : AQ.t('starfall.fellSea'), game);
     if (AQ.Tips) AQ.Tips.event('starfall');
     AQ.Save && AQ.Save.dirty();
     return L;
@@ -169,7 +169,7 @@ AQ.Starfall = (function () {
     const plan = s.plan;
     if (plan && plan.shower && !plan.announced && EVENING(phase)) {
       plan.announced = true;
-      tell('The sky is full of falling stars tonight', game);
+      tell(AQ.t('starfall.shower'), game);
       if (AQ.Music) AQ.Music.stinger('shower');
       if (AQ.Tips) AQ.Tips.event('shower');
     }

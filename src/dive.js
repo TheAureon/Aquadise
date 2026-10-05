@@ -2,7 +2,7 @@
 // near the thing to do. It never pauses the game or takes your controls: each step completes when you
 // actually do it, a small panel waits quietly in the top-left corner meanwhile, and SKIP (this step) or
 // OFF (the whole dive) are always there. Offered once on NEW GAME (a fresh save); restart it any time from
-// the pause menu (TUTORIAL). Text: data/tutorial.js (dive). Tuning: AQ.TUNING.dive.
+// the pause menu (TUTORIAL). Text: dive.* in data/lang/en.js. Tuning: AQ.TUNING.dive.
 // Saved in AQ.State.tutorial: diveAsked (the prompt was answered), dive { active, step, did{} }.
 var AQ = (typeof AQ !== 'undefined') ? AQ : {};
 
@@ -164,10 +164,10 @@ AQ.Dive = (function () {
     const s = step(), lines = D.nice > 0 ? [D.niceText] : wrapPx(AQ.Keys.fill(s.text).toUpperCase(), PANEL.w - 8);
     const h = 9 + lines.length * 7 + 15, r = { x: PANEL.x, y: PANEL.y, w: PANEL.w, h };
     D.panelRect = r; D.lines = lines;
-    if (s.id === 'done') D.ui.push({ id: 'ok', x: r.x + r.w - 30, y: r.y + h - 13, w: 26, h: 10, label: 'OK' });
+    if (s.id === 'done') D.ui.push({ id: 'ok', x: r.x + r.w - 30, y: r.y + h - 13, w: 26, h: 10, label: AQ.t('ui.ok') });
     else {
-      D.ui.push({ id: 'skip', x: r.x + 4, y: r.y + h - 13, w: 28, h: 10, label: 'SKIP' });
-      D.ui.push({ id: 'off', x: r.x + 35, y: r.y + h - 13, w: 46, h: 10, label: 'STOP ALL' });
+      D.ui.push({ id: 'skip', x: r.x + 4, y: r.y + h - 13, w: 28, h: 10, label: AQ.t('dive.skip') });
+      D.ui.push({ id: 'off', x: r.x + 35, y: r.y + h - 13, w: 46, h: 10, label: AQ.t('dive.stopAll') });
     }
   };
   D.draw = function (g, game) {
@@ -187,7 +187,7 @@ AQ.Dive = (function () {
     g.fillStyle = 'rgba(6,18,34,0.94)'; g.fillRect(r.x, r.y, r.w, r.h);
     g.fillStyle = '#7ef0c0'; g.fillRect(r.x, r.y, Math.round(r.w * s.step / (n - 1)), 1);           // progress along the top
     g.fillStyle = 'rgba(126,240,192,0.25)'; g.fillRect(r.x + Math.round(r.w * s.step / (n - 1)), r.y, r.w - Math.round(r.w * s.step / (n - 1)), 1);
-    F().draw(g, step().id === 'done' ? 'GUIDED DIVE' : `STEP ${s.step + 1} OF ${n}`, r.x + 4, r.y + 3, '#7ef0c0', { shadow: false });
+    F().draw(g, step().id === 'done' ? AQ.t('dive.title') : AQ.t('dive.stepOf', { n: s.step + 1, total: n }), r.x + 4, r.y + 3, '#7ef0c0', { shadow: false });
     D.lines.forEach((l, i) => F().draw(g, l, r.x + 4, r.y + 11 + i * 7, D.nice > 0 ? '#fff1b0' : '#e8f4ff', { shadow: false }));
     for (const b of D.ui) AQ.Aquarium.button(g, b, D.hover === b);
     g.restore();

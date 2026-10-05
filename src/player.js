@@ -117,7 +117,7 @@ AQ.Player = (function () {
       this.vy -= (U2.heavyPush + past * 6) * dt;
       if (!AQ.State.flags || !AQ.State.flags.heavyWater) {
         AQ.State.flags = AQ.State.flags || {}; AQ.State.flags.heavyWater = true;
-        AQ.HUD.toast('The water is too heavy. A depth upgrade might help.', '#9fd8ff', 4);
+        AQ.HUD.toast(AQ.t('world.heavyWater'), '#9fd8ff', 4);
         AQ.Save && AQ.Save.dirty();
       }
     }

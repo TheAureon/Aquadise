@@ -5,7 +5,7 @@ AQ.LogUI = (function () {
   const U = AQ.U, F = () => AQ.Font;
   const L = { from: 'play', tab: 'species', biomeIdx: 0, sel: 0, scroll: 0, vsel: 0, vscroll: 0, nsel: 0, nscroll: 0, entry: null, ui: [],
     sy: 0, vsy: 0, nsy: 0 };   // scroll / vscroll / nscroll: target offsets in px; sy / vsy / nsy: the eased offsets drawn
-  const TABS = [['species', 'SPECIES', 42], ['variants', 'VARIANTS', 46], ['notes', 'NOTES', 34]];
+  const TABS = [['species', 'log.tab.species', 42], ['variants', 'log.tab.variants', 46], ['notes', 'log.tab.notes', 34]];
   // one look for every tab: header bar (title, tabs, bottles, close), a context row, the content, a footer hint
   const C = { bg: '#06101c', bar: '#0b1a2c', line: '#1c3a52', panel: '#0d2236', title: '#ffe9a8', text: '#d8eef8', dim: '#8aa4b8', info: '#9fd3ee', hint: '#4f6f86', good: '#7ef0c0', warn: '#ffcf8a', gold: '#ffd25a' };
   const COLS = 5, CELL_H = 47, HEAD_H = 10, VIEW_H = 94;            // species grid area (y 30..124)
@@ -13,7 +13,7 @@ AQ.LogUI = (function () {
   const NROW_H = 10, NVIEW_H = 134;                                  // notes list (left column, y 30..164)
   const WHEEL = 0.3;                                                 // px scrolled per px of wheel / trackpad movement
   const sil = new Map();
-  const CAT_LABEL = { fish: 'Fish', gastropod: 'Gastropod', crustacean: 'Crustacean', amphibian: 'Amphibian', cephalopod: 'Cephalopod', reptile: 'Reptile', mammal: 'Mammal', plant: 'Plant' };
+  const catLabel = (c) => (AQ.Lang.has(`category.${c}`, 'en') ? AQ.t(`category.${c}`) : c);   // a creature kind (data/lang/ category.<kind>)
   const logOf = (id) => (AQ.State.log || {})[id] || {};
 
   const biomes = () => {
@@ -146,9 +146,9 @@ AQ.LogUI = (function () {
   // ---------------------------------------------------------------- layout
   function layout() {
     const ui = [];
-    ui.push({ id: 'close', x: 280, y: 2, w: 36, h: 10, label: 'CLOSE' });
+    ui.push({ id: 'close', x: 280, y: 2, w: 36, h: 10, label: AQ.t('ui.close') });
     let tx = 68;
-    for (const [id, label, w] of TABS) { ui.push({ id: 'tab', tab: id, x: tx, y: 2, w, h: 10, label, on: L.tab === id }); tx += w + 2; }
+    for (const [id, label, w] of TABS) { ui.push({ id: 'tab', tab: id, x: tx, y: 2, w, h: 10, label: AQ.t(label), on: L.tab === id }); tx += w + 2; }
     if (L.entry) {                                                    // entry page: browse the biome's species
       ui.push({ id: 'eprev', x: 268, y: 20, w: 10, h: 10, label: '<' });
       ui.push({ id: 'enext', x: 302, y: 20, w: 10, h: 10, label: '>' });
@@ -320,9 +320,9 @@ AQ.LogUI = (function () {
     g.fillStyle = C.bg; g.fillRect(0, 0, 320, 180);
     // header bar: title, tabs, bottles found, close
     g.fillStyle = C.bar; g.fillRect(0, 0, 320, 14); g.fillStyle = C.line; g.fillRect(0, 14, 320, 1);
-    F().draw(g, 'COLLECTION LOG', 6, 4, C.title, { shadow: false });
+    F().draw(g, AQ.t('log.title'), 6, 4, C.title, { shadow: false });
     const bp = AQ.Bottles ? AQ.Bottles.progress() : { found: 0, total: 0 };
-    F().draw(g, `BOTTLES FOUND ${bp.found}/${bp.total}`, 276, 4, C.info, { align: 'right', shadow: false });
+    F().draw(g, AQ.t('log.bottles', { n: bp.found, total: bp.total }), 276, 4, C.info, { align: 'right', shadow: false });
     for (const r of L.ui) if (r.id === 'tab' || r.id === 'close') AQ.Aquarium.button(g, r, L.hover === r);
     g.fillStyle = C.line; g.fillRect(0, 168, 320, 1);              // footer separator
     if (L.entry) { drawEntry(g, L.entry); return; }
@@ -370,32 +370,32 @@ AQ.LogUI = (function () {
       x -= lw + 7;
     };
     if (bred) stat('♥', '' + bred, '#ff9fc0');                     // ♥ = bred (as on the species cards)
-    stat('DONE', `${prog.complete}/${prog.total}`, C.good);
-    stat('CAUGHT', `${prog.discovered}/${prog.total}`, C.info);
+    stat(AQ.t('log.done'), `${prog.complete}/${prog.total}`, C.good);
+    stat(AQ.t('log.caught'), `${prog.discovered}/${prog.total}`, C.info);
     // details of the selected species
     const d = list[L.sel];
     g.fillStyle = C.panel; g.fillRect(4, 127, 312, 39);
     g.fillStyle = C.line; g.fillRect(4, 127, 312, 1);
     if (d) {
       const has = AQ.Collection.has(d.id);
-      F().draw(g, has ? d.name.toUpperCase() : '???', 9, 131, has ? C.title : C.dim);
-      const tags = [CAT_LABEL[d.category] || d.category, d.is_plant ? 'harvest' : '', d.requires_upgraded_net ? 'needs net lv2' : '',
-        d.active === 'night' || d.bloom === 'night' ? 'night only' : d.active === 'day' ? 'day only' : '',
-        d.event === 'star' ? 'falling stars only' : d.event === 'shower' ? 'meteor showers only' : '',
-        d.requires_depth ? 'needs depth ' + d.requires_depth : '', d.rare ? 'rare' : '', d.hostile ? 'hostile' : '', d.draft ? 'draft' : ''].filter(Boolean).join(' - ');
+      F().draw(g, has ? d.name.toUpperCase() : AQ.t('log.unknown'), 9, 131, has ? C.title : C.dim);
+      const tags = [catLabel(d.category), d.is_plant ? AQ.t('req.harvest') : '', d.requires_upgraded_net ? AQ.t('req.net2') : '',
+        d.active === 'night' || d.bloom === 'night' ? AQ.t('req.night') : d.active === 'day' ? AQ.t('req.day') : '',
+        d.event === 'star' ? AQ.t('req.star') : d.event === 'shower' ? AQ.t('req.shower') : '',
+        d.requires_depth ? AQ.t('req.depth', { n: d.requires_depth }) : '', d.rare ? AQ.t('req.rare') : '', d.hostile ? AQ.t('req.hostile') : '', d.draft ? AQ.t('req.draft') : ''].filter(Boolean).join(AQ.t('ui.listSep'));
       F().draw(g, tags.toUpperCase(), 311, 131, C.info, { align: 'right' });
-      const tip = (d.active === 'night' ? 'Comes out at night. ' : d.bloom === 'night' ? 'Opens at night. ' : d.active === 'day' ? 'Only out by day. ' : '') + (d.requires_depth ? `Lives deep: needs the depth upgrade (level ${d.requires_depth}). ` : '') + (d.hint || '');
+      const tip = [d.active === 'night' ? AQ.t('req.tip.night') : d.bloom === 'night' ? AQ.t('req.tip.bloom') : d.active === 'day' ? AQ.t('req.tip.day') : '', d.requires_depth ? AQ.t('req.tip.depth', { n: d.requires_depth }) : '', d.hint || ''].filter(Boolean).join(' ');
       const tl = wrap(tip, 75);
       tl.slice(0, 2).forEach((l, i) => F().draw(g, l + (i === 1 && tl.length > 2 ? '...' : ''), 9, 140 + i * 7, C.text));
       // bottom line: what's left to catch (left), field notes (right)
       if (has && AQ.Sex.has(d)) {
         const lg = logOf(d.id);
-        F().draw(g, AQ.Sex.complete(d) ? 'BOTH ♂ AND ♀ CAUGHT' : `STILL TO FIND: ${lg.m ? 'A FEMALE ♀' : 'A MALE ♂'}`, 9, 157, AQ.Sex.complete(d) ? C.good : C.warn);
-      } else if (!has) F().draw(g, 'NOT CAUGHT YET', 9, 157, C.dim);
+        F().draw(g, AQ.t(AQ.Sex.complete(d) ? 'log.bothSexes' : lg.m ? 'log.stillFemale' : 'log.stillMale'), 9, 157, AQ.Sex.complete(d) ? C.good : C.warn);
+      } else if (!has) F().draw(g, AQ.t('log.notCaught'), 9, 157, C.dim);
       const gotNote = AQ.Bottles && AQ.Bottles.isFound(d.id);
-      F().draw(g, gotNote ? 'FIELD NOTES FOUND' : 'NO FIELD NOTES YET', 311, 157, gotNote ? C.title : C.hint, { align: 'right' });
+      F().draw(g, AQ.t(gotNote ? 'log.notesFound' : 'log.noNotes'), 311, 157, gotNote ? C.title : C.hint, { align: 'right' });
     }
-    footer(g, [['WASD', 'MOVE'], ['ENTER', 'OPEN'], ['Q/E', 'BIOME'], ['LEFT/RIGHT', 'TABS'], ['ESC', 'CLOSE']]);
+    footer(g, [['log.key.move', 'log.do.move'], ['log.key.enter', 'log.do.open'], ['log.key.biome', 'log.do.biome'], ['log.key.tabs', 'log.do.tabs'], ['log.key.esc', 'log.do.close']]);
   }
   // a species card: picture, name, ♂/♀ slots and how many caught; ♥ = bred, tick = both sexes caught
   function drawCell(g, r) {
@@ -420,19 +420,19 @@ AQ.LogUI = (function () {
   // where a species stands on the way to its rare colour, and the next step
   function variantStatus(d) {
     const lg = logOf(d.id), name = d.name.toUpperCase();
-    if (lg.variant) return { stage: 4, head: `✦ ${name}: RARE COLOR BRED!`, next: 'YOU HAVE ONE. LOOK FOR IT IN ITS TANK.' };
-    if (!AQ.Collection.has(d.id)) return { stage: 0, head: '???: NOT DISCOVERED YET', next: 'CATCH ONE FIRST. ITS RARE COLOR CAN ONLY BE BRED, NEVER CAUGHT.' };
-    if (!(lg.m && lg.f)) return { stage: 1, head: `${name}: NOT BRED YET`, next: `STEP 1: CATCH A ${lg.m ? 'FEMALE ♀' : 'MALE ♂'} TOO, SO YOU HAVE A PAIR.` };
-    const tid = AQ.Tanks.forCreature(d), t = AQ.Tanks.get(tid), tank = AQ.Collection.tank(tid), tn = t ? (t.short || t.name).toUpperCase() : 'ITS';
+    if (lg.variant) return { stage: 4, head: AQ.t('log.var.bred', { name }), next: AQ.t('log.var.bred2') };
+    if (!AQ.Collection.has(d.id)) return { stage: 0, head: AQ.t('log.var.unknown'), next: AQ.t('log.var.unknown2') };
+    if (!(lg.m && lg.f)) return { stage: 1, head: AQ.t('log.var.notBred', { name }), next: AQ.t(lg.m ? 'log.var.step1Female' : 'log.var.step1Male') };
+    const tid = AQ.Tanks.forCreature(d), t = AQ.Tanks.get(tid), tank = AQ.Collection.tank(tid), tn = t ? (t.short || t.name).toUpperCase() : String(tid).toUpperCase();
     const here = tank.creatures.filter((e) => e.id === d.id);
     const paired = here.some((e) => e.sex === 'm') && here.some((e) => e.sex === 'f');
     const odds = Math.round(1 / AQ.TUNING.breeding.variantChance);
-    if (!paired) return { stage: 2, head: `${name}: NOT BRED YET`, next: `STEP 2: PUT A ♂ AND A ♀ TOGETHER IN THE ${tn} TANK.` };
-    return { stage: 3, head: `${name}: A PAIR LIVES IN THE ${tn} TANK ♥`, next: `KEEP THE TANK HAPPY (${AQ.TUNING.breeding.minStars}+ STARS) AND FED. ABOUT 1 BABY IN ${odds} IS A RARE COLOR.` };
+    if (!paired) return { stage: 2, head: AQ.t('log.var.notBred', { name }), next: AQ.t('log.var.step2', { tank: tn }) };
+    return { stage: 3, head: AQ.t('log.var.pair', { name, tank: tn }), next: AQ.t('log.var.pair2', { n: AQ.TUNING.breeding.minStars, odds }) };
   }
   function drawVariants(g) {
     const vp = L.variantProgress();
-    F().draw(g, 'BREED A PAIR IN A TANK: NOW AND THEN A BABY IS A RARE COLOR', 6, 19, C.dim);
+    F().draw(g, AQ.t('log.var.intro'), 6, 19, C.dim);
     F().draw(g, `${vp.got}/${vp.total}`, 316, 19, C.gold, { align: 'right' });
     F().draw(g, '✦', 316 - F().width(`${vp.got}/${vp.total}`) - 4, 19, C.gold, { align: 'right', shadow: false });
     // the selected species: where it stands and the next step
@@ -443,7 +443,7 @@ AQ.LogUI = (function () {
       F().draw(g, st.head, 9, 146, st.stage === 4 ? C.gold : st.stage ? C.title : C.dim);
       wrap(st.next, 75).slice(0, 2).forEach((l, i) => F().draw(g, l, 9, 154 + i * 7, st.stage === 4 ? C.good : C.text));
     }
-    footer(g, [['WASD', 'MOVE'], ['WHEEL', 'SCROLL'], ['LEFT/RIGHT', 'TABS'], ['ESC', 'CLOSE']]);
+    footer(g, [['log.key.move', 'log.do.move'], ['log.key.wheel', 'log.do.scroll'], ['log.key.tabs', 'log.do.tabs'], ['log.key.esc', 'log.do.close']]);
   }
   function drawVariantCell(g, r) {
     const d = r.d, has = AQ.Collection.has(d.id), sel = r.i === L.vsel, st = variantStatus(d), bred = st.stage === 4;
@@ -473,20 +473,20 @@ AQ.LogUI = (function () {
   // NOTES tab: every field note found so far, grouped by biome; the selected one is shown on the right
   function drawNotes(g) {
     const rows = noteRows(), it = rows.flatMap((r) => r.items || []).find((x) => x.i === L.nsel), bp = AQ.Bottles.progress();
-    F().draw(g, 'FIELD NOTES FROM MESSAGE BOTTLES', 6, 19, C.dim);
+    F().draw(g, AQ.t('log.notes.intro'), 6, 19, C.dim);
     F().draw(g, `${bp.found}/${bp.total}`, 316, 19, C.title, { align: 'right' });
-    F().draw(g, 'NOTES', 316 - F().width(`${bp.found}/${bp.total}`) - 4, 19, C.hint, { align: 'right', shadow: false });
+    F().draw(g, AQ.t('log.notes.count'), 316 - F().width(`${bp.found}/${bp.total}`) - 4, 19, C.hint, { align: 'right', shadow: false });
     if (!rows.length) {
       AQ.Assets.draw(g, 'misc.bottle', 'idle', 160, 78, { t: performance.now() / 1000 });
-      F().draw(g, 'NO FIELD NOTES FOUND YET', 160, 88, C.dim, { align: 'center' });
-      F().draw(g, 'MESSAGE BOTTLES ARE HIDDEN ALL OVER THE SEA, ONE FOR EVERY SPECIES.', 160, 100, C.hint, { align: 'center' });
-      F().draw(g, 'EACH ONE HOLDS A RESEARCHER\'S NOTES ON THE CREATURE.', 160, 108, C.hint, { align: 'center' });
+      F().draw(g, AQ.t('log.notes.none'), 160, 88, C.dim, { align: 'center' });
+      F().draw(g, AQ.t('log.notes.none2'), 160, 100, C.hint, { align: 'center' });
+      F().draw(g, AQ.t('log.notes.none3'), 160, 108, C.hint, { align: 'center' });
     } else if (it) {
       g.fillStyle = C.panel; g.fillRect(124, 30, 192, 136);
       g.fillStyle = C.line; g.fillRect(124, 30, 192, 1);
       drawNote(g, it.d, 129, 35, 43, 7, 311);
     }
-    footer(g, [['W/S', 'PICK A NOTE'], ['WHEEL', 'SCROLL'], ['LEFT/RIGHT', 'TABS'], ['ESC', 'CLOSE']]);
+    footer(g, [['log.key.pick', 'log.do.pick'], ['log.key.wheel', 'log.do.scroll'], ['log.key.tabs', 'log.do.tabs'], ['log.key.esc', 'log.do.close']]);
   }
   function drawNoteCell(g, r) {
     const sel = r.i === L.nsel, d = r.d, lore = AQ.data.lore[d.id];
@@ -526,37 +526,38 @@ AQ.LogUI = (function () {
     drawIcon(g, keyOf(d), 46, 48, 70, 50, has, 3);
     // record under the portrait
     const rec = [];
-    if (has) rec.push(['CAUGHT', 'X' + AQ.State.collection[d.id], C.title]);
-    if (has && AQ.Sex.has(d)) { rec.push(['MALE ♂', lg.m ? 'YES' : 'NOT YET', lg.m ? AQ.Sex.COLOR.m : C.hint]); rec.push(['FEMALE ♀', lg.f ? 'YES' : 'NOT YET', lg.f ? AQ.Sex.COLOR.f : C.hint]); }
-    if (lg.bred) rec.push(['BRED', '♥ YES', '#ff9fc0']);
+    const T = AQ.t, times = (n) => T('log.rec.times', { n });
+    if (has) rec.push([T('log.rec.caught'), times(AQ.State.collection[d.id]), C.title]);
+    if (has && AQ.Sex.has(d)) { rec.push([T('log.rec.male'), T(lg.m ? 'log.rec.yes' : 'log.rec.notYet'), lg.m ? AQ.Sex.COLOR.m : C.hint]); rec.push([T('log.rec.female'), T(lg.f ? 'log.rec.yes' : 'log.rec.notYet'), lg.f ? AQ.Sex.COLOR.f : C.hint]); }
+    if (lg.bred) rec.push([T('log.rec.bred'), T('log.rec.bredYes'), '#ff9fc0']);
     const inNursery = AQ.Nursery ? AQ.Nursery.tank().creatures.filter((e) => e.id === d.id).length + (AQ.Nursery.tank().eggs || []).filter((e) => e.id === d.id).length : 0;
-    if (inNursery) rec.push(['IN NURSERY', 'X' + inNursery, '#ffd8e8']);
-    if (lg.graduated) rec.push(['GRADUATED', 'X' + lg.graduated, '#ffe9a8']);
-    if (lg.variant) rec.push(['RARE COLOR', '✦ YES', C.gold]);
-    if (!has) rec.push(['NOT CAUGHT YET', '', C.dim]);
+    if (inNursery) rec.push([T('log.rec.inNursery'), times(inNursery), '#ffd8e8']);
+    if (lg.graduated) rec.push([T('log.rec.graduated'), times(lg.graduated), '#ffe9a8']);
+    if (lg.variant) rec.push([T('log.rec.rare'), T('log.rec.rareYes'), C.gold]);
+    if (!has) rec.push([T('log.notCaught'), '', C.dim]);
     rec.forEach(([k, v, col], i) => { F().draw(g, k, 9, 81 + i * 8, C.dim, { shadow: false }); if (v) F().draw(g, v, 83, 81 + i * 8, col, { align: 'right', shadow: false }); });
     // name, tags, tip
     const X = 92, W = 312 - X;
-    F().draw(g, has ? d.name.toUpperCase() : '???', X, 21, has ? C.title : C.dim);
-    F().draw(g, (CAT_LABEL[d.category] || d.category).toUpperCase() + ' - ' + biome.toUpperCase(), X, 30, C.info);
+    F().draw(g, has ? d.name.toUpperCase() : AQ.t('log.unknown'), X, 21, has ? C.title : C.dim);
+    F().draw(g, AQ.t('log.kindAndPlace', { kind: catLabel(d.category).toUpperCase(), place: biome.toUpperCase() }), X, 30, C.info);
     for (const r of L.ui) if (r.id === 'eprev' || r.id === 'enext') AQ.Aquarium.button(g, r, L.hover === r);
     F().draw(g, `${L.sel + 1}/${list.length}`, 290, 22, C.dim, { align: 'center', shadow: false });
-    const tl = wrap('Tip: ' + (d.hint || ''), Math.floor(W / 4));
+    const tl = wrap(AQ.t('log.tipLine', { hint: d.hint || '' }), Math.floor(W / 4));
     tl.slice(0, 3).forEach((l, i) => F().draw(g, l, X, 40 + i * 7, C.text));
     // Field Notes section
     g.fillStyle = 'rgba(255,217,168,0.25)'; g.fillRect(X, 64, W, 1);
-    F().draw(g, 'FIELD NOTES', X, 68, '#ffd9a8');
+    F().draw(g, AQ.t('log.fieldNotes'), X, 68, '#ffd9a8');
     if (AQ.Bottles && AQ.Bottles.isFound(d.id) && AQ.data.lore[d.id]) drawNote(g, d, X, 78, Math.floor((W - 6) / 4), 7, 312, true);
     else {
       AQ.Assets.draw(g, 'misc.bottle', 'idle', X + W / 2, 108, { t: performance.now() / 1000, alpha: 0.5 });
-      F().draw(g, 'NOT FOUND YET', X + W / 2, 116, C.dim, { align: 'center' });
-      wrap(`A message bottle somewhere in the ${bottleIn} holds these notes.`, Math.floor(W / 4)).forEach((l, i) => F().draw(g, l, X + W / 2, 126 + i * 8, C.hint, { align: 'center', shadow: false }));
+      F().draw(g, AQ.t('log.notFound'), X + W / 2, 116, C.dim, { align: 'center' });
+      wrap(AQ.t('log.bottleWhere', { place: bottleIn }), Math.floor(W / 4)).forEach((l, i) => F().draw(g, l, X + W / 2, 126 + i * 8, C.hint, { align: 'center', shadow: false }));
     }
-    footer(g, [['LEFT/RIGHT', 'PREV / NEXT SPECIES'], ['ESC', 'BACK TO THE LIST']]);
+    footer(g, [['log.key.tabs', 'log.do.browse'], ['log.key.esc', 'log.do.backToList']]);
   }
   // footer hints: [key, action] pairs, keys brighter than what they do, centred as one line
   function footer(g, pairs) {
-    const gap = 12, parts = pairs.map(([k, a]) => [k, a, F().width(k) + 4 + F().width(a)]);
+    const gap = 12, parts = pairs.map(([kk, ak]) => { const k = AQ.t(kk), a = AQ.t(ak); return [k, a, F().width(k) + 4 + F().width(a)]; });
     let x = Math.round(160 - (parts.reduce((s, p) => s + p[2], 0) + gap * (parts.length - 1)) / 2);
     for (const [k, a, w] of parts) { F().draw(g, k, x, 172, C.dim, { shadow: false }); F().draw(g, a, x + F().width(k) + 4, 172, C.hint, { shadow: false }); x += w + gap; }
   }
@@ -571,7 +572,7 @@ AQ.MapUI = (function () {
       const S = mm.scale, w = mm.canvas.width, h = mm.canvas.height;
       const ox = Math.round((320 - w) / 2), oy = 38;
       g.fillStyle = 'rgba(4,12,24,0.96)'; g.fillRect(0, 0, 320, 180);
-      F().draw(g, 'MAP', 160, 10, '#ffe9a8', { align: 'center' });
+      F().draw(g, AQ.t('map.title'), 160, 10, '#ffe9a8', { align: 'center' });
       g.fillStyle = '#5fc6d9'; g.fillRect(ox - 1, oy - 1, w + 2, h + 2);
       g.drawImage(mm.canvas, ox, oy);
       // biome labels at open-water centroids, nudged apart
@@ -588,9 +589,9 @@ AQ.MapUI = (function () {
       if (AQ.Starfall) AQ.Starfall.drawMap(g, ox, oy, S, game.time);
       const P = game.player;
       if (AQ.U.calm() || Math.floor(game.time * 4) % 2) { g.fillStyle = '#ff5a7a'; g.fillRect(Math.round(ox + P.x / S) - 1, Math.round(oy + P.y / S) - 1, 3, 3); }
-      F().draw(g, 'YOU', ox + P.x / S, oy + P.y / S + 4, '#ff9fb0', { align: 'center' });
+      F().draw(g, AQ.t('map.you'), ox + P.x / S, oy + P.y / S + 4, '#ff9fb0', { align: 'center' });
       const fallen = AQ.Starfall && AQ.Starfall.waiting().length;
-      F().draw(g, `GOLD = CHESTS${fallen ? '   SPARKLE = FALLEN STAR' : ''}   M / ESC: CLOSE`, 160, 160, '#8aa4b8', { align: 'center' });
+      F().draw(g, AQ.t(fallen ? 'map.legendStar' : 'map.legend', { map: AQ.Keys.name('map'), esc: AQ.Keys.name('pause') }), 160, 160, '#8aa4b8', { align: 'center' });
     }
   };
 })();
@@ -603,14 +604,14 @@ AQ.PauseUI = (function () {
     if (P.panel === 'sound') { AQ.SoundUI.update(game, () => { P.panel = null; }, () => AQ.SoundTest.open(game, 'pause')); return; }
     P.confirm = Math.max(0, P.confirm - dt);
     if (AQ.SaveFile && AQ.SaveFile.update(game)) return;        // a save-file panel (import confirm, messages) is up
-    const rows = [['resume', 'RESUME'], ['help', 'SHOW CONTROLS'], ['guide', 'GUIDE'], ['tutorial', AQ.Dive && AQ.Dive.active() ? 'RESTART TUTORIAL' : 'TUTORIAL'], ['sound', 'SETTINGS'], ['files'], ['home', 'HOME']];
+    const T = AQ.t, rows = [['resume', T('pause.resume')], ['help', T('pause.help')], ['guide', T('pause.guide')], ['tutorial', T(AQ.Dive && AQ.Dive.active() ? 'pause.restartTutorial' : 'pause.tutorial')], ['sound', T('pause.settings')], ['files'], ['home', T('pause.home')]];
     P.ui = [];
     rows.forEach(([id, label], i) => {
       const y = 38 + i * 14;
-      if (id === 'files') { P.ui.push({ id: 'export', x: 110, y, w: 49, h: 12, label: 'EXPORT SAVE' }, { id: 'import', x: 161, y, w: 49, h: 12, label: 'IMPORT SAVE' }); return; }
+      if (id === 'files') { P.ui.push({ id: 'export', x: 110, y, w: 49, h: 12, label: T('ui.exportSave') }, { id: 'import', x: 161, y, w: 49, h: 12, label: T('ui.importSave') }); return; }
       P.ui.push({ id, x: 110, y, w: 100, h: 12, label });
     });
-    P.ui.push({ id: 'reset', x: 110, y: 38 + rows.length * 14 + 4, w: 100, h: 12, label: P.confirm > 0 ? 'CLICK AGAIN TO WIPE' : 'RESET SAVE' });
+    P.ui.push({ id: 'reset', x: 110, y: 38 + rows.length * 14 + 4, w: 100, h: 12, label: T(P.confirm > 0 ? 'pause.wipeConfirm' : 'pause.reset') });
     if (I.wasPressed('Escape')) { game.state = 'play'; return; }
     const prev = P.hover;
     P.hover = P.ui.find((r) => m.x >= r.x && m.y >= r.y && m.x < r.x + r.w && m.y < r.y + r.h);
@@ -622,7 +623,7 @@ AQ.PauseUI = (function () {
       if (P.hover.id === 'guide') AQ.Guide.open(game, 'pause');
       if (P.hover.id === 'export') AQ.SaveFile.exportSave(game);
       if (P.hover.id === 'import') AQ.SaveFile.pickImport(game);
-      if (P.hover.id === 'tutorial') { game.state = 'play'; if (game.scene !== 'world') AQ.HUD.toast('The guided dive starts when you are back in the sea.', '#cfe8ff', 4); AQ.Dive.start(game); }
+      if (P.hover.id === 'tutorial') { game.state = 'play'; if (game.scene !== 'world') AQ.HUD.toast(AQ.t('pause.diveLater'), '#cfe8ff', 4); AQ.Dive.start(game); }
       if (P.hover.id === 'sound') { P.panel = 'sound'; AQ.SoundUI.open(); }
       if (P.hover.id === 'home') { AQ.Save.save(game); AQ.Title.open(game); }
       if (P.hover.id === 'reset') { if (P.confirm > 0) AQ.Save.reset(); else P.confirm = 3; }
@@ -631,10 +632,10 @@ AQ.PauseUI = (function () {
   P.draw = function (g) {
     g.fillStyle = 'rgba(4,12,24,0.75)'; g.fillRect(0, 0, 320, 180);
     if (P.panel === 'sound') { AQ.SoundUI.draw(g); return; }
-    F().draw(g, 'PAUSED', 160, 26, '#ffe9a8', { align: 'center' });
+    F().draw(g, AQ.t('pause.title'), 160, 26, '#ffe9a8', { align: 'center' });
     for (const r of P.ui) AQ.Aquarium.button(g, r, P.hover === r);
     const warn = AQ.SaveFile && AQ.SaveFile.statusLine();
-    F().draw(g, warn || 'PROGRESS SAVES AUTOMATICALLY', 160, 162, warn ? '#ffcf8a' : '#8aa4b8', { align: 'center' });
+    F().draw(g, warn || AQ.t('pause.autosave'), 160, 162, warn ? '#ffcf8a' : '#8aa4b8', { align: 'center' });
     if (AQ.SaveFile) AQ.SaveFile.draw(g);
   };
   return P;

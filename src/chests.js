@@ -60,11 +60,11 @@ AQ.Chests = (function () {
           AQ.FX.sparkle(c.x, c.y - 8, '#ffe36b', 18);
           AQ.Audio.play('chest');
           if (what) AQ.Audio.play({ net: 'up_net', speed: 'up_speed', lantern: 'up_lantern', depth: 'up_depth' }[what], { delay: 0.75 });
-          if (what === 'net') AQ.HUD.toast(`BIGGER NET! (LV ${game.upgrades.net})`, '#ffe36b', 3.5);
-          else if (what === 'speed') AQ.HUD.toast(`SWIM SPEED UP! (LV ${game.upgrades.speed})`, '#7ef0c0', 3.5);
-          else if (what === 'lantern') AQ.HUD.toast(`BRIGHTER LANTERN! (LV ${game.upgrades.lantern})`, '#ffe9a8', 3.5);
-          else if (what === 'depth') AQ.HUD.toast(`DEEPER DIVES! (DEPTH LV ${game.upgrades.depth})`, '#9fd8ff', 3.5);
-          else AQ.HUD.toast('Empty... all four upgrades are already the best.', '#cfe8ff');
+          if (what === 'net') AQ.HUD.toast(AQ.t('chest.net', { n: game.upgrades.net }), '#ffe36b', 3.5);
+          else if (what === 'speed') AQ.HUD.toast(AQ.t('chest.speed', { n: game.upgrades.speed }), '#7ef0c0', 3.5);
+          else if (what === 'lantern') AQ.HUD.toast(AQ.t('chest.lantern', { n: game.upgrades.lantern }), '#ffe9a8', 3.5);
+          else if (what === 'depth') AQ.HUD.toast(AQ.t('chest.depth', { n: game.upgrades.depth }), '#9fd8ff', 3.5);
+          else AQ.HUD.toast(AQ.t('chest.empty'), '#cfe8ff');
         } else if (c.t > c.life) { AQ.FX.puff(c.x, c.y - 4, 'rgba(220,210,180,0.6)', 8); remove(i); }
       } else if (c.t > 2.5) remove(i);
     }

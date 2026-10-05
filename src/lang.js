@@ -16,7 +16,9 @@ var AQ = (typeof AQ !== 'undefined') ? AQ : {};
 AQ.langFiles = AQ.langFiles || {};
 
 AQ.Lang = (function () {
-  const L = { code: 'en', missing: new Set() };
+  const L = { code: 'en', missing: new Set(), listeners: [] };
+  // things that cache text in pictures (the building's signs...) repaint when the language changes
+  L.onChange = (fn) => L.listeners.push(fn);
   const files = () => AQ.langFiles;
   const meta = (code) => (files()[code] && files()[code]._meta) || {};
   const tun = () => (AQ.TUNING && AQ.TUNING.debug) || {};
@@ -42,10 +44,17 @@ AQ.Lang = (function () {
   L.set = function (code) {
     if (L.available().indexOf(code) < 0) code = 'en';
     L.code = code; collator = null; plurals = null;
-    if (L.onChange) L.onChange(code);
+    L.listeners.forEach((fn) => { try { fn(code); } catch (e) { /* a listener never stops the switch */ } });
+    if (L.fillPage && typeof document !== 'undefined' && document.body) L.fillPage();
     return code;
   };
   L.refresh = () => L.set(L.pick());
+  // the page's own text: the tab title and every element with data-t="key" (index.html)
+  L.fillPage = function () {
+    if (typeof document === 'undefined') return;
+    document.title = L.t('game.title');
+    document.querySelectorAll('[data-t]').forEach((el) => { el.textContent = L.t(el.getAttribute('data-t')); });
+  };
 
   // ---------------------------------------------------------------- lookups
   // raw value (a string or a plural object) for a key: this language, then English

@@ -49,13 +49,13 @@ AQ.Scenes = (function () {
   };
   S.zoneName = (game) => { const sc = S.cur(game); return sc.zoneName ? sc.zoneName(game) : ''; };
   S.interactPressed = () => AQ.Input.wasPressed(...AQ.TUNING.interactKeys);
-  S.keyName = () => AQ.TUNING.interactKeys[0].replace('Key', '');
+  S.keyName = () => AQ.Keys.name('interact');
 
   // Shared little "press E" prompt over the player's head.
   // (touch: the INTERACT button shows while a prompt is up, labelled with its text: S.promptAt)
   S.prompt = function (ctx, x, y, text) {
     S.promptAt = { t: AQ.Render.t, text };
-    const F = AQ.Font, label = AQ.Touch && AQ.Touch.active() ? text : `${S.keyName()}: ${text}`, w = F.width(label) + 6;
+    const F = AQ.Font, label = AQ.Touch && AQ.Touch.active() ? text : AQ.t('ui.keyPrompt', { key: S.keyName(), text }), w = F.width(label) + 6;
     const t = (AQ.Render.t * 2) % 2 < 1 ? 0 : 1;
     ctx.fillStyle = 'rgba(6,18,34,0.82)'; ctx.fillRect(Math.round(x - w / 2), Math.round(y - 3 - t), w, 10);
     ctx.fillStyle = '#9feff0'; ctx.fillRect(Math.round(x - w / 2), Math.round(y - 3 - t), w, 1);

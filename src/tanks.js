@@ -17,11 +17,11 @@ AQ.Tanks = (function () {
     defs = {};
     AQ.World.biomes.forEach((b) => { defs[b.id] = Object.assign(b, { kind: 'biome', themes: [b.id] }); });
     (AQ.data.predatorTanks || []).forEach((p, i) => {
-      defs[p.id] = Object.assign({ kind: 'predator', index: 40 + i, dark: (AQ.data.tankStyles[p.id] || {}).dark || 0 }, p, { themes: [p.id].concat(p.themes || []) });
+      defs[p.id] = AQ.LangData.bindTank(Object.assign({ kind: 'predator', index: 40 + i, dark: (AQ.data.tankStyles[p.id] || {}).dark || 0 }, p, { themes: [p.id].concat(p.themes || []) }));
     });
     // special tanks that aren't a sea biome (Starfall)
     (AQ.data.specialTanks || []).forEach((p, i) => {
-      defs[p.id] = Object.assign({ kind: 'special', index: 60 + i, dark: (AQ.data.tankStyles[p.id] || {}).dark || 0 }, p, { themes: [p.id].concat((p.themes || []).filter((t) => t !== p.id)) });
+      defs[p.id] = AQ.LangData.bindTank(Object.assign({ kind: 'special', index: 60 + i, dark: (AQ.data.tankStyles[p.id] || {}).dark || 0 }, p, { themes: [p.id].concat((p.themes || []).filter((t) => t !== p.id)) }));
     });
     // building order from the slots in data/scenes.js; any tank without a slot goes at the end
     const slots = (AQ.data.station && AQ.data.station.tanks) || [];
@@ -34,15 +34,15 @@ AQ.Tanks = (function () {
   T.list = () => { ensure(); return order.map((id) => defs[id]); };
   T.get = (id) => { ensure(); return defs[id] || null; };
   // shortest readable label for a tank (used when space is tight)
-  const TINY = { tide_pools: 'TIDE', open_ocean: 'OCEAN', lush_cave: 'LUSH', mangrove: 'MANGROVE' };
-  T.tinyName = (d) => (d.tiny || TINY[d.id] || (d.short || d.name).split(' ')[0]).toUpperCase();
+  // (a biome's tiny name: biome.<id>.tiny in data/lang/ where there is one, else the first word of its short name)
+  T.tinyName = (d) => (d.tiny || (AQ.Lang.has(`biome.${d.id}.tiny`, 'en') ? AQ.t(`biome.${d.id}.tiny`) : '') || (d.short || d.name).split(' ')[0]).toUpperCase();
   // the longest of name -> short -> tiny that fits in `px` pixels
   T.labelFor = function (d, px) {
     const F = AQ.Font, opts = [(d.short || d.name).toUpperCase(), T.tinyName(d)];
     return opts.find((t) => F.width(t) <= px) || opts[opts.length - 1];
   };
   // a tank's name for file names: plain ASCII letters and digits (from the English name), e.g. TidePools
-  T.fileName = (d) => String(d.fileName || d.short || d.name || d.id).replace(/[^A-Za-z0-9]/g, '') || d.id;
+  T.fileName = (d) => String(AQ.Lang.tEn(d.kind === 'biome' ? `biome.${d.id}.short` : `tank.${d.id}.short`) || d.id).replace(/[^A-Za-z0-9]/g, '') || d.id;
   T.isPredatorTank = (id) => { const d = T.get(id); return !!d && d.kind === 'predator'; };
   T.isNursery = (id) => { const d = T.get(id); return !!d && !!d.nursery; };
   T.themesOf = (id) => { const d = T.get(id); return d ? d.themes : [id]; };

@@ -31,7 +31,7 @@ AQ.HUD = (function () {
   const SH = 'rgba(4,12,24,0.75)';
   H.clockText = function () {
     const h = AQ.Clock.hour(), hh = Math.floor(h), mm = Math.floor((h - hh) * 60 / 10) * 10;
-    return `${AQ.Clock.phase().toUpperCase()} ${String(hh).padStart(2, '0')}:${String(mm).padStart(2, '0')}`;
+    return AQ.t('clock.time', { phase: AQ.t(`clock.${AQ.Clock.phase()}`).toUpperCase(), h: String(hh).padStart(2, '0'), m: String(mm).padStart(2, '0') });
   };
   // 9x7 pixel icon for the current phase
   const SUN = ['..#.#.#..', '...###...', '.#######.', '..#####..', '.#######.', '...###...', '..#.#.#..'];
@@ -59,8 +59,8 @@ AQ.HUD = (function () {
     if (up) {
       // one row per upgrade: label + pips (lit = your level)
       const rows = [
-        ['NET', up.net, AQ.TUNING.net.maxLevel, '#ffd56b'], ['SPD', up.speed, AQ.TUNING.speedMaxLevel, '#7ef0c0'],
-        ['LAMP', up.lantern || 0, AQ.TUNING.upgrades.lanternMax, '#ffe9a8'], ['DEEP', up.depth || 0, AQ.TUNING.upgrades.depthMax, '#9fd8ff']
+        [AQ.t('hud.net'), up.net, AQ.TUNING.net.maxLevel, '#ffd56b'], [AQ.t('hud.speed'), up.speed, AQ.TUNING.speedMaxLevel, '#7ef0c0'],
+        [AQ.t('hud.lamp'), up.lantern || 0, AQ.TUNING.upgrades.lanternMax, '#ffe9a8'], [AQ.t('hud.deep'), up.depth || 0, AQ.TUNING.upgrades.depthMax, '#9fd8ff']
       ];
       ctx.globalAlpha = 0.85;
       rows.forEach(([label, lvl, max, col], r) => {
@@ -83,7 +83,7 @@ AQ.HUD = (function () {
       F.draw(ctx, `${c.discovered}/${c.total}`, vw - 4, 4, '#ffe9a8', { align: 'right', shadow: SH });
       ctx.globalAlpha = 1;
     }
-    if (game.player.sneaking) { ctx.globalAlpha = 0.8; F.draw(ctx, 'SNEAKING', 4, 34, '#9fe8ff', { shadow: SH }); ctx.globalAlpha = 1; }
+    if (game.player.sneaking) { ctx.globalAlpha = 0.8; F.draw(ctx, AQ.t('hud.sneaking'), 4, 34, '#9fe8ff', { shadow: SH }); ctx.globalAlpha = 1; }
     // toasts: at most two, newest at the bottom
     const shown = game.state === 'pause' ? [] : H.toasts.slice(-2), helpOn = H.showHelp && H.helpT > 0;   // (paused: the pause screen speaks)
     const base = helpOn ? vh - 28 : vh - 20;                     // above the controls hint while it's showing
@@ -95,7 +95,7 @@ AQ.HUD = (function () {
     // help (first moments only, or when H is pressed)
     if (H.showHelp && H.helpT > 0 && game.state !== 'pause') {
       ctx.globalAlpha = Math.min(1, H.helpT) * 0.9;
-      const tut = AQ.data.tutorial, lines = (AQ.Touch && AQ.Touch.active() && tut.touchHelpLines ? tut.touchHelpLines : tut.helpLines).map(AQ.Keys.fill);    // data/tutorial.js; key names from the bindings
+      const tut = AQ.data.tutorial, lines = (AQ.Touch && AQ.Touch.active() && tut.touchHelpLines ? tut.touchHelpLines : tut.helpLines).map(AQ.Keys.fill);    // help.* in data/lang/en.js; key names from the bindings
       lines.forEach((l, i) => F.draw(ctx, l, vw / 2, vh - 15 + i * 7, '#d8f3ff', { align: 'center', shadow: SH }));
       ctx.globalAlpha = 1;
     }

@@ -82,7 +82,7 @@ AQ.Catching = (function () {
 
     // Bait
     if (AQ.Keys.pressed('bait')) {
-      if (P.inAir) AQ.HUD.toast('Bait only works underwater.', '#cde');
+      if (P.inAir) AQ.HUD.toast(AQ.t('catch.baitAir'), '#cde');
       else {
         K.bait = { x: P.x + P.facing * 6, y: P.y + 2, t: 0, vy: 0 };
         AQ.FX.puff(K.bait.x, K.bait.y, 'rgba(240,170,100,0.5)', 4);
@@ -117,7 +117,7 @@ AQ.Catching = (function () {
       // a lure's glowing decoy: netting it only makes it puff and flicker
       if (!onBody && c.decoy && c.bhv.decoyHit && Math.hypot(c.decoy.x - net.x, c.decoy.y - net.y) <= net.r + 3) {
         s.hits.add(c); c.bhv.decoyHit(c);
-        if (!s.msg) { s.msg = true; AQ.HUD.toast(c.bhv.missText, '#cfe8ff'); }
+        if (!s.msg) { s.msg = true; AQ.HUD.toast(AQ.t(c.bhv.missKey), '#cfe8ff'); }
         continue;
       }
       if (!onBody) continue;
@@ -126,7 +126,7 @@ AQ.Catching = (function () {
       if (c.catchable) tryCatch(game, c);
       else if (!s.msg) {
         s.msg = true;
-        AQ.HUD.toast(c.hidden ? (c.pryable ? 'It\'s wedged in! Hold the net to pry.' : 'It\'s hiding out of reach.') : (c.bhv.missText && !c.decoy) ? c.bhv.missText : 'It slipped away!', '#cfe8ff');
+        AQ.HUD.toast(AQ.t(c.hidden ? (c.pryable ? 'catch.wedged' : 'catch.hiding') : (c.bhv.missKey && !c.decoy) ? c.bhv.missKey : 'catch.slipped'), '#cfe8ff');
         AQ.FX.puff(cx, cy, 'rgba(255,255,255,0.5)', 3);
       }
     }
@@ -134,24 +134,24 @@ AQ.Catching = (function () {
 
   function harvest(game, c) {
     if (c.harvested) return;
-    if (c.closed) { AQ.HUD.toast(`The ${c.def.name} is closed tight. Come back at night.`, '#cfe8ff'); AQ.FX.puff(c.x, c.y - 4, 'rgba(255,255,255,0.4)', 3); return; }
+    if (c.closed) { AQ.HUD.toast(AQ.t('catch.closed', { name: c.def.name }), '#cfe8ff'); AQ.FX.puff(c.x, c.y - 4, 'rgba(255,255,255,0.4)', 3); return; }
     const ctx = ctxFor(game, c);
     if (c.p.sting && ctx.noise > AQ.TUNING.stealth.carelessNoise) {
       game.player.knock(ctx.dx || 1, ctx.dy - 3, AQ.TUNING.knockback.light);
-      AQ.HUD.toast(`Ow! ${c.def.name} stings when rushed.`, '#ffb08a');
+      AQ.HUD.toast(AQ.t('catch.stingRushed', { name: c.def.name }), '#ffb08a');
       return;
     }
     c.harvested = true;
     c.st = AQ.TUNING.plants.regrowTime;
     const isNew = AQ.Collection.recordHarvest(c.def);
     AQ.FX.sparkle(c.x, c.y - 5, '#cfffbf', 8);
-    AQ.HUD.toast(`Harvested ${c.def.name}!${isNew ? '  NEW!' : ''}`, isNew ? '#ffe36b' : '#cfffbf');
+    AQ.HUD.toast(AQ.t(isNew ? 'catch.harvestedNew' : 'catch.harvested', { name: c.def.name }), isNew ? '#ffe36b' : '#cfffbf');
     AQ.Audio.play('harvest');
   }
 
   function tryCatch(game, c, pried) {
     if (c.def.requires_upgraded_net && game.upgrades.net < 2) {
-      AQ.HUD.toast('Too strong for this net! Find a better net in a chest.', '#ffb08a');
+      AQ.HUD.toast(AQ.t('catch.tooStrong'), '#ffb08a');
       if (c.def.hostile) game.player.knock(game.player.x - c.x || 1, game.player.y - c.y, AQ.TUNING.knockback.light);
       c.icon = '!'; c.iconT = 1;
       return;
@@ -161,8 +161,8 @@ AQ.Catching = (function () {
     AQ.Creatures.remove(c);
     const isNew = AQ.Collection.recordCatch(c.def, c.sex);
     AQ.FX.sparkle(c.x, c.y, '#fff7c2', 12);
-    AQ.FX.text(c.x, c.y - 8, pried ? 'PRIED!' : 'GOT IT!', '#ffe36b');
-    AQ.HUD.toast(`Caught ${c.def.name}!${isNew ? '  NEW!' : ''}`, isNew ? '#ffe36b' : '#ffffff', 3);
+    AQ.FX.text(c.x, c.y - 8, AQ.t(pried ? 'catch.pried' : 'catch.gotIt'), '#ffe36b');
+    AQ.HUD.toast(AQ.t(isNew ? 'catch.caughtNew' : 'catch.caught', { name: c.def.name }), isNew ? '#ffe36b' : '#ffffff', 3);
     AQ.Audio.play('catch', { rare: !!c.def.rare });
     if (AQ.Tips) AQ.Tips.event('catch');
     if (AQ.Dive) AQ.Dive.event('catch');

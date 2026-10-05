@@ -28,27 +28,27 @@ AQ.data.music = {
   motif: { notes: [0, 2, 4, 3, 1], beats: [1, 0.5, 1.5, 1, 2] },
 
   pieces: {
-    title:      { label: 'TITLE',       root: 60, scale: 'major',      bpm: 70,  lead: 'piano',   pad: 'warm',  bass: true, melody: [4, 2, 1, 2, 0, -1, 0], chords: [0, 5, 3, 4], rest: [3, 6] },
-    hill:       { label: 'HILL',        root: 62, scale: 'mixolydian', bpm: 76,  lead: 'guitar',  pad: 'warm',  bass: true, bounce: true, melody: [0, 2, 4, 5, 4, 2], chords: [0, 3, 6, 0], rest: [4, 7], night: true },
-    station:    { label: 'STATION',     root: 64, scale: 'lydian',     bpm: 84,  lead: 'chip',    pad: 'glass', arp: 'chip', arpDensity: 0.7, melody: [0, 4, 3, 7, 6, 4], chords: [0, 1, 0, 4], rest: [3, 6] },
-    aquarium:   { label: 'AQUARIUM',    root: 65, scale: 'lydian',     bpm: 72,  lead: 'bell',    pad: 'glass', arp: 'chip', arpDensity: 0.35, melody: [4, 3, 1, 0, 1, 4], chords: [0, 1, 3, 4], rest: [4, 7] },
-    tide_pools: { label: 'TIDE POOLS',  root: 67, scale: 'majPent',    bpm: 100, lead: 'marimba', bass: true, bounce: true, melody: [0, 1, 2, 4, 3, 2, 0], chords: [0, 3, 1, 4], rest: [3, 6], night: true },
-    coral:      { label: 'CORAL SHELF', root: 64, scale: 'major',      bpm: 80,  lead: 'harp',    pad: 'warm',  arp: 'harp', arpDensity: 0.6, melody: [2, 4, 5, 4, 2, 1], chords: [0, 3, 5, 4], rest: [3, 6], night: true },
-    ruins:      { label: 'SUNKEN RUINS',root: 57, scale: 'aeolian',    bpm: 64,  lead: 'piano',   pad: 'warm',  bass: true, melody: [0, 2, 3, 2, 4, 0], chords: [0, 5, 3, 6], rest: [4, 8], night: true },
-    open_ocean: { label: 'OPEN OCEAN',  root: 60, scale: 'lydian',     bpm: 60,  lead: 'bell',    pad: 'warm',  arp: 'harp', arpDensity: 0.5, bass: true, melody: [4, 7, 6, 4, 3, 4], chords: [0, 1, 5, 4], rest: [4, 8], night: true },
-    vents:      { label: 'VENTS', root: 47, scale: 'aeolian', bpm: 50,  lead: 'piano',   pad: 'warm',  bass: true, melody: [0, 1, 0, -2, 0], chords: [0, 5, 0, 6], rest: [6, 10], octave: 12, night: true },
-    trench:     { label: 'TRENCH', root: 45, scale: 'minPent',    bpm: 44,  lead: 'drone',   pad: 'warm',  melody: [0, 2, 1, 0], chords: [0, 3], rest: [8, 12], night: true },
-    kelp:       { label: 'KELP FOREST', root: 62, scale: 'dorian',     bpm: 66,  lead: 'harp',    pad: 'warm',  arp: 'harp', arpDensity: 0.65, bass: true, melody: [0, 2, 4, 6, 4, 3], chords: [0, 3, 6, 4], rest: [3, 7], night: true },
-    mangrove:   { label: 'MANGROVE',    root: 62, scale: 'mixolydian', bpm: 84,  lead: 'guitar',  bass: true, bounce: true, melody: [4, 2, 4, 6, 4, 0], chords: [0, 6, 3, 0], rest: [4, 7], night: true },
-    ice:        { label: 'ICE SHELF',   root: 69, scale: 'majPent',    bpm: 60,  lead: 'bell',    pad: 'glass', melody: [4, 3, 1, 3, 2, 0], chords: [0, 3, 2, 4], rest: [5, 9], night: true },
-    cave:       { label: 'CAVE',root: 50, scale: 'aeolian',    bpm: 52,  lead: 'piano',   pad: 'warm',  melody: [4, 3, 2, 0, 1], chords: [0, 5, 3], rest: [6, 11], octave: 12, night: true },
-    lush_cave:  { label: 'LUSH CAVE',   root: 65, scale: 'majPent',    bpm: 62,  lead: 'harp',    pad: 'warm',  melody: [2, 3, 4, 2, 1, 0], chords: [0, 3, 1, 4], rest: [5, 9], night: true }
+    title:      { root: 60, scale: 'major',      bpm: 70,  lead: 'piano',   pad: 'warm',  bass: true, melody: [4, 2, 1, 2, 0, -1, 0], chords: [0, 5, 3, 4], rest: [3, 6] },
+    hill:       { root: 62, scale: 'mixolydian', bpm: 76,  lead: 'guitar',  pad: 'warm',  bass: true, bounce: true, melody: [0, 2, 4, 5, 4, 2], chords: [0, 3, 6, 0], rest: [4, 7], night: true },
+    station:    { root: 64, scale: 'lydian',     bpm: 84,  lead: 'chip',    pad: 'glass', arp: 'chip', arpDensity: 0.7, melody: [0, 4, 3, 7, 6, 4], chords: [0, 1, 0, 4], rest: [3, 6] },
+    aquarium:   { root: 65, scale: 'lydian',     bpm: 72,  lead: 'bell',    pad: 'glass', arp: 'chip', arpDensity: 0.35, melody: [4, 3, 1, 0, 1, 4], chords: [0, 1, 3, 4], rest: [4, 7] },
+    tide_pools: { root: 67, scale: 'majPent',    bpm: 100, lead: 'marimba', bass: true, bounce: true, melody: [0, 1, 2, 4, 3, 2, 0], chords: [0, 3, 1, 4], rest: [3, 6], night: true },
+    coral:      { root: 64, scale: 'major',      bpm: 80,  lead: 'harp',    pad: 'warm',  arp: 'harp', arpDensity: 0.6, melody: [2, 4, 5, 4, 2, 1], chords: [0, 3, 5, 4], rest: [3, 6], night: true },
+    ruins:      { root: 57, scale: 'aeolian',    bpm: 64,  lead: 'piano',   pad: 'warm',  bass: true, melody: [0, 2, 3, 2, 4, 0], chords: [0, 5, 3, 6], rest: [4, 8], night: true },
+    open_ocean: { root: 60, scale: 'lydian',     bpm: 60,  lead: 'bell',    pad: 'warm',  arp: 'harp', arpDensity: 0.5, bass: true, melody: [4, 7, 6, 4, 3, 4], chords: [0, 1, 5, 4], rest: [4, 8], night: true },
+    vents:      { root: 47, scale: 'aeolian', bpm: 50,  lead: 'piano',   pad: 'warm',  bass: true, melody: [0, 1, 0, -2, 0], chords: [0, 5, 0, 6], rest: [6, 10], octave: 12, night: true },
+    trench:     { root: 45, scale: 'minPent',    bpm: 44,  lead: 'drone',   pad: 'warm',  melody: [0, 2, 1, 0], chords: [0, 3], rest: [8, 12], night: true },
+    kelp:       { root: 62, scale: 'dorian',     bpm: 66,  lead: 'harp',    pad: 'warm',  arp: 'harp', arpDensity: 0.65, bass: true, melody: [0, 2, 4, 6, 4, 3], chords: [0, 3, 6, 4], rest: [3, 7], night: true },
+    mangrove:   { root: 62, scale: 'mixolydian', bpm: 84,  lead: 'guitar',  bass: true, bounce: true, melody: [4, 2, 4, 6, 4, 0], chords: [0, 6, 3, 0], rest: [4, 7], night: true },
+    ice:        { root: 69, scale: 'majPent',    bpm: 60,  lead: 'bell',    pad: 'glass', melody: [4, 3, 1, 3, 2, 0], chords: [0, 3, 2, 4], rest: [5, 9], night: true },
+    cave:       { root: 50, scale: 'aeolian',    bpm: 52,  lead: 'piano',   pad: 'warm',  melody: [4, 3, 2, 0, 1], chords: [0, 5, 3], rest: [6, 11], octave: 12, night: true },
+    lush_cave:  { root: 65, scale: 'majPent',    bpm: 62,  lead: 'harp',    pad: 'warm',  melody: [2, 3, 4, 2, 1, 0], chords: [0, 3, 1, 4], rest: [5, 9], night: true }
   },
 
   // quiet reward moments (a new decoration unlocked): a short plucked phrase over the music
   stingers: {
-    shower: { label: 'METEOR SHOWER', root: 79, scale: 'major', bpm: 66, lead: 'bell', vol: 0.45, notes: [7, 11, 14, 9, 12, 16, 14], beats: [1, 1, 1.5, 1, 1, 1.5, 4] },
-    reward: { label: 'REWARD', root: 67, scale: 'major', bpm: 132, lead: 'guitar', notes: [0, 2, 4, 7, 9, 7, 11, 14], beats: [0.5, 0.5, 0.5, 1, 0.5, 0.5, 1, 3] }
+    shower: { root: 79, scale: 'major', bpm: 66, lead: 'bell', vol: 0.45, notes: [7, 11, 14, 9, 12, 16, 14], beats: [1, 1, 1.5, 1, 1, 1.5, 4] },
+    reward: { root: 67, scale: 'major', bpm: 132, lead: 'guitar', notes: [0, 2, 4, 7, 9, 7, 11, 14], beats: [0.5, 0.5, 0.5, 1, 0.5, 0.5, 1, 3] }
   }
 };
 

@@ -9,7 +9,7 @@
 //   node tools/check-game.js --shots dir        also save a screenshot of each screen into dir
 //   node tools/check-game.js --keys             also check the language keys (every t() key used in
 //                                               the code exists in data/lang/en.js, and which keys
-//                                               in en.js are never used)
+//                                               in en.js are never used); add --lang none to skip the browser
 //
 // Needs Playwright with its Chromium (a test tool only; the game itself has no dependencies):
 //   npm install --no-save playwright && npx playwright install chromium
@@ -46,20 +46,26 @@ function keyCheck() {
   const vm = require('vm'), ctx = {}; vm.createContext(ctx);
   vm.runInContext(fs.readFileSync(path.join(ROOT, 'data/lang/en.js'), 'utf8'), ctx);
   const en = ctx.AQ.langFiles.en, keys = Object.keys(en).filter((k) => k !== '_meta');
-  // every file that can look text up: the code and the data files
-  const files = [];
+  // every file that can look text up: the code, the data files and the page itself
+  const files = [path.join(ROOT, 'index.html')];
   const walk = (dir) => fs.readdirSync(dir).forEach((f) => { const p = path.join(dir, f); if (fs.statSync(p).isDirectory()) { if (f !== 'lang') walk(p); } else if (/\.js$/.test(f)) files.push(p); });
   walk(path.join(ROOT, 'src')); walk(path.join(ROOT, 'data'));
   const used = new Set(), prefixes = new Set(), missing = [];
+  const isKey = (k) => Object.prototype.hasOwnProperty.call(en, k);
   for (const f of files) {
-    const src = fs.readFileSync(f, 'utf8');
-    // t('key'), t("key"), tEn('key'), L.t('key'), and key prefixes built in code: t(`creature.${id}.name`)
-    for (const m of src.matchAll(/\b(?:t|tEn|has|plural)\(\s*'([a-z0-9_.]+)'/gi)) { used.add(m[1]); if (!(m[1] in en)) missing.push(`${path.relative(ROOT, f)}: ${m[1]}`); }
-    for (const m of src.matchAll(/\b(?:t|tEn|has)\(\s*`([a-z0-9_.]+)\$\{/gi)) prefixes.add(m[1]);
-    for (const m of src.matchAll(/LANG_PREFIX:\s*'([a-z0-9_.]+)'/gi)) prefixes.add(m[1]);   // prefixes looked up through data getters
+    const raw = fs.readFileSync(f, 'utf8');
+    for (const m of raw.matchAll(/LANG_PREFIX:\s*'([a-z0-9_.]+)'/gi)) prefixes.add(m[1]);   // (a marker comment: keys built from this prefix)
+    // comments out (examples in comments don't count), then:
+    const src = raw.replace(/\/\*[\s\S]*?\*\//g, '').replace(/(^|[^:'"`\\])\/\/[^\n]*/g, '$1').replace(/<!--[\s\S]*?-->/g, '');
+    // 1) any quoted string that is a key counts as used (t('a'), t(x ? 'a' : 'b'), ['a', 'b'] lists, data-t="a")
+    for (const m of src.matchAll(/['"]([a-z][a-zA-Z0-9_]*(?:\.[a-zA-Z0-9_]+)+)['"]/g)) if (isKey(m[1])) used.add(m[1]);
+    // 2) a literal key passed straight to t() / tEn() that English doesn't have
+    for (const m of src.matchAll(/\b(?:t|tEn)\(\s*'([a-z][a-zA-Z0-9_.]*)'/g)) if (!isKey(m[1])) missing.push(`${path.relative(ROOT, f)}: ${m[1]}`);
+    // 3) keys built in code from a prefix: `creature.${id}.name`, or marked LANG_PREFIX: 'sfx.'
+    for (const m of src.matchAll(/`([a-z][a-zA-Z0-9_]*\.(?:[a-zA-Z0-9_]+\.)*)\$\{/g)) prefixes.add(m[1]);
   }
   const unused = keys.filter((k) => !used.has(k) && ![...prefixes].some((p) => k.startsWith(p)));
-  console.log(`\nLanguage keys: ${keys.length} in en.js, ${used.size} used directly, ${prefixes.size} key prefixes built in code.`);
+  console.log(`\nLanguage keys: ${keys.length} in en.js (${used.size} used by name, the rest through ${prefixes.size} key prefixes built in code).`);
   if (missing.length) { console.log(`MISSING from en.js (${missing.length}):`); missing.forEach((m) => console.log('  ' + m)); }
   else console.log('Every key used in the code exists in en.js.');
   if (unused.length) { console.log(`Not used anywhere (${unused.length}):`); unused.forEach((k) => console.log('  ' + k)); }
@@ -159,7 +165,8 @@ async function run(lang, pw, port, dump, shotsDir) {
     // record every piece of text the pixel font draws
     const F = AQ.Font, orig = F.draw;
     window.__rec = null;
-    F.draw = function (ctx, str) { if (window.__rec) window.__rec.add(String(str)); return orig.apply(this, arguments); };
+    window.__all = window.__all || new Set();          // everything drawn, including text painted once into cached pictures
+    F.draw = function (ctx, str) { if (window.__rec) window.__rec.add(String(str)); window.__all.add(String(str)); return orig.apply(this, arguments); };
   }, lang);
   const screens = [];
   for (const [name, fn] of SCREENS) {
@@ -182,7 +189,8 @@ async function run(lang, pw, port, dump, shotsDir) {
       if (shotsDir) { fs.mkdirSync(shotsDir, { recursive: true }); await page.screenshot({ path: path.join(shotsDir, `${lang}-${name}.png`) }); }
     } catch (e) { problems.push(`[${name}] check script could not reach this screen: ${e.message.split('\n')[0]}`); }
   }
-  const missingGlyphs = await page.evaluate(() => [...AQ.Font.unknown]);
+  out['(all text drawn)'] = await page.evaluate(() => [...(window.__all || [])].sort());
+  const missingGlyphs = await page.evaluate(() => [...(AQ.Font.unknown || [])]);
   if (missingGlyphs.length) problems.push(`characters with no glyph in the font (drawn as boxes): ${missingGlyphs.map((c) => JSON.stringify(c)).join(' ')}`);
   await browser.close();
   console.log(`\n[${lang}] visited ${screens.length} screens, ${problems.length ? problems.length + ' problem(s):' : 'no console errors.'}`);
@@ -193,8 +201,9 @@ async function run(lang, pw, port, dump, shotsDir) {
 (async () => {
   let failures = 0;
   if (opt('--keys')) failures += keyCheck();
-  const pw = loadPlaywright(), server = await serve(), port = server.address().port;
   const want = opt('--lang');
+  if (want === 'none') process.exit(failures ? 1 : 0);              // --keys --lang none: just the key check
+  const pw = loadPlaywright(), server = await serve(), port = server.address().port;
   const langs = want && want !== true ? [want] : ['en', 'pseudo'];
   const dump = opt('--dump'), shots = opt('--shots'), all = {};
   for (const lang of langs) {

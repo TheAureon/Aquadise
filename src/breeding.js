@@ -29,7 +29,7 @@ AQ.Breeding = (function () {
   // "12 MIN" / "40 SEC": time left until a baby is grown up
   B.growLeftText = function (e, now = Date.now()) {
     const ms = B.growLeftMs(e, now);
-    return ms >= MIN ? `${Math.ceil(ms / MIN)} MIN` : `${Math.max(1, Math.ceil(ms / 1000))} SEC`;
+    return ms >= MIN ? AQ.t('ui.minutes', { n: Math.ceil(ms / MIN) }) : AQ.t('ui.seconds', { n: Math.max(1, Math.ceil(ms / 1000)) });
   };
   B.occupancy = (tank) => tank.creatures.length + (tank.eggs || []).length;
   B.courting = (tank) => (tank && tank.court ? [tank.court.a, tank.court.b] : null);
@@ -64,24 +64,24 @@ AQ.Breeding = (function () {
   B.describe = function (tankId, tank, vibe, now = Date.now()) {
     if (!cfg().enabled || (nursery() && nursery().is(tankId))) return null;
     const waiting = nursery() ? nursery().fromTank(tankId, now) : { eggs: 0, babies: 0 };
-    const also = waiting.eggs ? { text: 'EGG ON THE WAY TO THE NURSERY', good: true } : waiting.babies ? { text: 'A BABY IS IN THE NURSERY', good: true } : null;
+    const also = waiting.eggs ? { text: AQ.t('breed.eggOnTheWay'), good: true } : waiting.babies ? { text: AQ.t('breed.babyInNursery'), good: true } : null;
     const out = (text, good) => ({ text, good, also });
     if (tank.court) {
       const d = defOf(tank.court.id);
-      if (nursery() && nursery().full()) return out('BREEDING PAUSED: THE NURSERY IS FULL, GRADUATE SOME BABIES', false);
-      return out(`A PAIR OF ${(d ? d.name : 'CREATURES').toUpperCase()} IS COURTING ♥`, true);
+      if (nursery() && nursery().full()) return out(AQ.t('breed.pausedNurseryFull'), false);
+      return out(AQ.t('breed.courting', { name: (d ? d.name : tank.court.id).toUpperCase() }), true);
     }
     const legacy = (tank.eggs || []).length;                   // an egg from an older save, waiting for room in the nursery
-    if (legacy) return out(legacy > 1 ? `${legacy} EGGS ARE WAITING FOR THE NURSERY` : 'AN EGG IS WAITING FOR THE NURSERY', true);
+    if (legacy) return out(AQ.t('breed.eggsWaiting', { n: legacy }), true);
     const pairs = B.pairs(tank, now);
-    if (!pairs.length) { const babies = tank.creatures.filter((e) => B.isJuvenile(e, now)).length; return babies ? out(babies > 1 ? `${babies} BABIES ARE GROWING UP` : 'A BABY IS GROWING UP', true) : (also ? { text: also.text, good: true } : null); }
+    if (!pairs.length) { const babies = tank.creatures.filter((e) => B.isJuvenile(e, now)).length; return babies ? out(AQ.t('breed.babiesGrowing', { n: babies }), true) : (also ? { text: also.text, good: true } : null); }
     const why = B.blocker(tank, vibe, now);
-    if (why === 'nursery') return out('BREEDING PAUSED: THE NURSERY IS FULL, GRADUATE SOME BABIES', false);
-    if (why === 'nervous') return out('BREEDING PAUSED: SOMEONE IS NERVOUS', false);
-    if (why === 'hungry') return out('FEED THEM AND A PAIR MAY COURT', false);
-    if (why === 'vibe') return out(`A PAIR COULD COURT AT ${cfg().minStars} STARS`, false);
-    if (why === 'resting') return out('RESTING AFTER A NEW ARRIVAL', true);
-    return out('A PAIR MAY START COURTING SOON', true);
+    if (why === 'nursery') return out(AQ.t('breed.pausedNurseryFull'), false);
+    if (why === 'nervous') return out(AQ.t('breed.pausedNervous'), false);
+    if (why === 'hungry') return out(AQ.t('breed.feedThem'), false);
+    if (why === 'vibe') return out(AQ.t('breed.atStars', { n: cfg().minStars }), false);
+    if (why === 'resting') return out(AQ.t('breed.resting'), true);
+    return out(AQ.t('breed.soon'), true);
   };
 
   function announce(text) {
@@ -100,7 +100,7 @@ AQ.Breeding = (function () {
     AQ.Sex.logOf(id).bred = true;
     AQ.Audio.play('baby');
     if (AQ.Tips) AQ.Tips.event('baby');
-    announce(rare ? `A rare-coloured baby ${d.name} was born! It's in the nursery.` : `A baby ${d.name} was born! It's in the nursery.`);
+    announce(AQ.t(rare ? 'breed.bornRare' : 'breed.born', { name: d.name }));
     return e;
   }
 
@@ -152,7 +152,7 @@ AQ.Breeding = (function () {
         if (d && B.laysEggs(d)) {
           (nt.eggs = nt.eggs || []).push({ uid: AQ.U.uid(), id: sp, laidAt: now, x: 30 + Math.floor(Math.random() * 260), from: id });
           AQ.Sex.logOf(sp);
-          announce(`The ${d.name} pair laid an egg! It's in the nursery.`);
+          announce(AQ.t('breed.egg', { name: d.name }));
         } else arrive(sp, id, now);
         if (AQ.Aquarium && AQ.Aquarium.sparkleParents) AQ.Aquarium.sparkleParents(id, parents);   // only if you're looking at their tank
       }

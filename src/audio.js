@@ -20,7 +20,13 @@ AQ.Audio = (function () {
   const A = { sounds: {}, ctx: null, ready: false, voices: 0, last: {}, musicWanted: null, buffers: {} };
   const cfg = () => AQ.TUNING.audio;
 
-  A.register = function (id, def) { A.sounds[id] = Object.assign({ id, kind: 'sfx', label: id }, def); };
+  // a sound's name (the sound test) comes from the language file: sfx.<id>, amb.<bed>, music.<piece>
+  A.register = function (id, def) {
+    const s = A.sounds[id] = Object.assign({ id, kind: 'sfx' }, def);
+    const key = s.kind === 'amb' ? `amb.${s.bed}` : s.kind === 'music' ? `music.${s.piece}` : `sfx.${id}`;   // LANG_PREFIX: 'sfx.'
+    delete s.label;
+    Object.defineProperty(s, 'label', { get: () => AQ.Lang.t(key) || id, enumerable: true });
+  };
   A.list = (kind) => Object.values(A.sounds).filter((s) => s.kind === kind);
 
   // ---------------------------------------------------------------- settings (saved with the game)
@@ -45,7 +51,7 @@ AQ.Audio = (function () {
   A.toggleMute = function () {
     const st = A.settings(); st.mute = !st.mute;
     A.applyVolumes(true); AQ.Save && AQ.Save.dirty();
-    if (AQ.HUD) AQ.HUD.toast(st.mute ? 'Sound muted (O to unmute)' : 'Sound on', '#cfe8ff');
+    if (AQ.HUD) AQ.HUD.toast(st.mute ? AQ.t('ui.soundMuted', { key: AQ.Keys.name('mute') }) : AQ.t('ui.soundOn'), '#cfe8ff');
   };
 
   // ---------------------------------------------------------------- start-up (on the first gesture)

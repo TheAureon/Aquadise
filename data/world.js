@@ -43,7 +43,7 @@ AQ.data.world = {
   // palette: top = surface material (sand/mud/snow), rock = body shades, accent = speckles.
   // water = tint mixed into the water colour, dark = ambient darkness (0..1).
   biomes: [
-    { id: 'lush_cave', name: 'Half-Flooded Lush Cave', short: 'Lush Cave', rect: [5960, 700, 840, 260],
+    { id: 'lush_cave', rect: [5960, 700, 840, 260],
       palette: { top: ['#6fa456', '#4f8a43', '#3d6b37'], rock: ['#5a5560', '#4a4550', '#3b3742'], accent: '#c9e07a', style: 'mossy', backwall: true, air: '#26333a' }, water: '#2fa08c', waterMix: 0.45, dark: 0.36,
       props: [
         { type: 'vine', at: 'ceiling', n: 26, air: true },
@@ -56,7 +56,7 @@ AQ.data.world = {
         { type: 'glowshroom', at: 'floor', n: 5 },
         { type: 'stalactite', at: 'ceiling', n: 6, air: true }
       ] },
-    { id: 'cave', name: 'Flooded Cave System', short: 'Cave', rect: [5660, 400, 360, 820],
+    { id: 'cave', rect: [5660, 400, 360, 820],
       palette: { top: ['#56606b', '#4a535d', '#3f4750'], rock: ['#3e444d', '#343941', '#2a2e35'], accent: '#7fb0a8', style: 'strata', backwall: true }, water: '#1c3550', waterMix: 0.5, dark: 0.72,
       props: [
         { type: 'stalactite', at: 'ceiling', n: 22 },
@@ -65,7 +65,7 @@ AQ.data.world = {
         { type: 'crystal', at: 'ceiling', n: 5, colors: ['#6fd6e8', '#9f7fe8'] },
         { type: 'pebbles', at: 'floor', n: 6 }
       ] },
-    { id: 'trench', name: 'Deep Trench', short: 'Trench', rect: [3320, 640, 660, 800],
+    { id: 'trench', rect: [3320, 640, 660, 800],
       palette: { top: ['#2c3448', '#252c3d', '#1e2433'], rock: ['#1b2130', '#161b27', '#11151f'], accent: '#3c6b7a', style: 'strata' }, water: '#050c1c', waterMix: 0.4, dark: 0.74,
       props: [
         { type: 'spire', at: 'floor', n: 10, y: [1150, 1300] },
@@ -73,21 +73,21 @@ AQ.data.world = {
         { type: 'rock', at: 'floor', n: 14, y: [0, 1300] },
         { type: 'tubeworms', at: 'floor', n: 10, y: [1150, 1300] }
       ] },
-    { id: 'vents', name: 'Volcanic Vents', short: 'Vents', rect: [2560, 600, 760, 840],
+    { id: 'vents', rect: [2560, 600, 760, 840],
       palette: { top: ['#4a3f44', '#3d3338', '#33292e'], rock: ['#2f282c', '#272124', '#1f1a1d'], accent: '#ff8a3a', style: 'strata', embers: true }, water: '#3a2230', waterMix: 0.25, dark: 0.55,
       props: [
         { type: 'ventcrack', at: 'floor', n: 3, y: [790, 820] },
         { type: 'tubeworms', at: 'floor', n: 6 },
         { type: 'rock', at: 'floor', n: 5, color: '#4a3f44' }
       ] },
-    { id: 'open_ocean', name: 'Open Ocean', short: 'Open Ocean', rect: [2420, 0, 1550, 1440],
+    { id: 'open_ocean', rect: [2420, 0, 1550, 1440],
       palette: { top: ['#6d7c88', '#5d6b78', '#4f5c68'], rock: ['#46525e', '#3c4652', '#323b46'], accent: '#8da3b0' }, water: '#1f5fa8', waterMix: 0.2, dark: 0,
       props: [
         { type: 'rock', at: 'floor', n: 16 },
         { type: 'seagrass', at: 'floor', n: 8, y: [0, 420] },
         { type: 'anemone', at: 'floor', n: 5, y: [0, 500] }
       ] },
-    { id: 'tide_pools', name: 'Tide Pools', short: 'Tide Pools', rect: [0, 0, 720, 1440],
+    { id: 'tide_pools', rect: [0, 0, 720, 1440],
       palette: { top: ['#ecd9a0', '#d9c084', '#c4a86c'], rock: ['#8c8178', '#766b63', '#5f564f'], accent: '#6fa35a' }, water: '#58d0cf', waterMix: 0.25, dark: 0,
       props: [
         { type: 'algae', at: 'floor', n: 34, air: true, area: [0, 520] },
@@ -100,7 +100,7 @@ AQ.data.world = {
         { type: 'anemone', at: 'floor', n: 5, area: [480, 760] },
         { type: 'urchin', at: 'floor', n: 3, area: [520, 760] },
       ] },
-    { id: 'coral', name: 'Coral Shelf', short: 'Coral', rect: [720, 0, 1180, 1440],
+    { id: 'coral', rect: [720, 0, 1180, 1440],
       palette: { top: ['#f3e2b6', '#e6cf9a', '#d4b984'], rock: ['#c4a58a', '#a98b72', '#8d725d'], accent: '#ef8aa0' }, water: '#3fc0d8', waterMix: 0.25, dark: 0,
       props: [
         { type: 'coral', at: 'floor', n: 90 },
@@ -111,7 +111,7 @@ AQ.data.world = {
         { type: 'shell', at: 'floor', n: 6 },
         { type: 'urchin', at: 'floor', n: 4 }
       ] },
-    { id: 'ruins', name: 'Sunken Ruins', short: 'Ruins', rect: [1900, 0, 520, 1440],
+    { id: 'ruins', rect: [1900, 0, 520, 1440],
       palette: { top: ['#a6a283', '#928e70', '#7d7a5f'], rock: ['#6d6b5c', '#5c5a4d', '#4b4a40'], accent: '#a5643a' }, water: '#4a8f8a', waterMix: 0.3, dark: 0.05,
       props: [
         { type: 'plank', at: 'floor', n: 7 },
@@ -124,7 +124,7 @@ AQ.data.world = {
         { type: 'seagrass', at: 'floor', n: 10, colors: ['#6f8a3e', '#5b7333', '#86a04a'] },
         { type: 'rock', at: 'floor', n: 8 }
       ] },
-    { id: 'kelp', name: 'Kelp Forest', short: 'Kelp', rect: [3970, 0, 930, 1440],
+    { id: 'kelp', rect: [3970, 0, 930, 1440],
       palette: { top: ['#bfae7c', '#a8976a', '#8f8059'], rock: ['#6e705f', '#5c5e4f', '#4a4c40'], accent: '#7a9a3a' }, water: '#2f8a6a', waterMix: 0.3, dark: 0.08,
       props: [
         { type: 'kelp', at: 'floor', every: 32, chance: 0.85, area: [3990, 4900] },
@@ -132,7 +132,7 @@ AQ.data.world = {
         { type: 'seagrass', at: 'floor', n: 18 },
         { type: 'kelp', at: 'floor', every: 110, chance: 0.5, layer: 'front', sparse: true, alpha: 150, colors: ['#3f5a1c', '#33491a', '#4d6b22'], area: [3990, 4900] }
       ] },
-    { id: 'mangrove', name: 'Mangrove Roots', short: 'Mangrove', rect: [4900, 0, 800, 1440],
+    { id: 'mangrove', rect: [4900, 0, 800, 1440],
       palette: { top: ['#6e5a3c', '#5c4b32', '#4a3c29'], rock: ['#4e4234', '#41372b', '#342c23'], accent: '#7d8f3c' }, water: '#5c7a3a', waterMix: 0.4, dark: 0.12,
       props: [
         { type: 'mangrove', at: 'floor', every: 115, area: [4930, 5660] },
@@ -140,7 +140,7 @@ AQ.data.world = {
         { type: 'rock', at: 'floor', n: 10, color: '#5c4b32' },
         { type: 'algae', at: 'floor', n: 15, color: '#6b5a2f' }
       ] },
-    { id: 'ice', name: 'Ice Shelf', short: 'Ice', rect: [5700, 0, 1100, 1440], zones: [{ name: 'Icy', x0: 5700, x1: 6250 }, { name: 'Glaciers', x0: 6250, x1: 6800 }],
+    { id: 'ice', rect: [5700, 0, 1100, 1440], zones: [{ x0: 5700, x1: 6250 }, { x0: 6250, x1: 6800 }],
       palette: { top: ['#eef8ff', '#d2ebf7', '#b4d8ea'], rock: ['#5e6976', '#4f5966', '#424a55'], accent: '#9fd3ee' }, water: '#7fc6e6', waterMix: 0.35, dark: 0.05,
       props: [
         { type: 'icicle', at: 'ceiling', n: 26 },
@@ -152,10 +152,10 @@ AQ.data.world = {
   // Doors: solid while shut; they open by themselves when you swim up and close after you pass.
   // vertical doors stand in a doorway (w small, h tall); hatches lie flat (w wide, h small).
   doors: [
-    { x: 2026, y: 244, w: 4, h: 18, name: 'DOOR' },          // bow door into the ship's hold
-    { x: 2140, y: 213, w: 4, h: 18, name: 'DOOR' },          // cabin door
-    { x: 2180, y: 230, w: 24, h: 4, name: 'HATCH' },         // deck hatch into the hold
-    { x: 2094, y: 232, w: 18, h: 4, name: 'HATCH' }          // floor hatch, cabin -> hold
+    { x: 2026, y: 244, w: 4, h: 18, kind: 'door' },          // bow door into the ship's hold
+    { x: 2140, y: 213, w: 4, h: 18, kind: 'door' },          // cabin door
+    { x: 2180, y: 230, w: 24, h: 4, kind: 'hatch' },         // deck hatch into the hold
+    { x: 2094, y: 232, w: 18, h: 4, kind: 'hatch' }          // floor hatch, cabin -> hold
   ],
 
   // Terrain shapes, applied in order on top of the floor. ops: solid | carve | pool | air | water

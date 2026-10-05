@@ -234,10 +234,10 @@ AQ.Touch = (function () {
   };
 
   // ---------------------------------------------------------------- the MENU panel (drawn in the game, game px)
-  const MENU = [['log', 'LOG'], ['map', 'MAP'], ['guide', 'GUIDE'], ['help', 'HELP'], ['mute', 'MUTE'], ['pause', 'PAUSE'], ['settings', 'SETTINGS'], ['close', 'CLOSE']];
+  const MENU = ['log', 'map', 'guide', 'help', 'mute', 'pause', 'settings', 'close'];   // labels: touch.menu.<id>
   function menuLayout() {
     const muted = AQ.Audio.settings().mute;
-    return MENU.map(([id, label], i) => ({ id, x: 112 + (i % 2) * 50, y: 46 + Math.floor(i / 2) * 18, w: 46, h: 14, label: id === 'mute' ? (muted ? 'SOUND ON' : 'MUTE') : label, on: id === 'mute' && muted }));
+    return MENU.map((id, i) => ({ id, x: 112 + (i % 2) * 50, y: 46 + Math.floor(i / 2) * 18, w: 46, h: 14, label: AQ.t(id === 'mute' && muted ? 'touch.menu.soundOn' : `touch.menu.${id}`), on: id === 'mute' && muted }));
   }
   // returns true while the panel is open (the game underneath waits)
   T.updateMenu = function (game) {
@@ -254,7 +254,7 @@ AQ.Touch = (function () {
     if (id === 'mute') { AQ.Audio.toggleMute(); return true; }
     T.menuOpen = false;
     if (id === 'log' && AQ.LogUI) AQ.LogUI.open(game);
-    else if (id === 'map') { if (game.scene === 'world') game.state = game.state === 'map' ? 'play' : 'map'; else AQ.HUD.toast('The map only shows the sea.', '#cfe8ff'); }
+    else if (id === 'map') { if (game.scene === 'world') game.state = game.state === 'map' ? 'play' : 'map'; else AQ.HUD.toast(AQ.t('map.onlySea'), '#cfe8ff'); }
     else if (id === 'guide' && AQ.Guide) AQ.Guide.open(game, 'play');
     else if (id === 'help') { AQ.HUD.showHelp = true; AQ.HUD.helpT = AQ.HUD.helpT > 0 ? 0 : 12; if (game.state === 'map') game.state = 'play'; }
     else if (id === 'pause') game.state = 'pause';
@@ -266,7 +266,7 @@ AQ.Touch = (function () {
     g.fillStyle = 'rgba(4,12,24,0.55)'; g.fillRect(0, 0, 320, 180);
     g.fillStyle = 'rgba(6,18,34,0.96)'; g.fillRect(104, 30, 112, 100);
     g.fillStyle = '#6ef0ef'; g.fillRect(104, 30, 112, 1);
-    AQ.Font.draw(g, 'MENU', 160, 35, '#fff6dc', { align: 'center', shadow: false });
+    AQ.Font.draw(g, AQ.t('touch.menu'), 160, 35, '#fff6dc', { align: 'center', shadow: false });
     for (const r of (T.menuUi.length ? T.menuUi : menuLayout())) AQ.Aquarium.button(g, r, T.menuHover === r);
   };
 
@@ -304,7 +304,7 @@ AQ.Touch = (function () {
       sprite('ui.touch', 0, b.cx, b.cy, b.size, a);
       if (lit) sprite('ui.touch', 0, b.cx, b.cy, b.size, a * 0.6);               // lit: a brighter base
       sprite('ui.touch', FRAME[b.id], b.cx, b.cy, b.size, a);
-      if (b.id === 'sneak' && T.sneakOn) label('ON', b.cx, b.y + b.h + 2, a);
+      if (b.id === 'sneak' && T.sneakOn) label(AQ.t('touch.on'), b.cx, b.y + b.h + 2, a);
     }
     if (sh.stick) {
       const st = [...T.pointers.values()].find((p) => p.role === 'stick');

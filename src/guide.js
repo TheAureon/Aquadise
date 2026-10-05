@@ -1,6 +1,6 @@
 // The GUIDE: a small paged field-guide book. Open it from the title screen, the pause menu or with the
 // guide key during play (shown on the help line). Left / right (or A / D, or a click on the arrows) turns
-// the page; Esc or the guide key closes it. Pages come from data/tutorial.js (guide); a page or line that
+// the page; Esc or the guide key closes it. Pages come from data/tutorial.js (guide; the text is guide.* in data/lang/en.js); a page or line that
 // needs a feature the build doesn't have is left out. Key names and config numbers are filled in live.
 var AQ = (typeof AQ !== 'undefined') ? AQ : {};
 
@@ -37,7 +37,7 @@ AQ.Guide = (function () {
     const n = G.pages().length, ui = [];
     ui.push({ id: 'prev', x: BOOK.x + 8, y: BOOK.y + BOOK.h - 16, w: 30, h: 11, label: '<', off: G.page <= 0 });
     ui.push({ id: 'next', x: BOOK.x + BOOK.w - 38, y: BOOK.y + BOOK.h - 16, w: 30, h: 11, label: '>', off: G.page >= n - 1 });
-    ui.push({ id: 'close', x: BOOK.x + BOOK.w - 40, y: BOOK.y + 4, w: 34, h: 10, label: 'CLOSE' });
+    ui.push({ id: 'close', x: BOOK.x + BOOK.w - 40, y: BOOK.y + 4, w: 34, h: 10, label: AQ.t('ui.close') });
     return ui;
   }
   G.update = function (dt, game) {
@@ -82,13 +82,13 @@ AQ.Guide = (function () {
     g.fillStyle = '#efe4c8'; g.fillRect(b.x, b.y, b.w, b.h);
     g.fillStyle = '#e2d4b0'; g.fillRect(b.x + 82, b.y, 2, b.h);
     g.fillStyle = 'rgba(120,90,60,0.18)'; g.fillRect(b.x + 84, b.y, 3, b.h);
-    F().draw(g, 'FIELD GUIDE', b.x + 8, b.y + 6, '#8a5a3a', { shadow: false });
+    F().draw(g, AQ.t('guide.book'), b.x + 8, b.y + 6, '#8a5a3a', { shadow: false });
     if (!p) return;
     // left: the picture, in a soft blue window
     g.fillStyle = '#c8dde6'; g.fillRect(b.x + 10, b.y + 22, 64, 64);
     g.fillStyle = '#a9c8d6'; g.fillRect(b.x + 10, b.y + 80, 64, 6);
     illustration(g, p.icon, b.x + 42, b.y + 52, p.scale);
-    F().draw(g, `PAGE ${G.page + 1} OF ${pages.length}`, b.x + 42, b.y + 94, '#8a7a5a', { align: 'center', shadow: false });
+    F().draw(g, AQ.t('guide.pageOf', { n: G.page + 1, total: pages.length }), b.x + 42, b.y + 94, '#8a7a5a', { align: 'center', shadow: false });
     // right: title + text
     const X = b.x + 94, W = b.x + b.w - 8 - X;
     F().draw(g, p.title.toUpperCase(), X, b.y + 22, '#3a5a7a', { shadow: false });
@@ -103,7 +103,7 @@ AQ.Guide = (function () {
     // footer: arrows, page dots, how to close
     for (const r of G.ui) AQ.Aquarium.button(g, r, G.hover === r && !r.off);
     pages.forEach((_, i) => { g.fillStyle = i === G.page ? '#3a5a7a' : '#c4b48e'; g.fillRect(Math.round(160 - pages.length * 3.5 + i * 7), b.y + b.h - 11, 4, 4); });
-    F().draw(g, AQ.Keys.fill('LEFT / RIGHT: TURN    ESC / {k:guide}: CLOSE'), 160, b.y + b.h + 4, '#8aa4b8', { align: 'center', shadow: false });
+    F().draw(g, AQ.Keys.fill(AQ.t('guide.footer')), 160, b.y + b.h + 4, '#8aa4b8', { align: 'center', shadow: false });
   };
   return G;
 })();

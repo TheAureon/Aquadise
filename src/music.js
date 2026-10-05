@@ -280,7 +280,7 @@ AQ.Music = (function () {
     for (const id in D().pieces) {
       const p = D().pieces[id];
       out.push({ id, label: p.label });
-      if (p.night) out.push({ id: id + ':night', label: p.label + ' NIGHT' });
+      if (p.night) out.push({ id: id + ':night', label: AQ.t('music.nightVersion', { name: p.label }) });
     }
     for (const id in D().stingers) out.push({ id, label: D().stingers[id].label, stinger: true });
     return out;
@@ -290,6 +290,6 @@ AQ.Music = (function () {
 
 // register every piece by id, so the registry lists them alongside effects and ambience
 (function () {
-  for (const id in AQ.data.music.pieces) AQ.Audio.register('music:' + id, { kind: 'music', label: AQ.data.music.pieces[id].label, piece: id });
-  for (const id in AQ.data.music.stingers) AQ.Audio.register('music:' + id, { kind: 'music', label: AQ.data.music.stingers[id].label, piece: id, stinger: true });
+  for (const id in AQ.data.music.pieces) AQ.Audio.register('music:' + id, { kind: 'music', piece: id });
+  for (const id in AQ.data.music.stingers) AQ.Audio.register('music:' + id, { kind: 'music', piece: id, stinger: true });
 })();

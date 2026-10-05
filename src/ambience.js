@@ -2,7 +2,7 @@
 // crickets on the hill...), made from filtered noise and soft tones, plus small events that happen
 // now and then (a distant gull, a drip, a whale-like note). Beds crossfade as you move between places.
 //
-//   AQ.Ambience.register(id, { label, layers: [...], events: [...] })     registered as 'amb:<id>'
+//   AQ.Ambience.register(id, { layers: [...], events: [...] })     registered as 'amb:<id>' (name: amb.<id> in data/lang/)
 //     layer: { noise: { ft, f, q }, v, lfo: { rate, depth, filter } }  or  { tone: { f, type }, v, lfo }
 //            param: 'beam' | 'water'  -> its level follows AQ.Ambience.set(param, 0..1)
 //     event: { every: [minSec, maxSec], fn(ctx, out, t, bed) }
@@ -16,7 +16,7 @@ AQ.Ambience = (function () {
 
   B.register = function (id, def) {
     B.beds[id] = Object.assign({ id, layers: [], events: [] }, def);
-    A.register('amb:' + id, { kind: 'amb', label: def.label, bed: id });
+    A.register('amb:' + id, { kind: 'amb', bed: id });            // its name: amb.<id> in data/lang/
   };
 
   // ---------------------------------------------------------------- one playing bed
@@ -121,7 +121,6 @@ AQ.Ambience = (function () {
 
   // ---------------------------------------------------------------- the beds
   B.register('tide_pools', {
-    label: 'TIDE POOLS',
     layers: [
       { noise: { ft: 'lowpass', f: 650 }, v: 0.08, lfo: { rate: 0.12, depth: 0.85 } },                // lapping waves
       { noise: { ft: 'bandpass', f: 2400, q: 0.6 }, v: 0.03, lfo: { rate: 0.12, depth: 0.95 } }       // foam fizz on each wave
@@ -131,19 +130,16 @@ AQ.Ambience = (function () {
     } }]
   });
   B.register('kelp', {
-    label: 'KELP FOREST',
     layers: [{ noise: { ft: 'lowpass', f: 320 }, v: 0.25, lfo: { rate: 0.07, depth: 0.6, filter: 0.3 } }],
     events: [{ every: [4, 10], fn: (c, o, t) => creak(c, o, t) }]
   });
   B.register('coral', {
-    label: 'CORAL SHELF',
     layers: [{ noise: { ft: 'lowpass', f: 450 }, v: 0.14, lfo: { rate: 0.09, depth: 0.4 } }],
     events: [{ every: [0.12, 0.5], fn: (c, o, t) => {                                                // soft crackling
       for (let i = 0, n = 1 + Math.floor(Math.random() * 3); i < n; i++) H.noise(c, o, t + i * rnd(0.01, 0.04), { ft: 'highpass', f: rnd(3500, 6000), a: 0.001, d: 0.008, v: rnd(0.02, 0.05) });
     } }]
   });
   B.register('open_ocean', {
-    label: 'OPEN OCEAN',
     layers: [{ noise: { ft: 'lowpass', f: 220 }, v: 0.32, lfo: { rate: 0.05, depth: 0.5, filter: 0.4 } }],
     events: [{ every: [28, 55], fn: (c, o, t) => {                                                   // a rare whale-like note
       const g = c.createGain(); g.connect(o); g.connect(A.echo);
@@ -152,20 +148,17 @@ AQ.Ambience = (function () {
       setTimeout(() => { try { g.disconnect(); } catch (e) {} }, 8000);
     } }]
   });
-  const deep = (label) => ({
-    label,
+  const deep = () => ({
     layers: [{ tone: { f: 55 }, v: 0.05, lfo: { rate: 0.1, depth: 0.4 } }, { tone: { f: 82.5, detune: 5 }, v: 0.02 }, { noise: { ft: 'lowpass', f: 160 }, v: 0.18 }],
     events: [{ every: [2, 6], fn: (c, o, t) => drip(c, o, t) }]
   });
-  B.register('cave', deep('FLOODED CAVE'));
-  B.register('trench', deep('DEEP TRENCH'));
+  B.register('cave', deep());
+  B.register('trench', deep());
   B.register('vents', {
-    label: 'VOLCANIC VENTS',
     layers: [{ noise: { ft: 'lowpass', f: 110, q: 1.2 }, v: 0.45, lfo: { rate: 0.2, depth: 0.5 } }, { tone: { f: 41 }, v: 0.05 }],
     events: [{ every: [0.6, 2.2], fn: (c, o, t) => bubbleRun(c, o, t, 3 + Math.floor(Math.random() * 4)) }]
   });
   B.register('mangrove', {
-    label: 'MANGROVE',
     layers: [{ noise: { ft: 'bandpass', f: 1300, q: 1.2 }, v: 0.06, lfo: { rate: 1.3, depth: 0.5 } }, { noise: { ft: 'lowpass', f: 400 }, v: 0.1 }],
     events: [{ every: [2.5, 7], fn: (c, o, t) => {                                                    // insects
       const f = rnd(3800, 4800);
@@ -173,17 +166,14 @@ AQ.Ambience = (function () {
     } }]
   });
   B.register('ice', {
-    label: 'ICE SHELF',
     layers: [{ noise: { ft: 'bandpass', f: 700, q: 0.8 }, v: 0.14, lfo: { rate: 0.06, depth: 0.7, filter: 0.6 } }],     // faint wind
     events: [{ every: [2, 6], fn: (c, o, t) => H.bell(c, o, t, m(Math.floor(rnd(93, 104))), 0.018, 1.2) }]           // tinkling
   });
   B.register('ruins', {
-    label: 'SUNKEN RUINS',
     layers: [{ noise: { ft: 'lowpass', f: 240 }, v: 0.3 }, { noise: { ft: 'bandpass', f: 180, q: 9 }, v: 0.3, lfo: { rate: 0.08, depth: 0.6 } }],   // hollow echo
     events: [{ every: [6, 14], fn: (c, o, t) => { const g = c.createGain(); g.connect(o); g.connect(A.echo); creak(c, g, t, rnd(60, 90), 0.05); setTimeout(() => { try { g.disconnect(); } catch (e) {} }, 4000); } }]
   });
   B.register('lush_cave', {
-    label: 'LUSH CAVE',
     layers: [{ noise: { ft: 'lowpass', f: 300 }, v: 0.22 }],
     events: [
       { every: [1.5, 4.5], fn: (c, o, t) => drip(c, o, t, rnd(1100, 1800)) },
@@ -191,7 +181,6 @@ AQ.Ambience = (function () {
     ]
   });
   B.register('hill', {
-    label: 'THE HILL',
     layers: [
       { noise: { ft: 'bandpass', f: 550, q: 0.6 }, v: 0.14, lfo: { rate: 0.09, depth: 0.7, filter: 0.5 } },          // evening breeze
       { tone: { f: 110 }, v: 0.05, param: 'beam' }, { tone: { f: 220, detune: 6 }, v: 0.025, param: 'beam' }           // the beam's hum (near it)
@@ -202,7 +191,6 @@ AQ.Ambience = (function () {
     } }]
   });
   B.register('station', {
-    label: 'STATION',
     layers: [
       { tone: { f: 82 }, v: 0.05 }, { tone: { f: 123, detune: 4 }, v: 0.02, lfo: { rate: 0.15, depth: 0.5 } },        // warm low hum
       { noise: { ft: 'lowpass', f: 380 }, v: 0.14, param: 'water', lfo: { rate: 0.2, depth: 0.5 } }                     // tank water, muffled

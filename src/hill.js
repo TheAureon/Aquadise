@@ -29,7 +29,7 @@ AQ.Hill = (function () {
   };
   H.world = () => W;
   H.geom = () => G;
-  H.zoneName = () => 'The Hill';
+  H.zoneName = () => AQ.t('hill.name');
   H.valid = (x, y) => W.standable(x, y) && W.boxHits(x, y + 3, 5, 4);   // standing on ground
 
   H.enter = function (game, spawn) {
@@ -176,7 +176,7 @@ AQ.Hill = (function () {
     AQ.FX.draw(ctx);
     ctx.restore();
     const P = game.player;
-    if (H.mode === 'walk' && inBeam(P) && !AQ.Transition.active) AQ.Scenes.prompt(ctx, P.x - left, P.y - top - 22, 'BEAM UP');
+    if (H.mode === 'walk' && inBeam(P) && !AQ.Transition.active) AQ.Scenes.prompt(ctx, P.x - left, P.y - top - 22, AQ.t('hill.beamUp'));
   };
 
   AQ.Scenes.register('hill', H);

@@ -34,8 +34,8 @@ AQ.data.station = {
     [130, 3], [230, 3], [330, 3], [430, 3], [530, 3], [630, 3]
   ],
   plants: [[110, 0], [528, 0], [650, 1], [110, 2], [650, 3]],   // potted plants, [x, floor]
-  signs: [                                  // [text, x, floor, colour]
-    ['DIRECTORY', 496, 0, '#ffe08a'], ['BEAM PAD', 572, 0, '#9feff0'],
-    ['AQUARIUM STATION', 380, 2, '#ffd0e0'], ['PREDATOR WING', 380, 3, '#ffb0a0']
+  signs: [                                  // [id, x, floor, colour] (text: data/lang/ sign.<id>)
+    ['directory', 496, 0, '#ffe08a'], ['beampad', 572, 0, '#9feff0'],
+    ['station', 380, 2, '#ffd0e0'], ['predators', 380, 3, '#ffb0a0']
   ]
 };

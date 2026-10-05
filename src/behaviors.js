@@ -393,7 +393,7 @@ AQ.Behaviors = (function () {
     onCaught(c, ctx) {
       if (c.p.sting && ctx.noise > AQ.TUNING.stealth.carelessNoise) {
         ctx.P.knock(ctx.dx || 1, ctx.dy, AQ.TUNING.knockback.light);
-        AQ.HUD.toast('Ouch! A faint sting.', '#ffb0d8');
+        AQ.HUD.toast(AQ.t('catch.sting'), '#ffb0d8');
       }
     }
   };
@@ -514,9 +514,9 @@ AQ.Behaviors = (function () {
     },
     onSwing(c, ctx) {
       if (c.state === 'guard' && ctx.dist < 30) {
-        if (c.p.withdraw) { AQ.FX.text(c.x, c.y - c.r - 4, '...', '#dfe'); AQ.HUD.toast('It pulls into its shell. Wait for it to relax.', '#cfe8ff'); return; }
+        if (c.p.withdraw) { AQ.FX.text(c.x, c.y - c.r - 4, '...', '#dfe'); AQ.HUD.toast(AQ.t('catch.shell'), '#cfe8ff'); return; }
         ctx.P.knock(ctx.dx || 1, ctx.dy - 4, AQ.TUNING.knockback.light);
-        AQ.HUD.toast('Pinched! Wait for it to relax.', '#ffd56b');
+        AQ.HUD.toast(AQ.t('catch.pinched'), '#ffd56b');
       }
     }
   };
@@ -550,7 +550,7 @@ AQ.Behaviors = (function () {
       if (R() < chance) return true;
       c.state = 'empty'; c.st = U.rangeOf([10, 18]);
       AQ.FX.sparkle(c.x, c.pool.surface, '#bff', 8);
-      AQ.HUD.toast('Splash! It slipped away.', '#bfefff');
+      AQ.HUD.toast(AQ.t('catch.splash'), '#bfefff');
       return false;
     }
   };
@@ -613,7 +613,7 @@ AQ.Behaviors = (function () {
       if (Math.abs(P.vx) > 4) c.facing = P.vx > 0 ? -1 : 1;
       if (c.iconT <= 0 && !still) { c.icon = '~'; c.iconT = 0.6; }
     },
-    missText: 'It mirrors you! Stay still and let it come to you.'
+    missKey: 'catch.mirror'
   };
 
   // LURE: a bright glowing decoy bobs on a stalk; the real creature waits still and dim beside it.
@@ -653,7 +653,7 @@ AQ.Behaviors = (function () {
       g.fillStyle = '#ffffff'; g.fillRect(x, y, 1, 1);
       g.globalAlpha = 1;
     },
-    missText: 'Just a glowing decoy! The real one is hiding beside it.'
+    missKey: 'catch.decoy'
   };
 
   // MID-AIR: cruises just under the surface and leaps out in an arc every few seconds.
@@ -690,7 +690,7 @@ AQ.Behaviors = (function () {
         AQ.FX.puff(c.x, W.sea, 'rgba(230,250,255,0.8)', 6);
       }
     },
-    missText: 'Too quick underwater. Net it mid-leap!'
+    missKey: 'catch.leaper'
   };
 
   B.easy = {

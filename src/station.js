@@ -9,6 +9,7 @@ AQ.Station = (function () {
   const U = AQ.U, R = U.R, F = () => AQ.Font;
   const St = { mode: 'walk', t: 0, dust: [] };
   let W = null, L = null, canvas = null, tanks = [];
+  AQ.Lang.onChange(() => { canvas = null; });           // the signs are painted into the background: repaint in the new language
 
   St.build = function () {
     L = AQ.data.station;
@@ -27,7 +28,7 @@ AQ.Station = (function () {
     canvas = null;
   };
   St.world = () => W;
-  St.zoneName = () => 'Aquarium Station';
+  St.zoneName = () => AQ.t('station.name');
   St.valid = (x, y) => W.standable(x, y) && W.boxHits(x, y + 3, 5, 4) && x > L.hull.x + 10 && x < L.hull.x + L.hull.w - 10 && y > L.hull.y && y < L.floors[0];
 
   // tank slots straight from data/scenes.js (b = the tank def, or null for an empty slot)
@@ -48,10 +49,10 @@ AQ.Station = (function () {
     const feet = P.y + AQ.TUNING.swim.hitbox.h / 2;
     const fl = L.floors.findIndex((y) => Math.abs(feet - y) < 3);
     if (fl < 0 || P.mode !== 'walk') return null;
-    if (fl === 0 && Math.abs(P.x - L.pad.x) < 13) return { kind: 'pad', text: 'BEAM DOWN TO THE HILL' };
-    if (fl === 0 && Math.abs(P.x - L.console.x) < 11) return { kind: 'console', text: 'TANK DIRECTORY' };
+    if (fl === 0 && Math.abs(P.x - L.pad.x) < 13) return { kind: 'pad', text: AQ.t('station.beamDown') };
+    if (fl === 0 && Math.abs(P.x - L.console.x) < 11) return { kind: 'console', text: AQ.t('station.directory') };
     const t = tanks.find((k) => k.b && k.floor === fl && Math.abs(P.x - k.x) < 26);
-    if (t) return { kind: 'tank', tank: t, text: `TEND THE ${(t.b.short || t.b.name).toUpperCase()} TANK` };
+    if (t) return { kind: 'tank', tank: t, text: AQ.t('station.tend', { tank: (t.b.short || t.b.name).toUpperCase() }) };
     return null;
   }
 
@@ -137,7 +138,7 @@ AQ.Station = (function () {
     });
     // signs
     const sign = (x, y, text, col) => { const w = F().width(text) + 6; g.fillStyle = '#16283a'; g.fillRect(x - w / 2, y - 2, w, 9); g.fillStyle = col; g.fillRect(x - w / 2, y - 2, w, 1); F().draw(g, text, x, y, col, { align: 'center', shadow: false }); };
-    (L.signs || []).forEach(([text, sx, fl, col]) => sign(sx, L.floors[fl] - (fl === 0 ? 66 : 72), text, col));
+    (L.signs || []).forEach(([id, sx, fl, col]) => sign(sx, L.floors[fl] - (fl === 0 ? 66 : 72), AQ.t(`sign.${id}`), col));
     // potted plants
     L.plants.forEach(([px, fl]) => {
       const fy = L.floors[fl];
@@ -219,7 +220,7 @@ AQ.Station = (function () {
       ctx.fillStyle = 'rgba(40,30,20,0.5)'; ctx.fillRect(ex - 1, ey - 2, 4, 3);
       ctx.fillStyle = '#fff0dc'; ctx.fillRect(ex, ey - 2, 2, 2); ctx.fillRect(ex, ey - 3, 1, 1);
     });
-    if (!tank.creatures.length && !(tank.eggs || []).length) F().draw(ctx, 'EMPTY', tk.x, iy + ih / 2 - 2, 'rgba(230,250,255,0.55)', { align: 'center', shadow: false });
+    if (!tank.creatures.length && !(tank.eggs || []).length) F().draw(ctx, AQ.t('station.empty'), tk.x, iy + ih / 2 - 2, 'rgba(230,250,255,0.55)', { align: 'center', shadow: false });
     ctx.fillStyle = 'rgba(220,245,255,0.12)'; ctx.fillRect(ix + 2, iy + 1, 6, ih - 2);       // glass sheen
     if (frame) AQ.Assets.draw(ctx, 'misc.tank_frame', 'idle', tk.x, tk.y, {});
     // name above, star pips on the plate
@@ -284,7 +285,7 @@ AQ.Station = (function () {
       drawPrompt(ctx, P, sx, sy, z);
     }
     if (St.mode === 'walk' && !AQ.Transition.active) {
-      const F = AQ.Font, txt = `${cfg.zoomKey.replace('Key', '')}: ${St.zoomedOut() ? 'FOLLOW ROBOT' : 'SEE ALL TANKS'}`;
+      const F = AQ.Font, txt = AQ.t(St.zoomedOut() ? 'station.followRobot' : 'station.seeAll', { key: AQ.Keys.name('stationView') });
       const helpOn = AQ.HUD.showHelp && AQ.HUD.helpT > 0;              // above the controls hint while it's showing
       ctx.globalAlpha = 0.75; F.draw(ctx, txt, 316, helpOn ? 158 : 172, '#cfe8ff', { align: 'right', shadow: 'rgba(4,12,24,0.85)' }); ctx.globalAlpha = 1;
     }
