@@ -55,6 +55,11 @@ AQ.Vibe = (function () {
   // Full evaluation of a tank. Returns { score (0..1), stars (0..5 in halves), parts, helps, missing }.
   V.evaluate = function (biomeId) {
     const tank = AQ.Collection.tank(biomeId), cfg = T(), w = cfg.weights;
+    // the Universal Nursery has no vibe: no stars, no stress, no unlocks (babies are simply looked after)
+    if (AQ.Nursery && AQ.Nursery.is(biomeId)) {
+      const n = (tank.creatures || []).length;
+      return { score: 0, stars: 0, nursery: true, parts: { fed: V.fedLevel(tank) }, helps: [], missing: [], stressed: 0, creatures: n, breeding: null };
+    }
     const b = AQ.Tanks.get(biomeId), short = (b && (b.short || b.name)) || biomeId;
     const decor = tank.decor || [], creatures = tank.creatures || [];
     const nonPlant = decor.filter((d) => d.type !== 'plant'), plants = decor.filter((d) => d.type === 'plant');
@@ -113,6 +118,7 @@ AQ.Vibe = (function () {
   // Remember a tank's best stars; returns decor that just got unlocked by it.
   V.recordBest = function (biomeId, stars) {
     const st = AQ.State;
+    if (AQ.Nursery && AQ.Nursery.is(biomeId)) return [];                // no milestones in the nursery
     st.tankBest = st.tankBest || {}; st.unlocks = st.unlocks || {};
     if (stars > (st.tankBest[biomeId] || 0)) { st.tankBest[biomeId] = stars; AQ.Save && AQ.Save.dirty(); }
     const best = st.tankBest[biomeId] || 0, fresh = [];

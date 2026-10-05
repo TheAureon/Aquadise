@@ -259,10 +259,26 @@ browsers won't let a page save pictures made from file:// images.
   *discovered* when you catch either sex and *complete* with both. Once you have one sex, the other
   spawns more often (`sexes.missingBias`).
 - **Breeding (optional).** A ♂ and ♀ of the same species living in one tank may court (they swim
-  together with hearts) when the tank has at least `breeding.minStars`, was fed recently, nobody
-  is nervous and there's room. Then an egg appears (a baby for mammals) and later hatches; babies
-  grow up over `breeding.growMinutes`. It all runs on real time, wherever you are in the game. The
-  log marks species you've bred with a ♥. Nothing requires it.
+  together with hearts) when the tank has at least `breeding.minStars`, was fed recently and nobody
+  is nervous. When the courtship finishes, the egg (a baby for mammals) appears in the **Universal
+  Nursery**, never in the parents' tank, with a little sparkle by the parents if you're watching
+  them; eggs hatch there and babies grow up over `breeding.growMinutes`. It all runs on real time,
+  wherever you are in the game. The log marks species you've bred with a ♥. Nothing requires it.
+  The parents' tank's star tooltip says when an egg is on its way or a baby is in the nursery.
+- **The Universal Nursery** (3rd floor, next to Starfall; NURSERY in the directory, the TANKS
+  overview, the whole-building view and Q/E). A soft, warm, pastel tank where babies of every species
+  and biome live together, predators included: babies never stress, scare or eat each other, so no
+  predator rules apply. Only bred babies can be in it, never caught adults. It has its own room
+  (`nursery.capacity`, 20, counting babies, grown babies and eggs; shown as ♥ n/20); when it's full,
+  breeding pauses everywhere and the parents' tooltip says "BREEDING PAUSED: THE NURSERY IS FULL,
+  GRADUATE SOME BABIES". The nursery has no vibe stars, stress or unlocks; feeding still works (just
+  for fun). Its four decorations (Shell Cradle, Bubble Mobile, Soft Sand Mound, Little Pebble Nest)
+  are free from the start. Older saves: babies still growing and eggs in any tank (or its storage)
+  move into the nursery when the save loads, keeping sex, colour and birth time; if it's full the
+  rest stay where they are (nothing is ever deleted). Code: `src/nursery.js`, `src/breeding.js`.
+  - Testing: set `debug.fastNursery: true` in config.js. Courting, hatching, growing up and the rest
+    after a birth then take seconds (`debug.fastNurserySeconds`), and a ready pair starts courting at
+    once. The usual requirements still apply (a ♂ and ♀ adult in a fed tank with enough stars).
 - **Day and night.** A new game starts in the bright mid-morning (10:00, `clock.startHour`); saves keep
   their own time. The sea has a calm clock (`clock.dayMinutes`, 6 real minutes per day by default)
   with dawn, day, dusk and night; nights are darker and bluer near the surface, while deep and cave

@@ -42,6 +42,7 @@ AQ.Tanks = (function () {
     return opts.find((t) => F.width(t) <= px) || opts[opts.length - 1];
   };
   T.isPredatorTank = (id) => { const d = T.get(id); return !!d && d.kind === 'predator'; };
+  T.isNursery = (id) => { const d = T.get(id); return !!d && !!d.nursery; };
   T.themesOf = (id) => { const d = T.get(id); return d ? d.themes : [id]; };
   T.forCreature = function (def) {
     if (!def) return null;
@@ -60,6 +61,7 @@ AQ.Tanks = (function () {
     let moved = 0;
     Object.keys(tanks).forEach((id) => {
       const t = tanks[id];
+      if (AQ.Nursery && AQ.Nursery.is(id)) return;               // babies stay in the nursery until they graduate
       ['creatures', 'storage'].forEach((list) => {
         for (let i = (t[list] || []).length - 1; i >= 0; i--) {
           const e = t[list][i], def = AQ.Creatures.defs[e.id] || AQ.data.creatures.find((d) => d.id === e.id);

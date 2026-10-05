@@ -136,6 +136,8 @@ AQ.TUNING = {
     showerKey: 'KeyJ',        //   J = a meteor shower starts right now (2-4 stars over the next ~20 seconds)
     tutorialReset: false,     // TESTING ONLY: true adds a key that restarts the guided dive and marks every tip unseen
     tutorialResetKey: 'KeyR', //   R = restart the guided dive + reset all tips
+    fastNursery: false,       // TESTING ONLY: true makes breeding take seconds instead of minutes (the numbers below),
+    fastNurserySeconds: { court: 5, egg: 6, grow: 25, cooldown: 4, check: 1 },   // so the whole nursery can be tried quickly
     forceTouch: false         // TESTING ONLY: true shows the touch controls and makes the mouse act as a finger
   },                          //   (drag in the stick zone = joystick, click the on-screen buttons), to try them on a PC
   // Touch controls (src/touch.js). Sizes are in screen pixels (CSS px), so they stay finger-sized on any
@@ -237,6 +239,11 @@ AQ.TUNING = {
     growMinutes: 30,          // real minutes for a baby to grow up
     variantChance: 0.04,      // chance a newborn is a rare colour variant (bred babies only, never wild)
     checkSeconds: 5           // how often all tanks are checked (cheap; runs anywhere in the game)
+  },
+
+  // The Universal Nursery (src/nursery.js): every bred egg and baby lives here until it grows up.
+  nursery: {
+    capacity: 20              // babies + grown babies waiting to graduate + eggs; when full, breeding pauses everywhere
   },
 
   sexes: {

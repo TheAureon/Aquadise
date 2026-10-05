@@ -8,7 +8,8 @@
 // particles: motes | snow (slow falling flakes) | embers (warm rising sparks) | fireflies | spores
 // lamp:      colour of the LED strip in the lid
 // glow:      optional soft colour glowing up from the middle of the tank (Starfall)
-// particles: ...also 'stars' (drifting, twinkling star motes)
+// particles: ...also 'stars' (drifting, twinkling star motes) and 'soft' (slow pastel bubbles, the Nursery)
+// windowGlow: optional warm glow around the tank's window in the building (the Nursery)
 var AQ = (typeof AQ !== 'undefined') ? AQ : {};
 AQ.data = AQ.data || {};
 
@@ -26,6 +27,7 @@ AQ.data.tankStyles = {
   ice:        { top: '#eefcff', deep: '#4f9ccc', shafts: 0.11, caustics: 0.32, particles: 'snow', lamp: '#ffffff' },
   lush_cave:  { top: '#5a7a6a', deep: '#141e2a', shafts: 0.03, caustics: 0.06, dark: 0.32, particles: 'fireflies', lamp: '#ffc0f0' },
   starfall:   { top: '#2c2a6e', deep: '#0a0a26', shafts: 0.02, caustics: 0.05, dark: 0.3, particles: 'stars', lamp: '#c8b8ff', glow: '#6f5fd8' },
+  nursery:    { top: '#ffe6ee', deep: '#a8c8e0', shafts: 0.09, caustics: 0.24, particles: 'soft', lamp: '#ffd8e8', glow: '#ffd0a8', windowGlow: '#ffd6b8' },
   // predator tanks (4th floor)
   pred_reef:  { top: '#9fe2e8', deep: '#1f5f8a', shafts: 0.07, caustics: 0.24, dark: 0.08, lamp: '#ffb0a0' },
   pred_open:  { top: '#7fc8ea', deep: '#0f3478', shafts: 0.09, caustics: 0.2, lamp: '#bfe0ff' },
@@ -60,7 +62,10 @@ AQ.data.predatorTanks = [
 ];
 
 // Tanks that aren't a sea biome. Same fields as a predator tank (palette = sand/rock colours).
+// nursery: true marks the Universal Nursery (src/nursery.js): every bred egg and baby goes there.
 AQ.data.specialTanks = [
+  { id: 'nursery', nursery: true, tiny: 'NURSERY', name: 'Universal Nursery', short: 'Nursery', themes: ['nursery'], theme: 'nursery', water: '#e8b8c8',
+    palette: { top: ['#f8ead0', '#eedcbc', '#e0caa4'], rock: ['#e8ccd8', '#d4b4c4', '#c09cb0'] } },
   { id: 'starfall', tiny: 'STARFALL', name: 'Starfall', short: 'Starfall', themes: ['starfall'], theme: 'starfall', water: '#1c1650',
     palette: { top: ['#5a5480', '#4a4470', '#3a3660'], rock: ['#3a3458', '#2e2a48', '#24203a'] } }
 ];

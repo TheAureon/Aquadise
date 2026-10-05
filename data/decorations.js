@@ -110,6 +110,11 @@ AQ.data.decorations = [
   { id: 'reed_clump', name: 'Reed Clump', kind: 'floor', sprite_size: 'medium', color: '#7d8f3c', accent: '#c8b070', art: { shape: 'tuft' }, tags: ['plant', 'roots'], biomes: ['pred_swamp'], unlock: { tank: 'pred_swamp', tier: 2 } },
   { id: 'swamp_lantern', name: 'Swamp Lantern', kind: 'floor', sprite_size: 'small', color: '#5a4a3a', accent: '#ffd890', art: { shape: 'lantern', metal: '#4a3a2a' }, tags: ['light'], glow: '#ffd890', biomes: ['pred_swamp'], unlock: { tank: 'pred_swamp', tier: 3 } },
   // Starfall tank: one free piece, three that unlock at its tiers
+  // ---- Universal Nursery (all free from the start)
+  { id: 'shell_cradle', name: 'Shell Cradle', kind: 'floor', sprite_size: 'small', color: '#ffd8e0', accent: '#fff4e8', art: { shape: 'shellcradle' }, tags: ['shell', 'hideout'], biomes: ['nursery'] },
+  { id: 'bubble_mobile', name: 'Bubble Mobile', kind: 'float', hang: 20, sprite_size: 'medium', color: '#c8b8e8', accent: '#bfeaff', art: { shape: 'bubblemobile' }, tags: ['bubbles', 'light'], glow: '#ffe0f0', biomes: ['nursery'] },
+  { id: 'soft_sand_mound', name: 'Soft Sand Mound', kind: 'floor', sprite_size: 'wide', color: '#f4e2c4', accent: '#ffc8d8', art: { shape: 'sandmound' }, tags: ['perch'], biomes: ['nursery'] },
+  { id: 'pebble_nest', name: 'Little Pebble Nest', kind: 'floor', sprite_size: 'small', color: '#cdbfb4', accent: '#ffe8a8', art: { shape: 'pebblenest' }, tags: ['rock', 'hideout'], biomes: ['nursery'] },
   { id: 'stardust_patch', name: 'Stardust Patch', kind: 'floor', sprite_size: 'small', color: '#3a3460', accent: '#fff3b0', art: { shape: 'stardust' }, tags: ['stardust'], glow: '#d8d0ff', biomes: ['starfall'] },
   { id: 'meteorite_rock', name: 'Meteorite Rock', kind: 'floor', sprite_size: 'medium', color: '#4a4650', accent: '#ff9a5a', art: { shape: 'meteorite' }, tags: ['meteorite', 'rock', 'perch'], glow: '#ffb070', biomes: ['starfall'], unlock: { tank: 'starfall', tier: 1 } },
   { id: 'crater_bowl', name: 'Crater Bowl', kind: 'floor', sprite_size: 'wide', color: '#5a5668', accent: '#b8b0d8', art: { shape: 'crater' }, tags: ['meteorite', 'hideout', 'rock'], biomes: ['starfall'], unlock: { tank: 'starfall', tier: 2 } },

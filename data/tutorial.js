@@ -94,8 +94,9 @@ AQ.data.tutorial = {
     { title: 'Sexes, breeding and rare colors', icon: 'ui:3', needs: 'Breeding', lines: [
       'Most animals are ♂ or ♀; the log shows which ones you have caught.',
       'A ♂ and a ♀ in a happy ({c:breeding.minStars}+ stars), fed tank may court.',
-      'Then an egg or a baby arrives (mammals have live babies).',
-      'Babies grow up in about {c:breeding.growMinutes} minutes.',
+      'Their egg or baby (mammals have live babies) goes to the UNIVERSAL NURSERY on the 3rd floor, never their own tank.',
+      'Babies of every kind share the nursery and grow up in about {c:breeding.growMinutes} minutes.',
+      'It holds {c:nursery.capacity}. When it is full, breeding pauses until there is room.',
       'About 1 in {inv:breeding.variantChance} babies is a rare color (✦). It\'s all just for fun.'] },
     { title: 'The log', icon: 'ui:4', lines: [
       '{k:log} opens your collection log.',
@@ -176,11 +177,11 @@ AQ.data.tutorial = {
       'A pair is courting! Keep their tank happy and fed,',
       'and an egg or a baby will follow.'] },
     { id: 'baby', on: ['baby'], where: 'any', needs: 'Breeding', known: ['bred'], icon: 'ui:3', lines: [
-      'A baby! It grows up over time.',
-      'Now and then one is born a rare color (✦).'] },
+      'A baby! It went to the NURSERY (3rd floor),',
+      'where it grows up. Now and then one is a rare color (✦).'] },
     { id: 'flashing', on: ['flash'], where: 'any', icon: 'ui:6', lines: [
       'Bright flashes or blinking lights bothering you?',
-      'Turn on REDUCE FLASHING in Pause > SOUND (or on the title).'] },
+      'Turn on REDUCE FLASHING in Pause > SETTINGS > OPTIONS.'] },
     { id: 'bumped', on: ['bumped'], where: 'play', known: ['bumped'], icon: 'ui:0', lines: [
       'Just a bump! Nothing in the sea can hurt you.',
       'Some creatures only nudge you back a little.'] }

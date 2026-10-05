@@ -4,10 +4,12 @@
 // fresh; src/savefile.js shows the choice). If the browser blocks storage the game keeps running unsaved
 // and says so (export still works). Files (export / import) live in src/savefile.js.
 // Format: { game: 'aquadise', v: VERSION, savedAt, state, scene, player }. v1 saves (no `game`) still load.
+// v3: the Universal Nursery (src/nursery.js). Older saves load the same way; on loading, babies still
+// growing and eggs in any tank move into the nursery (AQ.Nursery.migrate, safe to run on every load).
 var AQ = (typeof AQ !== 'undefined') ? AQ : {};
 
 AQ.Save = (function () {
-  const S = { t: 0, isDirty: false, VERSION: 2, blocked: false, failed: false, status: 'none', backup: null };
+  const S = { t: 0, isDirty: false, VERSION: 3, blocked: false, failed: false, status: 'none', backup: null };
   const key = () => AQ.TUNING.save.key;
   const backupKey = () => key() + '.backup';
   const ls = () => { try { return window.localStorage; } catch (e) { return null; } };   // access itself can throw (blocked storage)
@@ -77,6 +79,7 @@ AQ.Save = (function () {
     if (st.tutorial && st.tutorial.seen) AQ.State.tutorial = st.tutorial;
     else { AQ.State.tutorial = { seen: {}, diveAsked: true }; if (AQ.Tips) AQ.Tips.inferFromProgress(); }
     if (AQ.Sex) AQ.Sex.migrate();              // older saves: give caught creatures a sex, fill ♂/♀ log slots
+    if (AQ.Nursery) AQ.Nursery.migrate();      // older saves: babies + eggs move into the Universal Nursery (if there's room)
     // where you were: scene + spot (older saves have no scene -> the sea world). Validated against
     // that scene's map at boot (AQ.Scenes.restore), which falls back to a safe spot if needed.
     game.scene = (data.scene && AQ.Scenes.list[data.scene]) ? data.scene : 'world';

@@ -134,6 +134,18 @@ listed here because their placeholder shapes are new.
 
 The creatures glow in the sea (`light` in `data/creatures.js`), so keep their bright parts bright.
 
+## Universal Nursery decorations
+
+Soft, warm pastels (pink, cream, lilac, pale blue) with gentle outlines: the nursery's water is a
+light pink-to-blue gradient, so keep a dark-enough outline for them to read against it.
+
+| key | size class | placeholder | notes |
+|---|---|---|---|
+| `decor.shell_cradle` | small (16 × 16) | `shellcradle` | an open pink scallop shell lined with something soft and cream |
+| `decor.bubble_mobile` | medium (24 × 24) | `bubblemobile` | floats: a little hanging mobile, a string from the top and three bubble charms (pink, pale blue, pink) dangling below. It hangs from the water's surface (`hang` in data/decorations.js) |
+| `decor.soft_sand_mound` | wide (32 × 16) | `sandmound` | a low, round mound of pale sand with a few pastel specks |
+| `decor.pebble_nest` | small (16 × 16) | `pebblenest` | a ring of round grey-pink pebbles around a soft yellow hollow |
+
 ## Tutorial UI
 
 | key | frame | frames | anchor | notes |

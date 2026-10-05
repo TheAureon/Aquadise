@@ -13059,6 +13059,94 @@ AQ.manifest = {
     15
    ]
   },
+  "decor.shell_cradle": {
+   "file": "sprites/decor/shell_cradle.png",
+   "fw": 16,
+   "fh": 16,
+   "anchor": [
+    8,
+    15
+   ],
+   "anims": {
+    "idle": {
+     "row": 0,
+     "frames": 1,
+     "fps": 1
+    }
+   },
+   "vis": [
+    1,
+    4,
+    14,
+    15
+   ]
+  },
+  "decor.bubble_mobile": {
+   "file": "sprites/decor/bubble_mobile.png",
+   "fw": 24,
+   "fh": 24,
+   "anchor": [
+    12,
+    23
+   ],
+   "anims": {
+    "idle": {
+     "row": 0,
+     "frames": 1,
+     "fps": 1
+    }
+   },
+   "vis": [
+    1,
+    1,
+    22,
+    17
+   ]
+  },
+  "decor.soft_sand_mound": {
+   "file": "sprites/decor/soft_sand_mound.png",
+   "fw": 32,
+   "fh": 16,
+   "anchor": [
+    16,
+    15
+   ],
+   "anims": {
+    "idle": {
+     "row": 0,
+     "frames": 1,
+     "fps": 1
+    }
+   },
+   "vis": [
+    1,
+    8,
+    30,
+    15
+   ]
+  },
+  "decor.pebble_nest": {
+   "file": "sprites/decor/pebble_nest.png",
+   "fw": 16,
+   "fh": 16,
+   "anchor": [
+    8,
+    15
+   ],
+   "anims": {
+    "idle": {
+     "row": 0,
+     "frames": 1,
+     "fps": 1
+    }
+   },
+   "vis": [
+    1,
+    9,
+    15,
+    15
+   ]
+  },
   "decor.stardust_patch": {
    "file": "sprites/decor/stardust_patch.png",
    "fw": 16,

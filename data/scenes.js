@@ -20,7 +20,7 @@ AQ.data.station = {
     { floor: 0, x: 352, tank: 'open_ocean' }, { floor: 0, x: 424, tank: 'vents' },
     { floor: 1, x: 180, tank: 'trench' }, { floor: 1, x: 280, tank: 'kelp' }, { floor: 1, x: 380, tank: 'mangrove' },
     { floor: 1, x: 480, tank: 'cave' }, { floor: 1, x: 580, tank: 'ice' },
-    { floor: 2, x: 180, tank: 'lush_cave' }, { floor: 2, x: 280, tank: 'starfall' }, { floor: 2, x: 380, tank: null },
+    { floor: 2, x: 180, tank: 'lush_cave' }, { floor: 2, x: 280, tank: 'starfall' }, { floor: 2, x: 380, tank: 'nursery' },
     { floor: 2, x: 480, tank: null }, { floor: 2, x: 580, tank: null },
     { floor: 3, x: 180, tank: 'pred_reef' }, { floor: 3, x: 280, tank: 'pred_open' }, { floor: 3, x: 380, tank: 'pred_deep' },
     { floor: 3, x: 480, tank: 'pred_cave' }, { floor: 3, x: 580, tank: 'pred_swamp' }

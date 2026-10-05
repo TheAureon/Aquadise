@@ -187,11 +187,17 @@ AQ.Station = (function () {
       if (frame) { ctx.globalAlpha = 0.6; AQ.Assets.draw(ctx, 'misc.tank_frame', 'idle', tk.x, tk.y, {}); ctx.globalAlpha = 1; }
       return;
     }
-    const tank = AQ.Collection.tank(b.id);
+    const tank = AQ.Collection.tank(b.id), st = AQ.Aquarium.styleOf(b.id);
+    // a calm, warm glow around a tank's window (the Nursery), so it's easy to spot from the walkway
+    if (st.windowGlow) {
+      const c = AQ.U.hex(st.windowGlow), a = AQ.U.calm() ? 0.22 : 0.2 + 0.04 * Math.sin(t * 0.9);
+      const rg = ctx.createRadialGradient(tk.x, iy + ih / 2, 4, tk.x, iy + ih / 2, fw * 0.75);
+      rg.addColorStop(0, `rgba(${c[0]},${c[1]},${c[2]},${a.toFixed(3)})`); rg.addColorStop(1, `rgba(${c[0]},${c[1]},${c[2]},0)`);
+      ctx.fillStyle = rg; ctx.fillRect(tk.x - fw, y0 - 14, fw * 2, fh + 24);
+    }
     // the tank's own water + backdrop, cropped to the window
     const bd = AQ.Aquarium.backdropOf(b), sw = Math.round(bd.height * iw / ih);
     ctx.drawImage(bd, Math.round((bd.width - sw) / 2), 0, sw, bd.height, ix, iy, iw, ih);
-    const st = AQ.Aquarium.styleOf(b.id);
     if (st.dark) { ctx.fillStyle = `rgba(2,6,16,${st.dark * 0.6})`; ctx.fillRect(ix, iy, iw, ih); }
     // its creatures, drifting about
     tank.creatures.slice(0, 7).forEach((e, k) => {
@@ -208,13 +214,19 @@ AQ.Station = (function () {
       AQ.Assets.draw(ctx, key, 'idle', 0, 0, { t: t + k, flip: facing < 0 });
       ctx.restore();
     });
-    if (!tank.creatures.length) F().draw(ctx, 'EMPTY', tk.x, iy + ih / 2 - 2, 'rgba(230,250,255,0.55)', { align: 'center', shadow: false });
+    (tank.eggs || []).slice(0, 5).forEach((egg, k) => {                    // eggs resting on the sand
+      const ex = Math.round(ix + 8 + k * 9), ey = iy + ih - 4;
+      ctx.fillStyle = 'rgba(40,30,20,0.5)'; ctx.fillRect(ex - 1, ey - 2, 4, 3);
+      ctx.fillStyle = '#fff0dc'; ctx.fillRect(ex, ey - 2, 2, 2); ctx.fillRect(ex, ey - 3, 1, 1);
+    });
+    if (!tank.creatures.length && !(tank.eggs || []).length) F().draw(ctx, 'EMPTY', tk.x, iy + ih / 2 - 2, 'rgba(230,250,255,0.55)', { align: 'center', shadow: false });
     ctx.fillStyle = 'rgba(220,245,255,0.12)'; ctx.fillRect(ix + 2, iy + 1, 6, ih - 2);       // glass sheen
     if (frame) AQ.Assets.draw(ctx, 'misc.tank_frame', 'idle', tk.x, tk.y, {});
     // name above, star pips on the plate
     if (!noLabels) F().draw(ctx, (b.short || b.name).toUpperCase(), tk.x, y0 - 7, '#e8fbff', { align: 'center', shadow: 'rgba(4,12,24,0.8)' });
     if (!tk.v || t - tk.vT > 1) { tk.v = AQ.Vibe.evaluate(b.id); tk.vT = t; }   // refreshed once a second
     const v = tk.v;
+    if (v.nursery) { F().draw(ctx, `♥ ${AQ.Nursery.occupancy()}/${AQ.Nursery.capacity()}`, tk.x, tk.y - 6, AQ.Nursery.full() ? '#ffcf8a' : '#ffd8e8', { align: 'center', shadow: false }); return; }   // no stars: how full it is
     for (let i = 0; i < 5; i++) { ctx.fillStyle = v.stars >= i + 1 ? '#ffd25a' : v.stars >= i + 0.5 ? '#c8a050' : '#3a4a5a'; ctx.fillRect(tk.x - 10 + i * 4, tk.y - 4, 3, 2); }
   }
 
