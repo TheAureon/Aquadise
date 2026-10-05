@@ -1337,6 +1337,15 @@
     else p.tri([11, c], [5, 3], [5, 12], Wh);                                                                // right
     p.outline(0.35);
   };
+  // the nursery: a tiny graduation cap (8 x 8, 2 frames: the tassel swings) over grown babies
+  S.uigradcap = function (p, o) {
+    const ink = [40, 34, 60, 255], top = hex('#3a3458'), hi = hex('#5a5488'), gold = hex('#ffd25a');
+    p.tri([0, 3], [4, 1], [8, 3], top); p.tri([0, 3], [4, 5], [8, 3], top);      // the flat board
+    p.rect(3, 1, 2, 1, hi);
+    p.rect(2, 4, 4, 2, ink);                                                    // the cap under it
+    if (o.frame === 0) { p.rect(6, 3, 1, 3, gold); p.set(6, 6, gold); } else { p.rect(7, 3, 1, 3, gold); p.set(7, 6, gold); }   // the tassel
+    p.outline(0.25);
+  };
   S.uistick = function (p, o) {
     const c = 15.5;
     if (o.frame === 0) {

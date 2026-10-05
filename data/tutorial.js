@@ -92,12 +92,13 @@ AQ.data.tutorial = {
       'The stars show the tank\'s vibe: hover them to see what helps.',
       'New star levels unlock new themed decorations.'] },
     { title: 'Sexes, breeding and rare colors', icon: 'ui:3', needs: 'Breeding', lines: [
-      'Most animals are ♂ or ♀; the log shows which ones you have caught.',
-      'A ♂ and a ♀ in a happy ({c:breeding.minStars}+ stars), fed tank may court.',
-      'Their egg or baby (mammals have live babies) goes to the UNIVERSAL NURSERY on the 3rd floor, never their own tank.',
-      'Babies of every kind share the nursery and grow up in about {c:breeding.growMinutes} minutes.',
-      'It holds {c:nursery.capacity}. When it is full, breeding pauses until there is room.',
-      'About 1 in {inv:breeding.variantChance} babies is a rare color (✦). It\'s all just for fun.'] },
+      'Most animals are ♂ or ♀ (the log shows which).',
+      'A ♂ and a ♀ in a fed tank with {c:breeding.minStars}+ stars may court.',
+      'Their egg or baby goes to the NURSERY (3rd floor).',
+      'Every kind grows up there, in about {c:breeding.growMinutes} min.',
+      'It holds {c:nursery.capacity}; when full, breeding pauses.',
+      'Grown babies wear a cap: GRADUATE sends one to its own tank\'s storage.',
+      'About 1 in {inv:breeding.variantChance} babies is a rare color (✦).'] },
     { title: 'The log', icon: 'ui:4', lines: [
       '{k:log} opens your collection log.',
       'SPECIES: every species by biome, with a hint for each.',
@@ -177,8 +178,13 @@ AQ.data.tutorial = {
       'A pair is courting! Keep their tank happy and fed,',
       'and an egg or a baby will follow.'] },
     { id: 'baby', on: ['baby'], where: 'any', needs: 'Breeding', known: ['bred'], icon: 'ui:3', lines: [
-      'A baby! It went to the NURSERY (3rd floor),',
-      'where it grows up. Now and then one is a rare color (✦).'] },
+      'A baby! Babies go to the NURSERY (3rd floor),',
+      'where every kind grows up together. Once grown,',
+      'it GRADUATES to its own tank. Some are a rare color (✦).'] },
+    { id: 'nursery', on: ['nursery'], where: 'tank', needs: 'Nursery', known: ['graduated'], icon: 'ui:3', lines: [
+      'The nursery! Babies grow up here, and a grown one wears a little cap.',
+      'Press GRADUATE on its card (or under it in the FISH tray) to send it',
+      'to its own tank\'s storage. GRADUATE ALL sends every grown baby.'] },
     { id: 'flashing', on: ['flash'], where: 'any', icon: 'ui:6', lines: [
       'Bright flashes or blinking lights bothering you?',
       'Turn on REDUCE FLASHING in Pause > SETTINGS > OPTIONS.'] },

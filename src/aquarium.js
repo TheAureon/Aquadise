@@ -8,7 +8,7 @@ AQ.Aquarium = (function () {
     photo: { on: false, paused: false, icons: true, frame: null, caption: false, flash: 0, preview: null, previewT: 0, ui: [] } };
   const TANK = { x: 4, y: 16, w: 312, h: 130, waterTop: 22, sandTop: 126, bottom: 145 };
   const SIZE_RANK = { tiny: 0, small: 1, medium: 2, mediumlong: 2, wide: 2, tall: 2, large: 3, widelarge: 3, huge: 4 };
-  const TRAY_Y = 149, CELL = 26;
+  const TRAY_Y = 149, CELL = 26, NCELL = 36;     // NCELL: the nursery's FISH tray (room for a GRADUATE button)
 
   const styleOf = (id) => Object.assign({}, AQ.data.tankStyles.default, AQ.data.tankStyles[id] || {});
   const defOf = (id) => AQ.Creatures.defs[id] || AQ.data.creatures.find((d) => d.id === id);
@@ -440,16 +440,32 @@ AQ.Aquarium = (function () {
       let x = 160 - (bar.reduce((a, b) => a + b[2] + 3, 0) - 3) / 2;
       bar.forEach(([id, label, w]) => { ui.push({ id, label, x: Math.round(x), y: TANK.y + 2, w, h: 10, warn: id === 'h_remove' }); x += w + 3; });
     }
-    const items = trayItems();
-    const perPage = Math.floor((308 - 50) / CELL);
+    // the nursery: GRADUATE ALL sits on the sand, bottom right; the open card has its own GRADUATE
+    if (inNursery()) {
+      const grown = AQ.Nursery.grown().length;
+      ui.push({ id: 'grad_all', x: TANK.x + TANK.w - 66, y: TANK.bottom - 13, w: 62, h: 10, label: 'GRADUATE ALL', off: !grown, count: grown });
+      const cf = A.card && A.fish.find((f) => f.uid === A.card);
+      if (cf) { const c = cardBox(cf); ui.push(gradButton(cf.entry, c.x + c.w - 58, c.y + c.h - 13, 54, 'grad_card')); }
+    }
+    const items = trayItems(), cell = A.tray === 'fish' && inNursery() ? NCELL : CELL;
+    const perPage = Math.floor((308 - 50) / cell);
     A.trayScroll = U.clamp(A.trayScroll, 0, Math.max(0, items.length - perPage));
     // the tray slides: items sit at their place minus the eased scroll, clipped to the strip
-    const off = Math.round(A.trayPos * CELL), clip = { x0: 50, x1: 50 + perPage * CELL - 2 };
+    const off = Math.round(A.trayPos * cell), clip = { x0: 50, x1: 50 + perPage * cell - 2 };
     items.forEach((it, i) => {
-      const x = 50 + i * CELL - off;
-      if (x + CELL - 2 > clip.x0 && x < clip.x1) ui.push(Object.assign({ x, y: TRAY_Y, w: CELL - 2, h: 29, clipX: clip }, it));
+      const x = 50 + i * cell - off;
+      if (!(x + cell - 2 > clip.x0 && x < clip.x1)) return;
+      if (it.where === 'nursery') {             // a baby: its picture (opens its card) above its own GRADUATE button
+        ui.push(Object.assign({ x, y: TRAY_Y, w: cell - 2, h: 19, clipX: clip }, it));
+        ui.push(Object.assign(gradButton(it.entry, x, TRAY_Y + 20, cell - 2, 'grad'), { clipX: clip }));
+      } else ui.push(Object.assign({ x, y: TRAY_Y, w: cell - 2, h: 29, clipX: clip }, it));
     });
     return ui;
+  }
+  // a GRADUATE button for one baby: greyed out with the time left while it's still growing
+  function gradButton(e, x, y, w, id) {
+    const grown = !AQ.Breeding.isJuvenile(e);
+    return { id, uid: e.uid, x, y, w, h: id === 'grad' ? 9 : 10, label: grown ? 'GRADUATE' : AQ.Breeding.growLeftText(e), off: !grown };
   }
   function trayItems() {
     const out = [];
@@ -478,7 +494,7 @@ AQ.Aquarium = (function () {
       const nm = (e) => (e.variant ? '✦ ' : '') + defOf(e.id).name + sx(e);
       const key = (e) => (AQ.Breeding.isJuvenile(e) && AQ.Sex.babyKey(defOf(e.id), e.variant)) || AQ.Sex.spriteKey(defOf(e.id), e.sex, e.variant);
       if (inNursery()) {                           // the nursery: every baby, and how it's growing (no storage here)
-        tank.creatures.forEach((e) => out.push({ id: 'fish', where: 'nursery', uid: e.uid, ref: e.id, sex: e.sex, variant: e.variant, key: key(e), name: nm(e), grown: !AQ.Breeding.isJuvenile(e) }));
+        tank.creatures.forEach((e) => out.push({ id: 'fish', where: 'nursery', uid: e.uid, ref: e.id, sex: e.sex, variant: e.variant, key: key(e), name: nm(e), grown: !AQ.Breeding.isJuvenile(e), entry: e }));
         return out;
       }
       tank.creatures.forEach((e) => out.push({ id: 'fish', where: 'tank', uid: e.uid, ref: e.id, sex: e.sex, variant: e.variant, key: AQ.Sex.spriteKey(defOf(e.id), e.sex, e.variant), name: nm(e) }));
@@ -505,6 +521,7 @@ AQ.Aquarium = (function () {
     if (AQ.Keys.pressed('tanks')) { openOverview(); return; }
     if (I.wasPressed(AQ.TUNING.photo.key)) { enterPhoto(); return; }
     A.ui = layout();
+    if (inNursery() && AQ.Tips) AQ.Tips.event('nursery');   // first time in the nursery: how GRADUATE works
     if (I.wasPressed('Escape') && A.card && !A.holding) A.card = null;
     else if (I.wasPressed('Tab') || (I.wasPressed('Escape') && !A.holding)) { A.close(game); return; }
     if (AQ.Keys.pressed('log')) { AQ.LogUI.open(game, 'aquarium'); return; }
@@ -659,6 +676,8 @@ AQ.Aquarium = (function () {
         A.holding = { kind: r.kind, id: r.ref, key: r.key };
         A.drag = { x: AQ.Input.mouse.x, y: AQ.Input.mouse.y };          // drag it straight into the tank, or click then click
         break;
+      case 'grad': case 'grad_card': graduateOne(r.uid); break;
+      case 'grad_all': graduateAll(); break;
       case 'fish': {
         if (r.where === 'nursery') { A.card = r.uid; AQ.Audio.play('menu_move'); break; }   // babies stay in the nursery: show its card
         const from = r.where === 'tank' ? tank.creatures : tank.storage, to = r.where === 'tank' ? tank.storage : tank.creatures;
@@ -669,6 +688,48 @@ AQ.Aquarium = (function () {
         break;
       }
     }
+  }
+
+  // ---------------------------------------------------------------- the nursery: graduating
+  const babyName = (e) => { const d = defOf(e.id); return (e.variant ? 'rare-coloured ' : '') + (d ? d.name : e.id); };
+  const Cap = (s) => s.charAt(0).toUpperCase() + s.slice(1);
+  function gradFx(e) {
+    const f = A.fish.find((x) => x.uid === e.uid);
+    if (f) { for (let i = 0; i < 6; i++) AQ.FX.sparkle(f.x + R.range(-4, 4), f.y - f.r + R.range(-3, 3), i % 2 ? '#ffe9a8' : '#ffb0d0', 5); AQ.FX.text(f.x, f.y - f.r - 4, '♥', '#ff9fc0'); }
+  }
+  function whyKept(r) {
+    const N = AQ.Nursery, nm = Cap(babyName(r.entry));
+    if (r.why === 'growing') return `${nm} is still growing: ${AQ.Breeding.growLeftText(r.entry)} to go.`;
+    if (r.why === 'storagefull') return `The ${N.homeName(r.home)} tank's storage is full, so ${nm} stays in the nursery for now.`;
+    return `${nm} has no home tank yet, so it stays in the nursery.`;
+  }
+  function graduateOne(uid) {
+    const N = AQ.Nursery, e = AQ.Collection.tank(A.biome).creatures.find((x) => x.uid === uid);
+    if (!e) return;
+    if (AQ.Breeding.isJuvenile(e)) { note(whyKept({ why: 'growing', entry: e }), '#ffcf8a'); return; }
+    gradFx(e);
+    const r = N.graduate(uid);
+    if (!r.ok) { note(whyKept(r), '#ffcf8a', 5); return; }
+    AQ.Audio.play('graduate');
+    note(`${Cap(babyName(e))} graduated! It's waiting in the ${N.homeName(r.home)} tank's storage.`, '#ffd8e8', 5);
+    if (A.card === uid) A.card = null;
+    A.rebuild();
+  }
+  function graduateAll() {
+    const N = AQ.Nursery;
+    if (!N.grown().length) { note('Nobody is grown up yet. Babies graduate once they\'re grown.', '#cfe8ff'); return; }
+    N.grown().forEach(gradFx);
+    const res = N.graduateAll(), where = {};
+    res.moved.forEach((r) => { const k = N.homeName(r.home); where[k] = (where[k] || 0) + 1; });
+    const parts = Object.entries(where).map(([k, n]) => `${n} to ${k}`), n = res.moved.length;
+    if (n) {
+      AQ.Audio.play('graduate');
+      note(`${n} ${n === 1 ? 'baby' : 'babies'} graduated: ${parts.slice(0, 3).join(', ')}${parts.length > 3 ? ` and ${parts.length - 3} more tanks` : ''}.`, '#ffd8e8', 6);
+      note('They\'re waiting in those tanks\' storage.', '#ffd8e8', 6);
+    }
+    if (res.kept.length) note(res.kept.length === 1 ? whyKept(res.kept[0]) : `${res.kept.length} stayed in the nursery: their tanks' storage is full.`, '#ffcf8a', 6);
+    A.card = null;
+    A.rebuild();
   }
 
   function decorAt(tank, m) {
@@ -792,8 +853,13 @@ AQ.Aquarium = (function () {
   }
   function note(text, color = '#ffffff', life = 3) {
     A.notes = A.notes || [];
-    A.notes.push({ text: text.toUpperCase(), color, t: 0, life });
-    if (A.notes.length > 2) A.notes.shift();
+    // a long message wraps onto a second line (the notes stack under each other)
+    const words = text.toUpperCase().split(' '), lines = [];
+    let cur = '';
+    for (const w of words) { const t = cur ? cur + ' ' + w : w; if (cur && F().width(t) > 290) { lines.push(cur); cur = w; } else cur = t; }
+    if (cur) lines.push(cur);
+    lines.forEach((l) => A.notes.push({ text: l, color, t: 0, life }));
+    while (A.notes.length > 3) A.notes.shift();
   }
   A.note = note;
 
@@ -855,6 +921,7 @@ AQ.Aquarium = (function () {
         const chompX = f.chomp > 0 && Math.sin(f.chomp * 40) > 0 ? f.facing : 0;
         AQ.Assets.draw(g, f.key, moving && !asleep ? 'move' : 'idle', f.x + (f.shake && f.stress ? 1 : 0) + chompX, f.y - (f.peck || 0) - Math.round(f.hop || 0), { t: asleep ? f.t * 0.25 : f.t, flip: f.facing < 0, alpha: f.stress ? 0.8 : 1 });
         if (icons) moodIcon(g, f);
+        if (icons && !f.juv && f.entry.bornAt && inNursery()) AQ.Assets.draw(g, 'ui.gradcap', 'idle', f.x - 4, f.y - f.r - 5 - (f.hop || 0), { t: A.t });   // grown: ready to graduate
         if (A.card === f.uid && !A.photo.on) selectMark(g, f);
         if (icons && (f.state === 'sleep' || (f.state === 'rest' && (f.def.category === 'mammal' || f.def.category === 'reptile'))) && !f.stress) F().draw(g, 'z', f.x + 4, f.y - f.r - 6 - Math.round((A.t * 4) % 4), '#e8f4ff');
       }
@@ -911,7 +978,8 @@ AQ.Aquarium = (function () {
     // hover tooltip on creatures
     if (!A.holding && inTank(m)) {
       const f = fishAt(m);
-      if (f && A.card !== f.uid) tip(g, `${f.variant ? '✦ ' : ''}${f.def.name}${f.sex ? ' ' + AQ.Sex.SYMBOL[f.sex] : ''} - ${f.moodName || 'CONTENT'}${f.near ? ' (LOVES THE ' + f.near.tag.replace(/_/g, ' ').toUpperCase() + ')' : ''}`, m.x, m.y - 10, f.moodCol || '#fff');
+      if (f && A.card !== f.uid && inNursery() && f.entry.bornAt) tip(g, `${f.variant ? '✦ ' : ''}${f.def.name}${f.sex ? ' ' + AQ.Sex.SYMBOL[f.sex] : ''} - ${f.juv ? 'GROWS UP IN ' + AQ.Breeding.growLeftText(f.entry) : 'GROWN UP! READY TO GRADUATE'}`, m.x, m.y - 10, f.juv ? '#ffd8e8' : '#ffe9a8');
+      else if (f && A.card !== f.uid) tip(g, `${f.variant ? '✦ ' : ''}${f.def.name}${f.sex ? ' ' + AQ.Sex.SYMBOL[f.sex] : ''} - ${f.moodName || 'CONTENT'}${f.near ? ' (LOVES THE ' + f.near.tag.replace(/_/g, ' ').toUpperCase() + ')' : ''}`, m.x, m.y - 10, f.moodCol || '#fff');
     }
 
     const cf = A.card && A.fish.find((f) => f.uid === A.card);
@@ -1108,8 +1176,10 @@ AQ.Aquarium = (function () {
     }
     return '';
   }
+  // the info card's place: the side of the tank away from the creature (taller in the nursery: GRADUATE)
+  function cardBox(f) { const w = 168, h = inNursery() && f.entry.bornAt ? 72 : 58; return { x: f.x < 160 ? TANK.x + TANK.w - w - 6 : TANK.x + 6, y: TANK.waterTop + 4, w, h }; }
   function drawCard(g, f) {
-    const W = 168, H = 58, x = f.x < 160 ? TANK.x + TANK.w - W - 6 : TANK.x + 6, y = TANK.waterTop + 4;
+    const box = cardBox(f), W = box.w, H = box.h, x = box.x, y = box.y;
     const tank = AQ.Collection.tank(A.biome), likes = f.def.likes || [];
     const have = new Set(); tank.decor.forEach((d) => AQ.Vibe.tagsOf(d).forEach((t) => have.add(t)));
     g.fillStyle = 'rgba(6,18,34,0.92)'; g.fillRect(x, y, W, H);
@@ -1146,6 +1216,13 @@ AQ.Aquarium = (function () {
     F().draw(g, activity(f), x + 4, y + 43, f.state === 'court' ? '#ffb0d0' : '#e8fbff', { shadow: false });
     const missing = likes.filter((l) => !have.has(l));
     F().draw(g, missing.length ? 'WOULD LOVE SOME ' + TAGWORD(missing[0]) : (f.stress ? 'THE TANK FEELS A BIT CROWDED' : 'HAS EVERYTHING IT LIKES'), x + 4, y + 50, missing.length || f.stress ? '#ffcf8a' : '#8ff0b0', { shadow: false });
+    if (H > 58) {                                   // the nursery: where it goes when it graduates (the button is in A.ui)
+      const home = AQ.Nursery.homeOf(f.entry);
+      F().draw(g, f.juv ? 'GROWING UP...' : 'GROWN UP!', x + 4, y + 59, f.juv ? '#ffd8e8' : '#ffe9a8', { shadow: false });
+      F().draw(g, `HOME: ${(AQ.Nursery.homeName(home) || '').toUpperCase()} TANK`, x + 4, y + 65, '#8fb6cc', { shadow: false });
+      const b = A.ui.find((r) => r.id === 'grad_card');
+      if (b) button(g, b, A.hover === b);
+    }
   }
 
   // Glanceable mood: a tiny icon pops over each creature now and then (always while nervous
@@ -1553,7 +1630,12 @@ AQ.Aquarium = (function () {
         if (r.id === 'fish' && r.where === 'nursery') F().draw(g, r.grown ? 'GROWN' : 'BABY', r.x + r.w / 2, r.y + 23, r.grown ? '#ffe9a8' : '#ffd8e8', { align: 'center' });
         else if (r.id === 'fish') F().draw(g, r.where === 'tank' ? 'IN' : 'OUT', r.x + r.w / 2, r.y + 23, r.where === 'tank' ? '#7ef0c0' : '#a8b8c8', { align: 'center' });
         g.restore();
-      } else if (r.id !== 'stars') button(g, r, hover);
+      } else if (r.id === 'grad') {                // a baby's GRADUATE button, clipped to the tray strip like its picture
+        g.save(); g.beginPath(); g.rect(r.clipX.x0, r.y, r.clipX.x1 - r.clipX.x0, r.h); g.clip();
+        button(g, Object.assign({}, r, { on: !r.off }), hover); g.restore();
+      } else if (r.id === 'grad_card') continue;      // drawn on the card
+      else if (r.id === 'grad_all') button(g, Object.assign({}, r, { on: !r.off }), hover);
+      else if (r.id !== 'stars') button(g, r, hover);
     }
     const items = trayItems();
     if (A.tray === 'decor') { const full = tank.decor.length >= AQ.TUNING.tank.decorCapacity; F().draw(g, `${tank.decor.length}/${AQ.TUNING.tank.decorCapacity}`, 21, TRAY_Y + 23, full ? '#ffcf8a' : '#5f7f96', { align: 'center', shadow: false }); }
@@ -1563,7 +1645,9 @@ AQ.Aquarium = (function () {
     if (A.hover && A.hover.id === 'stars' && A.vibe) { vibeTooltip(g, A.vibe); return; }
     // hints
     if (A.hover && A.hover.id === 'item') itemCard(g, A.hover);
-    else if (A.hover && A.hover.id === 'fish' && A.hover.where === 'nursery') tip(g, `${A.hover.name}: CLICK TO SEE ITS CARD`, A.hover.x + 12, TANK.y + 4, '#fff');
+    else if (A.hover && A.hover.id === 'fish' && A.hover.where === 'nursery') tip(g, `${A.hover.name}: ${A.hover.grown ? 'GROWN UP' : 'GROWS UP IN ' + AQ.Breeding.growLeftText(A.hover.entry)} - CLICK FOR ITS CARD`, A.hover.x + 12, TANK.y + 4, '#fff');
+    else if (A.hover && (A.hover.id === 'grad' || A.hover.id === 'grad_card')) { const e = AQ.Collection.tank(A.biome).creatures.find((x) => x.uid === A.hover.uid); if (e) tip(g, A.hover.off ? `STILL GROWING: ${AQ.Breeding.growLeftText(e)} TO GO` : `SEND IT TO THE ${AQ.Nursery.homeName(AQ.Nursery.homeOf(e)).toUpperCase()} TANK'S STORAGE`, 160, TANK.y + 4, '#ffe9a8'); }
+    else if (A.hover && A.hover.id === 'grad_all') tip(g, A.hover.off ? 'NOBODY IS GROWN UP YET' : `SEND ALL ${A.hover.count} GROWN BABIES TO THEIR TANKS' STORAGE`, 160, TANK.y + 4, '#ffe9a8');
     else if (A.hover && A.hover.id === 'fish') tip(g, `${A.hover.name}: CLICK TO MOVE ${A.hover.where === 'tank' ? 'TO STORAGE' : 'INTO TANK'}`, A.hover.x + 12, TANK.y + 4, '#fff');
     else if (A.holding) { if (!(A.notes || []).length) tip(g, A.drag ? 'LET GO IN THE TANK TO PLACE IT' : 'CLICK IN THE TANK TO PLACE   (OR DRAG)', 160, TANK.y + 15, '#ffe9a8'); }
     else if (inNursery() && !tank.creatures.length && !(tank.eggs || []).length) tip(g, 'BABIES BORN IN YOUR TANKS COME HERE TO GROW UP', 160, 70, '#ffffff');
@@ -1578,7 +1662,7 @@ AQ.Aquarium = (function () {
     // notices (tank full, cleared, unlocks...)
     (A.notes || []).forEach((n, i) => {
       g.globalAlpha = U.clamp(Math.min(n.t * 4, (n.life - n.t) * 2), 0, 1);
-      const w = F().width(n.text) + 10, y = TANK.waterTop + 16 + i * 11;
+      const w = F().width(n.text) + 10, y = (A.card ? TANK.waterTop + 82 : TANK.waterTop + 16) + i * 11;   // below an open info card
       g.fillStyle = 'rgba(6,18,34,0.85)'; g.fillRect(160 - w / 2, y - 3, w, 10);
       g.fillStyle = n.color; g.fillRect(160 - w / 2, y - 3, w, 1);
       F().draw(g, n.text, 160, y, n.color, { align: 'center', shadow: false });

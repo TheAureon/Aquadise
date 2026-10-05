@@ -227,6 +227,7 @@ var AQ = (typeof AQ !== 'undefined') ? AQ : {};
   reg('hearts', 'aquarium', 'HEART SPARKLES', (c, o, t) => { H.bell(c, o, t, m(rnd(98, 102) | 0), 0.018, 0.25); return H.bell(c, o, t + 0.07, m(103), 0.014, 0.25) + 0.07; }, { minGap: 1.5 });
 
   // ---------------------------------------------------------------- breeding + the clock
+  reg('graduate', 'life', 'NURSERY GRADUATE', (c, o, t) => run(c, o, t, [84, 88, 91, 96, 91, 96], 0.11, 0.07, 0.55), { important: true, minGap: 0.6 });
   reg('baby', 'life', 'BABY BORN', (c, o, t) => run(c, o, t, [79, 81, 84, 88, 86, 91], 0.12, 0.05, 0.8), { important: true, minGap: 2 });
   reg('court', 'life', 'COURTSHIP', (c, o, t) => {
     for (let i = 0; i < 5; i++) H.bell(c, o, t + i * 0.09 + rnd(0, 0.03), m(96 + [0, 4, 7, 4, 12][i]), 0.02, 0.4);

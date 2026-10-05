@@ -522,6 +522,9 @@ AQ.LogUI = (function () {
     if (has) rec.push(['CAUGHT', 'X' + AQ.State.collection[d.id], C.title]);
     if (has && AQ.Sex.has(d)) { rec.push(['MALE ♂', lg.m ? 'YES' : 'NOT YET', lg.m ? AQ.Sex.COLOR.m : C.hint]); rec.push(['FEMALE ♀', lg.f ? 'YES' : 'NOT YET', lg.f ? AQ.Sex.COLOR.f : C.hint]); }
     if (lg.bred) rec.push(['BRED', '♥ YES', '#ff9fc0']);
+    const inNursery = AQ.Nursery ? AQ.Nursery.tank().creatures.filter((e) => e.id === d.id).length + (AQ.Nursery.tank().eggs || []).filter((e) => e.id === d.id).length : 0;
+    if (inNursery) rec.push(['IN NURSERY', 'X' + inNursery, '#ffd8e8']);
+    if (lg.graduated) rec.push(['GRADUATED', 'X' + lg.graduated, '#ffe9a8']);
     if (lg.variant) rec.push(['RARE COLOR', '✦ YES', C.gold]);
     if (!has) rec.push(['NOT CAUGHT YET', '', C.dim]);
     rec.forEach(([k, v, col], i) => { F().draw(g, k, 9, 81 + i * 8, C.dim, { shadow: false }); if (v) F().draw(g, v, 83, 81 + i * 8, col, { align: 'right', shadow: false }); });

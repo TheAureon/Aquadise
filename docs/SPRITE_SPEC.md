@@ -144,6 +144,7 @@ light pink-to-blue gradient, so keep a dark-enough outline for them to read agai
 | `decor.shell_cradle` | small (16 × 16) | `shellcradle` | an open pink scallop shell lined with something soft and cream |
 | `decor.bubble_mobile` | medium (24 × 24) | `bubblemobile` | floats: a little hanging mobile, a string from the top and three bubble charms (pink, pale blue, pink) dangling below. It hangs from the water's surface (`hang` in data/decorations.js) |
 | `decor.soft_sand_mound` | wide (32 × 16) | `sandmound` | a low, round mound of pale sand with a few pastel specks |
+| `ui.gradcap` | 8 × 8, 2 frames @ 2 fps (the tassel swings), centre anchor | `uigradcap` | a tiny dark graduation cap with a gold tassel, drawn over grown babies in the nursery (just above-left of the creature) |
 | `decor.pebble_nest` | small (16 × 16) | `pebblenest` | a ring of round grey-pink pebbles around a soft yellow hollow |
 
 ## Tutorial UI

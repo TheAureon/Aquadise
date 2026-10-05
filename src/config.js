@@ -75,7 +75,7 @@ AQ.TUNING = {
 
   plants: { regrowTime: 50 },
 
-  tank: { capacity: 12, decorCapacity: 40 },
+  tank: { capacity: 12, decorCapacity: 40, storageCapacity: null },   // storageCapacity: null = no limit (graduates wait in storage)
 
   // Aquarium "vibe" (tank happiness). Each part scores 0..1; the weighted average becomes 0-5 stars.
   // Raise a weight to make that part matter more. Nothing here can ever hurt a creature.

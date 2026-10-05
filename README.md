@@ -276,6 +276,17 @@ browsers won't let a page save pictures made from file:// images.
   are free from the start. Older saves: babies still growing and eggs in any tank (or its storage)
   move into the nursery when the save loads, keeping sex, colour and birth time; if it's full the
   rest stay where they are (nothing is ever deleted). Code: `src/nursery.js`, `src/breeding.js`.
+  - **Growing up and graduating.** Babies grow up over `breeding.growMinutes`. In the nursery, hover
+    (or tap) a baby to see how long it has left; its info card shows its name, sex, rare colour and
+    time left, and grown babies wear a little graduation cap. Each grown baby has a GRADUATE button
+    (on its card, and under it in the nursery's FISH tray); it sends the baby to the **storage** of
+    its home tank (its biome tank, its predator tank, or Starfall for the falling-star creatures),
+    with a soft chime (`graduate`, also in the Sound Test) and a message saying where it went.
+    GRADUATE ALL (bottom right of the nursery) sends every grown baby at once and says how many went
+    where. Babies still growing can't graduate yet (the button shows the time left). If a home tank's
+    storage ever has a limit (`tank.storageCapacity`, none by default) and it's full, the baby simply
+    stays in the nursery and the message says why. The log's entry shows BRED, how many are IN
+    NURSERY and how many GRADUATED.
   - Testing: set `debug.fastNursery: true` in config.js. Courting, hatching, growing up and the rest
     after a birth then take seconds (`debug.fastNurserySeconds`), and a ready pair starts courting at
     once. The usual requirements still apply (a ♂ and ♀ adult in a fed tank with enough stars).

@@ -287,6 +287,28 @@ AQ.manifest = {
     30
    ]
   },
+  "ui.gradcap": {
+   "file": "sprites/ui/gradcap.png",
+   "fw": 8,
+   "fh": 8,
+   "anchor": [
+    4,
+    4
+   ],
+   "anims": {
+    "idle": {
+     "row": 0,
+     "frames": 2,
+     "fps": 2
+    }
+   },
+   "vis": [
+    0,
+    0,
+    7,
+    7
+   ]
+  },
   "misc.bottle": {
    "file": "sprites/scene/bottle.png",
    "fw": 12,

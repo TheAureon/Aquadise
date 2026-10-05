@@ -29,6 +29,37 @@ AQ.Nursery = (function () {
     };
   };
 
+  // ---------------------------------------------------------------- graduating
+  // A grown baby graduates to the STORAGE of its home tank (where its species lives: its biome tank, a
+  // predator tank, or Starfall for the falling-star creatures), keeping its sex, colour and everything
+  // else. If that storage ever has a limit (AQ.TUNING.tank.storageCapacity) and is full, the baby simply
+  // stays in the nursery and the reason is given. Returns { ok, why, entry, home }.
+  const defOf = (id) => AQ.Creatures.defs[id] || AQ.data.creatures.find((d) => d.id === id);
+  N.homeOf = (e) => { const d = defOf(e.id); return d ? AQ.Tanks.forCreature(d) : null; };
+  N.homeName = (home) => { const t = AQ.Tanks.get(home); return t ? (t.short || t.name) : home; };
+  N.grown = () => N.tank().creatures.filter((e) => !AQ.Breeding.isJuvenile(e));
+  N.graduate = function (uid) {
+    const t = N.tank(), i = t.creatures.findIndex((e) => e.uid === uid);
+    if (i < 0) return { ok: false, why: 'gone' };
+    const e = t.creatures[i], home = N.homeOf(e);
+    if (AQ.Breeding.isJuvenile(e)) return { ok: false, why: 'growing', entry: e, home };
+    if (!home || N.is(home)) return { ok: false, why: 'nohome', entry: e, home };
+    const h = AQ.Collection.tank(home), cap = AQ.TUNING.tank.storageCapacity;
+    if (cap != null && h.storage.length >= cap) return { ok: false, why: 'storagefull', entry: e, home };
+    t.creatures.splice(i, 1);
+    h.storage.push(e);
+    const L = AQ.Sex.logOf(e.id); L.graduated = (L.graduated || 0) + 1;
+    AQ.State.flags = AQ.State.flags || {}; AQ.State.flags.graduated = true;
+    AQ.Save && AQ.Save.dirty();
+    return { ok: true, entry: e, home };
+  };
+  // every grown baby at once: { moved: [{entry, home}], kept: [{entry, home, why}] }
+  N.graduateAll = function () {
+    const out = { moved: [], kept: [] };
+    N.grown().slice().forEach((e) => { const r = N.graduate(e.uid); (r.ok ? out.moved : out.kept).push(r); });
+    return out;
+  };
+
   // Older saves: babies still growing and eggs waiting in any tank (or its storage) move into the
   // nursery, keeping their sex, colour and birth time. If the nursery fills up, the rest stay where
   // they are (nothing is ever deleted). Anything in the nursery that isn't a bred baby goes home.
