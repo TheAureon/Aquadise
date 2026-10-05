@@ -19,8 +19,8 @@ AQ.LogUI = (function () {
   const biomes = () => {
     const order = ['tide_pools', 'coral', 'ruins', 'open_ocean', 'vents', 'trench', 'kelp', 'mangrove', 'ice', 'cave', 'lush_cave'];
     const all = AQ.World.biomes.slice();
-    // special tanks (Starfall) get a page of their own, after the sea biomes
-    return all.sort((a, b) => (order.indexOf(a.id) + 99) % 99 - (order.indexOf(b.id) + 99) % 99).concat(AQ.data.specialTanks || []);
+    // special tanks (Starfall) get a page of their own, after the sea biomes; the Nursery has no species of its own, so no page
+    return all.sort((a, b) => (order.indexOf(a.id) + 99) % 99 - (order.indexOf(b.id) + 99) % 99).concat((AQ.data.specialTanks || []).filter((t) => !t.nursery));
   };
   // a biome's species, with each family (AQ.data.families) kept together where its first member is
   const entries = (b) => {
@@ -159,7 +159,7 @@ AQ.LogUI = (function () {
       // biome picker: < NAME > then one dot per biome (click a dot to jump there)
       ui.push({ id: 'prev', x: 4, y: 17, w: 10, h: 10, label: '<' });
       ui.push({ id: 'next', x: 104, y: 17, w: 10, h: 10, label: '>' });
-      biomes().forEach((bb, k) => ui.push({ id: 'dot', k, b: bb, x: 119 + k * 7, y: 17, w: 7, h: 10 }));
+      biomes().forEach((bb, k) => ui.push({ id: 'dot', k, b: bb, x: 119 + k * 6, y: 17, w: 6, h: 10 }));
       const rows = rowsOf(list), maxS = maxScroll(rows, VIEW_H);
       L.scroll = U.clamp(L.scroll, 0, maxS);
       placeRows(ui, rows, L.sy, 30, VIEW_H, (row, y) => {
@@ -359,10 +359,17 @@ AQ.LogUI = (function () {
     const bred = AQ.data.creatures.filter((d) => logOf(d.id).bred).length;
     const got = list.filter((d) => AQ.Collection.has(d.id)).length, done = list.filter((d) => AQ.Sex.complete(d)).length;
     F().draw(g, fitText((b.short || b.name).toUpperCase(), 86), 59, 19, done === list.length ? C.good : C.title, { align: 'center' });
-    // overall progress, right-aligned: caught, complete (both sexes), bred
+    // overall progress, right-aligned: caught, complete (both sexes), ♥ bred
     let x = 316;
-    const stat = (label, val, col) => { const w = F().width(val); F().draw(g, val, x, 19, col, { align: 'right' }); x -= w + 3; F().draw(g, label, x, 19, C.hint, { align: 'right', shadow: false }); x -= F().width(label) + 7; };
-    if (bred) stat('BRED', '' + bred, '#ff9fc0');
+    const dotsEnd = 119 + biomes().length * 6 + 3;                  // the biome dots end here: the numbers never run into them
+    const stat = (label, val, col) => {
+      const w = F().width(val), lw = F().width(label);
+      if (x - w < dotsEnd) return;
+      F().draw(g, val, x, 19, col, { align: 'right' }); x -= w + 3;
+      if (x - lw >= dotsEnd) F().draw(g, label, x, 19, C.hint, { align: 'right', shadow: false });
+      x -= lw + 7;
+    };
+    if (bred) stat('♥', '' + bred, '#ff9fc0');                     // ♥ = bred (as on the species cards)
     stat('DONE', `${prog.complete}/${prog.total}`, C.good);
     stat('CAUGHT', `${prog.discovered}/${prog.total}`, C.info);
     // details of the selected species
