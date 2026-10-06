@@ -338,8 +338,9 @@ AQ.TUNING = {
     windowSeconds: 600,       // ...in this many seconds (10 minutes)
     afterCatch: 60,           // none this soon (seconds) after a catch
     spam: { swings: 12, seconds: 20, fastClicks: 4, fastSeconds: 3 },   // 12 swings in 20 s with no catch, or 4+ clicks a second for 3 s
-    drought: { seconds: 240, newGameSeconds: 180, idleGrace: 20 },    // no catch for 4 min of play (3 min in a new game); away from the keys
+    drought: { seconds: 240, newGameSeconds: 180, idleGrace: 20,      // no catch for 4 min of play (3 min in a new game); away from the keys
                                                                        // for more than idleGrace seconds doesn't count
+      maxSpecies: 25 },       // only while you've found fewer species than this (null = any number); never once you've caught them all
     mash: { presses: 6, seconds: 8 },   // the same key that does nothing here, 6 times in 8 seconds
     droughtRedoButton: true   // the "no catch for a while" nudge also shows a small REDO TUTORIAL button
   },

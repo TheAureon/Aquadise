@@ -2,7 +2,8 @@
 // Three situations, watched only during active play in the sea (never in a menu, the guided dive, a
 // transition, photo mode or the tank screens: those aren't 'play' in the sea):
 //   spam    many net swings and no catch in a short time, or clicking very fast for a few seconds
-//   drought no catch for a long stretch of active play (a new game with nothing caught: a bit sooner)
+//   drought no catch for a long stretch of active play (a new game with nothing caught: a bit sooner);
+//           only while the collection is incomplete and smaller than drought.maxSpecies (a newer player)
 //   mash    pressing a key that does nothing here, over and over (the interact key in the sea, say)
 // Each situation only ever shows its own lines (shuffled: a type doesn't repeat a line until all of its
 // lines have shown). A drought line can carry a small REDO TUTORIAL button (src/redo.js).
@@ -81,8 +82,11 @@ AQ.Nudges = (function () {
     const s = c.spam, k = c.mash, tooFast = N.clicks.length >= Math.ceil(s.fastClicks * s.fastSeconds) && N.clicks[0] >= N.t - s.fastSeconds;
     if (N.swings.length >= s.swings || tooFast) { if (show('spam')) { N.swings.length = 0; N.clicks.length = 0; } return; }
     for (const code in N.keys) if (N.keys[code].length >= k.presses) { if (show('mash', false, code)) N.keys = {}; return; }
-    const caughtAny = Object.keys(AQ.State.collection || {}).length > 0;
-    if (N.dry >= (caughtAny ? c.drought.seconds : c.drought.newGameSeconds)) { if (show('drought')) N.dry = 0; }
+    // (only for someone still finding their feet: not once every species is caught, and not for a seasoned
+    // collector, for whom a long wait between catches is just hunting the rare ones)
+    const prog = AQ.Collection.progress(), mx = c.drought.maxSpecies;
+    if (prog.discovered >= prog.total || (mx != null && prog.discovered >= mx)) { N.dry = 0; return; }
+    if (N.dry >= (prog.discovered > 0 ? c.drought.seconds : c.drought.newGameSeconds)) { if (show('drought')) N.dry = 0; }
   };
   function trim() {
     const c = cfg(), cutS = N.t - c.spam.seconds, cutF = N.t - c.spam.fastSeconds, cutK = N.t - c.mash.seconds;
