@@ -137,6 +137,18 @@ browsers won't let a page save pictures made from file:// images.
     `expandCost` [10, 20, 35] panes, `width` [312, 468, 624, 780]; the nursery's room by size is
     `nursery.capacity` [20, 30, 40, 50]; scrolling speeds `aquarium.scroll`; the animation length
     `aquarium.buildSeconds`; the keys `keys.scrollLeft` / `keys.scrollRight`.
+- **ONE PAIR EACH (TANK tab):** arranges the tank to show one ♂ and one ♀ of every species that
+  lives there (two of a species without sexes), bringing creatures in from the tank's storage and
+  sending the extras to storage. It always asks first ("Move 7 extras to storage and bring 2 from
+  storage into the tank?", CONFIRM / CANCEL) and never removes anything: creatures only move between
+  the tank and its own storage. Which one is shown, best first: a rare variant (✦), an adult over a
+  still-growing baby, one already in the tank (so nothing swaps for no reason), then the oldest. A
+  courting pair always stays (it is already a ♂ and a ♀), so breeding carries on; that's the one case a
+  rare variant may wait in storage instead. A species with only one sex collected shows the one it has.
+  If every pair doesn't fit the room, complete pairs go in first (the species you have the most of
+  first), then singles, and the question says what waits in storage and which size fits them all
+  ("A pair of each needs room for 18: expand the tank to size 1"). Logic: `src/pairs.js`. Not in the
+  nursery.
 - **New catch behaviours:** `mirror` (copies your swimming mirrored; hold still and it drifts in),
   `lure` (a glowing decoy on a stalk; net the dim creature beside it, not the light) and `midair`
   (leaps out of the water; only nettable in the air). See the header of data/creatures.js.
@@ -444,6 +456,7 @@ src/catching.js       net, pry, bait
 src/aquarium.js       tanks, decorating, creature life + moods, info card, overview, undo
 src/vibe.js           tank happiness (stars), helping/missing reasons, unlock milestones
 src/panes.js          glass panes: the building material for the tanks (count, add, spend, the counter)
+src/pairs.js          ONE PAIR EACH: which creatures a tank shows (a pair of every species) and the moves
 src/transition.js     reusable fade-to-black scene transition (AQ.Transition.go)
 src/scenes.js         scene system: world / hill / station, scene switching, save restore, prompts
 src/miniworld.js      small collision maps for side scenes (ladders, one-way platforms)

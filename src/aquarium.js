@@ -731,8 +731,9 @@ AQ.Aquarium = (function () {
       case 'h_stop': A.holding = null; break;
       case 'tray_decor': A.tray = 'decor'; A.trayScroll = 0; A.trayPos = 0; break;
       case 'tray_fish': A.tray = 'fish'; A.trayScroll = 0; A.trayPos = 0; break;
-      case 'tray_tank': A.tray = 'tank'; break;
+      case 'tray_tank': A.tray = 'tank'; if (AQ.Tips) AQ.Tips.event('tankTab'); break;
       case 'expand': startExpand(); break;
+      case 'pairs': onePairEach(); break;
       case 'strip': A.stripDrag = true; break;
       case 'tray_left': A.trayScroll = Math.round(A.trayScroll) - 3; break;
       case 'tray_right': A.trayScroll = Math.round(A.trayScroll) + 3; break;
@@ -814,10 +815,49 @@ AQ.Aquarium = (function () {
     const sizeTxt = T('tank.size.level', { n: lvl, max }), sx = 44 + Math.min(70, F().width(sizeTxt)) + 6;
     const label = st.why === 'max' ? T('tank.size.maxBtn') : T('tank.size.expand', { n: st.cost });
     ui.push({ id: 'expand', x: sx, y: TRAY_Y, w: Math.max(52, F().width(label) + (st.why === 'max' ? 6 : 17)), h: 10, label, off: !st.ok, on: st.ok, pane: st.why !== 'max', sizeTxt });
-    // stage 3 / 4 buttons go on the bottom row (A.tankTools)
-    (A.tankTools ? A.tankTools() : []).forEach((b) => ui.push(b));
+    // the tank tools, on the bottom row (not in the nursery: babies are simply looked after there)
+    if (!inNursery()) {
+      const tools = [{ id: 'pairs', label: AQ.t('pairs.btn') }];
+      let x = 44;
+      tools.forEach((b) => { b.w = Math.max(40, F().width(b.label) + 8); b.x = x; b.y = TRAY_Y + 19; b.h = 10; x += b.w + 4; ui.push(b); });
+      A.fitRow(tools, 44, 316, 4, 'left');
+    }
+  }
+  // ---------------------------------------------------------------- ONE PAIR EACH (src/pairs.js)
+  function onePairEach() {
+    const tank = AQ.Collection.tank(A.biome), T = AQ.t;
+    if (!tank.creatures.length && !tank.storage.length) { note(T('pairs.none'), '#cfe8ff'); return; }
+    const plan = AQ.Pairs.plan(A.biome), lines = [];
+    const sizeLine = () => (plan.needSize != null ? T('pairs.needSize', { n: plan.need, size: plan.needSize }) : T('pairs.needMax', { n: plan.need }));
+    if (!plan.changes) {
+      note(T('pairs.already'), '#8ff0b0', 4);
+      if (plan.leftOut.length) note(sizeLine(), '#ffcf8a', 5);
+      return;
+    }
+    const q = plan.toStorage.length && plan.toTank.length ? T('pairs.both', { n: plan.toStorage.length, m: plan.toTank.length })
+      : plan.toStorage.length ? T('pairs.onlyOut', { n: plan.toStorage.length }) : T('pairs.onlyIn', { n: plan.toTank.length });
+    lines.push([q, '#e8fbff']);
+    if (plan.leftOut.length) {
+      const names = plan.leftOut.map((l) => l.name.toUpperCase()), list = names.slice(0, 3).join(T('ui.commaSep'));
+      lines.push([T('pairs.room', { n: plan.shown, need: plan.need }), '#ffcf8a']);
+      lines.push([names.length > 3 ? T('pairs.leftMore', { list, n: names.length - 3 }) : T('pairs.left', { list }), '#ffcf8a']);
+      lines.push([sizeLine(), '#ffe9a8']);
+    }
+    lines.push([T('pairs.safe'), '#8fb6cc']);
+    ask({
+      title: T('pairs.title'), lines, ok: T('ui.confirm'),
+      onOk: () => {
+        AQ.Pairs.apply(plan);
+        A.card = null; A.rebuild();
+        AQ.Audio.play('place');
+        A.fish.forEach((f) => { if (plan.toTank.indexOf(f.uid) >= 0) AQ.FX.sparkle(f.x, f.y, '#fff3b0', 6); });
+        note(T('pairs.done'), '#8ff0b0', 4);
+        if (plan.leftOut.length) note(sizeLine(), '#ffcf8a', 6);
+      }
+    });
   }
   A.startExpand = () => startExpand();
+  A.onePairEach = () => onePairEach();
   function startExpand() {
     const st = expandState(), b = AQ.Tanks.get(A.biome), T = AQ.t;
     if (!st.ok) { note(expandWhy(st), '#ffcf8a', 4); AQ.Audio.play('menu_move'); return; }
@@ -1915,6 +1955,7 @@ AQ.Aquarium = (function () {
       tip(g, AQ.t('tank.decorHover', { name: nm }), 160, TANK.y + 4, '#cfe8ff');
     }
     else if (A.hover && A.hover.id === 'expand') { const st = expandState(); tip(g, st.ok ? AQ.t(inNursery() ? 'tank.size.nextNursery' : 'tank.size.next', { n: AQ.Tanks.capacity(A.biome, AQ.Tanks.size(A.biome) + 1), decor: AQ.Tanks.decorCapacity(A.biome, AQ.Tanks.size(A.biome) + 1) }) : expandWhy(st), 160, TANK.waterTop + 4, st.ok ? '#8ff0b0' : '#ffcf8a'); }
+    else if (A.hover && A.hover.id === 'pairs') tip(g, AQ.t('pairs.hint'), 160, TANK.waterTop + 4, '#cfe8ff');
     else if (A.hover && A.hover.id === 'tray_decor') tip(g, AQ.t('tank.tab.decorHint', { n: tank.decor.length, max: AQ.Tanks.decorCapacity(A.biome) }), 160, TANK.waterTop + 4, '#cfe8ff');
     else if (A.hover && A.hover.id === 'tray_fish') tip(g, AQ.t(inNursery() ? 'tank.tab.fishHintNursery' : 'tank.tab.fishHint', { n: tank.creatures.length, max: AQ.Tanks.capacity(A.biome), out: tank.storage.length }), 160, TANK.waterTop + 4, '#cfe8ff');
     else if (A.hover && A.hover.id === 'tray_tank') tip(g, AQ.t('tank.tab.tankHint'), 160, TANK.waterTop + 4, '#cfe8ff');

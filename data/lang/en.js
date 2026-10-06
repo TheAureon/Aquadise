@@ -233,7 +233,8 @@ AQ.langFiles.en = {
   'tip.flashing': 'Bright flashes or blinking lights bothering you? Turn on REDUCE FLASHING in Pause > SETTINGS > OPTIONS.',
   'tip.bumped': 'Just a bump! Nothing in the sea can hurt you. Some creatures only nudge you back a little.',
   'tip.panes': 'Glass panes! Every chest holds a few. They are for building: on a tank\'s TANK tab, EXPAND makes it bigger. Your count is in the top right corner.',
-  'tip.wideTank': 'A bigger tank! It\'s wider than the screen: scroll with {k:scrollLeft} / {k:scrollRight}, drag the water, or use the strip under the tank.',
+  'tip.tankTab': 'The TANK tab: EXPAND makes this tank bigger with glass panes, and ONE PAIR EACH shows one ♂ and one ♀ of every species (the extras wait in storage).',
+  'tip.wideTank': 'A bigger tank! It\'s wider than the screen: scroll with {k:scrollLeft} and {k:scrollRight}, drag the water, or use the strip under the tank.',
 
   // ---------------------------------------------------------------- the guided first dive
   'dive.prompt.title': 'Want a quick guided dive?',
@@ -299,7 +300,8 @@ AQ.langFiles.en = {
   'guide.tanks.4': 'The stars show the tank\'s vibe: hover them to see what helps.',
   'guide.tanks.5': 'New star levels unlock new themed decorations.',
   'guide.tanks.6': 'GLASS PANES from chests EXPAND a tank (its TANK tab): more room, wider glass.',
-  'guide.tanks.7': 'Scroll a wide tank with {k:scrollLeft} / {k:scrollRight} or by dragging the water.',
+  'guide.tanks.7': 'Scroll a wide tank ({k:scrollLeft} and {k:scrollRight}) or drag the water.',
+  'guide.tanks.8': 'ONE PAIR EACH shows one ♂ and one ♀ of every species; extras wait in storage.',
   'guide.breeding.title': 'Sexes, breeding and rare colors',
   'guide.breeding.1': 'Most animals are ♂ or ♀ (the log shows which).',
   'guide.breeding.2': 'A ♂ and a ♀ in a fed tank with {c:breeding.minStars}+ stars may court.',
@@ -1259,6 +1261,23 @@ AQ.langFiles.en = {
   'tank.expand.wider': 'The tank gets wider: scroll along it to see it all.',
   'tank.expand.ok': 'EXPAND',
   'tank.expand.done': 'The {tank} tank is bigger now! Size {n}/{max}.',
+
+  // ---------------------------------------------------------------- ONE PAIR EACH (the TANK tab)
+  'pairs.btn': 'ONE PAIR EACH',
+  'pairs.hint': 'ONE ♂ AND ONE ♀ OF EVERY SPECIES IN THE TANK, THE EXTRAS WAIT IN STORAGE',
+  'pairs.title': 'ONE PAIR OF EACH SPECIES?',
+  'pairs.both': { one: 'Move 1 extra to storage and bring {m} from storage into the tank?', other: 'Move {n} extras to storage and bring {m} from storage into the tank?' },   // {m} = how many come in
+  'pairs.onlyOut': { one: 'Move 1 extra to storage?', other: 'Move {n} extras to storage?' },
+  'pairs.onlyIn': { one: 'Bring 1 creature from storage into the tank?', other: 'Bring {n} creatures from storage into the tank?' },
+  'pairs.safe': 'Nobody leaves: extras simply wait in this tank\'s storage.',
+  'pairs.room': 'The tank has room for {n} of the {need}.',
+  'pairs.left': 'Waiting in storage: {list}.',   // {list} = species names
+  'pairs.leftMore': 'Waiting in storage: {list} and {n} more.',
+  'pairs.needSize': 'A pair of each needs room for {n}: expand the tank to size {size}.',
+  'pairs.needMax': 'A pair of each needs room for {n}, more than even the biggest tank holds.',
+  'pairs.already': 'Already one pair of each species.',
+  'pairs.none': 'No creatures in this tank yet.',
+  'pairs.done': 'One pair of each!',
   'tank.flipBtn': 'FLIP (X)',
   'tank.layerBtn': 'LAYER: {layer} (Z)',
   'tank.putBack': 'PUT BACK',

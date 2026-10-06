@@ -36,7 +36,7 @@ AQ.data.tutorial = {
     { id: 'chests', icon: 'chest', needs: 'Chests', lines: 6, lineNeeds: { 6: 'Panes' } },
     { id: 'daynight', icon: 'ui:1', lines: 5, lineNeeds: { 4: 'Starfall', 5: 'Starfall' } },
     { id: 'aquarium', icon: 'misc.ufo', lines: 5 },
-    { id: 'tanks', icon: 'decor.castle', lines: 7, lineNeeds: { 6: 'Panes' } },
+    { id: 'tanks', icon: 'decor.castle', lines: 8, lineNeeds: { 6: 'Panes', 8: 'Pairs' } },
     { id: 'breeding', icon: 'ui:3', needs: 'Breeding', lines: 7 },
     { id: 'log', icon: 'ui:4', lines: 5, lineNeeds: { 4: 'Bottles', 5: 'Bottles' } },
     { id: 'photo', icon: 'ui:6', lines: 5 },
@@ -63,6 +63,7 @@ AQ.data.tutorial = {
     { id: 'flashing', on: ['flash'], where: 'any', icon: 'ui:6' },
     { id: 'bumped', on: ['bumped'], where: 'play', known: ['bumped'], icon: 'ui:0' },
     { id: 'panes', on: ['panes'], where: 'any', needs: 'Panes', known: ['panes'], icon: 'ui.pane' },
-    { id: 'wideTank', on: ['wideTank'], where: 'tank', icon: 'ui.pane' }
+    { id: 'wideTank', on: ['wideTank'], where: 'tank', icon: 'ui.pane' },
+    { id: 'tankTab', on: ['tankTab'], where: 'tank', icon: 'ui:3' }
   ]
 };
