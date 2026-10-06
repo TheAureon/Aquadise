@@ -34,7 +34,7 @@ AQ.Collection = (function () {
     if (AQ.Sex.has(def) && sex !== 'm' && sex !== 'f') sex = AQ.Sex.random(def);
     const entry = { uid: AQ.U.uid(), id: def.id };
     if (sex) { entry.sex = sex; AQ.Sex.logOf(def.id)[sex] = true; }
-    if (tank.creatures.length < AQ.TUNING.tank.capacity) tank.creatures.push(entry); else tank.storage.push(entry);
+    if (tank.creatures.length < AQ.Tanks.capacity(AQ.Tanks.forCreature(def))) tank.creatures.push(entry); else tank.storage.push(entry);
     AQ.Save && AQ.Save.dirty();
     return isNew;
   };

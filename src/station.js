@@ -197,11 +197,14 @@ AQ.Station = (function () {
       ctx.fillStyle = rg; ctx.fillRect(tk.x - fw, y0 - 14, fw * 2, fh + 24);
     }
     // the tank's own water + backdrop, cropped to the window
-    const bd = AQ.Aquarium.backdropOf(b), sw = Math.round(bd.height * iw / ih);
-    ctx.drawImage(bd, Math.round((bd.width - sw) / 2), 0, sw, bd.height, ix, iy, iw, ih);
+    // (a bigger tank is wider than its window: the view pans slowly from one end to the other and back,
+    // AQ.TUNING.station.windowPanSeconds; a size-0 tank shows its middle, as always)
+    const bd = AQ.Aquarium.backdropOf(b), sw = Math.round(bd.height * iw / ih), spare = bd.width - sw, base = AQ.Tanks.width(b.id, 0) - sw;
+    const pan = spare > base ? 0.5 - 0.5 * Math.cos(t * Math.PI * 2 / AQ.TUNING.station.windowPanSeconds) : 0.5;
+    ctx.drawImage(bd, Math.round(spare * pan), 0, sw, bd.height, ix, iy, iw, ih);
     if (st.dark) { ctx.fillStyle = `rgba(2,6,16,${st.dark * 0.6})`; ctx.fillRect(ix, iy, iw, ih); }
     // its creatures, drifting about
-    tank.creatures.slice(0, 7).forEach((e, k) => {
+    tank.creatures.slice(0, 7 + 3 * AQ.Tanks.size(b.id)).forEach((e, k) => {   // (a bigger tank shows a few more)
       const def = AQ.Creatures.defs[e.id], juv = AQ.Breeding.isJuvenile(e);
       const key = !def ? 'creature.' + e.id : juv && AQ.Sex.babyKey(def, e.variant) ? AQ.Sex.babyKey(def, e.variant) : AQ.Sex.spriteKey(def, e.sex, e.variant), en = AQ.Assets.entry(key);
       if (!en || !def) return;

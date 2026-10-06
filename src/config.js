@@ -79,7 +79,16 @@ AQ.TUNING = {
 
   plants: { regrowTime: 50 },
 
-  tank: { capacity: 12, decorCapacity: 40, storageCapacity: null },   // storageCapacity: null = no limit (graduates wait in storage)
+  // Tanks, by SIZE level 0..3 (each tank's level is saved; 0 = the original tank). EXPAND on the tank
+  // screen's TANK tab costs expandCost[level] glass panes to go up one level (so 10, then 20, then 35).
+  // width: how wide the tank really is, in pixels (the screen shows 312 at a time and scrolls sideways).
+  tank: {
+    capacity: [12, 18, 24, 30],         // creatures living in the tank (the rest wait in its storage)
+    decorCapacity: [40, 60, 80, 100],   // decorations + plants placed in it
+    expandCost: [10, 20, 35],           // panes for size 1, 2 and 3 (its length is the number of levels)
+    width: [312, 468, 624, 780],        // px wide
+    storageCapacity: null               // null = no limit (graduates wait in storage)
+  },
 
   // Aquarium "vibe" (tank happiness). Each part scores 0..1; the weighted average becomes 0-5 stars.
   // Raise a weight to make that part matter more. Nothing here can ever hurt a creature.
@@ -89,10 +98,10 @@ AQ.TUNING = {
     decorAmountTarget: 10,    // total decor pieces for a full "amount" score
     themeTarget: 4,           // decor pieces matching the tank's biome for a full "theme" score
     plantTarget: 3,           // plants for a full "plants" score
-    comfortable: 8,           // creatures before the tank starts to feel crowded
+    comfortable: 8,           // creatures before a size-0 tank starts to feel crowded (bigger tanks: in proportion to their room)
     crowdedFloor: 0.5,        // "space" score when the tank is completely full (never lower)
     stressPenalty: 0.6,       // how much a fully nervous tank lowers "calm" (gentle on purpose)
-    nervousAbove: 10,         // more creatures than this in one tank -> the smallest few feel a bit nervous
+    nervousAbove: 10,         // more creatures than this in a size-0 tank -> the smallest few feel a bit nervous (bigger: in proportion)
     fedFreshMinutes: 20,      // real minutes a feeding counts as "fed"...
     fedFadeMinutes: 40,       // ...then fades to hungry over this many minutes (they never starve)
     recomputeEvery: 0.5,      // seconds between vibe updates while watching a tank
@@ -116,6 +125,10 @@ AQ.TUNING = {
     feedPellets: 8,
     chompSeconds: 0.45,
     undoSteps: 30,            // how many decor changes UNDO remembers per tank visit
+    // a bigger (wider) tank scrolls sideways: arrow keys / A D (keys.scrollLeft / scrollRight), dragging
+    // the water, the mouse wheel, the strip under the tank, or carrying a piece to the edge of the view
+    scroll: { keySpeed: 180, edgeSpeed: 110, edgeZone: 14 },   // px per second; edgeZone: px from the view's edge
+    buildSeconds: 1.6,        // the EXPAND animation: how long the new glass takes to sweep out
     unlockStars: [2, 3.5, 5]  // tank stars needed for each biome's unlock tiers 1, 2 and 3 (new themed decor)
   },
 
@@ -201,7 +214,8 @@ AQ.TUNING = {
     log: ['KeyL'], map: ['KeyM'], help: ['KeyH'], pause: ['Escape'],
     // in a tank
     feed: ['KeyF'], tanks: ['KeyT'], undo: ['KeyU'], flip: ['KeyX'], layer: ['KeyZ'],
-    prevTank: ['KeyQ', 'ArrowLeft'], nextTank: ['KeyE', 'ArrowRight'],
+    prevTank: ['KeyQ', 'ArrowLeft'], nextTank: ['KeyE', 'ArrowRight'],   // (in a bigger tank the arrows scroll it instead; Q / E still switch)
+    scrollLeft: ['KeyA', 'ArrowLeft'], scrollRight: ['KeyD', 'ArrowRight'],   // scroll a bigger tank sideways
     // in photo mode
     photoSnap: ['Space'], photoFreeze: ['KeyZ'], photoIcons: ['KeyI'], photoFrame: ['KeyF'], photoCaption: ['KeyC'],
     // the GUIDE (field-guide book): from the help line, pause menu or title
@@ -253,7 +267,8 @@ AQ.TUNING = {
 
   // The Universal Nursery (src/nursery.js): every bred egg and baby lives here until it grows up.
   nursery: {
-    capacity: 20              // babies + grown babies waiting to graduate + eggs; when full, breeding pauses everywhere
+    capacity: [20, 30, 40, 50]   // by the nursery's SIZE level (it expands like any tank): babies + grown babies waiting
+                              // to graduate + eggs; when full, breeding pauses everywhere
   },
 
   sexes: {
@@ -265,7 +280,8 @@ AQ.TUNING = {
     zoomedOutByDefault: false, // OPTIONAL view: true starts zoomed out to see the whole building (all tanks)
     zoomKey: 'KeyV',          // toggles the zoomed-out view in the building (your choice is saved)
     zoomSeconds: 0.6,         // how long the zoom in/out takes
-    zoomMargin: 10            // space (px) kept around the building when zoomed out
+    zoomMargin: 10,           // space (px) kept around the building when zoomed out
+    windowPanSeconds: 40      // a bigger tank's window slowly pans across the whole tank, one way and back in this long
   },       // ladder climbing speed in the aquarium building (px/s)
 
   // ---- distant seagulls in the sky (sea surface, Tide Pools shore, the hill); day, dawn + dusk only

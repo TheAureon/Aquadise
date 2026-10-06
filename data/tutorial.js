@@ -8,7 +8,7 @@
 // Write key names as {k:action} (e.g. {k:sneak}); they're filled in from the real key bindings
 // (AQ.TUNING.keys in config.js, see src/keys.js), so they stay correct if the controls change. Actions:
 // move left right up down jump sneak net bait log map help pause interact mute photo stationView feed
-// tanks undo flip layer prevTank nextTank photoSnap photoFreeze photoIcons photoFrame photoCaption guide.
+// tanks undo flip layer scrollLeft scrollRight prevTank nextTank photoSnap photoFreeze photoIcons photoFrame photoCaption guide.
 // Guide pages can also show config numbers: {c:clock.dayMinutes} (any AQ.TUNING path) and
 // {inv:breeding.variantChance} (1 / that value, rounded: "1 in 25").
 //
@@ -36,7 +36,7 @@ AQ.data.tutorial = {
     { id: 'chests', icon: 'chest', needs: 'Chests', lines: 6, lineNeeds: { 6: 'Panes' } },
     { id: 'daynight', icon: 'ui:1', lines: 5, lineNeeds: { 4: 'Starfall', 5: 'Starfall' } },
     { id: 'aquarium', icon: 'misc.ufo', lines: 5 },
-    { id: 'tanks', icon: 'decor.castle', lines: 5 },
+    { id: 'tanks', icon: 'decor.castle', lines: 7, lineNeeds: { 6: 'Panes' } },
     { id: 'breeding', icon: 'ui:3', needs: 'Breeding', lines: 7 },
     { id: 'log', icon: 'ui:4', lines: 5, lineNeeds: { 4: 'Bottles', 5: 'Bottles' } },
     { id: 'photo', icon: 'ui:6', lines: 5 },
@@ -62,6 +62,7 @@ AQ.data.tutorial = {
     { id: 'nursery', on: ['nursery'], where: 'tank', needs: 'Nursery', known: ['graduated'], icon: 'ui:3' },
     { id: 'flashing', on: ['flash'], where: 'any', icon: 'ui:6' },
     { id: 'bumped', on: ['bumped'], where: 'play', known: ['bumped'], icon: 'ui:0' },
-    { id: 'panes', on: ['panes'], where: 'play', needs: 'Panes', known: ['panes'], icon: 'ui.pane' }
+    { id: 'panes', on: ['panes'], where: 'any', needs: 'Panes', known: ['panes'], icon: 'ui.pane' },
+    { id: 'wideTank', on: ['wideTank'], where: 'tank', icon: 'ui.pane' }
   ]
 };

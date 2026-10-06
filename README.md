@@ -59,6 +59,9 @@ them on a computer, set `AQ.TUNING.debug.forceTouch: true`: the controls show an
 finger (drag in the joystick area, click the buttons).
 
 In the aquarium: **Q/E** switch tanks, **F** feeds, **T** (or TANKS) shows every tank at a glance.
+In a bigger (expanded) tank: **A/D** or **Left/Right** scroll it sideways (Q/E still switch tanks;
+in a size-0 tank the arrows switch tanks as before), or drag the water, use the mouse wheel over it,
+or click / drag the thin strip on the tank's lower rim.
 Drag a tray item into the tank (or click it, then click in the tank). Drag a placed item to move it;
 right-click or **Delete** removes it. Tray pieces show ♥ when a creature in the tank loves them and a
 green dot when they suit the tank's theme (best ones first; hover for details). While carrying a piece,
@@ -108,6 +111,32 @@ browsers won't let a page save pictures made from file:// images.
   explains them. The name is `pane.name` in `data/lang/en.js` (change it there and every text follows).
   Tuning: `AQ.TUNING.panes` (`chestMin`, `chestMax`). **Testing:** set `debug.hundredPanes: true` in
   `src/config.js` and every game you load or start has 100 panes.
+- **Bigger tanks (SIZE 0-3):** every tank, the nursery included, has a SIZE level, saved per tank
+  (`AQ.State.tanks[id].size`; older saves are all size 0, today's tank). The tank screen's third tray
+  tab, **TANK**, shows `SIZE n/3`, the counts and your panes, and an **EXPAND: 20** button with a pane
+  icon. It's greyed out with the reason beside it ("Need 12 more glass panes." / "As big as a tank
+  gets.", MAX SIZE). Pressing it asks first (what it costs, how much room the next size gives), then
+  plays a soft building sound (TANK EXPANDED in the Sound Test) while a seam of new glass sweeps out
+  to the new end of the tank, a blueprint until it arrives, and the view follows it.
+  - **Physically wider, never squashed:** each size is wider (312, 468, 624, 780 px), drawn at the same
+    crisp scale. The screen shows 312 px at a time and scrolls sideways (keys above, dragging the water
+    with a mouse or a finger, the wheel, the strip on the lower rim, or carrying a piece to the edge of
+    the view). Small arrows at the view's edges show there's more tank that way. Placing, moving,
+    flipping and layering decor, info cards, hover and tap tooltips, the vibe tooltip, feeding (the
+    shaker sprinkles where you're looking), undo and photo mode all work anywhere along it.
+  - **Photo mode** captures the whole tank, however wide (in photo mode, scroll with the keys or by
+    dragging; a tap that doesn't drag takes the photo).
+  - **Room:** creatures spawn and swim across the whole width; capacity is read from the tank's size
+    everywhere (new catches, moving creatures in from storage, graduates, old-save moves, the "12/18"
+    count in the top bar, the nursery's room and its "breeding paused" limit). Crowding scales with the
+    room: a tank's "comfortable" and "nervous above" numbers grow in proportion, so 12 creatures in a
+    size-1 tank feel roomy, not crowded.
+  - **In the building:** each tank's window keeps its size; a bigger tank's window slowly pans across
+    the whole tank and back (`station.windowPanSeconds`), and shows a few more of its creatures.
+  - Tuning (`AQ.TUNING.tank`): `capacity` [12, 18, 24, 30], `decorCapacity` [40, 60, 80, 100],
+    `expandCost` [10, 20, 35] panes, `width` [312, 468, 624, 780]; the nursery's room by size is
+    `nursery.capacity` [20, 30, 40, 50]; scrolling speeds `aquarium.scroll`; the animation length
+    `aquarium.buildSeconds`; the keys `keys.scrollLeft` / `keys.scrollRight`.
 - **New catch behaviours:** `mirror` (copies your swimming mirrored; hold still and it drifts in),
   `lure` (a glowing decoy on a stalk; net the dim creature beside it, not the light) and `midair`
   (leaps out of the water; only nettable in the air). See the header of data/creatures.js.

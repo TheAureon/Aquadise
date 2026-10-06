@@ -14,7 +14,7 @@ AQ.Nursery = (function () {
   N.id = () => { const t = (AQ.data.specialTanks || []).find((s) => s.nursery); return t ? t.id : null; };
   N.is = (tankId) => !!tankId && tankId === N.id();
   N.tank = () => AQ.Collection.tank(N.id());
-  N.capacity = () => AQ.TUNING.nursery.capacity;
+  N.capacity = () => AQ.Tanks.capacity(N.id());                  // grows with the nursery's SIZE (AQ.TUNING.nursery.capacity)
   N.occupancy = () => { const t = N.tank(); return t.creatures.length + (t.eggs || []).length + (t.storage || []).length; };
   N.room = () => Math.max(0, N.capacity() - N.occupancy());
   N.full = () => N.room() <= 0;
@@ -97,7 +97,7 @@ AQ.Nursery = (function () {
         if (!home || home === id) return;
         nt[list].splice(nt[list].indexOf(e), 1);
         const h = AQ.Collection.tank(home);
-        (h.creatures.length < AQ.TUNING.tank.capacity ? h.creatures : h.storage).push(e);
+        (h.creatures.length < AQ.Tanks.capacity(home) ? h.creatures : h.storage).push(e);
       });
     });
     if (nt.storage.length) { nt.creatures.push(...nt.storage); nt.storage.length = 0; }   // the nursery has no storage: everyone is in

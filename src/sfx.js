@@ -216,6 +216,15 @@ var AQ = (typeof AQ !== 'undefined') ? AQ : {};
   }, { important: true, minGap: 0.5 });
 
   // ---------------------------------------------------------------- aquarium
+  // EXPAND: soft glass panes set into place (muted taps) and a warm rising shimmer as the tank grows
+  reg('build', 'aquarium', (c, o, t) => {
+    for (let i = 0; i < 4; i++) {
+      H.tone(c, o, t + i * 0.22, { type: 'triangle', f: 520 + i * 40, f2: 380, d: 0.06, v: 0.05, lp: 1800 });
+      H.noise(c, o, t + i * 0.22, { ft: 'lowpass', f: 900, a: 0.002, d: 0.05, v: 0.04 });
+    }
+    [m(60), m(67), m(72)].forEach((f, i) => H.tone(c, o, t + 0.3 + i * 0.12, { f, a: 0.4, d: 1.3, v: 0.03 }));
+    return run(c, o, t + 0.95, [84, 88, 91, 96], 0.1, 0.045, 0.8) + 0.95;
+  }, { important: true, minGap: 1 });
   reg('place', 'aquarium', (c, o, t) => {
     H.tone(c, o, t, { type: 'triangle', f: 1500, d: 0.025, v: 0.04 });
     return H.tone(c, o, t, { f: 320, f2: 220, d: 0.07, v: 0.08 });

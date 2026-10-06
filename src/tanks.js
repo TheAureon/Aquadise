@@ -7,6 +7,7 @@
 //   AQ.Tanks.forCreature(d)  which tank a creature lives in (predators -> their predator tank)
 //   AQ.Tanks.themesOf(id)    biomes whose decor/plants count as "on theme" for that tank
 //   AQ.Tanks.migrate()       move any creature sitting in the wrong tank to its home (old saves)
+//   AQ.Tanks.size / capacity / decorCapacity / width / expandCost / expand   bigger tanks (SIZE 0..3)
 var AQ = (typeof AQ !== 'undefined') ? AQ : {};
 
 AQ.Tanks = (function () {
@@ -46,6 +47,36 @@ AQ.Tanks = (function () {
   T.isPredatorTank = (id) => { const d = T.get(id); return !!d && d.kind === 'predator'; };
   T.isNursery = (id) => { const d = T.get(id); return !!d && !!d.nursery; };
   T.themesOf = (id) => { const d = T.get(id); return d ? d.themes : [id]; };
+  // ---------------------------------------------------------------- tank size (SIZE 0..3, saved per tank)
+  // AQ.State.tanks[id].size (missing = 0, today's tank). Each level is wider, holds more creatures and
+  // more decor; the numbers are AQ.TUNING.tank (the nursery's room: AQ.TUNING.nursery.capacity).
+  const TT = () => AQ.TUNING.tank;
+  const at = (arr, lvl) => (Array.isArray(arr) ? arr[Math.min(lvl, arr.length - 1)] : arr);
+  T.maxSize = () => TT().expandCost.length;
+  T.size = (id) => { const t = AQ.State.tanks && AQ.State.tanks[id]; return Math.max(0, Math.min(T.maxSize(), (t && t.size) | 0)); };
+  T.capacity = (id, lvl = T.size(id)) => (T.isNursery(id) ? at(AQ.TUNING.nursery.capacity, lvl) : at(TT().capacity, lvl));
+  T.decorCapacity = (id, lvl = T.size(id)) => at(TT().decorCapacity, lvl);
+  T.width = (id, lvl = T.size(id)) => at(TT().width, lvl);
+  // how much bigger than a size-0 tank (crowding thresholds scale with it, so a bigger tank is never
+  // "crowded" at the numbers it was built for)
+  T.roomScale = (id) => T.capacity(id) / T.capacity(id, 0);
+  // panes needed for the next level (null at the maximum)
+  T.expandCost = (id) => { const l = T.size(id); return l >= T.maxSize() ? null : TT().expandCost[l]; };
+  // the smallest size whose capacity is at least n (null if even the biggest isn't enough)
+  T.sizeFor = (id, n) => { for (let l = 0; l <= T.maxSize(); l++) if (T.capacity(id, l) >= n) return l; return null; };
+  // EXPAND: uses the panes and makes the tank one size bigger. Returns 'ok' | 'max' | 'panes'.
+  T.expand = function (id) {
+    const cost = T.expandCost(id);
+    if (cost == null) return 'max';
+    if (!AQ.Panes.spend(cost)) return 'panes';
+    const t = AQ.Collection.tank(id);
+    t.size = T.size(id) + 1;
+    AQ.Save && AQ.Save.dirty();
+    return 'ok';
+  };
+  // a new creature (a catch, a graduate going home...): into the tank if there's room, else its storage
+  T.room = (id) => Math.max(0, T.capacity(id) - AQ.Collection.tank(id).creatures.length);
+
   T.forCreature = function (def) {
     if (!def) return null;
     if (def.predator) {
@@ -72,7 +103,7 @@ AQ.Tanks = (function () {
           t[list].splice(i, 1);
           const h = AQ.Collection.tank(home);
           // predators were often parked in storage to stop them stressing prey: now they get their own tank
-          if (h.creatures.length < AQ.TUNING.tank.capacity) h.creatures.push(e); else h.storage.push(e);
+          if (h.creatures.length < T.capacity(home)) h.creatures.push(e); else h.storage.push(e);
           moved++;
         }
       });

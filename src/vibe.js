@@ -27,8 +27,11 @@ AQ.Vibe = (function () {
   // Nervous creatures. Predators live in their own tanks now, so the only thing that makes anyone
   // nervous is crowding: past AQ.TUNING.aquarium.nervousAbove creatures, the smallest few get
   // nervous (one per creature over the limit). Nobody is ever hurt.
-  V.stressedIds = function (creatures) {
-    const out = new Set(), over = creatures.length - T().nervousAbove;
+  // (a bigger tank has room for more: the limit grows with it, AQ.Tanks.roomScale)
+  V.nervousAbove = (tankId) => Math.round(T().nervousAbove * (tankId ? AQ.Tanks.roomScale(tankId) : 1));
+  V.comfortable = (tankId) => Math.round(T().comfortable * (tankId ? AQ.Tanks.roomScale(tankId) : 1));
+  V.stressedIds = function (creatures, tankId) {
+    const out = new Set(), over = creatures.length - V.nervousAbove(tankId);
     if (over <= 0) return out;
     const rank = (e) => { const d = creatureDef(e.id); return d ? (SIZE_RANK[d.sprite_size] || 1) : 1; };
     creatures.slice().sort((a, b) => rank(a) - rank(b)).slice(0, over).forEach((e) => out.add(e.uid));
@@ -71,10 +74,11 @@ AQ.Vibe = (function () {
     const n = creatures.length;
     let stressed = new Set(), wants = [];
     if (n) {
-      stressed = V.stressedIds(creatures);
+      stressed = V.stressedIds(creatures, biomeId);
       parts.fed = V.fedLevel(tank);
       parts.calm = 1 - (stressed.size / n) * cfg.stressPenalty;
-      parts.space = n <= cfg.comfortable ? 1 : U.lerp(1, cfg.crowdedFloor, (n - cfg.comfortable) / Math.max(1, AQ.TUNING.tank.capacity - cfg.comfortable));
+      const comfy = V.comfortable(biomeId), cap = AQ.Tanks.capacity(biomeId);
+      parts.space = n <= comfy ? 1 : U.lerp(1, cfg.crowdedFloor, Math.min(1, (n - comfy) / Math.max(1, cap - comfy)));
       let liked = 0, withLikes = 0;
       creatures.forEach((e) => {
         const d = creatureDef(e.id); if (!d || !d.likes || !d.likes.length) return;
