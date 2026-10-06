@@ -159,6 +159,8 @@ AQ.TUNING = {
     fastNursery: false,       // TESTING ONLY: true makes breeding take seconds instead of minutes (the numbers below),
     fastNurserySeconds: { court: 5, egg: 6, grow: 25, cooldown: 4, check: 1 },   // so the whole nursery can be tried quickly
     hundredPanes: false,      // TESTING ONLY: true gives you 100 glass panes (topped back up to 100 whenever a game loads or starts)
+    nudges: false,            // TESTING ONLY: true adds a key (below) that shows a friendly nudge right now, cycling
+    nudgeKey: 'KeyY',         //   through net spam -> no catch for a while -> key mashing (it skips the rate limits)
     forceTouch: false         // TESTING ONLY: true shows the touch controls and makes the mouse act as a finger
   },                          //   (drag in the stick zone = joystick, click the on-screen buttons), to try them on a PC
   // Text that doesn't fit (long translations): it is squeezed sideways down to this much of its width,
@@ -323,6 +325,23 @@ AQ.TUNING = {
     streakSpeed: 0.6,         // ...and this much as fast
     landGlowSeconds: 2.4,     // a falling star's landing: a soft glow that swells and fades over this long
     landGlowAlpha: 0.22       //   (instead of the sparkle burst)
+  },
+
+  // Friendly nudges for a player who seems stuck (src/nudges.js; the lines are nudge.* in data/lang/en.js).
+  // Only active play in the sea counts (never menus, the guided dive, transitions or the tank screens).
+  nudges: {
+    enabled: true,            // the whole feature (HINTS off in the settings turns them off too)
+    showSeconds: 5,           // how long one stays (it also goes when you do something else...)
+    dismissGrace: 2.5,        // ...but not in its first seconds, so there's time to read it
+    minGap: 90,               // at most one every this many seconds...
+    maxPerWindow: 3,          // ...and at most this many...
+    windowSeconds: 600,       // ...in this many seconds (10 minutes)
+    afterCatch: 60,           // none this soon (seconds) after a catch
+    spam: { swings: 12, seconds: 20, fastClicks: 4, fastSeconds: 3 },   // 12 swings in 20 s with no catch, or 4+ clicks a second for 3 s
+    drought: { seconds: 240, newGameSeconds: 180, idleGrace: 20 },    // no catch for 4 min of play (3 min in a new game); away from the keys
+                                                                       // for more than idleGrace seconds doesn't count
+    mash: { presses: 6, seconds: 8 },   // the same key that does nothing here, 6 times in 8 seconds
+    droughtRedoButton: true   // the "no catch for a while" nudge also shows a small REDO TUTORIAL button
   },
 
   // REDO TUTORIAL (src/redo.js): closer than this (px) to the Tide Pools' starting spot, the guided dive

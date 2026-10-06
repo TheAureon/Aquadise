@@ -279,6 +279,27 @@ browsers won't let a page save pictures made from file:// images.
     no trip). Text: `dive.*` in `data/lang/en.js`. Tuning: `AQ.TUNING.dive`. Testing: set
   `debug.tutorialReset: true` and press **R** to restart the dive and reset every tip
   (`debug.tutorialResetKey`).
+- **Friendly nudges for players who struggle** (`src/nudges.js`): now and then, a short, light line in
+  the tip-box style (top centre, with a small icon and the soft "new tip" sound) when someone seems
+  stuck. They never mention the log or the Guide and are never bossy, never pause or block anything,
+  and go after 5 seconds or when you do something else (a click on the box closes it too).
+  - **Where they can happen:** only active play in the sea counts. Never in a menu, the guided dive (or
+    its question), a transition, photo mode or the tank and nursery screens.
+  - **Three situations,** each with its own 12 lines (`nudge.*` in `data/lang/en.js`), shuffled so a
+    line doesn't repeat until all of its kind have shown (the shuffle is saved):
+    - **net spam** (teasing): 12 swings in 20 seconds with no catch (holding to pry isn't a swing), or 4+
+      clicks a second for 3 seconds;
+    - **no catch for a long time** (encouraging): 4 minutes of active play without a catch (3 in a game
+      with nothing caught yet); being away from the keys for more than 20 seconds doesn't count. These
+      also show a small REDO TUTORIAL button (`nudges.droughtRedoButton`);
+    - **key mashing** (silly): the same key that does nothing in the sea (the interact key, say), 6
+      times in 8 seconds.
+  - **Rate limits:** at most one every 90 seconds and 3 per 10 minutes, none within 60 seconds of a
+    catch, and none while a tip or toast is showing (tips wait for a nudge, too). HINTS off turns them
+    off, and `nudges.enabled` turns the whole feature off.
+  - Tuning: `AQ.TUNING.nudges`. **Testing:** set `debug.nudges: true` and press **Y** in the sea to show
+    one right now (it skips the rate limits), cycling net spam, no catch, key mashing
+    (`debug.nudgeKey`).
 - **The GUIDE.** A small paged field-guide book: from the title screen (GUIDE), the pause menu
   (GUIDE) or the help line's key (**I** by default, `keys.guide`). Left/right, A/D or the arrows turn
   the page; Esc or the guide key closes it. Ten short pages, each with a picture: moving, swimming and
@@ -527,6 +548,7 @@ data/glyphs.js        the pixel font's characters (add letters for other languag
 src/tips.js           one-time tips: events, queue, safe placement, saved as seen
 src/dive.js           the optional guided first dive: prompt, steps, checklist, markers
 src/redo.js           REDO TUTORIAL: the question, the trip to the Tide Pools and back
+src/nudges.js         friendly nudges: noticing a stuck player (net spam, no catch, key mashing), rate limits
 src/guide.js          the GUIDE: a paged field-guide book (title, pause menu, help-line key)
 src/savefile.js       EXPORT / IMPORT SAVE, import checks + confirm, the save-recovery choice
 src/starfall.js       falling stars + meteor showers: nightly plan, landings, light columns, map/HUD marks

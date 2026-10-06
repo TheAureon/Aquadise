@@ -97,6 +97,7 @@ AQ.Input = (function () {
     // swallow a press so nothing else acts on it this frame (e.g. Esc that only closed a tip)
     consume: (...codes) => codes.forEach((c) => pressed.delete(c)),
     anyPressed: () => pressed.size > 0,
+    pressedCodes: () => [...pressed],                            // every key pressed this frame (src/nudges.js)
     axis() {
       if (!enabled) return { x: 0, y: 0 };
       let x = 0, y = 0;

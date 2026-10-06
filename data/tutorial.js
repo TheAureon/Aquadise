@@ -29,6 +29,7 @@ AQ.data = AQ.data || {};
 
 AQ.data.tutorial = {
   helpLines: 2, touchHelpLines: 2, controls: 9,
+  nudges: { spam: 12, drought: 12, mash: 12 },   // friendly nudges: how many lines of each kind (nudge.<kind>.<n>, src/nudges.js)
   dive: { prompt: { lines: 2 }, steps: ['move', 'jump', 'swim', 'sneak', 'net', 'catch', 'bait', 'log', 'done'], nice: 4 },
   guide: [
     { id: 'moving', icon: 'player', scale: 2, lines: 5 },

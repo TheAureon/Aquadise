@@ -94,6 +94,7 @@ AQ.Tips = (function () {
     }
     T.gap -= dt;
     if (T.gap > 0 || !ctx) return;
+    if (AQ.Nudges && AQ.Nudges.showing()) return;   // a friendly nudge is up: wait (they never overlap)
     const i = T.queue.findIndex((tip) => fits(tip, ctx) && !T.seen(tip.id));
     if (i < 0) return;
     const tip = T.queue.splice(i, 1)[0];

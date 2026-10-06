@@ -115,6 +115,7 @@ AQ.Game = (function () {
       if (AQ.LogButton && AQ.LogButton.update(dt, G)) return;   // the HUD counter is the log button (a click on it is used up)
       if (AQ.Tips) AQ.Tips.update(dt, G);           // one-time tips (first, so an Esc / click that closes a tip is used up)
       if (AQ.Dive) AQ.Dive.update(dt, G);           // the optional guided dive (its buttons' clicks never swing the net)
+      if (AQ.Nudges) AQ.Nudges.update(dt, G);       // friendly nudges for a player who seems stuck (src/nudges.js)
       if (AQ.TUNING.debug.tutorialReset && I.wasPressed(AQ.TUNING.debug.tutorialResetKey) && AQ.Dive) { AQ.Tips.reset(); AQ.Dive.start(G); AQ.HUD.toast(AQ.t('debug.tutorialReset'), '#cfe8ff'); }
       if (!frozen) {
         if (AQ.TUNING.debug.timeSkip && I.wasPressed(AQ.TUNING.debug.timeSkipKey)) { AQ.Clock.set(AQ.Clock.hour() + AQ.TUNING.clock.skipHours); AQ.HUD.toast(AQ.t('debug.timeSkip', { time: AQ.HUD.clockText() }), '#cfe8ff'); }
@@ -213,6 +214,7 @@ AQ.Game = (function () {
     AQ.HUD.draw(ctx, G);
     if (G.state === 'play' && AQ.Tips) AQ.Tips.draw(ctx, G);
     if (G.state === 'play' && AQ.Dive) AQ.Dive.draw(ctx, G);
+    if (G.state === 'play' && AQ.Nudges) AQ.Nudges.draw(ctx, G);
     if (G.state === 'map') AQ.MapUI.draw(ctx, G);
     if (G.state === 'log') AQ.LogUI.draw(ctx, G);
     if (G.state === 'pause') AQ.PauseUI.draw(ctx, G);

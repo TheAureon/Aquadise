@@ -42,6 +42,7 @@ AQ.Catching = (function () {
       if (aim[0]) P.facing = aim[0] > 0 ? 1 : -1;
       AQ.Audio.play('swing');
       if (AQ.Dive) AQ.Dive.event('swing');
+      if (AQ.Nudges) AQ.Nudges.swing();             // (lots of swings and no catch: a friendly nudge, src/nudges.js)
       // some creatures react to the swing itself (curious dodgers, defensive pinchers)
       for (const c of AQ.Creatures.near(P.x, P.y, 48)) if (c.bhv.onSwing) c.bhv.onSwing(c, ctxFor(game, c));
     }
@@ -144,6 +145,7 @@ AQ.Catching = (function () {
     c.harvested = true;
     c.st = AQ.TUNING.plants.regrowTime;
     const isNew = AQ.Collection.recordHarvest(c.def);
+    if (AQ.Nudges) AQ.Nudges.caught();
     AQ.FX.sparkle(c.x, c.y - 5, '#cfffbf', 8);
     AQ.HUD.toast(AQ.t(isNew ? 'catch.harvestedNew' : 'catch.harvested', { name: c.def.name }), isNew ? '#ffe36b' : '#cfffbf');
     AQ.Audio.play('harvest');
@@ -160,6 +162,7 @@ AQ.Catching = (function () {
     if (c.bhv.onCaught) c.bhv.onCaught(c, ctx);
     AQ.Creatures.remove(c);
     const isNew = AQ.Collection.recordCatch(c.def, c.sex);
+    if (AQ.Nudges) AQ.Nudges.caught();
     AQ.FX.sparkle(c.x, c.y, '#fff7c2', 12);
     AQ.FX.text(c.x, c.y - 8, AQ.t(pried ? 'catch.pried' : 'catch.gotIt'), '#ffe36b');
     AQ.HUD.toast(AQ.t(isNew ? 'catch.caughtNew' : 'catch.caught', { name: c.def.name }), isNew ? '#ffe36b' : '#ffffff', 3);
