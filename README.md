@@ -149,6 +149,27 @@ browsers won't let a page save pictures made from file:// images.
   first), then singles, and the question says what waits in storage and which size fits them all
   ("A pair of each needs room for 18: expand the tank to size 1"). Logic: `src/pairs.js`. Not in the
   nursery.
+- **Releasing creatures:** every info card has **RELEASE**: a creature in the tank (click it), one
+  waiting in storage (the small "i" on its FISH-tray tile opens its card, with INTO TANK and RELEASE) or a
+  baby in the nursery. The TANK tab has **RELEASE EXTRAS** and **SELECT TO RELEASE**. A released creature
+  swims up and away with a sparkle and a soft chime (RELEASE CHIME in the Sound Test), with a quiet note
+  ("Goodbye, Ribbonmane! Released into the sea."). It's simply removed from your collection: no wild
+  respawn trick, and nothing else changes. The log's discovered species, the ♂ / ♀ slots, the
+  rare-variant marks, the "bred" marker and the catch counts all stay exactly as they are
+  (`src/release.js` never touches the log). A courting pair that loses one simply stops courting.
+  - **Always asks:** every release asks for confirmation first.
+  - **A second, clearly worded question** comes before releasing a rare variant (✦), the last ♂ or ♀ of
+    a species you have (or the last one of a species without sexes), a nursery baby or one still growing
+    ("This is a rare variant (✦). Release it anyway?", RELEASE ANYWAY / CANCEL).
+  - **RELEASE EXTRAS** only takes from the tank's storage, never from the tank itself or the nursery. It
+    keeps one pair of every species (the same pair ONE PAIR EACH would show), every rare variant, the
+    last of a sex and anything still growing, and shows a preview first ("Release 9 creatures from
+    storage? Keeping one pair of every species, all rare variants and anything still growing.").
+  - **SELECT TO RELEASE** is the careful way: the tray shows the storage creatures, a tap or click
+    picks one (a warm frame and a tick), and RELEASE n / DONE replace the tabs. If any picked one
+    deserves a second look, you're asked about those first (RELEASE THEM TOO / KEEP THOSE), then the
+    final CONFIRM. Esc or DONE leaves select mode.
+  - Tuning: `aquarium.releaseSeconds` (how long the swim-away takes).
 - **New catch behaviours:** `mirror` (copies your swimming mirrored; hold still and it drifts in),
   `lure` (a glowing decoy on a stalk; net the dim creature beside it, not the light) and `midair`
   (leaps out of the water; only nettable in the air). See the header of data/creatures.js.
@@ -457,6 +478,7 @@ src/aquarium.js       tanks, decorating, creature life + moods, info card, overv
 src/vibe.js           tank happiness (stars), helping/missing reasons, unlock milestones
 src/panes.js          glass panes: the building material for the tanks (count, add, spend, the counter)
 src/pairs.js          ONE PAIR EACH: which creatures a tank shows (a pair of every species) and the moves
+src/release.js        releasing creatures: which ones need a second look, RELEASE EXTRAS' choice, removing them
 src/transition.js     reusable fade-to-black scene transition (AQ.Transition.go)
 src/scenes.js         scene system: world / hill / station, scene switching, save restore, prompts
 src/miniworld.js      small collision maps for side scenes (ladders, one-way platforms)

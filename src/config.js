@@ -129,6 +129,7 @@ AQ.TUNING = {
     // the water, the mouse wheel, the strip under the tank, or carrying a piece to the edge of the view
     scroll: { keySpeed: 180, edgeSpeed: 110, edgeZone: 14 },   // px per second; edgeZone: px from the view's edge
     buildSeconds: 1.6,        // the EXPAND animation: how long the new glass takes to sweep out
+    releaseSeconds: 1.8,      // a released creature swims up and away, fading out, over this long
     unlockStars: [2, 3.5, 5]  // tank stars needed for each biome's unlock tiers 1, 2 and 3 (new themed decor)
   },
 

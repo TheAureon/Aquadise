@@ -134,6 +134,8 @@ const SCREENS = [
   ['tank-tab', () => { const A = AQ.Aquarium; A.card = null; A.tray = 'tank'; }],
   ['tank-expand', () => { AQ.State.panes = 100; AQ.Aquarium.startExpand(); }],
   ['tank-wide', () => { const A = AQ.Aquarium; A.dialog = null; AQ.Collection.tank('kelp').size = 2; A.rebuild(); A.scrollTo(150); A.tray = 'decor'; }],
+  ['tank-select', () => { const A = AQ.Aquarium; A.dialog = null; const t = AQ.Collection.tank('kelp'); if (!t.storage.length) t.storage.push({ uid: 'chk1', id: 'ribbonmane', sex: 'm' }, { uid: 'chk2', id: 'ribbonmane', sex: 'f', variant: true }); A.rebuild(); A.select = new Set(['chk1']); A.tray = 'fish'; }],
+  ['tank-release', () => { const A = AQ.Aquarium; A.select = null; A.tray = 'tank'; A.releaseExtras(); }],
   ['nursery-card', () => { const A = AQ.Aquarium; A.open(AQ.Game, 'station', 'nursery'); A.tray = 'fish'; A.card = A.fish[0] && A.fish[0].uid; }],
   ['photo-mode', () => { const A = AQ.Aquarium; A.open(AQ.Game, 'station', 'kelp'); A.card = null; AQ.Input.vPress(AQ.TUNING.photo.key); }],
   ['log-species', () => { AQ.Input.vRelease(AQ.TUNING.photo.key); AQ.Aquarium.photo.on = false; AQ.LogUI.open(AQ.Game, 'title'); AQ.LogUI.tab = 'species'; }],

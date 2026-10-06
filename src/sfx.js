@@ -225,6 +225,11 @@ var AQ = (typeof AQ !== 'undefined') ? AQ : {};
     [m(60), m(67), m(72)].forEach((f, i) => H.tone(c, o, t + 0.3 + i * 0.12, { f, a: 0.4, d: 1.3, v: 0.03 }));
     return run(c, o, t + 0.95, [84, 88, 91, 96], 0.1, 0.045, 0.8) + 0.95;
   }, { important: true, minGap: 1 });
+  // RELEASE: a soft, airy chime drifting upward, like bubbles rising out of the tank
+  reg('release', 'aquarium', (c, o, t) => {
+    H.noise(c, o, t, { f: 900, f2: 2600, q: 0.7, a: 0.15, d: 0.7, v: 0.03 });
+    return run(c, o, t + 0.1, [79, 84, 86, 91, 96], 0.14, 0.04, 1.1) + 0.1;
+  }, { important: true, minGap: 0.8 });
   reg('place', 'aquarium', (c, o, t) => {
     H.tone(c, o, t, { type: 'triangle', f: 1500, d: 0.025, v: 0.04 });
     return H.tone(c, o, t, { f: 320, f2: 220, d: 0.07, v: 0.08 });
