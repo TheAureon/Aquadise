@@ -333,7 +333,7 @@ browsers won't let a page save pictures made from file:// images.
     save is checked carefully (an Aquadise save, the right structure, a version this game understands)
     and refuses anything else with a friendly message, then asks before replacing your save; the
     imported save loads through the normal loading and migration, just like an old save, and your
-    previous save becomes the backup. Saves carry a version number (`AQ.Save.VERSION`, now 2; the
+    previous save becomes the backup. Saves carry a version number (`AQ.Save.VERSION`, now 3; the
     original v1 saves still load). Before every save the previous good one is kept as a backup. If your
     save can't be read, the title asks whether to restore the backup (or import a file) or start fresh,
     and the unreadable save is never overwritten: starting fresh keeps it aside
