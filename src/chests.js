@@ -1,4 +1,5 @@
-// Treasure chests: the only source of progression (bigger net, faster swimming).
+// Treasure chests: the only source of progression (bigger net, faster swimming), and of glass panes
+// (the building material for the tanks: AQ.TUNING.panes, src/panes.js).
 // A handful exist at once at random seabed spots; opened or expired chests despawn and new ones
 // respawn elsewhere after a delay.
 var AQ = (typeof AQ !== 'undefined') ? AQ : {};
@@ -56,7 +57,7 @@ AQ.Chests = (function () {
         if (Math.hypot(P.x - c.x, P.y - (c.y - 6)) < 13) {
           c.state = 'open'; c.t = 0;
           if (AQ.Tips) AQ.Tips.event('chest');
-          const what = reward(game);
+          const what = reward(game), panes = AQ.Panes ? AQ.Panes.roll() : 0;
           AQ.FX.sparkle(c.x, c.y - 8, '#ffe36b', 18);
           AQ.Audio.play('chest');
           if (what) AQ.Audio.play({ net: 'up_net', speed: 'up_speed', lantern: 'up_lantern', depth: 'up_depth' }[what], { delay: 0.75 });
@@ -64,7 +65,12 @@ AQ.Chests = (function () {
           else if (what === 'speed') AQ.HUD.toast(AQ.t('chest.speed', { n: game.upgrades.speed }), '#7ef0c0', 3.5);
           else if (what === 'lantern') AQ.HUD.toast(AQ.t('chest.lantern', { n: game.upgrades.lantern }), '#ffe9a8', 3.5);
           else if (what === 'depth') AQ.HUD.toast(AQ.t('chest.depth', { n: game.upgrades.depth }), '#9fd8ff', 3.5);
-          else AQ.HUD.toast(AQ.t('chest.empty'), '#cfe8ff');
+          // glass panes: on top of the upgrade (their own toast), or on their own once every upgrade is maxed
+          if (panes) {
+            AQ.Panes.add(panes);
+            AQ.HUD.toast(AQ.t(what ? 'chest.panes' : 'chest.onlyPanes', { n: panes, panes: AQ.Panes.name(panes) }), '#bfefff', 3.5);
+            AQ.Audio.play('panes', { delay: what ? 1.3 : 0.6 });
+          } else if (!what) AQ.HUD.toast(AQ.t('chest.empty'), '#cfe8ff');
         } else if (c.t > c.life) { AQ.FX.puff(c.x, c.y - 4, 'rgba(220,210,180,0.6)', 8); remove(i); }
       } else if (c.t > 2.5) remove(i);
     }

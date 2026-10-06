@@ -100,6 +100,14 @@ browsers won't let a page save pictures made from file:// images.
   dive before the water gets heavy: you slow down, the view softens and you drift back up, never
   any damage). Limits are in `upgrades.depthLimitY`; level 0 reaches everything except the bottom of the
   trench's rounded floor, which each level lets you sink a little further into (level 3 reaches the bottom).
+- **Glass panes (building material):** the one material used for every tank. Every chest holds 2-4
+  panes on top of its upgrade; once all four upgrades are maxed, a chest holds only panes ("You found
+  3 glass panes!"). The amount shows in the chest's toast. A small counter (a pane icon and the
+  number) sits in the top-right corner of the HUD under the clock, once you've found any, and on the
+  TANKS overview. Saved with the game; older saves start with 0. The first time you get some, a tip
+  explains them. The name is `pane.name` in `data/lang/en.js` (change it there and every text follows).
+  Tuning: `AQ.TUNING.panes` (`chestMin`, `chestMax`). **Testing:** set `debug.hundredPanes: true` in
+  `src/config.js` and every game you load or start has 100 panes.
 - **New catch behaviours:** `mirror` (copies your swimming mirrored; hold still and it drifts in),
   `lure` (a glowing decoy on a stalk; net the dim creature beside it, not the light) and `midair`
   (leaps out of the water; only nettable in the air). See the header of data/creatures.js.
@@ -141,7 +149,8 @@ browsers won't let a page save pictures made from file:// images.
   it's in the Sound Test as SHOOTING STAR. Tuning: `AQ.TUNING.shootingStars` (how often, speed, trail
   length, angle, tints, underwater glow, sound volume).
 - **No fail state.** Hostile creatures only knock you back. Air is unlimited.
-- **Progression** comes only from chests: a bigger net (3 levels) and faster swimming (3 levels).
+- **Progression** comes only from chests: a bigger net (3 levels) and faster swimming (3 levels),
+  the LAMP and DEEP upgrades, and glass panes for building bigger tanks.
   Six chests exist at a time, and they despawn and respawn around the world.
 - **Getting to the aquarium.** Walk left off the far edge of Tide Pools (by the little signpost)
   and the screen fades to a separate hill scene. Walk up the hill and stand in the UFO's beam,
@@ -405,6 +414,7 @@ src/creatures.js      spawning / simulation / drawing of creatures + plants
 src/catching.js       net, pry, bait
 src/aquarium.js       tanks, decorating, creature life + moods, info card, overview, undo
 src/vibe.js           tank happiness (stars), helping/missing reasons, unlock milestones
+src/panes.js          glass panes: the building material for the tanks (count, add, spend, the counter)
 src/transition.js     reusable fade-to-black scene transition (AQ.Transition.go)
 src/scenes.js         scene system: world / hill / station, scene switching, save restore, prompts
 src/miniworld.js      small collision maps for side scenes (ladders, one-way platforms)

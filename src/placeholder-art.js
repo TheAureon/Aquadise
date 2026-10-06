@@ -1346,6 +1346,15 @@
     if (o.frame === 0) { p.rect(6, 3, 1, 3, gold); p.set(6, 6, gold); } else { p.rect(7, 3, 1, 3, gold); p.set(7, 6, gold); }   // the tassel
     p.outline(0.25);
   };
+  // glass panes (8 x 8, 2 frames): a small stack of two pale-blue panes with a white edge; frame 1 adds a glint
+  S.uipane = function (p, o) {
+    const back = hex('#6fa8c8'), glass = hex('#bfe8f6'), edge = hex('#f4fdff'), deep = hex('#8cc6de');
+    p.rect(2, 0, 6, 6, back);                                               // the pane behind
+    p.rect(0, 2, 6, 6, glass); p.rect(0, 2, 6, 1, edge); p.rect(0, 2, 1, 6, edge);   // the front pane, lit top-left
+    p.rect(3, 5, 2, 2, deep);
+    if (o.frame === 1) { p.set(2, 4, edge); p.set(3, 3, edge); p.set(1, 5, edge); }   // a glint across the glass
+    p.outline(0.3);
+  };
   S.uistick = function (p, o) {
     const c = 15.5;
     if (o.frame === 0) {

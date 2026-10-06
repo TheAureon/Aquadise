@@ -209,6 +209,12 @@ var AQ = (typeof AQ !== 'undefined') ? AQ : {};
     return 2;
   }, { important: true });
 
+  // glass panes from a chest: a few light glassy clinks, like panes settling in a crate
+  reg('panes', 'upgrades', (c, o, t) => {
+    [96, 100, 103].forEach((n, i) => { H.bell(c, o, t + i * 0.09 + rnd(0, 0.02), m(n), 0.03, 0.35); H.noise(c, o, t + i * 0.09, { ft: 'highpass', f: 5200, a: 0.001, d: 0.02, v: 0.02 }); });
+    return 0.6;
+  }, { important: true, minGap: 0.5 });
+
   // ---------------------------------------------------------------- aquarium
   reg('place', 'aquarium', (c, o, t) => {
     H.tone(c, o, t, { type: 'triangle', f: 1500, d: 0.025, v: 0.04 });

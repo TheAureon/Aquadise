@@ -62,6 +62,7 @@ add('ui.icons', 'sprites/ui/icons.png', 'uiicons', [12, 12], { shape: 'uiicons',
 add('ui.touch', 'sprites/ui/touch.png', 'uitouch', [16, 16], { shape: 'uitouch', fit: false });
 add('ui.stick', 'sprites/ui/stick.png', 'uistick', [32, 32], { shape: 'uistick', fit: false });
 add('ui.gradcap', 'sprites/ui/gradcap.png', 'uigradcap', [8, 8], { shape: 'uigradcap', fit: false });
+add('ui.pane', 'sprites/ui/pane.png', 'uipane', [8, 8], { shape: 'uipane', fit: false });
 add('misc.bottle', 'sprites/scene/bottle.png', 'bottle', [12, 14], { shape: 'bottle', fit: false });
 add('misc.beampad', 'sprites/scene/beampad.png', 'propanim', [40, 12], { shape: 'beampad' });
 add('misc.console', 'sprites/scene/console.png', 'propanim', [20, 28], { shape: 'console' });

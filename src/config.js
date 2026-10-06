@@ -68,6 +68,10 @@ AQ.TUNING = {
 
   chests: { active: 6, respawnMin: 40, respawnMax: 80, lifetime: 300, minPlayerDist: 220 },
 
+  // Glass panes: the building material for every tank (src/panes.js). Every chest drops this many
+  // (a random whole number in the range), on top of its upgrade; with every upgrade maxed, just panes.
+  panes: { chestMin: 2, chestMax: 4 },
+
   creatures: {
     simRadius: 520,      // creatures farther than this from the player are frozen
     respawnTime: 45      // seconds before a caught creature's slot refills
@@ -140,6 +144,7 @@ AQ.TUNING = {
                               //   longer and in [!! brackets !!], to spot untranslated text and layout problems)
     fastNursery: false,       // TESTING ONLY: true makes breeding take seconds instead of minutes (the numbers below),
     fastNurserySeconds: { court: 5, egg: 6, grow: 25, cooldown: 4, check: 1 },   // so the whole nursery can be tried quickly
+    hundredPanes: false,      // TESTING ONLY: true gives you 100 glass panes (topped back up to 100 whenever a game loads or starts)
     forceTouch: false         // TESTING ONLY: true shows the touch controls and makes the mouse act as a finger
   },                          //   (drag in the stick zone = joystick, click the on-screen buttons), to try them on a PC
   // Text that doesn't fit (long translations): it is squeezed sideways down to this much of its width,

@@ -6,6 +6,7 @@ AQ.State = {
   plants: {},       // id -> plants in inventory (usable as decorations)
   tanks: {},        // tankId (biome id or predator tank id) -> { creatures: [{uid,id}], storage: [{uid,id}], decor: [{uid,type,id,x,y}] }
   upgrades: { net: 1, speed: 1, lantern: 0, depth: 0 },
+  panes: 0,         // glass panes (building material for the tanks; src/panes.js)
   unlocks: {},      // decorId -> true once unlocked by a tank's happiness
   tankBest: {},     // biomeId -> best stars that tank has ever reached
   settings: {},     // player options (e.g. stationZoomOut)

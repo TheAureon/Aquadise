@@ -17,7 +17,7 @@
 //          where   'play' (out in the world: sea, hill, building) | 'tank' (the tank screen) | 'any' (either)
 //          needs   optional module the feature needs (e.g. 'Starfall'): skipped if the build doesn't have it
 //          known   things that prove a returning player already knows it (older saves skip those tips):
-//                  caughtAny chest deep night bottle star station tank tankstar pair bred bumped graduated
+//                  caughtAny chest deep night bottle star station tank tankstar pair bred bumped graduated panes
 //          icon    optional: a sprite key ('chest', 'misc.bottle', 'creature.<id>'...) or 'ui:<n>' for
 //                  the small UI icons (0 alert, 1 moon, 2 star, 3 heart, 4 book, 5 sneak, 6 sparkle)
 // A Guide page: id (its text is guide.<id>.*), icon (a sprite key or 'ui:<n>'), optional `needs` (a
@@ -33,7 +33,7 @@ AQ.data.tutorial = {
   guide: [
     { id: 'moving', icon: 'player', scale: 2, lines: 5 },
     { id: 'catching', icon: 'creature.glasswinged_minnow', lines: 6 },
-    { id: 'chests', icon: 'chest', needs: 'Chests', lines: 5 },
+    { id: 'chests', icon: 'chest', needs: 'Chests', lines: 6, lineNeeds: { 6: 'Panes' } },
     { id: 'daynight', icon: 'ui:1', lines: 5, lineNeeds: { 4: 'Starfall', 5: 'Starfall' } },
     { id: 'aquarium', icon: 'misc.ufo', lines: 5 },
     { id: 'tanks', icon: 'decor.castle', lines: 5 },
@@ -61,6 +61,7 @@ AQ.data.tutorial = {
     { id: 'baby', on: ['baby'], where: 'any', needs: 'Breeding', known: ['bred'], icon: 'ui:3' },
     { id: 'nursery', on: ['nursery'], where: 'tank', needs: 'Nursery', known: ['graduated'], icon: 'ui:3' },
     { id: 'flashing', on: ['flash'], where: 'any', icon: 'ui:6' },
-    { id: 'bumped', on: ['bumped'], where: 'play', known: ['bumped'], icon: 'ui:0' }
+    { id: 'bumped', on: ['bumped'], where: 'play', known: ['bumped'], icon: 'ui:0' },
+    { id: 'panes', on: ['panes'], where: 'play', needs: 'Panes', known: ['panes'], icon: 'ui.pane' }
   ]
 };

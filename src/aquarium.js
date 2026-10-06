@@ -1314,7 +1314,8 @@ AQ.Aquarium = (function () {
     F().draw(g, AQ.t('overview.title'), 6, 4, '#ffe9a8', { max: 110 });
     const total = real.reduce((a, o) => a + o.v.creatures, 0), stars = real.reduce((a, o) => a + o.v.stars, 0);
     const lockable = AQ.data.decorations.filter((d) => d.unlock), got = lockable.filter((d) => AQ.Vibe.isUnlocked(d)).length;
-    const tl = 6 + titleW + 8, tr = 288;                              // between the title and the TANK button
+    const pw = AQ.Panes ? AQ.Panes.drawCounter(g, 289, 3, { shadow: false }) : 0;   // glass panes, beside the TANK button
+    const tl = 6 + titleW + 8, tr = 288 - (pw ? pw + 4 : 0);          // between the title and the panes / TANK button
     F().draw(g, AQ.t('overview.totals', { n: total, stars, got, all: lockable.length }), Math.max(186, tl + Math.min(tr - tl, F().width(AQ.t('overview.totals', { n: total, stars, got, all: lockable.length }))) / 2), 4, '#8fb6cc', { align: 'center', max: tr - tl });
     overviewButtons().forEach((r) => button(g, r, hit(r, m)));
     A.overview.forEach((o) => {

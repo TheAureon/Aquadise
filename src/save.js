@@ -4,6 +4,7 @@
 // fresh; src/savefile.js shows the choice). If the browser blocks storage the game keeps running unsaved
 // and says so (export still works). Files (export / import) live in src/savefile.js.
 // Format: { game: 'aquadise', v: VERSION, savedAt, state, scene, player }. v1 saves (no `game`) still load.
+// State.panes (glass panes, a number) was added without a version bump: older saves simply start with 0.
 // v3: the Universal Nursery (src/nursery.js). Older saves load the same way; on loading, babies still
 // growing and eggs in any tank move into the nursery (AQ.Nursery.migrate, safe to run on every load).
 var AQ = (typeof AQ !== 'undefined') ? AQ : {};
@@ -61,6 +62,7 @@ AQ.Save = (function () {
     AQ.State.plants = st.plants || {};
     AQ.State.tanks = st.tanks || {};
     AQ.State.upgrades = Object.assign({ net: 1, speed: 1, lantern: 0, depth: 0 }, st.upgrades || {});   // older saves: new upgrades at 0
+    AQ.State.panes = typeof st.panes === 'number' && st.panes >= 0 ? Math.floor(st.panes) : 0;   // older saves: no glass panes yet
     AQ.State.unlocks = st.unlocks || {};      // older saves: nothing unlocked yet, best stars 0
     AQ.State.tankBest = st.tankBest || {};
     AQ.State.settings = st.settings || {};   // player options (e.g. the building's zoomed-out view)
@@ -80,6 +82,7 @@ AQ.Save = (function () {
     else { AQ.State.tutorial = { seen: {}, diveAsked: true }; if (AQ.Tips) AQ.Tips.inferFromProgress(); }
     if (AQ.Sex) AQ.Sex.migrate();              // older saves: give caught creatures a sex, fill ♂/♀ log slots
     if (AQ.Nursery) AQ.Nursery.migrate();      // older saves: babies + eggs move into the Universal Nursery (if there's room)
+    if (AQ.Panes) AQ.Panes.debugTopUp();       // TESTING ONLY flag: 100 glass panes
     // where you were: scene + spot (older saves have no scene -> the sea world). Validated against
     // that scene's map at boot (AQ.Scenes.restore), which falls back to a safe spot if needed.
     game.scene = (data.scene && AQ.Scenes.list[data.scene]) ? data.scene : 'world';
@@ -149,6 +152,8 @@ AQ.Save = (function () {
     AQ.State.starfall = { night: 0, lastStar: 0, phase: null, plan: null, landings: [] };
     if (AQ.Creatures) AQ.Creatures.list.filter((c) => c.landing).forEach((c) => { c.fadedOut = true; AQ.Creatures.remove(c); });   // no stars waiting in a new game
     AQ.State.upgrades = { net: 1, speed: 1, lantern: 0, depth: 0 };
+    AQ.State.panes = 0;
+    if (AQ.Panes) AQ.Panes.debugTopUp();
     game.upgrades = AQ.State.upgrades;
     const st = AQ.data.world.playerStart, P = game.player;
     P.x = st[0]; P.y = st[1]; P.vx = P.vy = 0; P.speedLevel = 1;

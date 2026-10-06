@@ -309,6 +309,28 @@ AQ.manifest = {
     7
    ]
   },
+  "ui.pane": {
+   "file": "sprites/ui/pane.png",
+   "fw": 8,
+   "fh": 8,
+   "anchor": [
+    4,
+    4
+   ],
+   "anims": {
+    "idle": {
+     "row": 0,
+     "frames": 2,
+     "fps": 0.5
+    }
+   },
+   "vis": [
+    0,
+    0,
+    7,
+    7
+   ]
+  },
   "misc.bottle": {
    "file": "sprites/scene/bottle.png",
    "fw": 12,

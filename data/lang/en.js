@@ -231,6 +231,7 @@ AQ.langFiles.en = {
   'tip.nursery': 'The nursery! Babies grow up here, and a grown one wears a little cap. Press GRADUATE on its card (or under it in the FISH tray) to send it to its own tank\'s storage. GRADUATE ALL sends every grown baby.',
   'tip.flashing': 'Bright flashes or blinking lights bothering you? Turn on REDUCE FLASHING in Pause > SETTINGS > OPTIONS.',
   'tip.bumped': 'Just a bump! Nothing in the sea can hurt you. Some creatures only nudge you back a little.',
+  'tip.panes': 'Glass panes! Every chest holds a few. They are for building: use them in your aquarium to make tanks bigger. Your count is in the top right corner.',
 
   // ---------------------------------------------------------------- the guided first dive
   'dive.prompt.title': 'Want a quick guided dive?',
@@ -276,6 +277,7 @@ AQ.langFiles.en = {
   'guide.chests.3': 'SPEED: faster swimming. LAMP: more light around you in the dark.',
   'guide.chests.4': 'DEEP: dive deeper. Past your depth the water just turns heavy:',
   'guide.chests.5': 'nothing is ever hurt, you simply drift back up.',
+  'guide.chests.6': 'Every chest also holds a few GLASS PANES, for building bigger tanks.',
   'guide.daynight.title': 'Day and night',
   'guide.daynight.1': 'A whole day passes in about {c:clock.dayMinutes} real minutes. The HUD shows the sun or moon.',
   'guide.daynight.2': 'Some creatures only come out at night, and glowing ones are easier to spot.',
@@ -393,6 +395,11 @@ AQ.langFiles.en = {
   'chest.lantern': 'BRIGHTER LANTERN! (LV {n})',
   'chest.depth': 'DEEPER DIVES! (DEPTH LV {n})',
   'chest.empty': 'Empty... all four upgrades are already the best.',
+  'chest.panes': '+{n} {panes}',   // a second toast after the upgrade one: {panes} = pane.name (for that number)
+  'chest.onlyPanes': 'You found {n} {panes}!',   // every upgrade is already the best: the chest holds only panes
+
+  // ---------------------------------------------------------------- glass panes (building material for the tanks)
+  'pane.name': { one: 'glass pane', other: 'glass panes' },   // the material's name: change it here (it fills {panes} everywhere)
 
   // ---------------------------------------------------------------- message bottles
   'bottle.found': 'Message in a bottle! Field notes on {name} ({key})',   // {key} = the log key
@@ -1611,6 +1618,7 @@ AQ.langFiles.en = {
   'sfx.up_speed': 'SPEED WHOOSH',
   'sfx.up_lantern': 'LANTERN GLOW',
   'sfx.up_depth': 'DEPTH HUM',
+  'sfx.panes': 'GLASS PANES',
   'sfx.place': 'PLACE',
   'sfx.flip': 'FLIP',
   'sfx.undo': 'UNDO',

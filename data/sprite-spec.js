@@ -30,9 +30,10 @@ AQ.data.spriteSpec = {
     uimarker: { idle: { row: 0, frames: 4, fps: 5 } },          // guided-dive marker ring / arrow (pulse / bob)
     uitouch:  { idle: { row: 0, frames: 12, fps: 1 } },         // touch buttons: a round base + one icon per frame
     uistick:  { idle: { row: 0, frames: 2, fps: 1 } },          // touch joystick: 0 ring, 1 knob
-    uigradcap: { idle: { row: 0, frames: 2, fps: 2 } }          // nursery: a tiny graduation cap over grown babies (a gentle bob)
+    uigradcap: { idle: { row: 0, frames: 2, fps: 2 } },         // nursery: a tiny graduation cap over grown babies (a gentle bob)
+    uipane:   { idle: { row: 0, frames: 2, fps: 0.5 } }         // glass panes: the counter icon (a slow glint)
   },
   // anchor = the pixel inside a frame that sits on the entity's world position
   anchors: { creature: 'center', plant: 'bottom', decor: 'bottom', player: 'center', chest: 'bottom', bait: 'center',
-             prop: 'bottom', propanim: 'bottom', ufo: 'center', beam: 'top', still: 'topleft', bottle: 'bottom', uiicons: 'center', uimarker: 'center', uitouch: 'center', uistick: 'center', uigradcap: 'center' }
+             prop: 'bottom', propanim: 'bottom', ufo: 'center', beam: 'top', still: 'topleft', bottle: 'bottom', uiicons: 'center', uimarker: 'center', uitouch: 'center', uistick: 'center', uigradcap: 'center', uipane: 'center' }
 };
