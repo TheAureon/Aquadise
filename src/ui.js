@@ -320,9 +320,9 @@ AQ.LogUI = (function () {
     g.fillStyle = C.bg; g.fillRect(0, 0, 320, 180);
     // header bar: title, tabs, bottles found, close
     g.fillStyle = C.bar; g.fillRect(0, 0, 320, 14); g.fillStyle = C.line; g.fillRect(0, 14, 320, 1);
-    F().draw(g, AQ.t('log.title'), 6, 4, C.title, { shadow: false });
+    F().draw(g, AQ.t('log.title'), 6, 4, C.title, { shadow: false, max: 60 });   // (the tabs start at x 68)
     const bp = AQ.Bottles ? AQ.Bottles.progress() : { found: 0, total: 0 };
-    F().draw(g, AQ.t('log.bottles', { n: bp.found, total: bp.total }), 276, 4, C.info, { align: 'right', shadow: false });
+    F().draw(g, AQ.t('log.bottles', { n: bp.found, total: bp.total }), 276, 4, C.info, { align: 'right', shadow: false, max: 276 - 200 });   // (the tabs end near x 196)
     for (const r of L.ui) if (r.id === 'tab' || r.id === 'close') AQ.Aquarium.button(g, r, L.hover === r);
     g.fillStyle = C.line; g.fillRect(0, 168, 320, 1);              // footer separator
     if (L.entry) { drawEntry(g, L.entry); return; }
@@ -535,7 +535,11 @@ AQ.LogUI = (function () {
     if (lg.graduated) rec.push([T('log.rec.graduated'), times(lg.graduated), '#ffe9a8']);
     if (lg.variant) rec.push([T('log.rec.rare'), T('log.rec.rareYes'), C.gold]);
     if (!has) rec.push([T('log.notCaught'), '', C.dim]);
-    rec.forEach(([k, v, col], i) => { F().draw(g, k, 9, 81 + i * 8, C.dim, { shadow: false }); if (v) F().draw(g, v, 83, 81 + i * 8, col, { align: 'right', shadow: false }); });
+    rec.forEach(([k, v, col], i) => {                                 // label left, value right: a long label squeezes before the value
+      const vw = v ? F().drawnWidth(v, 40) : 0;
+      F().draw(g, k, 9, 81 + i * 8, C.dim, { shadow: false, max: 74 - (vw ? vw + 4 : 0) });
+      if (v) F().draw(g, v, 83, 81 + i * 8, col, { align: 'right', shadow: false, max: 40 });
+    });
     // name, tags, tip
     const X = 92, W = 312 - X;
     F().draw(g, has ? d.name.toUpperCase() : AQ.t('log.unknown'), X, 21, has ? C.title : C.dim);
@@ -557,9 +561,17 @@ AQ.LogUI = (function () {
   }
   // footer hints: [key, action] pairs, keys brighter than what they do, centred as one line
   function footer(g, pairs) {
-    const gap = 12, parts = pairs.map(([kk, ak]) => { const k = AQ.t(kk), a = AQ.t(ak); return [k, a, F().width(k) + 4 + F().width(a)]; });
-    let x = Math.round(160 - (parts.reduce((s, p) => s + p[2], 0) + gap * (parts.length - 1)) / 2);
-    for (const [k, a, w] of parts) { F().draw(g, k, x, 172, C.dim, { shadow: false }); F().draw(g, a, x + F().width(k) + 4, 172, C.hint, { shadow: false }); x += w + gap; }
+    const parts = pairs.map(([kk, ak]) => { const k = AQ.t(kk), a = AQ.t(ak); return [k, a, F().width(k) + 4 + F().width(a)]; });
+    // a longer language: the gaps close up first, then every part squeezes evenly so the line fits the screen
+    const textW = parts.reduce((s, p) => s + p[2], 0), gap = Math.max(4, Math.min(12, Math.floor((312 - textW) / Math.max(1, parts.length - 1))));
+    const k = Math.min(1, (312 - gap * (parts.length - 1)) / textW);
+    let x = Math.round(160 - (textW * k + gap * (parts.length - 1)) / 2);
+    for (const [kt, a, w] of parts) {
+      const kw = F().drawnWidth(kt, F().width(kt) * k);
+      F().draw(g, kt, x, 172, C.dim, { shadow: false, max: F().width(kt) * k });
+      F().draw(g, a, x + kw + 4 * k, 172, C.hint, { shadow: false, max: F().width(a) * k });
+      x += w * k + gap;
+    }
   }
   return L;
 })();

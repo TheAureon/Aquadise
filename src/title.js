@@ -234,7 +234,7 @@ AQ.Title = (function () {
     if (T.diverT < 16) AQ.Assets.draw(g, 'player', 'swim', diverX(), diverY(), { t: T.t });
 
     logo(g, 160, 14 + Math.round(Math.sin(T.t * 1.4) * 1.5));
-    F().draw(g, AQ.t('title.tagline'), 160, 47, '#e2f7ff', { align: 'center', shadow: SH });
+    F().draw(g, AQ.t('title.tagline'), 160, 47, '#e2f7ff', { align: 'center', shadow: SH, max: 212 });
     // little wave divider
     for (let x = 128; x < 192; x++) {
       const y = 57 + Math.round(Math.sin(x * 0.5 + T.t * 3) * 1);
@@ -248,7 +248,7 @@ AQ.Title = (function () {
       pill(g, box, 'rgba(6,20,38,0.92)', 'rgba(110,240,239,0.6)');
       F().draw(g, AQ.t('title.controls'), 160, 71, '#6ef0ef', { align: 'center', shadow: false });
       const rows = AQ.data.tutorial.controls.map(([a, b]) => [a, AQ.Keys.fill(b)]);   // data/tutorial.js, keys from the bindings
-      rows.forEach(([a, b], i) => { F().draw(g, a, 50, 82 + i * 9, '#9fd3ee', { shadow: false }); F().draw(g, b, 270, 82 + i * 9, '#ffffff', { align: 'right', shadow: false }); });
+      rows.forEach(([a, b], i) => { const bw = F().drawnWidth(b, 150); F().draw(g, a, 50, 82 + i * 9, '#9fd3ee', { shadow: false, max: 220 - bw - 6 }); F().draw(g, b, 270, 82 + i * 9, '#ffffff', { align: 'right', shadow: false, max: 150 }); });
       return;
     }
     T.items.forEach((it, i) => {
@@ -257,11 +257,11 @@ AQ.Title = (function () {
       if (!on) { g.fillStyle = 'rgba(180,230,245,0.18)'; g.fillRect(it.x + 1, it.y, it.w - 2, 1); }
       const nudge = on ? Math.round(Math.sin(T.t * 5)) : 0;
       if (it.icon) icon(g, it.icon, it.x + 5 + nudge, it.y + 2, on ? '#6ef0ef' : '#7fb6cc');
-      F().draw(g, it.label, it.x + it.w / 2 + (it.icon ? 5 : 0), it.y + 3, on ? '#ffffff' : '#c3dfec', { align: 'center', shadow: on ? false : SH });
+      F().draw(g, it.label, it.x + it.w / 2 + (it.icon ? 5 : 0), it.y + 3, on ? '#ffffff' : '#c3dfec', { align: 'center', shadow: on ? false : SH, max: it.w - (it.icon ? 14 : 4) });
     });
     const c = AQ.Collection.progress();
-    F().draw(g, AQ.t('title.progress', { n: c.discovered, total: c.total, done: c.complete }), 316, 172, '#7fa4ba', { align: 'right', shadow: SH });
-    F().draw(g, AQ.t('title.howTo'), 4, 172, '#7fa4ba', { shadow: SH });
+    F().draw(g, AQ.t('title.progress', { n: c.discovered, total: c.total, done: c.complete }), 316, 172, '#7fa4ba', { align: 'right', shadow: SH, max: 150 });
+    F().draw(g, AQ.t('title.howTo'), 4, 172, '#7fa4ba', { shadow: SH, max: 150 });
     const warn = AQ.SaveFile && AQ.SaveFile.statusLine();
     if (warn) F().draw(g, warn, 160, 164, '#ffcf8a', { align: 'center', shadow: SH });
     T.drawFade(g);

@@ -10,3 +10,7 @@
 - Saves store ids and numbers only, never display text.
 - Check with `node tools/check-game.js --keys` (every key used exists, unused keys listed, no console
   errors on any screen). See docs/TRANSLATING.md.
+- Text in buttons or narrow spaces gets a width limit (`AQ.Font.draw(..., { max })`), so long translations
+  squeeze instead of overflowing. Check new screens with the PSEUDO language (`debug.pseudoLanguage` in
+  src/config.js; `node tools/check-game.js --lang pseudo`).
+- Translator tools: `node tools/lang-check.js <code>`, `node tools/lang-csv.js export|import <code>`.

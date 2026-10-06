@@ -142,6 +142,9 @@ AQ.TUNING = {
     fastNurserySeconds: { court: 5, egg: 6, grow: 25, cooldown: 4, check: 1 },   // so the whole nursery can be tried quickly
     forceTouch: false         // TESTING ONLY: true shows the touch controls and makes the mouse act as a finger
   },                          //   (drag in the stick zone = joystick, click the on-screen buttons), to try them on a PC
+  // Text that doesn't fit (long translations): it is squeezed sideways down to this much of its width,
+  // then cut short with ".." (src/font.js). screenMargin: px kept free at the screen's edges.
+  text: { squeezeMin: 0.55, screenMargin: 2 },
   // Touch controls (src/touch.js). Sizes are in screen pixels (CSS px), so they stay finger-sized on any
   // screen; fractions are of the window. The settings (TOUCH CONTROLS auto/on/off, SWAP SIDES) live in
   // the SETTINGS panel and are saved with the game.

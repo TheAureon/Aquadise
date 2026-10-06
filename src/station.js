@@ -137,7 +137,7 @@ AQ.Station = (function () {
       for (let x = inner.x0 + 40; x < inner.x1 - 20; x += 96) { g.fillStyle = '#3a4a5a'; g.fillRect(x - 5, ceil, 10, 2); g.fillStyle = '#ffe6a8'; g.fillRect(x - 4, ceil + 2, 8, 1); }
     });
     // signs
-    const sign = (x, y, text, col) => { const w = F().width(text) + 6; g.fillStyle = '#16283a'; g.fillRect(x - w / 2, y - 2, w, 9); g.fillStyle = col; g.fillRect(x - w / 2, y - 2, w, 1); F().draw(g, text, x, y, col, { align: 'center', shadow: false }); };
+    const sign = (x, y, text, col) => { const w = Math.min(F().width(text), 68) + 6; g.fillStyle = '#16283a'; g.fillRect(x - w / 2, y - 2, w, 9); g.fillStyle = col; g.fillRect(x - w / 2, y - 2, w, 1); F().draw(g, text, x, y, col, { align: 'center', shadow: false, max: 68 }); };   // signs stay narrow: a long name squeezes
     (L.signs || []).forEach(([id, sx, fl, col]) => sign(sx, L.floors[fl] - (fl === 0 ? 66 : 72), AQ.t(`sign.${id}`), col));
     // potted plants
     L.plants.forEach(([px, fl]) => {
@@ -224,7 +224,7 @@ AQ.Station = (function () {
     ctx.fillStyle = 'rgba(220,245,255,0.12)'; ctx.fillRect(ix + 2, iy + 1, 6, ih - 2);       // glass sheen
     if (frame) AQ.Assets.draw(ctx, 'misc.tank_frame', 'idle', tk.x, tk.y, {});
     // name above, star pips on the plate
-    if (!noLabels) F().draw(ctx, (b.short || b.name).toUpperCase(), tk.x, y0 - 7, '#e8fbff', { align: 'center', shadow: 'rgba(4,12,24,0.8)' });
+    if (!noLabels) F().draw(ctx, AQ.Tanks.labelFor(b, 90), tk.x, y0 - 7, '#e8fbff', { align: 'center', shadow: 'rgba(4,12,24,0.8)', max: 90 });
     if (!tk.v || t - tk.vT > 1) { tk.v = AQ.Vibe.evaluate(b.id); tk.vT = t; }   // refreshed once a second
     const v = tk.v;
     if (v.nursery) { F().draw(ctx, `♥ ${AQ.Nursery.occupancy()}/${AQ.Nursery.capacity()}`, tk.x, tk.y - 6, AQ.Nursery.full() ? '#ffcf8a' : '#ffd8e8', { align: 'center', shadow: false }); return; }   // no stars: how full it is
@@ -279,7 +279,7 @@ AQ.Station = (function () {
         ctx.globalAlpha = U.clamp((zoomAmt - 0.5) * 3, 0, 1);
         // room for each label = distance to the nearest neighbouring slot on the same floor
         const room = (tk) => Math.min(...tanks.filter((o) => o !== tk && o.floor === tk.floor).map((o) => Math.abs(o.x - tk.x)), 200) * z - 4;
-        tanks.filter((tk) => tk.b).forEach((tk) => F().draw(ctx, AQ.Tanks.labelFor(tk.b, room(tk)), Math.round((tk.x - sx) * z), Math.round((tk.y - 44 - sy) * z) - 7, '#e8fbff', { align: 'center', shadow: 'rgba(4,12,24,0.9)' }));
+        tanks.filter((tk) => tk.b).forEach((tk) => F().draw(ctx, AQ.Tanks.labelFor(tk.b, room(tk)), Math.round((tk.x - sx) * z), Math.round((tk.y - 44 - sy) * z) - 7, '#e8fbff', { align: 'center', shadow: 'rgba(4,12,24,0.9)', max: room(tk) }));
         ctx.globalAlpha = 1;
       }
       drawPrompt(ctx, P, sx, sy, z);

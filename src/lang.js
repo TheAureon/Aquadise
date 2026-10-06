@@ -99,3 +99,20 @@ AQ.Lang = (function () {
   return L;
 })();
 AQ.t = AQ.Lang.t;
+
+// PSEUDO: a test language made from English (only with AQ.TUNING.debug.pseudoLanguage on). Every text is
+// about 40% longer (vowels repeated) and wrapped in [!! markers !!], so anything still in plain English
+// was missed, and anything cut off, overflowing or overlapping is a layout problem. Placeholders
+// ({name}, {k:jump}...) are kept as they are; texts with no letters (number formats) are left alone.
+AQ.Lang.pseudo = (function () {
+  const longer = (part) => {
+    if (/^\{[^}]*\}$/.test(part) || !/[A-Za-z]/.test(part)) return part;
+    const target = Math.ceil(part.replace(/[^A-Za-z]/g, '').length * 1.4);
+    let letters = part.replace(/[^A-Za-z]/g, '').length, out = '';
+    for (const ch of part) { out += ch; if (letters < target && /[AEIOUaeiou]/.test(ch)) { out += ch; letters++; } }
+    return out;
+  };
+  const one = (s) => (/[A-Za-z]/.test(String(s).replace(/\{[^}]*\}/g, '')) ? '[!! ' + String(s).split(/(\{[^}]*\})/).map(longer).join('') + ' !!]' : String(s));
+  return (v) => (v == null ? v : typeof v === 'object' ? Object.fromEntries(Object.entries(v).map(([k, x]) => [k, one(x)])) : one(v));
+})();
+AQ.Lang.extra = { pseudo: { name: 'PSEUDO', locale: 'en', flag: 'pseudoLanguage', raw: (key) => { const en = AQ.langFiles.en; return key in en ? AQ.Lang.pseudo(en[key]) : undefined; } } };

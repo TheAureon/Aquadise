@@ -63,12 +63,13 @@ AQ.HUD = (function () {
         [AQ.t('hud.lamp'), up.lantern || 0, AQ.TUNING.upgrades.lanternMax, '#ffe9a8'], [AQ.t('hud.deep'), up.depth || 0, AQ.TUNING.upgrades.depthMax, '#9fd8ff']
       ];
       ctx.globalAlpha = 0.85;
+      const px = Math.max(23, 4 + Math.min(60, Math.max(...rows.map((r) => F.width(r[0])))) + 4);   // pips sit after the longest label
       rows.forEach(([label, lvl, max, col], r) => {
         const y = 4 + r * 7;
-        F.draw(ctx, label, 4, y, '#cfeaf5', { shadow: SH });
+        F.draw(ctx, label, 4, y, '#cfeaf5', { shadow: SH, max: 60 });
         for (let i = 0; i < max; i++) {
-          ctx.fillStyle = SH; ctx.fillRect(24 + i * 5, y + 2, 4, 3);
-          ctx.fillStyle = i < lvl ? col : 'rgba(255,255,255,0.22)'; ctx.fillRect(23 + i * 5, y + 1, 4, 3);
+          ctx.fillStyle = SH; ctx.fillRect(px + 1 + i * 5, y + 2, 4, 3);
+          ctx.fillStyle = i < lvl ? col : 'rgba(255,255,255,0.22)'; ctx.fillRect(px + i * 5, y + 1, 4, 3);
         }
       });
       ctx.globalAlpha = 1;

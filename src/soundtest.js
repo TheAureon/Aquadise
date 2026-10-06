@@ -41,7 +41,7 @@ AQ.SoundUI = (function () {
         ui.push({ id: r.id + 'bar', row: r.id, x: 159, y, w: 62, h: 9, bar: r.bar });
       } else if (r.kind === 'wide') ui.push({ id: r.id, row: r.id, x: 110, y, w: 100, h: 11, label: r.value });
       else ui.push({ id: r.id, row: r.id, x: 146, y, w: 106, h: 10, label: r.value, warn: r.warn, on2: r.on, off: r.off });
-      ui.push({ id: 'label:' + r.id, row: r.id, label: r.label, y, text: true });
+      if (r.label != null) ui.push({ id: 'label:' + r.id, row: r.id, label: r.label, y, text: true });   // (a wide button has no label)
     });
     ui.push({ id: 'back', row: 'back', x: 110, y: BOX.y + BOX.h - 22, w: 100, h: 11, label: AQ.t('ui.back') });
     return ui;
@@ -101,7 +101,7 @@ AQ.SoundUI = (function () {
     F().draw(g, AQ.t('settings.title'), 160, BOX.y + 4, '#6ef0ef', { align: 'center', shadow: false });
     g.fillStyle = 'rgba(110,240,239,0.25)'; g.fillRect(BOX.x + 8, BOX.y + 28, BOX.w - 16, 1);
     for (const r of S.ui) {
-      if (r.text) { F().draw(g, r.label, 66, r.y + ((rows().find((x) => x.id === r.row) || {}).kind === 'bar' ? 2 : 3), selRow === r.row ? '#ffffff' : '#9fd3ee', { shadow: false }); continue; }
+      if (r.text) { F().draw(g, r.label, 66, r.y + ((rows().find((x) => x.id === r.row) || {}).kind === 'bar' ? 2 : 3), selRow === r.row ? '#ffffff' : '#9fd3ee', { shadow: false, max: (S.ui.find((u) => u.row === r.row && !u.text) || { x: 146 }).x - 70 }); continue; }
       if (r.bar != null) {
         for (let i = 0; i < 10; i++) { g.fillStyle = i < Math.round(r.bar * 10) ? (st.mute ? '#5f7a8c' : '#6ef0ef') : '#16334a'; g.fillRect(r.x + i * 6 + 1, r.y + 2, 5, 5); }
         F().draw(g, AQ.t('ui.percent', { n: Math.round(r.bar * 100) }), 258, r.y + 2, '#c3dfec', { align: 'right', shadow: false });
@@ -110,7 +110,7 @@ AQ.SoundUI = (function () {
     }
     if (selRow !== 'tabs' && selRow !== 'back') { const r = S.ui.find((u) => u.text && u.row === selRow); if (r) F().draw(g, '>', 59, r.y + 3, '#6ef0ef', { shadow: false }); }
     const foot = S.tab === 'sound' ? AQ.t('settings.foot.sound', { key: AQ.Keys.name('mute') }) : S.tab === 'touch' ? AQ.t(AQ.Touch && AQ.Touch.active() ? 'settings.foot.touchOn' : 'settings.foot.touchOff') : AQ.t('settings.foot.saved');
-    F().draw(g, foot, 160, BOX.y + BOX.h - 8, '#7fa4ba', { align: 'center', shadow: false });
+    F().draw(g, foot, 160, BOX.y + BOX.h - 8, '#7fa4ba', { align: 'center', shadow: false, max: BOX.w - 8 });
   };
   return S;
 })();
@@ -182,7 +182,7 @@ AQ.SoundTest = (function () {
 
   T.draw = function (g) {
     g.fillStyle = '#06101e'; g.fillRect(0, 0, 320, 180);
-    F().draw(g, AQ.t('soundtest.title'), 8, 4, '#ffe9a8');
+    F().draw(g, AQ.t('soundtest.title'), 8, 4, '#ffe9a8', { max: 90 });
     const st = A.settings();
     if (st.mute) F().draw(g, AQ.t('soundtest.muted', { key: AQ.Keys.name('mute') }), 160, 4, '#ffb08a', { align: 'center' });
     let cur = null;
@@ -192,7 +192,7 @@ AQ.SoundTest = (function () {
       if (sel) cur = r.it;
       g.fillStyle = on ? '#2e7d96' : sel ? '#24506b' : '#132b40'; g.fillRect(r.x, r.y, r.w, r.h);
       if (sel) { g.fillStyle = '#6ef0ef'; g.fillRect(r.x, r.y + r.h - 1, r.w, 1); }
-      F().draw(g, (on ? '> ' : '') + r.label, r.x + 3, r.y + 1, on ? '#ffffff' : '#c3dfec', { shadow: false });
+      F().draw(g, (on ? '> ' : '') + r.label, r.x + 3, r.y + 1, on ? '#ffffff' : '#c3dfec', { shadow: false, max: r.w - 4 });
     }
     const kind = TABS[T.tab][0];
     // (the font has no '_': ids show it as a space, as they always looked)

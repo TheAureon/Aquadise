@@ -129,7 +129,7 @@ AQ.SaveFile = (function () {
     g.fillStyle = 'rgba(4,10,20,0.6)'; g.fillRect(0, 0, 320, 180);
     g.fillStyle = 'rgba(6,18,34,0.97)'; g.fillRect(r.x, r.y, r.w, r.h);
     g.fillStyle = p.kind === 'recover' || p.kind === 'freshconfirm' ? '#ffcf8a' : '#6ef0ef'; g.fillRect(r.x, r.y, r.w, 1);
-    F().draw(g, AQ.t(p.title), 160, r.y + 5, '#fff6dc', { align: 'center', shadow: false });
+    F().draw(g, AQ.t(p.title), 160, r.y + 5, '#fff6dc', { align: 'center', shadow: false, max: BOX_W - 10 });
     p.wrapped.forEach((l, i) => F().draw(g, l, 160, r.y + 15 + i * 8, '#9fd3ee', { align: 'center', shadow: false }));
     for (const b of SF.ui) AQ.Aquarium.button(g, b, SF.hover === b);
   };

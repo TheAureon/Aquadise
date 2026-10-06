@@ -82,23 +82,34 @@ AQ.Guide = (function () {
     g.fillStyle = '#efe4c8'; g.fillRect(b.x, b.y, b.w, b.h);
     g.fillStyle = '#e2d4b0'; g.fillRect(b.x + 82, b.y, 2, b.h);
     g.fillStyle = 'rgba(120,90,60,0.18)'; g.fillRect(b.x + 84, b.y, 3, b.h);
-    F().draw(g, AQ.t('guide.book'), b.x + 8, b.y + 6, '#8a5a3a', { shadow: false });
+    F().draw(g, AQ.t('guide.book'), b.x + 8, b.y + 6, '#8a5a3a', { shadow: false, max: 70 });
     if (!p) return;
     // left: the picture, in a soft blue window
     g.fillStyle = '#c8dde6'; g.fillRect(b.x + 10, b.y + 22, 64, 64);
     g.fillStyle = '#a9c8d6'; g.fillRect(b.x + 10, b.y + 80, 64, 6);
     illustration(g, p.icon, b.x + 42, b.y + 52, p.scale);
-    F().draw(g, AQ.t('guide.pageOf', { n: G.page + 1, total: pages.length }), b.x + 42, b.y + 94, '#8a7a5a', { align: 'center', shadow: false });
+    F().draw(g, AQ.t('guide.pageOf', { n: G.page + 1, total: pages.length }), b.x + 42, b.y + 94, '#8a7a5a', { align: 'center', shadow: false, max: 72 });
     // right: title + text
     const X = b.x + 94, W = b.x + b.w - 8 - X;
-    F().draw(g, p.title.toUpperCase(), X, b.y + 22, '#3a5a7a', { shadow: false });
+    F().draw(g, p.title.toUpperCase(), X, b.y + 22, '#3a5a7a', { shadow: false, max: W });
     g.fillStyle = 'rgba(58,90,122,0.4)'; g.fillRect(X, b.y + 30, W, 1);
-    let y = b.y + 36;
-    for (const ln of p.lines) {
-      const line = typeof ln === 'string' ? ln : has(ln.needs) ? ln.text : null;
-      if (!line) continue;
-      wrapPx(G.fill(line).toUpperCase(), W).forEach((w, k) => { F().draw(g, (k ? '  ' : '') + w, X, y, '#3a3226', { shadow: false }); y += 8; });
-      y += 2;
+    // the lines, wrapped; a page that runs long (a longer language) closes up its spacing, then ends with ".."
+    const paras = p.lines.map((ln) => (typeof ln === 'string' ? ln : has(ln.needs) ? ln.text : null)).filter(Boolean).map((l) => wrapPx(G.fill(l).toUpperCase(), W));
+    // (room: the last line's letters must end above the page buttons)
+    const top = b.y + 36, bottom = b.y + b.h - 17, rows = paras.reduce((a, q) => a + q.length, 0);
+    const need = (st, gp) => top + (rows - 1) * st + (paras.length - 1) * gp + F().GH;
+    let step = 8, gap = 2;
+    if (need(step, gap) > bottom) { step = 7; gap = 0; }
+    const fits = Math.floor((bottom - F().GH - top) / step) + 1;
+    let y = top, drawn = 0;
+    for (const q of paras) {
+      for (let k = 0; k < q.length; k++) {
+        if (drawn >= fits) break;
+        const last = drawn === fits - 1 && (k < q.length - 1 || q !== paras[paras.length - 1]);
+        F().draw(g, (k ? '  ' : '') + q[k] + (last ? ' ..' : ''), X, y, '#3a3226', { shadow: false, max: W + (k ? 8 : 0) });
+        y += step; drawn++;
+      }
+      y += gap;
     }
     // footer: arrows, page dots, how to close
     for (const r of G.ui) AQ.Aquarium.button(g, r, G.hover === r && !r.off);

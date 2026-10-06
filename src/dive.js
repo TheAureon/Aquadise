@@ -176,8 +176,8 @@ AQ.Dive = (function () {
       if (!r) return;
       g.fillStyle = 'rgba(6,18,34,0.95)'; g.fillRect(r.x, r.y, r.w, r.h);
       g.fillStyle = '#ffe9a8'; g.fillRect(r.x, r.y, r.w, 1);
-      F().draw(g, p.title.toUpperCase(), 160, r.y + 4, '#fff6dc', { align: 'center', shadow: false });
-      p.lines.forEach((l, i) => F().draw(g, l.toUpperCase(), 160, r.y + 12 + i * 7, '#9fd3ee', { align: 'center', shadow: false }));
+      F().draw(g, p.title.toUpperCase(), 160, r.y + 4, '#fff6dc', { align: 'center', shadow: false, max: r.w - 8 });
+      p.lines.forEach((l, i) => F().draw(g, l.toUpperCase(), 160, r.y + 12 + i * 7, '#9fd3ee', { align: 'center', shadow: false, max: r.w - 8 }));
       for (const b of D.ui) AQ.Aquarium.button(g, Object.assign({ on: b.id === 'yes' }, b), D.hover === b);
       return;
     }
@@ -187,7 +187,7 @@ AQ.Dive = (function () {
     g.fillStyle = 'rgba(6,18,34,0.94)'; g.fillRect(r.x, r.y, r.w, r.h);
     g.fillStyle = '#7ef0c0'; g.fillRect(r.x, r.y, Math.round(r.w * s.step / (n - 1)), 1);           // progress along the top
     g.fillStyle = 'rgba(126,240,192,0.25)'; g.fillRect(r.x + Math.round(r.w * s.step / (n - 1)), r.y, r.w - Math.round(r.w * s.step / (n - 1)), 1);
-    F().draw(g, step().id === 'done' ? AQ.t('dive.title') : AQ.t('dive.stepOf', { n: s.step + 1, total: n }), r.x + 4, r.y + 3, '#7ef0c0', { shadow: false });
+    F().draw(g, step().id === 'done' ? AQ.t('dive.title') : AQ.t('dive.stepOf', { n: s.step + 1, total: n }), r.x + 4, r.y + 3, '#7ef0c0', { shadow: false, max: r.w - 8 });
     D.lines.forEach((l, i) => F().draw(g, l, r.x + 4, r.y + 11 + i * 7, D.nice > 0 ? '#fff1b0' : '#e8f4ff', { shadow: false }));
     for (const b of D.ui) AQ.Aquarium.button(g, b, D.hover === b);
     g.restore();
