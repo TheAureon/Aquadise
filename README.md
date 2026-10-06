@@ -290,9 +290,10 @@ browsers won't let a page save pictures made from file:// images.
     - **net spam** (teasing): 12 swings in 20 seconds with no catch (holding to pry isn't a swing), or 4+
       clicks a second for 3 seconds;
     - **no catch for a long time** (encouraging): 4 minutes of active play without a catch (3 in a game
-      with nothing caught yet); being away from the keys for more than 20 seconds doesn't count. Only
-      for newer players: never once every species is caught, and not after 25 species
-      (`nudges.drought.maxSpecies`, null = no limit), when a long wait is just hunting the rare ones. These
+      with nothing caught yet); being away from the keys for more than 20 seconds doesn't count. A bigger
+      collection waits longer, since the rare ones take time (`nudges.drought.bySpecies`): 5 minutes
+      with 20+ species, 6 with 40+, 7 with 50+, 8 with 60+, 10 with 70+. Never once every species is
+      caught (`nudges.drought.maxSpecies` can also stop it from a number of species on). These
       also show a small REDO TUTORIAL button (`nudges.droughtRedoButton`);
     - **key mashing** (silly): the same key that does nothing in the sea (the interact key, say), 6
       times in 8 seconds.
