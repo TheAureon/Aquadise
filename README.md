@@ -319,17 +319,27 @@ browsers won't let a page save pictures made from file:// images.
   marker and the Variants outline. A one-time tip mentions it the first time a flash plays; the
   Guide's Sound page too. Tuning: `AQ.TUNING.calm`.
 - **Save files and safety.** EXPORT SAVE and IMPORT SAVE are on the title screen and in the pause
-  menu. Export downloads your save as `Aquadise-save-YYYY-MM-DD.json` (it works even when the browser
-  won't let the game save). Import lets you pick a file, checks it carefully (an Aquadise save, the
-  right structure, a version this game understands) and refuses anything else with a friendly message,
-  then asks before replacing your save; the imported save loads through the normal loading and
-  migration, just like an old save, and your previous save becomes the backup. Saves carry a version
-  number (`AQ.Save.VERSION`, now 2; the original v1 saves still load). Before every save the previous
-  good one is kept as a backup. If your save can't be read, the title asks whether to restore the
-  backup (or import a file) or start fresh, and the unreadable save is never overwritten: starting
-  fresh keeps it aside (`aquadise.save.v1.unreadable`). If the browser blocks saving (e.g. private
-  browsing), the game keeps running, says so once, and the title / pause screens show a small note.
-  Tuning: `saveFile.maxImportBytes`.
+  menu.
+  - **Export** saves `Aquadise-save-YYYY-MM-DD.json` (it works even when the browser won't let the game
+    save). On a phone whose browser can share files, it opens the share sheet ("Save to Files",
+    Drive, a message...); everywhere else it's a download.
+  - **Why it waits for the click to finish:** some browsers only allow a download, the file picker, the
+    share sheet or the clipboard during the click or tap itself, and the game sees a click a frame later.
+    So these run when the button is let go (`saveFile.gestureWaitMs`).
+  - **COPY SAVE TEXT:** some browsers and embedded pages silently block downloads, so the export message
+    always offers COPY SAVE TEXT. It copies the save to the clipboard, or, if the clipboard is blocked too,
+    shows it in a text box to copy by hand.
+  - **Import** asks CHOOSE FILE or PASTE TEXT (a text box for save text copied that way). Either way the
+    save is checked carefully (an Aquadise save, the right structure, a version this game understands)
+    and refuses anything else with a friendly message, then asks before replacing your save; the
+    imported save loads through the normal loading and migration, just like an old save, and your
+    previous save becomes the backup. Saves carry a version number (`AQ.Save.VERSION`, now 2; the
+    original v1 saves still load). Before every save the previous good one is kept as a backup. If your
+    save can't be read, the title asks whether to restore the backup (or import a file) or start fresh,
+    and the unreadable save is never overwritten: starting fresh keeps it aside
+    (`aquadise.save.v1.unreadable`). If the browser blocks saving (e.g. private browsing), the game
+    keeps running, says so once, and the title / pause screens show a small note.
+  - Tuning: `saveFile.maxImportBytes`, `saveFile.gestureWaitMs`.
 - **Key bindings in one place:** `AQ.TUNING.keys` in config.js (plus `interactKeys`, `audio.muteKey`,
   `photo.key`, `station.zoomKey`). The game reads them, and the help line, the title's CONTROLS panel
   and every tip show key names from them (`src/keys.js`), so changing a key changes the text too.

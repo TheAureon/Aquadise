@@ -434,5 +434,6 @@ AQ.TUNING = {
   },
 
   save: { key: 'aquadise.save.v1', autosaveEvery: 10 },
-  saveFile: { maxImportBytes: 5000000 },   // IMPORT SAVE refuses files bigger than this (a normal save is a few KB)
+  saveFile: { maxImportBytes: 5000000,    // IMPORT SAVE refuses files bigger than this (a normal save is a few KB)
+    gestureWaitMs: 400 },                  // a download / file picker waits this long for the click to finish (browsers need it)
 };

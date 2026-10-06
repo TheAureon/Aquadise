@@ -43,7 +43,7 @@ AQ.Touch = (function () {
     window.addEventListener('pointerup', onUp, opts);
     window.addEventListener('pointercancel', onUp, opts);
     // no scrolling, rubber-banding, double-tap zoom or long-press callouts, and no "mouse" events copied from touches
-    const stop = (e) => { if (e.target && e.target.tagName === 'INPUT') return; if (e.cancelable) e.preventDefault(); };
+    const stop = (e) => { if (formEl(e.target)) return; if (e.cancelable) e.preventDefault(); };
     document.addEventListener('touchstart', (e) => { firstTouch(); stop(e); }, opts);
     document.addEventListener('touchmove', stop, opts);
     // the last finger lifted: anything still held by a touch lets go (a safety net for lost pointerups)
@@ -149,13 +149,14 @@ AQ.Touch = (function () {
     if (code) { if (on) AQ.Input.vPress(code); else AQ.Input.vRelease(code); }
   }
 
+  const formEl = (t) => !!(t && t.closest && t.closest('input, textarea, button, .aq-form'));   // the save text box (src/savefile.js) works normally
   // ---------------------------------------------------------------- pointers
   const isFinger = (e) => e.pointerType === 'touch' || e.pointerType === 'pen' || (T.forced() && e.pointerType === 'mouse');
   const tapHeld = () => [...T.pointers.values()].some((p) => p.role === 'tap');
   function onDown(e) {
     if (e.pointerType === 'touch') firstTouch();
     if (!isFinger(e) || (e.pointerType === 'mouse' && e.button !== 0)) return;
-    if (e.target && e.target.tagName === 'INPUT') return;
+    if (formEl(e.target)) return;
     if (e.cancelable) e.preventDefault();
     const game = AQ.Game, x = e.clientX, y = e.clientY;
     const p = { id: e.pointerId, kind: e.pointerType, role: 'none', x, y, x0: x, y0: y, t0: now() };
