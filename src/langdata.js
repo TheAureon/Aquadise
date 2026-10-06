@@ -56,7 +56,8 @@ AQ.LangData = (function () {
     const pr = T.dive.prompt, nPrompt = pr.lines, steps = T.dive.steps, nNice = T.dive.nice;
     getter(pr, 'title', () => t('dive.prompt.title')); getter(pr, 'lines', () => lines('dive.prompt', nPrompt));
     getter(pr, 'yes', () => t('dive.prompt.yes')); getter(pr, 'no', () => t('dive.prompt.no'));
-    T.dive.steps = steps.map((id) => { const s = { id }; getter(s, 'text', () => t(`dive.step.${id}`)); return s; });
+    // (a step can have its own wording with touch controls: dive.step.<id>.touch)
+    T.dive.steps = steps.map((id) => { const s = { id }; getter(s, 'text', () => (AQ.Touch && AQ.Touch.active() && AQ.Lang.has(`dive.step.${id}.touch`, 'en') ? t(`dive.step.${id}.touch`) : t(`dive.step.${id}`))); return s; });
     getter(T.dive, 'nice', () => lines('dive.nice', nNice));
     T.guide.forEach((pg) => {
       const n = pg.lines, needs = pg.lineNeeds || {};

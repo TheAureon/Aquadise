@@ -110,6 +110,7 @@ AQ.Game = (function () {
       const frozen = AQ.Transition.blocking(), inWorld = G.scene === 'world';
       AQ.Clock.update(dt);                         // one day/night clock for everywhere (the sea, the hill, the station)
       if (AQ.Starfall) AQ.Starfall.update(dt, G);   // falling stars + meteor showers: on schedule wherever you are
+      if (AQ.LogButton && AQ.LogButton.update(dt, G)) return;   // the HUD counter is the log button (a click on it is used up)
       if (AQ.Tips) AQ.Tips.update(dt, G);           // one-time tips (first, so an Esc / click that closes a tip is used up)
       if (AQ.Dive) AQ.Dive.update(dt, G);           // the optional guided dive (its buttons' clicks never swing the net)
       if (AQ.TUNING.debug.tutorialReset && I.wasPressed(AQ.TUNING.debug.tutorialResetKey) && AQ.Dive) { AQ.Tips.reset(); AQ.Dive.start(G); AQ.HUD.toast(AQ.t('debug.tutorialReset'), '#cfe8ff'); }

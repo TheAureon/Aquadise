@@ -29,7 +29,7 @@ npx http-server -c-1 .      # or: python3 -m http.server
 | climb a ladder      | W / S (or Up / Down) on a ladder         |
 | building: whole-view toggle | V                                |
 | field guide         | I (Left/Right: turn the page, Esc: close)  |
-| collection log      | L (Left/Right: tabs, WASD or Up/Down: move, Q/E or the dots: biome, wheel: scroll, Enter: open entry, then Left/Right: prev/next species, Esc: back / close) |
+| collection log      | L, or click / tap the counter in the top right (Left/Right: tabs, WASD or Up/Down: move, Q/E or the dots: biome, wheel: scroll, Enter: open entry, then Left/Right: prev/next species, Esc: back / close) |
 | map                 | M                                        |
 | pause / home / reset | Esc                                     |
 | help overlay        | H                                        |
@@ -103,6 +103,23 @@ browsers won't let a page save pictures made from file:// images.
   dive before the water gets heavy: you slow down, the view softens and you drift back up, never
   any damage). Limits are in `upgrades.depthLimitY`; level 0 reaches everything except the bottom of the
   trench's rounded floor, which each level lets you sink a little further into (level 3 reaches the bottom).
+- **The collection-log button:** the discovered counter in the HUD's top-right corner ("31/77") is also
+  a button, with a small book beside it. Click or tap it to open the collection log, just like L (which
+  still works, as do the touch MENU and the title screen). It still shows the count exactly as before.
+  - **Looks:** it lights up on hover with a tooltip, "COLLECTION LOG (L)" (the key name follows the
+    binding; there's no tooltip with touch), and presses in while held.
+  - **Safe to click:** a click or tap on it is used up, so it never swings the net or reaches anything
+    underneath. With touch, its hit area grows to a thumb-sized 44 screen pixels without looking any
+    different, and it never covers the touch MENU button.
+  - **When it works:** everywhere the counter shows: the sea (also with the map open), the hill and the
+    aquarium building. It's dimmed and does nothing whenever the log key wouldn't work (a scene
+    transition, the guided dive's first question, the touch MENU panel, pause and the other menus), so
+    it never opens on top of another menu.
+  - **The glow:** until you've clicked it once (saved), it glows gently every few seconds, so players who
+    don't read know it's a button.
+  - The controls hint, the Guide's log page, the catch tip and the guided dive's log step ("click the
+    counter, or press L"; on touch, "tap the counter") mention it.
+  - Tuning: `AQ.TUNING.logButton` (`pulseEvery` 6 s, `pulseSeconds` 1.2 s, `touchPx` 44).
 - **Glass panes (building material):** the one material used for every tank. Every chest holds 2-4
   panes on top of its upgrade; once all four upgrades are maxed, a chest holds only panes ("You found
   3 glass panes!"). The amount shows in the chest's toast. A small counter (a pane icon and the
@@ -476,6 +493,7 @@ src/creatures.js      spawning / simulation / drawing of creatures + plants
 src/catching.js       net, pry, bait
 src/aquarium.js       tanks, decorating, creature life + moods, info card, overview, undo
 src/vibe.js           tank happiness (stars), helping/missing reasons, unlock milestones
+src/logbutton.js      the HUD counter as the collection-log button (hover, press, touch area, gentle glow)
 src/panes.js          glass panes: the building material for the tanks (count, add, spend, the counter)
 src/pairs.js          ONE PAIR EACH: which creatures a tank shows (a pair of every species) and the moves
 src/release.js        releasing creatures: which ones need a second look, RELEASE EXTRAS' choice, removing them

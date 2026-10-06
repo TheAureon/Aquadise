@@ -325,6 +325,13 @@ AQ.TUNING = {
     landGlowAlpha: 0.22       //   (instead of the sparkle burst)
   },
 
+  // The collection-log button: the discovered counter in the HUD's top-right corner (src/logbutton.js)
+  logButton: {
+    pulseEvery: 6,            // until it has been clicked once: a gentle glow every this many seconds...
+    pulseSeconds: 1.2,        // ...lasting this long
+    touchPx: 44               // with touch, its hit area is at least this many screen pixels (a thumb)
+  },
+
   // One-time tips (src/tips.js; the text is tip.* in data/lang/en.js). Never blocking: any key or click closes one.
   tips: {
     baseSeconds: 4,           // how long a tip stays at least...

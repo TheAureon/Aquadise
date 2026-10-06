@@ -80,7 +80,9 @@ AQ.HUD = (function () {
     // glass panes (top-right, under the clock), once you've found any
     if (AQ.Panes && AQ.Panes.known()) { ctx.globalAlpha = 0.85; AQ.Panes.drawCounter(ctx, vw - 3, 22); ctx.globalAlpha = 1; }
     // collection progress (top-right)
-    if (AQ.Collection) {
+    // (it's also the collection-log button, with a little book: src/logbutton.js)
+    if (AQ.LogButton) AQ.LogButton.draw(ctx, game);
+    else if (AQ.Collection) {
       const c = AQ.Collection.progress();
       ctx.globalAlpha = 0.85;
       F.draw(ctx, `${c.discovered}/${c.total}`, vw - 4, 4, '#ffe9a8', { align: 'right', shadow: SH });

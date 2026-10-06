@@ -150,6 +150,7 @@ AQ.langFiles.en = {
   'hud.lamp': 'LAMP',
   'hud.deep': 'DEEP',
   'hud.sneaking': 'SNEAKING',
+  'hud.logTip': 'COLLECTION LOG ({key})',   // hovering the counter button (top right): {key} = the log key
 
   // ---------------------------------------------------------------- touch controls
   'touch.menu.log': 'LOG',
@@ -187,10 +188,10 @@ AQ.langFiles.en = {
   'key.arrows': 'ARROWS',
 
   // ---------------------------------------------------------------- the controls help line
-  'help.1': 'MOVE {k:move}  JUMP {k:jump}  SNEAK {k:sneak}  NET {k:net} (HOLD TO PRY)',
-  'help.2': 'BAIT {k:bait}  INTERACT {k:interact}  LOG {k:log}  MAP {k:map}  GUIDE {k:guide}  MUTE {k:mute}',
+  'help.1': 'MOVE {k:move}  JUMP {k:jump}  SNEAK {k:sneak}  NET {k:net} (HOLD TO PRY)  MUTE {k:mute}',
+  'help.2': 'BAIT {k:bait}  INTERACT {k:interact}  LOG {k:log} / COUNTER  MAP {k:map}  GUIDE {k:guide}',   // COUNTER = the 31/77 button, top right
   'help.touch.1': 'STICK: MOVE   JUMP   SNEAK (TAP ON / OFF)',
-  'help.touch.2': 'TAP: NET (HOLD TO PRY)   BAIT   HAND: INTERACT   MENU: LOG, MAP, GUIDE',
+  'help.touch.2': 'TAP: NET (HOLD TO PRY)  BAIT  HAND: INTERACT  COUNTER: LOG  MENU: MAP, GUIDE',
 
   // ---------------------------------------------------------------- the CONTROLS panel
   'controls.1': 'MOVE / SWIM',
@@ -215,7 +216,7 @@ AQ.langFiles.en = {
   // ---------------------------------------------------------------- one-time tips
   'tip.noticed': 'Creatures notice how close and how fast you come. Hold {k:sneak} to sneak up slowly and quietly.',
   'tip.bait': 'Bait drifts down and draws curious creatures out. Wait nearby and let them come to you.',
-  'tip.catch': 'Got one! Every catch goes straight to its tank in your aquarium. The log ({k:log}) keeps track.',
+  'tip.catch': 'Got one! Every catch goes straight to its tank in your aquarium. The log keeps track: click the counter in the top right, or press {k:log}.',
   'tip.log': 'Your log has three tabs: SPECIES, VARIANTS, NOTES. Every species has a hint on how to catch it.',
   'tip.chest': 'Chests hold upgrades: NET, SPEED, LAMP and DEEP. A bigger net, faster swimming, a brighter lamp and the strength to dive deeper.',
   'tip.deep': 'Heavy water: you are past your depth for now. Nothing is hurt. A DEEP upgrade lets you go further.',
@@ -249,7 +250,8 @@ AQ.langFiles.en = {
   'dive.step.net': 'Swing your net with {k:net}.',
   'dive.step.catch': 'Now catch the minnow: aim at it and swing.',
   'dive.step.bait': 'Drop some bait with {k:bait}. It draws curious creatures out.',
-  'dive.step.log': 'Open your log with {k:log} to see your catch.',
+  'dive.step.log': 'Click the counter in the top right corner (or press {k:log}) to open your log and see your catch.',
+  'dive.step.log.touch': 'Tap the counter in the top right corner to open your log and see your catch.',   // with touch controls
   'dive.step.done': 'That\'s the basics! The GUIDE ({k:guide}, or the pause menu) has more, whenever you like.',
   'dive.nice.1': 'NICE!',
   'dive.nice.2': 'LOVELY!',
@@ -312,7 +314,7 @@ AQ.langFiles.en = {
   'guide.breeding.6': 'Grown babies wear a cap: GRADUATE sends one to its own tank\'s storage.',
   'guide.breeding.7': 'About 1 in {inv:breeding.variantChance} babies is a rare color (✦).',
   'guide.log.title': 'The log',
-  'guide.log.1': '{k:log} opens your collection log.',
+  'guide.log.1': 'The counter in the top right (with the book) or {k:log} opens your log.',
   'guide.log.2': 'SPECIES: every species by biome, with a hint for each.',
   'guide.log.3': 'VARIANTS: the rare colors you have bred.',
   'guide.log.4': 'NOTES: field notes from message bottles. There is one bottle per species,',
