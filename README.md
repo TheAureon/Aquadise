@@ -260,8 +260,23 @@ browsers won't let a page save pictures made from file:// images.
   net, catch it (a very easy Glasswinged Minnow waits in the water for you: it's a real catch), drop
   bait, open the log, done. Each step completes when you actually do it (a soft chime), nothing ever
   pauses or takes your controls, and if you wander off it just waits (it dims, and hides away from the
-  sea). SKIP skips a step, STOP ALL ends it. Restart it any time from the pause menu (TUTORIAL); it
-  never changes your progress. Text: `dive.*` in `data/lang/en.js`. Tuning: `AQ.TUNING.dive`. Testing: set
+  sea). SKIP skips a step, STOP ALL ends it. The last step points out the log button (the counter) and
+  the Guide. It never changes your progress.
+- **REDO TUTORIAL** (pause menu, title screen under CONTROLS and GUIDE, and the Guide's left page) runs the
+  guided dive again from anywhere (`src/redo.js`).
+  - **It asks first:** "Redo the tutorial?" with "Also show the tips again?" YES / NO (NO by default:
+    tips are marked unseen only if you say YES), LET'S GO / CANCEL (Enter / Esc work too).
+  - **The trip there:** away from the Tide Pools' start (the hill, the building, a tank screen, far out at
+    sea, or the title screen), it says "You'll go to the Tide Pools and come back here after", then fades
+    to the starting spot and starts the dive.
+  - **The trip back:** when the dive finishes, is skipped through or stopped (STOP ALL), it fades back to
+    where you were (the same scene and spot, or the tank screen you came from), with the scene's own
+    safety check, and a toast: "Tutorial done! Back where you were." The way back is kept in the save
+    (`tutorial.redo`), so a reload mid-dive still brings you back.
+  - **Progress stays as it is:** the log, upgrades, bottles, panes, tanks and breeding never change.
+    The dive's easy minnow is a real creature, so catching it counts as a normal catch.
+  - Tuning: `redo.nearStart` (closer than 400 px to the start, the dive just begins where you are, with
+    no trip). Text: `dive.*` in `data/lang/en.js`. Tuning: `AQ.TUNING.dive`. Testing: set
   `debug.tutorialReset: true` and press **R** to restart the dive and reset every tip
   (`debug.tutorialResetKey`).
 - **The GUIDE.** A small paged field-guide book: from the title screen (GUIDE), the pause menu
@@ -511,6 +526,7 @@ data/lang/en.js       every player-visible text, in English (the master copy for
 data/glyphs.js        the pixel font's characters (add letters for other languages here)
 src/tips.js           one-time tips: events, queue, safe placement, saved as seen
 src/dive.js           the optional guided first dive: prompt, steps, checklist, markers
+src/redo.js           REDO TUTORIAL: the question, the trip to the Tide Pools and back
 src/guide.js          the GUIDE: a paged field-guide book (title, pause menu, help-line key)
 src/savefile.js       EXPORT / IMPORT SAVE, import checks + confirm, the save-recovery choice
 src/starfall.js       falling stars + meteor showers: nightly plan, landings, light columns, map/HUD marks

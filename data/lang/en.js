@@ -95,15 +95,12 @@ AQ.langFiles.en = {
   'pause.resume': 'RESUME',
   'pause.help': 'SHOW CONTROLS',
   'pause.guide': 'GUIDE',
-  'pause.restartTutorial': 'RESTART TUTORIAL',
-  'pause.tutorial': 'TUTORIAL',
   'pause.settings': 'SETTINGS',
   'pause.home': 'HOME',
   'pause.wipeConfirm': 'CLICK AGAIN TO WIPE',
   'pause.reset': 'RESET SAVE',
   'pause.title': 'PAUSED',
   'pause.autosave': 'PROGRESS SAVES AUTOMATICALLY',
-  'pause.diveLater': 'The guided dive starts when you are back in the sea.',
 
   // ---------------------------------------------------------------- saves: export, import, recovery
   'save.worksAgain': 'Saving works again.',
@@ -252,7 +249,8 @@ AQ.langFiles.en = {
   'dive.step.bait': 'Drop some bait with {k:bait}. It draws curious creatures out.',
   'dive.step.log': 'Click the counter in the top right corner (or press {k:log}) to open your log and see your catch.',
   'dive.step.log.touch': 'Tap the counter in the top right corner to open your log and see your catch.',   // with touch controls
-  'dive.step.done': 'That\'s the basics! The GUIDE ({k:guide}, or the pause menu) has more, whenever you like.',
+  'dive.step.done': 'That\'s the basics! Your log is the counter with the book, top right. The GUIDE ({k:guide}, or the pause menu) has more whenever you like. Happy fishing!',
+  'dive.step.done.touch': 'That\'s the basics! Tap the counter with the book (top right) for your log. The GUIDE is in the MENU whenever you like. Happy fishing!',
   'dive.nice.1': 'NICE!',
   'dive.nice.2': 'LOVELY!',
   'dive.nice.3': 'GOT IT!',
@@ -261,6 +259,18 @@ AQ.langFiles.en = {
   'dive.stopAll': 'STOP ALL',
   'dive.title': 'GUIDED DIVE',
   'dive.stepOf': 'STEP {n} OF {total}',
+
+  // ---------------------------------------------------------------- REDO TUTORIAL (pause menu, title screen, Guide)
+  'redo.btn': 'REDO TUTORIAL',
+  'redo.title': 'REDO THE TUTORIAL?',
+  'redo.q': 'A quick guided dive, just like the first time.',
+  'redo.away1': 'You\'ll go to the Tide Pools',
+  'redo.away2': 'and come back here after.',
+  'redo.tipsQ': 'ALSO SHOW THE TIPS AGAIN?',
+  'redo.yes': 'YES',
+  'redo.no': 'NO',
+  'redo.go': 'LET\'S GO',
+  'redo.back': 'Tutorial done! Back where you were.',
 
   // ---------------------------------------------------------------- the GUIDE book
   'guide.moving.title': 'Moving, swimming and sneaking',
@@ -330,7 +340,8 @@ AQ.langFiles.en = {
   'guide.settings.2': '{k:mute} mutes or unmutes anywhere.',
   'guide.settings.3': 'HINTS turns the tips on or off; RESET TIPS shows them all again.',
   'guide.settings.4': 'REDUCE FLASHING softens the camera flash, falling stars and blinking lights.',
-  'guide.settings.5': 'Pause > TUTORIAL starts the guided dive again any time. Progress saves by itself.',
+  'guide.settings.5': 'REDO TUTORIAL (pause menu, title screen or this book) runs the guided dive again.',
+  'guide.settings.6': 'It takes you to the Tide Pools and back. Progress saves by itself.',
   'guide.book': 'FIELD GUIDE',
   'guide.pageOf': 'PAGE {n} OF {total}',
   'guide.footer': 'LEFT / RIGHT: TURN    ESC / {k:guide}: CLOSE',

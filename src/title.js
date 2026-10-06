@@ -26,13 +26,16 @@ AQ.Title = (function () {
     items.push({ id: 'new', label: AQ.t(T.confirmNew > 0 ? 'title.newConfirm' : 'title.new'), icon: 'plus' });
     items.push({ id: 'aquarium', label: AQ.t('title.aquarium'), icon: 'fish' });
     items.push({ id: 'log', label: AQ.t('title.collection'), icon: 'book' });
-    items.push({ id: 'controls', label: AQ.t('title.controls'), icon: 'pad' });
-    items.push({ id: 'guide', label: AQ.t('title.guide'), icon: 'book' });
+    // CONTROLS and GUIDE share a row (two halves), with REDO TUTORIAL just under them
+    items.push({ id: 'controls', label: AQ.t('title.controls'), icon: 'pad', pair: 'l' });
+    items.push({ id: 'guide', label: AQ.t('title.guide'), icon: 'book', pair: 'r' });
+    if (AQ.Redo) items.push({ id: 'redo', label: AQ.t('redo.btn'), icon: 'play' });
     items.push({ id: 'sound', label: AQ.t('title.settings'), icon: 'note' });
-    const rows = items.length + 1, y0 = 80 - (rows - 4) * 6;
-    items.forEach((it, i) => Object.assign(it, { x: 108, y: y0 + i * 14, w: 104, h: 11 }));
+    const rows = items.filter((it) => it.pair !== 'r').length + 1, y0 = 80 - (rows - 4) * 6;
+    let row = -1;
+    items.forEach((it) => { if (it.pair !== 'r') row++; Object.assign(it, it.pair ? { x: it.pair === 'l' ? 108 : 161, y: y0 + row * 14, w: 51, h: 11, half: true } : { x: 108, y: y0 + row * 14, w: 104, h: 11 }); });
     // save files share the last row: EXPORT SAVE | IMPORT SAVE (src/savefile.js)
-    const yl = y0 + items.length * 14;
+    const yl = y0 + (row + 1) * 14;
     items.push({ id: 'export', label: AQ.t('ui.exportSave'), x: 108, y: yl, w: 51, h: 11, half: true });
     items.push({ id: 'import', label: AQ.t('ui.importSave'), x: 161, y: yl, w: 51, h: 11, half: true });
     return items;
@@ -106,6 +109,7 @@ AQ.Title = (function () {
     else if (it.id === 'log') { AQ.LogUI.open(game, 'title'); }
     else if (it.id === 'controls') T.panel = 'controls';
     else if (it.id === 'guide') AQ.Guide.open(game, 'title');
+    else if (it.id === 'redo') AQ.Redo.ask(game, 'title');
     else if (it.id === 'export') AQ.SaveFile.exportSave(game);
     else if (it.id === 'import') AQ.SaveFile.pickImport(game);
     else if (it.id === 'sound') { T.panel = 'sound'; AQ.SoundUI.open(); }

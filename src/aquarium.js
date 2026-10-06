@@ -1669,6 +1669,7 @@ AQ.Aquarium = (function () {
   // A grid that mirrors the building: one row per floor (top floor first), 5 slots per row.
   const CARD = { w: 60, h: 37, gap: 2, x0: 6, y0: 15, cols: 5 };
   A.openOverview = () => openOverview();
+  A.leaveQuietly = () => putBack();              // (REDO TUTORIAL is taking you out of the tank screen)
   A.backdropOf = (b) => backdrop(b);              // (as wide as that tank is: AQ.Tanks.width)
   A.styleOf = styleOf;
   function overviewSlots() {

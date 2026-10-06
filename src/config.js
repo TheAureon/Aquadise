@@ -325,6 +325,10 @@ AQ.TUNING = {
     landGlowAlpha: 0.22       //   (instead of the sparkle burst)
   },
 
+  // REDO TUTORIAL (src/redo.js): closer than this (px) to the Tide Pools' starting spot, the guided dive
+  // just starts where you are; anywhere else, you go there first and come back after
+  redo: { nearStart: 400 },
+
   // The collection-log button: the discovered counter in the HUD's top-right corner (src/logbutton.js)
   logButton: {
     pulseEvery: 6,            // until it has been clicked once: a gentle glow every this many seconds...

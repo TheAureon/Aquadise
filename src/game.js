@@ -103,6 +103,8 @@ AQ.Game = (function () {
     G.time += dt;
     AQ.Render.t = G.time;
     if (AQ.Touch) AQ.Touch.update(dt, G);
+    // REDO TUTORIAL's question (from any screen) has the input to itself while it's up
+    if (AQ.Redo && AQ.Redo.dialog && !AQ.Transition.active) { AQ.Redo.update(G); AQ.Transition.update(dt); I.endFrame(); return; }
 
     if (AQ.Touch && AQ.Touch.updateMenu(G)) {
       // the touch MENU panel is open: the game waits underneath
@@ -156,6 +158,7 @@ AQ.Game = (function () {
 
   function draw() {
     drawScene();
+    if (AQ.Redo) AQ.Redo.draw(AQ.Render.ctx);  // REDO TUTORIAL's question, over whatever screen asked
     AQ.Transition.draw(AQ.Render.ctx);
     if (AQ.Touch) AQ.Touch.drawOverlay(G);     // the on-screen touch controls (their own canvas, screen px)
   }

@@ -38,6 +38,7 @@ AQ.Guide = (function () {
     ui.push({ id: 'prev', x: BOOK.x + 8, y: BOOK.y + BOOK.h - 16, w: 30, h: 11, label: '<', off: G.page <= 0 });
     ui.push({ id: 'next', x: BOOK.x + BOOK.w - 38, y: BOOK.y + BOOK.h - 16, w: 30, h: 11, label: '>', off: G.page >= n - 1 });
     ui.push({ id: 'close', x: BOOK.x + BOOK.w - 40, y: BOOK.y + 4, w: 34, h: 10, label: AQ.t('ui.close') });
+    if (AQ.Redo) ui.push({ id: 'redo', x: BOOK.x + 8, y: BOOK.y + 112, w: 68, h: 11, label: AQ.t('redo.btn') });   // on the left page, under the page count
     return ui;
   }
   G.update = function (dt, game) {
@@ -51,6 +52,7 @@ AQ.Guide = (function () {
       if (G.hover.id === 'prev') turn(-1);
       else if (G.hover.id === 'next') turn(1);
       else if (G.hover.id === 'close') G.close(game);
+      else if (G.hover.id === 'redo') AQ.Redo.ask(game, 'guide');
     }
   };
 

@@ -616,7 +616,7 @@ AQ.PauseUI = (function () {
     if (P.panel === 'sound') { AQ.SoundUI.update(game, () => { P.panel = null; }, () => AQ.SoundTest.open(game, 'pause')); return; }
     P.confirm = Math.max(0, P.confirm - dt);
     if (AQ.SaveFile && AQ.SaveFile.update(game)) return;        // a save-file panel (import confirm, messages) is up
-    const T = AQ.t, rows = [['resume', T('pause.resume')], ['help', T('pause.help')], ['guide', T('pause.guide')], ['tutorial', T(AQ.Dive && AQ.Dive.active() ? 'pause.restartTutorial' : 'pause.tutorial')], ['sound', T('pause.settings')], ['files'], ['home', T('pause.home')]];
+    const T = AQ.t, rows = [['resume', T('pause.resume')], ['help', T('pause.help')], ['guide', T('pause.guide')], ['redo', T('redo.btn')], ['sound', T('pause.settings')], ['files'], ['home', T('pause.home')]];
     P.ui = [];
     rows.forEach(([id, label], i) => {
       const y = 38 + i * 14;
@@ -635,7 +635,7 @@ AQ.PauseUI = (function () {
       if (P.hover.id === 'guide') AQ.Guide.open(game, 'pause');
       if (P.hover.id === 'export') AQ.SaveFile.exportSave(game);
       if (P.hover.id === 'import') AQ.SaveFile.pickImport(game);
-      if (P.hover.id === 'tutorial') { game.state = 'play'; if (game.scene !== 'world') AQ.HUD.toast(AQ.t('pause.diveLater'), '#cfe8ff', 4); AQ.Dive.start(game); }
+      if (P.hover.id === 'redo' && AQ.Redo) AQ.Redo.ask(game, 'pause');   // asks first, then works from anywhere
       if (P.hover.id === 'sound') { P.panel = 'sound'; AQ.SoundUI.open(); }
       if (P.hover.id === 'home') { AQ.Save.save(game); AQ.Title.open(game); }
       if (P.hover.id === 'reset') { if (P.confirm > 0) AQ.Save.reset(); else P.confirm = 3; }

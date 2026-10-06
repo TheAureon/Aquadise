@@ -40,7 +40,7 @@ AQ.data.tutorial = {
     { id: 'breeding', icon: 'ui:3', needs: 'Breeding', lines: 7 },
     { id: 'log', icon: 'ui:4', lines: 5, lineNeeds: { 4: 'Bottles', 5: 'Bottles' } },
     { id: 'photo', icon: 'ui:6', lines: 5 },
-    { id: 'settings', icon: 'ui:5', lines: 5 }
+    { id: 'settings', icon: 'ui:5', lines: 6 }
   ],
   tips: [
     { id: 'noticed', on: ['noticed'], where: 'play', known: ['caughtAny'], icon: 'ui:0' },

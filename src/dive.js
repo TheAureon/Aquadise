@@ -2,7 +2,7 @@
 // near the thing to do. It never pauses the game or takes your controls: each step completes when you
 // actually do it, a small panel waits quietly in the top-left corner meanwhile, and SKIP (this step) or
 // OFF (the whole dive) are always there. Offered once on NEW GAME (a fresh save); restart it any time from
-// the pause menu (TUTORIAL). Text: dive.* in data/lang/en.js. Tuning: AQ.TUNING.dive.
+// the pause menu, the title screen or the Guide (REDO TUTORIAL, src/redo.js). Text: dive.* in data/lang/en.js. Tuning: AQ.TUNING.dive.
 // Saved in AQ.State.tutorial: diveAsked (the prompt was answered), dive { active, step, did{} }.
 var AQ = (typeof AQ !== 'undefined') ? AQ : {};
 
@@ -27,9 +27,11 @@ AQ.Dive = (function () {
     AQ.Save && AQ.Save.dirty();
   };
   D.stop = function () {
+    const was = D.active();
     if (st()) st().active = false;
     D.prompt = false; D.removeGentle();
     AQ.Save && AQ.Save.dirty();
+    if (was && AQ.Redo) AQ.Redo.diveEnded(AQ.Game);   // a REDO TUTORIAL trip: back to where you were (src/redo.js)
   };
   D.decline = function () { tut().diveAsked = true; D.prompt = false; AQ.Save && AQ.Save.dirty(); };
 
