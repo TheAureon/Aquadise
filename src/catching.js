@@ -3,7 +3,7 @@ var AQ = (typeof AQ !== 'undefined') ? AQ : {};
 
 AQ.Catching = (function () {
   const U = AQ.U, R = U.R;
-  const K = { swing: null, bait: null, hold: 0, pryTarget: null, recent: [], franticMsgT: -1e9 };
+  const K = { swing: null, bait: null, hold: 0, pryTarget: null };
 
   K.swinging = () => !!K.swing;
   K.armOut = () => !!(K.swing || K.holdNet);
@@ -36,16 +36,9 @@ AQ.Catching = (function () {
     const mousePress = AQ.Keys.pressed('net'), keyPress = false;   // the net (left click by default; AQ.TUNING.keys.net)
     const holding = AQ.Keys.down('net');
 
-    // spam clicking does nothing: every net click counts (even ones during a swing), and a swing in a
-    // frantic burst (AQ.TUNING.net.frantic) never catches anything. Each creature has its own way of
-    // being caught (its hint is in the log).
-    const fr = AQ.TUNING.net.frantic, now = game.time;
-    if (mousePress || keyPress) { K.recent = K.recent.filter((t) => now - t < fr.seconds); K.recent.push(now); }
-    const frantic = fr.enabled && K.recent.filter((t) => now - t < fr.seconds).length >= fr.clicks;
-    if (K.swing && frantic) K.swing.frantic = true;      // clicking on during a swing makes it frantic too
     if ((mousePress || keyPress) && !K.swing) {
       const aim = aimFrom(game, mousePress);
-      K.swing = { t: 0, aim, hits: new Set(), msg: false, frantic };
+      K.swing = { t: 0, aim, hits: new Set(), msg: false };
       if (aim[0]) P.facing = aim[0] > 0 ? 1 : -1;
       AQ.Audio.play('swing');
       if (AQ.Dive) AQ.Dive.event('swing');
@@ -111,7 +104,6 @@ AQ.Catching = (function () {
   function checkHits(game, net, s) {
     for (const c of AQ.Creatures.near(net.x, net.y, 60)) {
       if (s.hits.has(c)) continue;
-      if (s.frantic) { franticMiss(game, net, s, c); continue; }
       const [cx, cy] = centerOf(c);
       // tide-pool dwellers: hitting the pool counts
       if (c.pool) {
@@ -159,15 +151,6 @@ AQ.Catching = (function () {
     AQ.Audio.play('harvest');
   }
 
-  // a frantic swing touched a creature: it slips away, with a short note (now and then) and the tip once
-  function franticMiss(game, net, s, c) {
-    const [cx, cy] = centerOf(c);
-    if (Math.hypot(cx - net.x, cy - net.y) > net.r + c.r * 0.8 && !(c.pool && Math.abs(net.x - c.pool.x) < c.pool.w / 2 + net.r)) return;
-    s.hits.add(c);
-    AQ.FX.puff(cx, cy, 'rgba(255,255,255,0.5)', 3);
-    if (!s.msg && game.time - K.franticMsgT > AQ.TUNING.net.frantic.noteEvery) { s.msg = true; K.franticMsgT = game.time; AQ.HUD.toast(AQ.t('catch.frantic'), '#cfe8ff'); }
-    if (AQ.Tips) AQ.Tips.event('frantic');
-  }
   function tryCatch(game, c, pried) {
     if (c.def.requires_upgraded_net && game.upgrades.net < 2) {
       AQ.HUD.toast(AQ.t('catch.tooStrong'), '#ffb08a');

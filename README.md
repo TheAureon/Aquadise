@@ -99,14 +99,6 @@ browsers won't let a page save pictures made from file:// images.
   through and deep ones can be swum in. Tap a pool with the net to try for a Glasswinged Minnow.
 - **The sunken ship** in the Sunken Ruins has a door at the bow, a cabin door and two hatches.
   They open by themselves as you swim up and close behind you (listed in `data/world.js` `doors`).
-- **Spam clicking does nothing:** every creature has its own way of being caught (sneaking, waiting,
-  bait, the right moment...), and the log has a hint for each. From the 4th net click within 2 seconds,
-  swings are "frantic" and catch nothing: the creature slips away with a little puff, and a short note
-  says "Spam clicking does nothing! Each creature has its own trick." (at most every 8 seconds). The
-  first time, a tip explains it and points to the log hints. A calm swing works as always. The guided
-  dive's catch and log steps, the Guide's catching page, the catch tip and a net-spam nudge line say so
-  too (the nudges still never mention the log). Tuning: `net.frantic` (`clicks` 4, `seconds` 2,
-  `noteEvery` 8, `enabled`).
 - **Upgrades from chests:** NET, SPD, LAMP (wider light in dark places) and DEEP (how deep you can
   dive before the water gets heavy: you slow down, the view softens and you drift back up, never
   any damage). Limits are in `upgrades.depthLimitY`; level 0 reaches everything except the bottom of the
