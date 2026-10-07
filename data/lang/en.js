@@ -236,7 +236,7 @@ AQ.langFiles.en = {
   // ---------------------------------------------------------------- one-time tips
   'tip.noticed': 'Creatures notice how close and how fast you come. Hold {k:sneak} to sneak up slowly and quietly.',
   'tip.bait': 'Bait drifts down and draws curious creatures out. Wait nearby and let them come to you.',
-  'tip.catch': 'Got one! Every catch goes straight to its tank in your aquarium. The log keeps track: click the counter in the top right, or press {k:log}.',
+  'tip.catch': 'Got one! Every catch goes straight to its tank in your aquarium. The log keeps track, with a hint for every creature: click the counter in the top right, or press {k:log}.',
   'tip.log': 'Your log has three tabs: SPECIES, VARIANTS, NOTES. Every species has a hint on how to catch it.',
   'tip.chest': 'Chests hold upgrades: NET, SPEED, LAMP and DEEP. A bigger net, faster swimming, a brighter lamp and the strength to dive deeper.',
   'tip.deep': 'Heavy water: you are past your depth for now. Nothing is hurt. A DEEP upgrade lets you go further.',
@@ -252,6 +252,7 @@ AQ.langFiles.en = {
   'tip.baby': 'A baby! Babies go to the NURSERY (3rd floor), where every kind grows up together. Once grown, it GRADUATES to its own tank. Some are a rare color (✦).',
   'tip.nursery': 'The nursery! Babies grow up here, and a grown one wears a little cap. Press GRADUATE on its card (or under it in the FISH tray) to send it to its own tank\'s storage. GRADUATE ALL sends every grown baby.',
   'tip.flashing': 'Bright flashes or blinking lights bothering you? Turn on REDUCE FLASHING in Pause > SETTINGS > OPTIONS.',
+  'tip.frantic': 'Spam clicking does nothing: every creature has its own way of being caught (sneaking, waiting, bait, the right moment...). Each one\'s hint is in your log: click the counter or press {k:log}.',
   'tip.bumped': 'Just a bump! Nothing in the sea can hurt you. Some creatures only nudge you back a little.',
   'tip.panes': 'Glass panes! Every chest holds a few. They are for building: on a tank\'s TANK tab, EXPAND makes it bigger. Your count is in the top right corner.',
   'tip.tankTab': 'The TANK tab: EXPAND makes this tank bigger with glass panes, ONE PAIR EACH shows one ♂ and one ♀ of every species, and RELEASE EXTRAS returns spare ones to the sea (it always asks).',
@@ -268,10 +269,10 @@ AQ.langFiles.en = {
   'dive.step.swim': 'Wade into the deep water at the end of the shore and swim.',
   'dive.step.sneak': 'Hold {k:sneak} and drift close to the little minnow. Sneaking keeps it calm.',
   'dive.step.net': 'Swing your net with {k:net}.',
-  'dive.step.catch': 'Now catch the minnow: aim at it and swing.',
+  'dive.step.catch': 'Now catch the minnow: aim at it and swing once. Spam clicking does nothing: each creature has its own way of being caught.',
   'dive.step.bait': 'Drop some bait with {k:bait}. It draws curious creatures out.',
-  'dive.step.log': 'Click the counter in the top right corner (or press {k:log}) to open your log and see your catch.',
-  'dive.step.log.touch': 'Tap the counter in the top right corner to open your log and see your catch.',   // with touch controls
+  'dive.step.log': 'Click the counter in the top right corner (or press {k:log}) to open your log. It has a hint on how to catch every creature.',
+  'dive.step.log.touch': 'Tap the counter in the top right corner to open your log. It has a hint on how to catch every creature.',   // with touch controls
   'dive.step.done': 'That\'s the basics! Your log is the counter with the book, top right. The GUIDE ({k:guide}, or the pause menu) has more whenever you like. Happy fishing!',
   'dive.step.done.touch': 'That\'s the basics! Tap the counter with the book (top right) for your log. The GUIDE is in the MENU whenever you like. Happy fishing!',
   'dive.nice.1': 'NICE!',
@@ -297,6 +298,7 @@ AQ.langFiles.en = {
   'nudge.spam.10': 'Somewhere, a minnow is doing an impression of you. It\'s quite good.',
   'nudge.spam.11': 'Fun fact: fish don\'t get startled into nets. They checked.',
   'nudge.spam.12': 'The water is very well stirred now. Thank you!',
+  'nudge.spam.13': 'Spam clicking does nothing. Every fish has its own way of being caught.',
   // no catch for a long while (encouraging, warm)
   'nudge.drought.1': 'Everyone starts somewhere. The fish are just warming up.',
   'nudge.drought.2': 'Fish are shy. Slowing down and sneaking up on them works wonders.',
@@ -350,6 +352,7 @@ AQ.langFiles.en = {
   'guide.catching.4': 'hiders blend in until they move, some only show at the right moment,',
   'guide.catching.5': 'curious ones come to look at you, and shy ones peek out if you wait quietly.',
   'guide.catching.6': 'Some need a bigger net. The log has a hint for every species.',
+  'guide.catching.7': 'Spam clicking does nothing: a frantic burst of swings never catches anything.',
   'guide.chests.title': 'Upgrades and chests',
   'guide.chests.1': 'Chests turn up on the seabed now and then. Each holds an upgrade:',
   'guide.chests.2': 'NET: a bigger net that reaches further, for stronger creatures too.',
@@ -506,6 +509,7 @@ AQ.langFiles.en = {
   'catch.stingRushed': 'Ow! {name} stings when rushed.',
   'catch.harvested': 'Harvested {name}!',
   'catch.harvestedNew': 'Harvested {name}!  NEW!',
+  'catch.frantic': 'Spam clicking does nothing! Each creature has its own trick.',   // a frantic burst of swings (net.frantic)
   'catch.tooStrong': 'Too strong for this net! Find a better net in a chest.',
   'catch.pried': 'PRIED!',
   'catch.gotIt': 'GOT IT!',

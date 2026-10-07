@@ -29,11 +29,11 @@ AQ.data = AQ.data || {};
 
 AQ.data.tutorial = {
   helpLines: 2, touchHelpLines: 2, controls: 9,
-  nudges: { spam: 12, drought: 12, mash: 12 },   // friendly nudges: how many lines of each kind (nudge.<kind>.<n>, src/nudges.js)
+  nudges: { spam: 13, drought: 12, mash: 12 },   // friendly nudges: how many lines of each kind (nudge.<kind>.<n>, src/nudges.js)
   dive: { prompt: { lines: 2 }, steps: ['move', 'jump', 'swim', 'sneak', 'net', 'catch', 'bait', 'log', 'done'], nice: 4 },
   guide: [
     { id: 'moving', icon: 'player', scale: 2, lines: 5 },
-    { id: 'catching', icon: 'creature.glasswinged_minnow', lines: 6 },
+    { id: 'catching', icon: 'creature.glasswinged_minnow', lines: 7 },
     { id: 'chests', icon: 'chest', needs: 'Chests', lines: 6, lineNeeds: { 6: 'Panes' } },
     { id: 'daynight', icon: 'ui:1', lines: 5, lineNeeds: { 4: 'Starfall', 5: 'Starfall' } },
     { id: 'aquarium', icon: 'misc.ufo', lines: 5 },
@@ -63,6 +63,7 @@ AQ.data.tutorial = {
     { id: 'nursery', on: ['nursery'], where: 'tank', needs: 'Nursery', known: ['graduated'], icon: 'ui:3' },
     { id: 'flashing', on: ['flash'], where: 'any', icon: 'ui:6' },
     { id: 'bumped', on: ['bumped'], where: 'play', known: ['bumped'], icon: 'ui:0' },
+    { id: 'frantic', on: ['frantic'], where: 'play', icon: 'ui:4' },
     { id: 'panes', on: ['panes'], where: 'any', needs: 'Panes', known: ['panes'], icon: 'ui.pane' },
     { id: 'wideTank', on: ['wideTank'], where: 'tank', icon: 'ui.pane' },
     { id: 'tankTab', on: ['tankTab'], where: 'tank', icon: 'ui:3' }

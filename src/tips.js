@@ -6,7 +6,7 @@
 // (longer for longer text) and goes away on any key press or click (Esc and clicks on the box are used up).
 // Seen tips are saved (AQ.State.tutorial.seen); HINTS off in the sound settings hides them all.
 // Events: noticed bait catch logClosed chest heavy evening bottle starfall shower ufo station tank flash
-//         tankstar unlock pair court baby bumped nursery panes wideTank tankTab
+//         tankstar unlock pair court baby bumped nursery panes wideTank tankTab frantic
 var AQ = (typeof AQ !== 'undefined') ? AQ : {};
 
 AQ.Tips = (function () {

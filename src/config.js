@@ -39,7 +39,10 @@ AQ.TUNING = {
     reach:  [0, 14, 16, 19],    // index = net level (1..3)
     radius: [0, 9, 13, 18],
     pryTime: 1.2,               // seconds of holding to pry a clinging creature
-    maxLevel: 3
+    maxLevel: 3,
+    // spam clicking does nothing: from the 4th net click within 2 seconds on, swings are "frantic" and
+    // never catch anything (each creature has its own way of being caught; the log has its hint)
+    frantic: { enabled: true, clicks: 4, seconds: 2, noteEvery: 8 }   // noteEvery: seconds between the little "spam clicking does nothing" notes
   },
 
   speedMaxLevel: 3,
