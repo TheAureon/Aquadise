@@ -270,7 +270,7 @@ AQ.TUNING = {
 
   // The Universal Nursery (src/nursery.js): every bred egg and baby lives here until it grows up.
   nursery: {
-    capacity: [20, 30, 40, 50]   // by the nursery's SIZE level (it expands like any tank): babies + grown babies waiting
+    capacity: [40, 60, 80, 100]  // by the nursery's SIZE level (it expands like any tank): babies + grown babies waiting
                               // to graduate + eggs; when full, breeding pauses everywhere
   },
 

@@ -22,6 +22,7 @@ AQ.SoundUI = (function () {
     if (S.tab === 'options') return [
       { id: 'hints', kind: 'btn', label: AQ.t('settings.tips'), value: AQ.t(!AQ.Tips || AQ.Tips.hintsOn() ? 'settings.hintsOn' : 'settings.hintsOff') },
       { id: 'resettips', kind: 'btn', label: AQ.t('settings.seeAgain'), value: AQ.t(S.resetDone > 0 ? 'settings.tipsReset' : 'settings.resetTips') },
+      { id: 'autograd', kind: 'btn', label: AQ.t('settings.autoGraduate'), value: AQ.t(set().autoGraduate ? 'settings.on' : 'settings.off'), on: !!set().autoGraduate },
       { id: 'flashing', kind: 'btn', label: AQ.t('settings.flashing'), value: AQ.t(AQ.U.calm() ? 'settings.reduced' : 'settings.normal'), on: AQ.U.calm() },
       { id: 'language', kind: 'btn', label: AQ.t('settings.language'), value: AQ.Lang.name(AQ.Lang.code), off: AQ.Lang.available().length < 2 }];
     return [
@@ -58,6 +59,7 @@ AQ.SoundUI = (function () {
     else if (id === 'mute') { A.toggleMute(); A.play('menu_select'); }
     else if (id === 'hints') { AQ.Tips.setHints(!AQ.Tips.hintsOn()); dirty(); }
     else if (id === 'flashing') { set().reduceFlashing = !AQ.U.calm(); dirty(); }
+    else if (id === 'autograd') { set().autoGraduate = !set().autoGraduate; dirty(); if (set().autoGraduate && AQ.Breeding) AQ.Breeding.autoGraduate(); }   // grown babies go home by themselves
     else if (id === 'language') {                 // the next language that exists (only the ones with a file)
       const list = AQ.Lang.available(), next = list[(list.indexOf(AQ.Lang.code) + 1) % list.length];
       if (list.length > 1) { set().language = AQ.Lang.set(next); dirty(); }

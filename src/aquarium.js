@@ -474,7 +474,8 @@ AQ.Aquarium = (function () {
     // the nursery: GRADUATE ALL sits on the sand, bottom right; the open card has its own GRADUATE
     if (inNursery()) {
       const grown = AQ.Nursery.grown().length;
-      ui.push({ id: 'grad_all', x: TANK.x + VW - 66, y: TANK.bottom - 13, w: 62, h: 10, label: AQ.t('nursery.graduateAll'), off: !grown, count: grown });
+      const gl = AQ.t('nursery.graduateAllN', { n: grown }), gw = Math.max(62, F().width(gl) + 8);   // GRADUATE ALL (5): how many are ready
+      ui.push({ id: 'grad_all', x: TANK.x + VW - 4 - gw, y: TANK.bottom - 13, w: gw, h: 10, label: gl, off: !grown, count: grown });
     }
     const items = trayItems(), cell = A.tray === 'fish' && inNursery() ? NCELL : CELL;
     const perPage = Math.floor((308 - 50) / cell);
@@ -1382,6 +1383,7 @@ AQ.Aquarium = (function () {
 
     const cf = cardFish();
     if (cf) drawCard(g, cf); else { A.card = null; A.scard = null; }
+    if (inNursery()) drawNurseryCounter(g);
     drawBars(g, tank, b);
     if (A.dialog) drawDialog(g);
   };
@@ -1750,7 +1752,7 @@ AQ.Aquarium = (function () {
       g.save(); g.beginPath(); g.rect(r.x, r.y, r.w, r.h); g.clip();
       F().draw(g, (b.short || b.name).toUpperCase(), r.x + 2, r.y + 2, cur ? '#ffe9a8' : '#e8fbff', { shadow: false, max: r.w - 4 });
       g.restore();
-      if (nurs) F().draw(g, `♥ ${AQ.Nursery.occupancy()}/${AQ.Nursery.capacity()}`, r.x + 2, r.y + 23, '#ffd8e8', { shadow: false });
+      if (nurs) { F().draw(g, `♥ ${AQ.Nursery.occupancy()}/${AQ.Nursery.capacity()}`, r.x + 2, r.y + 23, AQ.Nursery.full() ? '#ffcf8a' : '#ffd8e8', { shadow: false }); if (AQ.Nursery.full()) AQ.Nursery.drawWarning(g, r.x + r.w - 10, r.y + 10, A.t); }   // full: a warning mark
       else drawStars(g, r.x + 2, r.y + 22, v.stars);
       F().draw(g, `${ids.length}`, r.x + r.w - 2, r.y + 23, '#8fb6cc', { align: 'right', shadow: false });
       // one-line status: the most useful thing to know about this tank
@@ -1956,6 +1958,14 @@ AQ.Aquarium = (function () {
     lines.forEach(([t, c], i) => F().draw(g, t, x + 5, y + 12 + i * 7, c, { shadow: false, max: w - 10 }));
   }
 
+  // the nursery's counter on the sand, bottom left: "14/40, 5 READY TO GRADUATE" (amber when full)
+  function drawNurseryCounter(g) {
+    const N = AQ.Nursery, full = N.full(), txt = AQ.t('nursery.counter', { count: N.occupancy(), max: N.capacity(), n: N.ready() });
+    const x = TANK.x + 6, y = TANK.bottom - 11, w = F().width(txt);
+    if (AQ.Tips && AQ.Tips.overlaps(x - 1, y - 1, w + 12, 8)) return;      // a tutorial tip is there: step aside
+    if (full) N.drawWarning(g, x, y - 1, A.t);
+    F().draw(g, txt, x + (full ? 10 : 0), y, full ? '#ffcf8a' : '#ffe9f2', { shadow: 'rgba(4,12,24,0.85)', max: VW - 80 });
+  }
   // the nursery's own tooltip (instead of the vibe): how full it is and what it's for
   function nurseryTooltip(g) {
     const N = AQ.Nursery, t = N.tank(), now = Date.now();

@@ -84,10 +84,10 @@ AQ.Breeding = (function () {
     return out(AQ.t('breed.soon'), true);
   };
 
-  function announce(text) {
+  function announce(text, col = '#ffb0d0', life = 4) {
     const A = AQ.Aquarium, G = AQ.Game;
-    if (G && G.state === 'aquarium' && A.note) A.note(text, '#ffb0d0', 4);
-    else if (AQ.HUD) AQ.HUD.toast(text, '#ffb0d0', 4);
+    if (G && G.state === 'aquarium' && A.note) A.note(text, col, life);
+    else if (AQ.HUD) AQ.HUD.toast(text, col, life);
   }
   // a new baby, straight into the nursery (keeps species, sex, rare colour and birth time)
   function arrive(id, from, now) {
@@ -104,10 +104,33 @@ AQ.Breeding = (function () {
     return e;
   }
 
+  // AUTO-GRADUATE (SETTINGS > OPTIONS, saved as settings.autoGraduate, off by default): every grown baby
+  // graduates by itself to its home tank's storage, with a quiet toast and the graduate chime.
+  B.autoOn = () => !!(AQ.State.settings && AQ.State.settings.autoGraduate);
+  B.autoGraduate = function () {
+    const N = nursery();
+    if (!N || !N.id() || !B.autoOn() || !N.grown().length) return 0;
+    const res = N.graduateAll();
+    if (!res.moved.length) return 0;
+    const one = res.moved[0], d = defOf(one.entry.id);
+    if (res.moved.length === 1) announce(AQ.t('nursery.autoGrad', { name: d ? d.name : one.entry.id, tank: N.homeName(one.home) }), '#ffd8e8');
+    else announce(AQ.t('nursery.autoGradMany', { n: res.moved.length }), '#ffd8e8');
+    AQ.Audio.play('graduate');
+    if (AQ.Aquarium && AQ.Game && AQ.Game.state === 'aquarium' && AQ.Aquarium.biome === N.id()) AQ.Aquarium.rebuild();
+    return res.moved.length;
+  };
+  // the nursery just filled up: say so once (again only after it has had room and filled up again)
+  function watchFull(N) {
+    const f = AQ.State.flags = AQ.State.flags || {}, full = N.full();
+    if (full && !f.nurseryFullWarned) { f.nurseryFullWarned = true; announce(AQ.t('nursery.fullToast'), '#ffcf8a', 6); AQ.Save && AQ.Save.dirty(); }
+    else if (!full && f.nurseryFullWarned) { f.nurseryFullWarned = false; AQ.Save && AQ.Save.dirty(); }
+  }
+
   // One check over every tank. Cheap: a few array scans per tank.
   B.tick = function (now = Date.now()) {
     const c = cfg(), N = nursery();
     if (!c.enabled || !N || !N.id()) return;
+    B.autoGraduate();
     const tanks = AQ.State.tanks || {}, nid = N.id();
     let changed = false;
     // eggs in the nursery hatch (an egg already has its place there, so a baby always fits)
@@ -157,6 +180,8 @@ AQ.Breeding = (function () {
         if (AQ.Aquarium && AQ.Aquarium.sparkleParents) AQ.Aquarium.sparkleParents(id, parents);   // only if you're looking at their tank
       }
     }
+    B.autoGraduate();                               // (a baby that grew up just now goes home too)
+    watchFull(N);
     if (changed && AQ.Save) AQ.Save.dirty();
   };
 

@@ -230,7 +230,11 @@ AQ.Station = (function () {
     if (!noLabels) F().draw(ctx, AQ.Tanks.labelFor(b, 90), tk.x, y0 - 7, '#e8fbff', { align: 'center', shadow: 'rgba(4,12,24,0.8)', max: 90 });
     if (!tk.v || t - tk.vT > 1) { tk.v = AQ.Vibe.evaluate(b.id); tk.vT = t; }   // refreshed once a second
     const v = tk.v;
-    if (v.nursery) { F().draw(ctx, `♥ ${AQ.Nursery.occupancy()}/${AQ.Nursery.capacity()}`, tk.x, tk.y - 6, AQ.Nursery.full() ? '#ffcf8a' : '#ffd8e8', { align: 'center', shadow: false }); return; }   // no stars: how full it is
+    if (v.nursery) {                                // no stars: how full it is (and a warning mark when it's full: breeding pauses)
+      F().draw(ctx, `♥ ${AQ.Nursery.occupancy()}/${AQ.Nursery.capacity()}`, tk.x, tk.y - 6, AQ.Nursery.full() ? '#ffcf8a' : '#ffd8e8', { align: 'center', shadow: false });
+      if (AQ.Nursery.full()) AQ.Nursery.drawWarning(ctx, ix + iw - 10, iy + 2, t);
+      return;
+    }
     for (let i = 0; i < 5; i++) { ctx.fillStyle = v.stars >= i + 1 ? '#ffd25a' : v.stars >= i + 0.5 ? '#c8a050' : '#3a4a5a'; ctx.fillRect(tk.x - 10 + i * 4, tk.y - 4, 3, 2); }
   }
 
@@ -283,6 +287,9 @@ AQ.Station = (function () {
         // room for each label = distance to the nearest neighbouring slot on the same floor
         const room = (tk) => Math.min(...tanks.filter((o) => o !== tk && o.floor === tk.floor).map((o) => Math.abs(o.x - tk.x)), 200) * z - 4;
         tanks.filter((tk) => tk.b).forEach((tk) => F().draw(ctx, AQ.Tanks.labelFor(tk.b, room(tk)), Math.round((tk.x - sx) * z), Math.round((tk.y - 44 - sy) * z) - 7, '#e8fbff', { align: 'center', shadow: 'rgba(4,12,24,0.9)', max: room(tk) }));
+        // a full nursery: its warning mark, crisp and full size over the shrunk building
+        const nt = AQ.Nursery && AQ.Nursery.full() && tanks.find((tk) => tk.b && AQ.Nursery.is(tk.b.id));
+        if (nt) AQ.Nursery.drawWarning(ctx, Math.round((nt.x - sx) * z) - 3, Math.round((nt.y - 44 - sy) * z) + 1, AQ.Render.t);
         ctx.globalAlpha = 1;
       }
       drawPrompt(ctx, P, sx, sy, z);

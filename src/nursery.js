@@ -18,6 +18,18 @@ AQ.Nursery = (function () {
   N.occupancy = () => { const t = N.tank(); return t.creatures.length + (t.eggs || []).length + (t.storage || []).length; };
   N.room = () => Math.max(0, N.capacity() - N.occupancy());
   N.full = () => N.room() <= 0;
+  N.ready = () => N.grown().length;                                // grown babies waiting to graduate
+  // the "nursery is full" mark: a small amber warning triangle with a "!" (7 x 7), top-left at x, y.
+  // Drawn on the nursery's window in the building (and the whole-building view) and its TANKS card.
+  N.drawWarning = function (g, x, y, t) {
+    const a = AQ.U.calm() ? 1 : 0.75 + 0.25 * Math.sin((t || 0) * 3);
+    const rows = ['...#...', '..###..', '..#.#..', '.##.##.', '.#####.', '##.#.##', '#######'];
+    g.save(); g.globalAlpha *= a;
+    rows.forEach((r, ry) => [...r].forEach((v, rx) => { if (v === '#') { g.fillStyle = 'rgba(30,14,4,0.75)'; g.fillRect(x + rx + 1, y + ry + 1, 1, 1); } }));
+    rows.forEach((r, ry) => [...r].forEach((v, rx) => { if (v === '#') { g.fillStyle = '#ffb347'; g.fillRect(x + rx, y + ry, 1, 1); } }));
+    g.fillStyle = '#2a1404'; g.fillRect(x + 3, y + 2, 1, 2); g.fillRect(x + 3, y + 5, 1, 1);   // the "!"
+    g.restore();
+  };
   // bred babies (still growing or grown up) and eggs may live here; caught adults never
   N.canHold = (e) => !!e && (!!e.bornAt || !!e.laidAt);
   // what this tank's parents have waiting in the nursery

@@ -38,7 +38,7 @@ AQ.data.tutorial = {
     { id: 'daynight', icon: 'ui:1', lines: 5, lineNeeds: { 4: 'Starfall', 5: 'Starfall' } },
     { id: 'aquarium', icon: 'misc.ufo', lines: 5 },
     { id: 'tanks', icon: 'decor.castle', lines: 9, lineNeeds: { 6: 'Panes', 8: 'Pairs', 9: 'Release' } },
-    { id: 'breeding', icon: 'ui:3', needs: 'Breeding', lines: 7 },
+    { id: 'breeding', icon: 'ui:3', needs: 'Breeding', lines: 8 },
     { id: 'log', icon: 'ui:4', lines: 5, lineNeeds: { 4: 'Bottles', 5: 'Bottles' } },
     { id: 'photo', icon: 'ui:6', lines: 5 },
     { id: 'settings', icon: 'ui:5', lines: 6 }

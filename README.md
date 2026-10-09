@@ -152,7 +152,7 @@ browsers won't let a page save pictures made from file:// images.
     the whole tank and back (`station.windowPanSeconds`), and shows a few more of its creatures.
   - Tuning (`AQ.TUNING.tank`): `capacity` [12, 18, 24, 30], `decorCapacity` [40, 60, 80, 100],
     `expandCost` [10, 20, 35] panes, `width` [312, 468, 624, 780]; the nursery's room by size is
-    `nursery.capacity` [20, 30, 40, 50]; scrolling speeds `aquarium.scroll`; the animation length
+    `nursery.capacity` [40, 60, 80, 100]; scrolling speeds `aquarium.scroll`; the animation length
     `aquarium.buildSeconds`; the keys `keys.scrollLeft` / `keys.scrollRight`.
 - **ONE PAIR EACH (TANK tab):** arranges the tank to show one ♂ and one ♀ of every species that
   lives there (two of a species without sexes), bringing creatures in from the tank's storage and
@@ -406,9 +406,21 @@ browsers won't let a page save pictures made from file:// images.
   overview, the whole-building view and Q/E). A soft, warm, pastel tank where babies of every species
   and biome live together, predators included: babies never stress, scare or eat each other, so no
   predator rules apply. Only bred babies can be in it, never caught adults. It has its own room
-  (`nursery.capacity`, 20, counting babies, grown babies and eggs; shown as ♥ n/20); when it's full,
-  breeding pauses everywhere and the parents' tooltip says "BREEDING PAUSED: THE NURSERY IS FULL,
-  GRADUATE SOME BABIES". The nursery has no vibe stars, stress or unlocks; feeding still works (just
+  (`nursery.capacity`: 40 at size 0, then 60, 80 and 100 if expanded, counting babies, grown babies
+  and eggs; shown as ♥ n/40); when it's full, breeding pauses everywhere and the parents' tooltip says
+  "BREEDING PAUSED: THE NURSERY IS FULL, GRADUATE SOME BABIES".
+  - **A full nursery is easy to spot.** The moment it fills up, a toast says "The nursery is full.
+    Breeding is paused. Graduate some babies." (once: it only comes back after the nursery has had room
+    and filled up again; saved as `flags.nurseryFullWarned`). While it's full, a small amber warning
+    mark shows on the nursery's window in the building (and in the whole-building view), on its card
+    in the directory / TANKS overview, and next to its counter.
+  - **The counter.** On the nursery's tank screen, the sand shows how full it is and how many are
+    ready: "14/40, 5 ready to graduate". GRADUATE ALL shows the number too: "GRADUATE ALL (5)".
+  - **AUTO-GRADUATE** (SETTINGS > OPTIONS, ON / OFF, saved, OFF by default so graduating by hand still
+    works as before). When it's on, every grown baby graduates by itself to its home tank's storage,
+    with a quiet toast ("Ribbonmane graduated and is waiting in the Kelp tank's storage"; several at
+    once: "3 babies graduated to their tanks' storage") and the graduate chime, so grown babies never
+    fill up the nursery. It runs with the breeding check, wherever you are in the game. The nursery has no vibe stars, stress or unlocks; feeding still works (just
   for fun). Its four decorations (Shell Cradle, Bubble Mobile, Soft Sand Mound, Little Pebble Nest)
   are free from the start. Older saves: babies still growing and eggs in any tank (or its storage)
   move into the nursery when the save loads, keeping sex, colour and birth time; if it's full the

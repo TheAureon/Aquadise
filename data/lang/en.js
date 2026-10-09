@@ -63,6 +63,9 @@ AQ.langFiles.en = {
   'settings.seeAgain': 'SEE AGAIN',
   'settings.tipsReset': 'TIPS RESET!',
   'settings.resetTips': 'RESET TIPS',
+  'settings.autoGraduate': 'AUTO-GRADUATE',   // grown babies leave the nursery by themselves
+  'settings.on': 'ON',
+  'settings.off': 'OFF',
   'settings.flashing': 'FLASHING',
   'settings.reduced': 'REDUCED',
   'settings.normal': 'NORMAL',
@@ -387,6 +390,7 @@ AQ.langFiles.en = {
   'guide.breeding.5': 'It holds {c:nursery.capacity.0} (more if expanded); when full, breeding pauses.',
   'guide.breeding.6': 'Grown babies wear a cap: GRADUATE sends one to its own tank\'s storage.',
   'guide.breeding.7': 'About 1 in {inv:breeding.variantChance} babies is a rare color (✦).',
+  'guide.breeding.8': 'AUTO-GRADUATE (SETTINGS > OPTIONS) sends grown babies home by themselves.',
   'guide.log.title': 'The log',
   'guide.log.1': 'The counter in the top right (with the book) or {k:log} opens your log.',
   'guide.log.2': 'SPECIES: every species by biome, with a hint for each.',
@@ -1583,7 +1587,11 @@ AQ.langFiles.en = {
   'breed.egg': 'The {name} pair laid an egg! It\'s in the nursery.',
 
   // ---------------------------------------------------------------- the Universal Nursery
-  'nursery.graduateAll': 'GRADUATE ALL',
+  'nursery.graduateAllN': 'GRADUATE ALL ({n})',   // the button: {n} = grown babies ready to graduate
+  'nursery.counter': { one: '{count}/{max}, {n} ready to graduate', other: '{count}/{max}, {n} ready to graduate' },   // on the nursery's sand: {count}/{max} = how full, {n} = grown
+  'nursery.autoGrad': '{name} graduated and is waiting in the {tank} tank\'s storage',   // AUTO-GRADUATE (one baby)
+  'nursery.autoGradMany': { one: '1 baby graduated to its tank\'s storage', other: '{n} babies graduated to their tanks\' storage' },
+  'nursery.fullToast': 'The nursery is full. Breeding is paused. Graduate some babies.',
   'nursery.graduate': 'GRADUATE',
   'nursery.rareName': 'rare-coloured {name}',   // a rare-coloured baby, in the messages below
   'nursery.stillGrowing': '{name} is still growing: {time} to go.',
