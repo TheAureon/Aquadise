@@ -23,7 +23,9 @@ AQ.Nudges = (function () {
   const COLOR = { spam: '#9fe8ff', drought: '#ffd8e8', mash: '#ffe9a8' };
   const store = () => (AQ.State.nudges = AQ.State.nudges && typeof AQ.State.nudges === 'object' ? AQ.State.nudges : { bags: {} });
 
-  N.on = () => cfg().enabled && (!AQ.Tips || AQ.Tips.hintsOn());
+  // on unless: the feature is off (config), HINTS are off, or the player turned NUDGES off (SETTINGS > OPTIONS)
+  N.playerOn = () => !(AQ.State.settings && AQ.State.settings.nudges === false);
+  N.on = () => cfg().enabled && (!AQ.Tips || AQ.Tips.hintsOn()) && N.playerOn();
   // the moments that count: playing in the sea, nothing else going on
   function active(game) {
     if (game.state !== 'play' || game.scene !== 'world') return false;

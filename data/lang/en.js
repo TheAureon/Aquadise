@@ -63,6 +63,7 @@ AQ.langFiles.en = {
   'settings.seeAgain': 'SEE AGAIN',
   'settings.tipsReset': 'TIPS RESET!',
   'settings.resetTips': 'RESET TIPS',
+  'settings.nudges': 'NUDGES',   // friendly nudges for a player who seems stuck (on / off)
   'settings.autoGraduate': 'AUTO-GRADUATE',   // grown babies leave the nursery by themselves
   'settings.on': 'ON',
   'settings.off': 'OFF',
@@ -406,7 +407,7 @@ AQ.langFiles.en = {
   'guide.settings.title': 'Sound and settings',
   'guide.settings.1': 'Pause ({k:pause}) > SOUND: music and effects volume, mute and a SOUND TEST.',
   'guide.settings.2': '{k:mute} mutes or unmutes anywhere.',
-  'guide.settings.3': 'HINTS turns the tips and friendly nudges on or off; RESET TIPS shows tips again.',
+  'guide.settings.3': 'HINTS turns tips and nudges on or off; NUDGES turns just the nudges off.',
   'guide.settings.4': 'REDUCE FLASHING softens the camera flash, falling stars and blinking lights.',
   'guide.settings.5': 'REDO TUTORIAL (pause menu, title screen or this book) runs the guided dive again.',
   'guide.settings.6': 'It takes you to the Tide Pools and back. Progress saves by itself.',

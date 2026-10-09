@@ -298,8 +298,9 @@ browsers won't let a page save pictures made from file:// images.
     - **key mashing** (silly): the same key that does nothing in the sea (the interact key, say), 6
       times in 8 seconds.
   - **Rate limits:** at most one every 90 seconds and 3 per 10 minutes, none within 60 seconds of a
-    catch, and none while a tip or toast is showing (tips wait for a nudge, too). HINTS off turns them
-    off, and `nudges.enabled` turns the whole feature off.
+    catch, and none while a tip or toast is showing (tips wait for a nudge, too). Players can turn them
+    off with **NUDGES** (SETTINGS > OPTIONS, ON / OFF, saved, on by default; tips stay on), or with HINTS
+    off (tips and nudges); `nudges.enabled` turns the whole feature off for everyone.
   - Tuning: `AQ.TUNING.nudges`. **Testing:** set `debug.nudges: true` and press **Y** in the sea to show
     one right now (it skips the rate limits), cycling net spam, no catch, key mashing
     (`debug.nudgeKey`).
