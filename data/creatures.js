@@ -16,6 +16,14 @@
 //               can't be netted and flickers when you're close). params: decoyDist, decoyColor, alpha, glow
 //   midair      (new) cruises under the surface and leaps out every few seconds; only nettable in the air
 //               params: leapEvery [min,max], leap, speed, depth, wanderR
+//   tracker     (new) hidden and camouflaged at one of a few spots near home; calls now and then (its own
+//               sound + a ripple: src/hydrophone.js) and every few calls slips off to another spot. A net
+//               on its spot catches it; a near miss makes it go quiet and move. Faint shimmer within ~60 px.
+//               params: spots, spotAt (floor|wall|ceiling|reef|water), spotR, callEvery [min,max],
+//               callsPerSpot [min,max], sound (sfx id, group 'hydro'), burst + burstGap, echo { dx, dy, delay },
+//               quiet [min,max], moveTime, alpha, color (ripple), edgePulse (screen edges pulse with each call)
+//   requires_hydro                       tracker: hydrophone (EAR) level needed to hear / see its calls (default 0;
+//                                        log tag "needs hydrophone n"); it can still be netted by chance close up
 //   active                               optional 'night' | 'day': only out at those hours (default: always)
 //   bloom                                plants: 'night' = closed (not harvestable) by day, open + glowing at night
 //   requires_depth                       lives past a depth limit: needs that DEPTH upgrade level to reach (log tag)

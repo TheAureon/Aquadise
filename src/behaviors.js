@@ -693,6 +693,83 @@ AQ.Behaviors = (function () {
     missKey: 'catch.leaper'
   };
 
+  // Hidden and camouflaged at one of a few spots near its home; it calls now and then (its own sound
+  // + a ripple, src/hydrophone.js) and every few calls it slips off to another of its spots. A net
+  // landing on its spot catches it; a near miss (within ~2x the net's reach) makes it go quiet for a
+  // few seconds and move. Close up (hydrophone.shimmerR px) it shimmers faintly, at any hydrophone
+  // level, so it can always be found by chance. Below its def.requires_hydro level its calls aren't
+  // heard or shown at all.
+  //   params: spots (how many places), spotAt (floor|wall|ceiling|reef|water), spotR (px from home),
+  //           callEvery [min,max] s, callsPerSpot [min,max], sound (sfx id, group 'hydro'),
+  //           burst (calls in a row, e.g. 3 chirps) + burstGap s, echo { dx, dy, delay } (a fainter,
+  //           later, offset second ripple), quiet [min,max] s after a near miss, moveTime s, alpha
+  //           (how see-through it is in cover), color (ripple color), edgePulse (the screen's edges
+  //           pulse gently with each call it makes while you can hear it)
+  const callsOf = (p) => { const v = p.callsPerSpot || [2, 4]; return Array.isArray(v) ? R.int(v[0], v[1]) : v; };
+  B.tracker = {
+    init(c) {
+      const p = c.p, n = p.spots || 3, at = p.spotAt || 'floor', sp = c.slot && c.slot.sp;
+      c.spots = [[c.x, c.y]];
+      for (let i = 0; i < 40 && c.spots.length < n; i++) {
+        const s = AQ.Creatures.findSpot(c.def, at, c.hx, p.spotR || 70, sp);
+        if (s && c.spots.every((o) => Math.hypot(o[0] - s[0], o[1] - s[1]) > 18)) c.spots.push(s);
+      }
+      c.spot = 0; c.calls = 0; c.callsTarget = callsOf(p);
+      c.ct = U.rangeOf(p.callEvery || [3, 5]) * R.range(0.3, 1);
+      c.caller = { x: c.x, y: c.y, sound: p.sound, req: c.def.requires_hydro || 0, key: 'call:' + c.def.id + ':' + Math.round(c.seed * 1000),
+        color: p.color, echo: p.echo, echoSound: p.echo && p.sound, def: c.def, quietUntil: 0, edgePulse: p.edgePulse };
+    },
+    update(c, ctx, dt) {
+      const p = c.p, now = AQ.Game.time, cfg = AQ.TUNING.hydrophone;
+      c.caller.x = c.x; c.caller.y = c.y;
+      if (c.moveT > 0) {                         // slipping off to its next spot, unseen (it can't be netted on the way)
+        c.moveT -= dt;
+        const k = 1 - Math.max(0, c.moveT) / c.moveDur;
+        c.x = U.lerp(c.from[0], c.to[0], k); c.y = U.lerp(c.from[1], c.to[1], k);
+        c.catchable = false; c.hidden = true; c.targetAlpha = 0; c.moving = false;
+        if (c.moveT <= 0) { c.hidden = false; c.x = c.to[0]; c.y = c.to[1]; c.hx = c.x; c.hy = c.y; }
+        return;
+      }
+      c.catchable = true; c.hidden = false; c.moving = false; c.vx = c.vy = 0;
+      c.targetAlpha = p.alpha != null ? p.alpha : 0.1;
+      if (c.leaving) return;                    // out of its hours: it goes quiet and fades away (src/creatures.js)
+      // a faint shimmer close up (any hydrophone level): bubbles of light rising off it now and then
+      if (ctx.dist < cfg.shimmerR && R.chance(dt * cfg.shimmerRate)) AQ.FX.add({ type: 'trail', x: c.x + R.range(-c.r, c.r), y: c.y - R.range(0, c.r), vy: -6, life: 0.9, color: cfg.shimmerColor });
+      if (ctx.dist < cfg.shimmerR) c.targetAlpha = Math.max(c.targetAlpha, cfg.shimmerAlpha);
+      // its calls (none while it's quiet after a near miss)
+      if (c.burstLeft > 0) { c.bt -= dt; if (c.bt <= 0) { c.burstLeft--; c.bt = p.burstGap || 0.3; B.tracker.call(c, true); } }
+      if (now < c.caller.quietUntil) return;
+      c.ct -= dt;
+      if (c.ct > 0) return;
+      c.ct = U.rangeOf(p.callEvery || [3, 5]);
+      B.tracker.call(c, false);
+      if (p.burst > 1) { c.burstLeft = p.burst - 1; c.bt = p.burstGap || 0.3; }
+      if (++c.calls >= c.callsTarget) B.tracker.move(c, 0);
+    },
+    // one call: heard (sound + ripple, or an edge arrow off screen) only within range and level
+    call(c, inBurst) {
+      const heard = AQ.Hydro.call(c.caller, { echo: !inBurst && c.p.echo });
+      if (heard && c.p.edgePulse) AQ.Hydro.edgePulse(c.caller);
+      return heard;
+    },
+    // off to another of its spots (quiet: seconds it stays silent after it gets there)
+    move(c, quiet) {
+      const p = c.p;
+      if (c.spots.length > 1) { let i = c.spot; while (i === c.spot) i = R.int(0, c.spots.length - 1); c.spot = i; }
+      c.from = [c.x, c.y]; c.to = c.spots[c.spot].slice();
+      c.moveDur = c.moveT = p.moveTime || 1.5;
+      c.calls = 0; c.callsTarget = callsOf(p); c.burstLeft = 0;
+      c.caller.quietUntil = AQ.Game.time + c.moveDur + (quiet || 0);
+      c.ct = U.rangeOf(p.callEvery || [3, 5]) * 0.5;
+      AQ.FX.puff(c.x, c.y, 'rgba(200,230,255,0.35)', 3);           // a little stir where it was
+    },
+    // a swing that came close but missed (src/catching.js): it goes quiet and moves
+    nearMiss(c) {
+      if (c.moveT > 0) return;
+      B.tracker.move(c, U.rangeOf(c.p.quiet || [5, 8]));
+    }
+  };
+
   B.easy = {
     update(c, ctx, dt) { c.catchable = true; c.targetAlpha = 1; if (!H.lure(c, ctx, dt, 10)) H.wander(c, dt, c.p.speed || 7, 40); }
   };

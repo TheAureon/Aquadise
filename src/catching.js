@@ -56,7 +56,7 @@ AQ.Catching = (function () {
         s.net = net;
         checkHits(game, net, s);
       }
-      if (prog >= 1) { K.swing = null; K.holdAim = s.aim; }
+      if (prog >= 1) { K.swing = null; K.holdAim = s.aim; nearMisses(game, s); }
     }
 
     // Hold the net after a swing to pry clinging/hidden creatures loose.
@@ -103,6 +103,8 @@ AQ.Catching = (function () {
 
   function checkHits(game, net, s) {
     for (const c of AQ.Creatures.near(net.x, net.y, 60)) {
+      // hidden callers (tracker): how close the net came, for a near miss once the swing is over
+      if (c.bhv.nearMiss) { const d = Math.hypot(c.x - net.x, c.y - net.y) - (net.r + c.r * 0.8); s.close = s.close || new Map(); if (!s.close.has(c) || d < s.close.get(c).d) s.close.set(c, { d, r: net.r + c.r * 0.8 }); }
       if (s.hits.has(c)) continue;
       const [cx, cy] = centerOf(c);
       // tide-pool dwellers: hitting the pool counts
@@ -131,6 +133,14 @@ AQ.Catching = (function () {
         AQ.FX.puff(cx, cy, 'rgba(255,255,255,0.5)', 3);
       }
     }
+  }
+
+  // a swing that came within hydrophone.nearMiss x the net's catch distance of a hidden caller but didn't
+  // catch it: it goes quiet for a while and slips off to another spot
+  function nearMisses(game, s) {
+    if (!s.close) return;
+    const k = AQ.TUNING.hydrophone.nearMiss;
+    for (const [c, m] of s.close) if (AQ.Creatures.list.indexOf(c) >= 0 && m.d + m.r <= m.r * k) c.bhv.nearMiss(c);
   }
 
   function harvest(game, c) {

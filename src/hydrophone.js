@@ -19,7 +19,7 @@ var AQ = (typeof AQ !== 'undefined') ? AQ : {};
 
 AQ.Hydro = (function () {
   const U = AQ.U, R = U.R;
-  const H = { k: 0, listening: false, ripples: [], flashes: [], debugSrc: [], heardAny: false };
+  const H = { k: 0, listening: false, ripples: [], flashes: [], pulses: [], debugSrc: [], heardAny: false };
   const cfg = () => AQ.TUNING.hydrophone;
   const dbg = () => !!AQ.TUNING.debug.hydrophone;
   H.max = () => cfg().max;
@@ -32,7 +32,7 @@ AQ.Hydro = (function () {
   // ---------------------------------------------------------------- sources
   H.sources = function () {
     const out = H.debugSrc.slice();
-    if (AQ.Creatures) for (const c of AQ.Creatures.list) if (c.caller && !c.fadedOut) out.push(c.caller);
+    if (AQ.Creatures) for (const c of AQ.Creatures.list) if (c.caller && !c.fadedOut && !c.leaving) out.push(c.caller);
     return out;
   };
   const P = () => AQ.Game.player;
@@ -74,6 +74,12 @@ AQ.Hydro = (function () {
     if (H.ripples.length > c.max) H.ripples.shift();
   }
   H.ripple = ripple;
+  // a deep call (edgePulse): the screen's edges glow gently once, stronger the closer it is
+  H.edgePulse = function (src) {
+    const d = Math.hypot(src.x - P().x, src.y - P().y);
+    H.pulses.push({ t: 0, life: cfg().edgePulse.life, k: U.clamp(1 - d / H.range(), 0.25, 1) });
+    if (H.pulses.length > 4) H.pulses.shift();
+  };
   function flash(x, y, d) { H.flashes.push({ x, y, d, t: 0, life: cfg().edgeFlashSeconds }); if (H.flashes.length > 8) H.flashes.shift(); }
 
   // ---------------------------------------------------------------- update (every frame, any screen)
@@ -106,6 +112,7 @@ AQ.Hydro = (function () {
     }
     for (let i = H.ripples.length - 1; i >= 0; i--) if ((H.ripples[i].t += dt) > H.ripples[i].life) H.ripples.splice(i, 1);
     for (let i = H.flashes.length - 1; i >= 0; i--) if ((H.flashes[i].t += dt) > H.flashes[i].life) H.flashes.splice(i, 1);
+    for (let i = H.pulses.length - 1; i >= 0; i--) if ((H.pulses[i].t += dt) > H.pulses[i].life) H.pulses.splice(i, 1);
   };
   // TESTING: a few calling sources in the water near the start (only with debug.hydrophone)
   function debugSources(dt, game) {
@@ -141,6 +148,15 @@ AQ.Hydro = (function () {
     g.beginPath(); g.moveTo(size, 0); g.lineTo(-size, -size * 0.7); g.lineTo(-size, size * 0.7); g.fill();
     g.restore();
   }
+  function drawEdgePulse(g, p) {
+    const c = cfg().edgePulse, x = p.t / p.life, a = Math.sin(Math.PI * x) * c.alpha * p.k;
+    for (let i = 0; i < c.width; i++) {
+      g.fillStyle = `rgba(${c.color},${(a * (1 - i / c.width)).toFixed(3)})`;
+      g.fillRect(i, i, 320 - i * 2, 1); g.fillRect(i, 179 - i, 320 - i * 2, 1);
+      g.fillRect(i, i + 1, 1, 178 - i * 2); g.fillRect(319 - i, i + 1, 1, 178 - i * 2);
+    }
+  }
+  H.drawEdgePulse = drawEdgePulse;
   H.draw = function (g, game) {
     if (game.scene !== 'world' || (game.state !== 'play' && game.state !== 'map' && game.state !== 'pause')) return;
     const l = AQ.Camera.left(), t = AQ.Camera.top(), L = cfg().listen;
@@ -150,6 +166,7 @@ AQ.Hydro = (function () {
       ring(g, r.x - l, r.y - t, rad, a * 0.9, r.col);
       if (r.r1 > 20 && k > 0.25) ring(g, r.x - l, r.y - t, rad * 0.6, a * 0.5, r.col);    // a second, inner ring on big ones
     }
+    for (const p of H.pulses) drawEdgePulse(g, p);
     for (const f of H.flashes) edgeArrow(g, f.x, f.y, f.d, Math.min(1, (f.life - f.t) * 2), cfg().ripple.color);
     // listening: an arrow at the edge for each source in range that's off screen
     if (H.k > 0.05) for (const s of H.sources()) {

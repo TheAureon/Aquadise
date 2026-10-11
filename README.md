@@ -219,6 +219,18 @@ browsers won't let a page save pictures made from file:// images.
 - **New catch behaviours:** `mirror` (copies your swimming mirrored; hold still and it drifts in),
   `lure` (a glowing decoy on a stalk; net the dim creature beside it, not the light) and `midair`
   (leaps out of the water; only nettable in the air). See the header of data/creatures.js.
+- **The TRACKER behaviour (hidden callers, for the hydrophone):** the creature hides, camouflaged
+  (nearly see-through), at one of a few spots near its home (`params.spots`, `spotAt`, `spotR`). It
+  calls at random intervals (`callEvery`), with its own sound and a ripple (heard and shown only
+  within your hearing range, and only at its `requires_hydro` level or above). Every few calls
+  (`callsPerSpot`) it slips off, unseen, to another of its spots. A net landing on its spot catches
+  it. A near miss (the net within `hydrophone.nearMiss` = 2x its catch distance) makes it go quiet
+  for a few seconds (`quiet`) and move. Within `hydrophone.shimmerR` (60 px) it shimmers faintly at
+  any level, so it can always be found by chance close up, even below its hydrophone level. Extras:
+  `burst` (several calls in a row), `echo` (a fainter, later, offset second ripple) and `edgePulse`
+  (the screen's edges pulse gently with each call). The log shows "needs hydrophone n" and "Hides
+  and calls" lines. Hidden callers make no creature-voice sounds (their call is the only cue, and it
+  is always also shown). Swings that miss count toward the net-spam nudge like any other.
 - **Nine new creatures:** Auroravein Squid (ice, night), Moonshell Crab (tide pools,
   night), Ribbonmane (kelp, mirror), Candlepolyp (coral plant, blooms at night), Skyleap Flyfish
   (open ocean, mid-air), Sail Turtle (open ocean), Pressure Tortoise (bottom of the trench, depth 3),

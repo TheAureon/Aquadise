@@ -764,6 +764,7 @@ AQ.langFiles.en = {
   'req.star': 'falling stars only',
   'req.shower': 'meteor showers only',
   'req.depth': 'needs depth {n}',
+  'req.hydro': 'needs hydrophone {n}',
   'req.rare': 'rare',
   'req.hostile': 'hostile',
   'req.draft': 'draft',
@@ -771,6 +772,8 @@ AQ.langFiles.en = {
   'req.tip.bloom': 'Opens at night.',
   'req.tip.day': 'Only out by day.',
   'req.tip.depth': 'Lives deep: needs the depth upgrade (level {n}).',
+  'req.tip.caller': 'Hides and calls: follow the ripples.',
+  'req.tip.hydro': 'Hides and calls: a hydrophone (level {n}) hears it.',
 
   // ---------------------------------------------------------------- field notes (message bottles). {name} = the species name
   'lore.saltbloom.title': 'The Pool-Edge Crystal',

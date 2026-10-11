@@ -77,6 +77,13 @@ AQ.TUNING = {
       max: 60                 // ripples on screen at once (the oldest goes first)
     },
     edgeFlashSeconds: 1.2,    // a call heard off screen: the edge arrow shows this long
+    edgePulse: { life: 0.9, alpha: 0.28, width: 10, color: '120,200,255' },   // a deep call's gentle pulse at the screen's edges
+    // hidden callers (the tracker behavior, src/behaviors.js)
+    shimmerR: 60,             // closer than this (px) one shimmers faintly, at any hydrophone level...
+    shimmerAlpha: 0.3,        // ...showing this much of itself...
+    shimmerRate: 2.5,         // ...with this many light specks a second rising off it
+    shimmerColor: '#d8f6ff',
+    nearMiss: 2,              // a swing within this many times the net's catch distance (but not on it) is a near miss
     listen: {                 // LISTEN (hold keys.listen; touch: the ear button), hydrophone level 1+
       fade: 0.35,             // seconds to fade in / out
       duck: 0.65,             // music and ambience drop by this much (0..1) while listening

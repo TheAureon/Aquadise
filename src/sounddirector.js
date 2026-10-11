@@ -83,7 +83,7 @@ AQ.SoundDirector = (function () {
     if (S.voiceT > 0 || !AQ.Creatures) return;
     S.voiceT = cfg().creatureVoiceEvery * (0.6 + Math.random() * 0.8);
     const range = cfg().creatureVoiceRange;
-    const near = AQ.Creatures.list.filter((c) => !c.hidden && !c.closed && voiceOf(c.def) && Math.abs(c.x - P.x) < range && Math.abs(c.y - P.y) < range);
+    const near = AQ.Creatures.list.filter((c) => !c.hidden && !c.closed && !c.caller && voiceOf(c.def) && Math.abs(c.x - P.x) < range && Math.abs(c.y - P.y) < range);
     if (!near.length) return;
     const c = near[Math.floor(Math.random() * near.length)], dist = Math.hypot(c.x - P.x, c.y - P.y);
     A.play(voiceOf(c.def), { vol: Math.max(0.25, 1 - dist / range), pan: (c.x - P.x) / range });
