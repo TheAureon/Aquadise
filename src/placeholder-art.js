@@ -1315,7 +1315,8 @@
   };
   // Touch controls (screen buttons, drawn big and semi-transparent). ui.touch, 16 x 16: frame 0 is the
   // round button base, the rest are icons drawn on top of it: 1 jump, 2 bait, 3 sneak, 4 interact,
-  // 5 menu, 6 close, 7 back, 8 view, 9 shutter, 10 left, 11 right. ui.stick, 32 x 32: 0 ring, 1 knob.
+  // 5 menu, 6 close, 7 back, 8 view, 9 shutter, 10 left, 11 right, 12 listen (an ear with sound waves:
+  // the hydrophone's hold-to-listen button; also the hydrophone tips' icon). ui.stick, 32 x 32: 0 ring, 1 knob.
   S.uitouch = function (p, o) {
     const f = o.frame, Wh = hex('#eaf8ff'), Y = hex('#ffe9a8'), c = 7.5;
     if (f === 0) {
@@ -1334,7 +1335,14 @@
     else if (f === 8) { p.ellipse(c, c, 5, 3, Wh); p.circle(c, c, 1.8, [20, 50, 80, 255]); }                 // an eye (view)
     else if (f === 9) { p.rect(3, 5, 10, 7, Wh); p.rect(6, 4, 4, 1, Wh); p.circle(c, 8.5, 2, [20, 50, 80, 255]); }   // a camera
     else if (f === 10) p.tri([4, c], [10, 3], [10, 12], Wh);                                                  // left
-    else p.tri([11, c], [5, 3], [5, 12], Wh);                                                                // right
+    else if (f === 11) p.tri([11, c], [5, 3], [5, 12], Wh);                                                  // right
+    else {                                                                                                    // an ear + sound waves (listen)
+      const Cy = hex('#9ff3ff');
+      for (let a = -2.4; a < 2.4; a += 0.05) p.set(6 + Math.cos(a) * 3, 7 + Math.sin(a) * 4, Wh);           // the ear's outer curve
+      p.rect(8, 10, 1, 3, Wh); p.rect(6, 12, 2, 1, Wh);                                                       // ...down to the lobe
+      p.rect(5, 6, 1, 3, Wh); p.set(6, 5, Wh);                                                                // the inner fold
+      for (let a = -0.7; a <= 0.7; a += 0.08) { p.set(10 + Math.cos(a) * 2, 7.5 + Math.sin(a) * 2, Cy); p.set(10 + Math.cos(a) * 4, 7.5 + Math.sin(a) * 4, Cy); }   // waves
+    }
     p.outline(0.35);
   };
   // the nursery: a tiny graduation cap (8 x 8, 2 frames: the tassel swings) over grown babies

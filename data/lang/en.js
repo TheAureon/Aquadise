@@ -86,6 +86,8 @@ AQ.langFiles.en = {
   'soundtest.effects': 'EFFECTS',
   'soundtest.ambience': 'AMBIENCE',
   'soundtest.music': 'MUSIC',
+  'soundtest.hydro': 'HYDROPHONE',   // the hydrophone's sounds (each also shows its ripple)
+  'soundtest.ripple': 'WHAT YOU SEE IN THE GAME:',   // over the ripple preview on the HYDROPHONE tab
   'soundtest.title': 'SOUND TEST',
   'soundtest.muted': 'MUTED - PRESS {key}',
   'soundtest.info.sfx': 'ID: {id}{rec}',   // the selected sound: {id} = its id, {rec} = the RECORDING mark if it has one
@@ -173,6 +175,7 @@ AQ.langFiles.en = {
   'hud.speed': 'SPD',
   'hud.lamp': 'LAMP',
   'hud.deep': 'DEEP',
+  'hud.ear': 'EAR',            // the HYDROPHONE upgrade's HUD row (keep it short)
   'hud.sneaking': 'SNEAKING',
   'hud.logTip': 'COLLECTION LOG ({key})',   // hovering the counter button (top right): {key} = the log key
 
@@ -242,7 +245,7 @@ AQ.langFiles.en = {
   'tip.bait': 'Bait drifts down and draws curious creatures out. Wait nearby and let them come to you.',
   'tip.catch': 'Got one! Every catch goes straight to its tank in your aquarium. The log keeps track: click the counter in the top right, or press {k:log}.',
   'tip.log': 'Your log has three tabs: SPECIES, VARIANTS, NOTES. Every species has a hint on how to catch it.',
-  'tip.chest': 'Chests hold upgrades: NET, SPEED, LAMP and DEEP. A bigger net, faster swimming, a brighter lamp and the strength to dive deeper.',
+  'tip.chest': 'Chests hold upgrades: NET, SPEED, LAMP, DEEP and EAR. A bigger net, faster swimming, a brighter lamp, the strength to dive deeper and a hydrophone to hear hidden creatures.',
   'tip.deep': 'Heavy water: you are past your depth for now. Nothing is hurt. A DEEP upgrade lets you go further.',
   'tip.night': 'Evening falls. Some creatures only come out at night, and glowing ones are easier to spot. A LAMP upgrade lights up more of the dark.',
   'tip.bottle': 'A message bottle! It holds field notes on one species. Read them in the log ({k:log}), NOTES tab.',
@@ -259,6 +262,9 @@ AQ.langFiles.en = {
   'tip.bumped': 'Just a bump! Nothing in the sea can hurt you. Some creatures only nudge you back a little.',
   'tip.panes': 'Glass panes! Every chest holds a few. They are for building: on a tank\'s TANK tab, EXPAND makes it bigger. Your count is in the top right corner.',
   'tip.tankTab': 'The TANK tab: EXPAND makes this tank bigger with glass panes, ONE PAIR EACH shows one ♂ and one ♀ of every species, and RELEASE EXTRAS returns spare ones to the sea (it always asks).',
+  'tip.hydro': 'A HYDROPHONE! Some creatures hide and call now and then: a ripple shows where. Hold {k:listen} to listen.',
+  'tip.hydro.touch': 'A HYDROPHONE! Some creatures hide and call now and then: a ripple shows where. Hold the ear button to listen.',
+  'tip.heard': 'A call! Something hidden is nearby, right about where the ripple was. A better hydrophone hears further.',
   'tip.wideTank': 'A bigger tank! It\'s wider than the screen: scroll with {k:scrollLeft} and {k:scrollRight}, drag the water, or use the strip under the tank.',
 
   // ---------------------------------------------------------------- the guided first dive
@@ -360,7 +366,8 @@ AQ.langFiles.en = {
   'guide.chests.3': 'SPEED: faster swimming. LAMP: more light around you in the dark.',
   'guide.chests.4': 'DEEP: dive deeper. Past your depth the water just turns heavy:',
   'guide.chests.5': 'nothing is ever hurt, you simply drift back up.',
-  'guide.chests.6': 'Every chest also holds a few GLASS PANES, for building bigger tanks.',
+  'guide.chests.6': 'EAR: a hydrophone, to hear hidden creatures calling (a ripple shows where).',
+  'guide.chests.7': 'Every chest also holds a few GLASS PANES, for building bigger tanks.',
   'guide.daynight.title': 'Day and night',
   'guide.daynight.1': 'A whole day passes in about {c:clock.dayMinutes} real minutes. The HUD shows the sun or moon.',
   'guide.daynight.2': 'Some creatures only come out at night, and glowing ones are easier to spot.',
@@ -483,7 +490,8 @@ AQ.langFiles.en = {
   'chest.speed': 'SWIM SPEED UP! (LV {n})',
   'chest.lantern': 'BRIGHTER LANTERN! (LV {n})',
   'chest.depth': 'DEEPER DIVES! (DEPTH LV {n})',
-  'chest.empty': 'Empty... all four upgrades are already the best.',
+  'chest.hydro': 'HYDROPHONE! (EAR LV {n})',
+  'chest.empty': 'Empty... all five upgrades are already the best.',
   'chest.panes': '+{n} {panes}',   // a second toast after the upgrade one: {panes} = pane.name (for that number)
   'chest.onlyPanes': 'You found {n} {panes}!',   // every upgrade is already the best: the chest holds only panes
 
@@ -1798,6 +1806,10 @@ AQ.langFiles.en = {
   'sfx.up_speed': 'SPEED WHOOSH',
   'sfx.up_lantern': 'LANTERN GLOW',
   'sfx.up_depth': 'DEPTH HUM',
+  'sfx.up_hydro': 'SONAR BLIP',
+  'sfx.listen_on': 'LISTEN START',
+  'sfx.listen_off': 'LISTEN STOP',
+  'sfx.call_test': 'TEST CALL',
   'sfx.panes': 'GLASS PANES',
   'sfx.place': 'PLACE',
   'sfx.build': 'TANK EXPANDED',

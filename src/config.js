@@ -58,6 +58,36 @@ AQ.TUNING = {
     heavyHaze: 0.35           // how much the screen softens (0..1)
   },
 
+  // The HYDROPHONE (src/hydrophone.js): the fifth chest upgrade (EAR in the HUD), levels 0..3 (older saves: 0).
+  // It lets you hear hidden creatures that call (tracker behavior). Every call you can hear also shows a
+  // ripple (or an arrow at the screen's edge when it's off screen), so nothing ever needs the sound on.
+  hydrophone: {
+    max: 3,
+    range: [100, 200, 340, 520],  // world px you can hear a call from, per hydrophone level 0..3
+    jitter: 16,               // the most a ripple's centre is off from the true spot (px)...
+    minJitterK: 0.25,         // ...shrinking with closeness down to this fraction of it (right next to it)...
+    jitterLevel: [1, 1, 0.75, 0.5],   // ...and times this, per level (a better hydrophone = a truer ripple)
+    ripple: {
+      life: 1.1,              // seconds a call's ripple lasts...
+      radius: 14,             // ...and how wide it grows (px)
+      bigLife: 1.6,           // the big ripples while listening
+      bigRadius: 30,
+      color: '#9ff3ff',
+      faintAlpha: 0.45,       // an echo's ripple is this see-through
+      max: 60                 // ripples on screen at once (the oldest goes first)
+    },
+    edgeFlashSeconds: 1.2,    // a call heard off screen: the edge arrow shows this long
+    listen: {                 // LISTEN (hold keys.listen; touch: the ear button), hydrophone level 1+
+      fade: 0.35,             // seconds to fade in / out
+      duck: 0.65,             // music and ambience drop by this much (0..1) while listening
+      slow: 0.6,              // you move at this fraction of your speed while listening
+      pulseEvery: 1.4,        // every source in range shows a big ripple this often
+      dim: 0.3,               // how much the world dims (0..1)
+      arrowMin: 3, arrowMax: 7   // edge arrow size (px): far .. close
+    },
+    debugEvery: 2.5           // (testing sources only) seconds between their calls
+  },
+
   bait: { lifetime: 22, sinkSpeed: 7, lureRadius: 95 },
 
   stealth: {
@@ -161,6 +191,9 @@ AQ.TUNING = {
     hundredPanes: false,      // TESTING ONLY: true gives you 100 glass panes (topped back up to 100 whenever a game loads or starts)
     nudges: false,            // TESTING ONLY: true adds a key (below) that shows a friendly nudge right now, cycling
     nudgeKey: 'KeyY',         //   through net spam -> no catch for a while -> key mashing (it skips the rate limits)
+    hydrophone: false,        // TESTING ONLY: true sets the hydrophone to max level (EAR 3, topped up whenever a game loads
+                              //   or starts), adds 4 calling testing sources near the start (needing EAR 0..3), and draws
+                              //   every hidden sound source's true position (magenta crosses + labels + your hearing range)
     forceTouch: false         // TESTING ONLY: true shows the touch controls and makes the mouse act as a finger
   },                          //   (drag in the stick zone = joystick, click the on-screen buttons), to try them on a PC
   // Text that doesn't fit (long translations): it is squeezed sideways down to this much of its width,
@@ -215,6 +248,7 @@ AQ.TUNING = {
     net: ['Mouse0'],
     bait: ['KeyB', 'KeyK', 'Mouse2'],
     log: ['KeyL'], map: ['KeyM'], help: ['KeyH'], pause: ['Escape'],
+    listen: ['KeyQ'],         // hold to LISTEN (hydrophone level 1+, in the sea)
     // in a tank
     feed: ['KeyF'], tanks: ['KeyT'], undo: ['KeyU'], flip: ['KeyX'], layer: ['KeyZ'],
     prevTank: ['KeyQ', 'ArrowLeft'], nextTank: ['KeyE', 'ArrowRight'],   // (in a bigger tank the arrows scroll it instead; Q / E still switch)
@@ -428,6 +462,8 @@ AQ.TUNING = {
     nightPace: 0.8,           // night versions of the sea music play this much slower...
     nightVolume: 0.7,         // ...and this much quieter
     crossfadeSeconds: 3,      // how long music + ambience take to blend into the next place
+    // sounds from a spot in the world (AQ.Audio.playAt: hydrophone calls)
+    spatial: { range: 300, panWidth: 200, panMax: 0.85, minVol: 0.15, nearCutoff: 8000, farCutoff: 450 },
     menuDuck: 0.5,            // music level while the log, map or pause menu is open
     lookahead: 0.3,           // seconds of music notes scheduled ahead (keeps timing steady, cheap)
     creatureVoiceEvery: 9,    // average seconds between little creature sounds (higher = rarer)

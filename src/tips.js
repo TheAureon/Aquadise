@@ -6,7 +6,7 @@
 // (longer for longer text) and goes away on any key press or click (Esc and clicks on the box are used up).
 // Seen tips are saved (AQ.State.tutorial.seen); HINTS off in the sound settings hides them all.
 // Events: noticed bait catch logClosed chest heavy evening bottle starfall shower ufo station tank flash
-//         tankstar unlock pair court baby bumped nursery panes wideTank tankTab
+//         tankstar unlock pair court baby bumped nursery panes wideTank tankTab hydro heard listen
 var AQ = (typeof AQ !== 'undefined') ? AQ : {};
 
 AQ.Tips = (function () {
@@ -24,7 +24,7 @@ AQ.Tips = (function () {
   // ---------------------------------------------------------------- what a returning player already knows
   const KNOWN = {
     caughtAny: () => Object.keys(AQ.State.collection || {}).length > 0,
-    chest: () => { const u = AQ.State.upgrades || {}; return u.net > 1 || u.speed > 1 || u.lantern > 0 || u.depth > 0; },
+    chest: () => { const u = AQ.State.upgrades || {}; return u.net > 1 || u.speed > 1 || u.lantern > 0 || u.depth > 0 || u.hydro > 0; },
     deep: () => !!(AQ.State.flags && AQ.State.flags.heavyWater) || ((AQ.State.upgrades || {}).depth || 0) > 0,
     night: () => caught((d) => d.active === 'night' || d.bloom === 'night') || ((AQ.State.starfall || {}).night || 0) > 0,
     bottle: () => Object.keys(AQ.State.bottles || {}).length > 0,
@@ -36,7 +36,8 @@ AQ.Tips = (function () {
     bred: () => Object.values(AQ.State.log || {}).some((l) => l.bred),
     bumped: () => caught((d) => !!d.knockback || !!d.hostile),
     graduated: () => !!(AQ.State.flags && AQ.State.flags.graduated),
-    panes: () => (AQ.State.panes || 0) > 0 || !!(AQ.State.flags && AQ.State.flags.panes)
+    panes: () => (AQ.State.panes || 0) > 0 || !!(AQ.State.flags && AQ.State.flags.panes),
+    hydro: () => ((AQ.State.upgrades || {}).hydro || 0) > 0
   };
   function caught(test) { return Object.keys(AQ.State.collection || {}).some((id) => { const d = AQ.data.creatures.find((x) => x.id === id); return d && test(d); }); }
   function tankActivity() { return Object.values(AQ.State.tanks || {}).some((t) => (t.decor || []).length || t.lastFed) || Object.keys(AQ.State.tankBest || {}).length > 0; }
@@ -99,7 +100,7 @@ AQ.Tips = (function () {
     if (i < 0) return;
     const tip = T.queue.splice(i, 1)[0];
     // key names filled in from the bindings, then wrapped to the box (a long key name never spills out)
-    const room = c.maxWidth - (tip.icon ? 24 : 10) - 10, lines = [];
+    const room = boxMax(ctx) - (tip.icon ? 24 : 10) - 10, lines = [];
     // the tip's lines flow together as one short paragraph, wrapped to the box (no orphaned words)
     wrapPx(tip.lines.map((l) => AQ.Keys.fill(l)).join(' ').toUpperCase(), room).forEach((w) => lines.push(w));
     const chars = lines.join('').length;
@@ -114,6 +115,10 @@ AQ.Tips = (function () {
     if (cur) out.push(cur);
     return out;
   }
+  // the widest the box gets: out in the world it's centred at the top, clear of the HUD's upgrade rows
+  // on the left (and as much on the right, by the counter), however long their labels are
+  function boxMax(where) { return where === 'tank' || !AQ.HUD.leftWidth ? cfg().maxWidth : Math.min(cfg().maxWidth, 320 - 2 * (AQ.HUD.leftWidth() + 3)); }
+  T.boxMax = boxMax;
   function end() { T.cur = null; T.rect = null; T.gap = cfg().gapSeconds; }
   T.showing = () => !!T.cur;
 
@@ -125,7 +130,7 @@ AQ.Tips = (function () {
   T.draw = function (g, game) {
     const cur = T.cur;
     if (!cur || !fits(cur.tip, context(game))) { T.rect = null; return; }
-    const w = Math.min(cfg().maxWidth, Math.max(...cur.lines.map((l) => F().width(l))) + (cur.tip.icon ? 24 : 10) + 10);
+    const w = Math.min(boxMax(game.state === 'aquarium' ? 'tank' : 'play'), Math.max(...cur.lines.map((l) => F().width(l))) + (cur.tip.icon ? 24 : 10) + 10);
     const h = Math.max(cur.lines.length * 7 + 8, cur.tip.icon ? 20 : 0);
     const x = game.state === 'aquarium' ? 8 : Math.round(160 - w / 2), y = game.state === 'aquarium' ? 145 - h - 3 : 16;
     T.rect = { x, y, w, h };
@@ -143,6 +148,7 @@ AQ.Tips = (function () {
   };
   function drawIcon(g, icon, cx, cy) {
     if (/^ui:/.test(icon)) { AQ.Assets.draw(g, 'ui.icons', 'idle', cx, cy, { frame: +icon.slice(3) }); return; }
+    if (/^ui\.touch:/.test(icon)) { AQ.Assets.draw(g, 'ui.touch', 'idle', cx, cy, { frame: +icon.slice(9) }); return; }
     const e = AQ.Assets.entry(icon);
     if (!e) return;
     const sc = Math.min(1, 12 / Math.max(e.fw, e.fh));

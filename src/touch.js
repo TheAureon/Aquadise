@@ -1,7 +1,7 @@
 // Touch controls. Everything goes through AQ.Input (src/input.js), so the game reads touch exactly like
 // keys and the mouse, and a keyboard / mouse keep working at the same time:
 //   - on-screen buttons hold "virtual keys" (the same codes as their keys: JUMP holds Space, BAIT holds B,
-//     INTERACT holds E, SNEAK toggles Shift), looked up from the bindings (AQ.Keys), so they follow any change
+//     INTERACT holds E, LISTEN (an ear, hydrophone 1+) holds Q, SNEAK toggles Shift), looked up from the bindings (AQ.Keys), so they follow any change
 //   - the floating joystick sets AQ.Input.stick (read by Input.axis()); pushed far up it also holds "up"
 //   - a tap on the game is the left mouse button at that point (the net in the sea; menus and buttons
 //     everywhere else); keeping the finger down holds it (prying)
@@ -103,7 +103,7 @@ AQ.Touch = (function () {
     if (!T.active() || T.portrait || !game) return {};
     if (game.state === 'map') return { menu: true };
     if (game.state !== 'play') return {};
-    return { menu: true, stick: true, jump: true, sneak: true, bait: game.scene === 'world', interact: interactUp() };
+    return { menu: true, stick: true, jump: true, sneak: true, bait: game.scene === 'world', interact: interactUp(), listen: game.scene === 'world' && !!AQ.Hydro && AQ.Hydro.unlocked() };
   }
   function interactUp() { const p = AQ.Scenes && AQ.Scenes.promptAt; return !!p && AQ.Render.t - p.t < cfg().interactLinger && AQ.Render.t >= p.t; }
   function layout(game) {
@@ -120,6 +120,7 @@ AQ.Touch = (function () {
     L.buttons.push(btn('jump', cx, cy, size));
     L.buttons.push(btn('bait', cx, cy - size - gap, size));
     L.buttons.push(btn('sneak', cx, cy - 2 * (size + gap), size));
+    L.buttons.push(btn('listen', cx + inw * (size + gap), cy - 2 * (size + gap), size));   // hold to LISTEN (hydrophone 1+, the sea)
     // INTERACT takes BAIT's place when there's no bait (prompts only come up on the hill and in the station);
     // otherwise it sits beside JUMP
     if (shown(game).bait) L.buttons.push(btn('interact', cx + inw * (size + gap), cy, size));
@@ -142,7 +143,7 @@ AQ.Touch = (function () {
 
   // ---------------------------------------------------------------- the virtual keys each button holds
   const keyOf = (action) => AQ.Keys.list(action).find((c) => !/^Mouse/.test(c));
-  const CODES = { jump: () => keyOf('jump'), bait: () => keyOf('bait'), interact: () => keyOf('interact') };
+  const CODES = { jump: () => keyOf('jump'), bait: () => keyOf('bait'), interact: () => keyOf('interact'), listen: () => keyOf('listen') };
   function setSneak(on) {
     const code = keyOf('sneak');
     T.sneakOn = on;
@@ -287,7 +288,7 @@ AQ.Touch = (function () {
     AQ.Font.draw(ctx, text, 2, 2, '#ffe9a8', { shadow: false });
     ctx.globalAlpha = 1;
   }
-  const FRAME = { jump: 1, bait: 2, sneak: 3, interact: 4, menu: 5 };
+  const FRAME = { jump: 1, bait: 2, sneak: 3, interact: 4, menu: 5, listen: 12 };
   T.drawOverlay = function (game) {
     if (!ctx) return;
     ctx.setTransform(1, 0, 0, 1, 0, 0);

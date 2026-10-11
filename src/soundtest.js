@@ -122,7 +122,11 @@ AQ.SoundUI = (function () {
 AQ.SoundTest = (function () {
   const F = () => AQ.Font, A = AQ.Audio;
   const T = { tab: 0, sel: 0, ui: [], from: 'title' };
-  const TABS = [['sfx', 'soundtest.effects'], ['amb', 'soundtest.ambience'], ['music', 'soundtest.music']];
+  // (the hydrophone's sounds have their own tab: they're sfx with group 'hydro', and playing one also shows
+  // the ripple the game draws for it, since every hydrophone sound is also seen)
+  const TABS = [['sfx', 'soundtest.effects'], ['amb', 'soundtest.ambience'], ['music', 'soundtest.music'], ['hydro', 'soundtest.hydro']];
+  const PREV = { x: 160, y: 126 };                                 // where the ripple preview plays (hydrophone tab)
+  T.ripples = [];
   const COLS = 4, CW = 76, CH = 8, STEP = 9, X0 = 8, Y0 = 28;
 
   T.open = function (game, from) {
@@ -132,16 +136,16 @@ AQ.SoundTest = (function () {
   function items() {
     const kind = TABS[T.tab][0];
     if (kind === 'music') return AQ.Music.catalog().map((p) => ({ id: p.id, label: p.label, stinger: p.stinger, key: 'music:' + p.id.split(':')[0] }));
-    const list = A.list(kind);
+    const list = kind === 'hydro' ? A.list('sfx').filter((s) => s.group === 'hydro') : A.list(kind).filter((s) => kind !== 'sfx' || s.group !== 'hydro');
     if (kind === 'sfx') {
       const order = [];
       list.forEach((s) => { if (order.indexOf(s.group) < 0) order.push(s.group); });
       list.sort((a, b) => order.indexOf(a.group) - order.indexOf(b.group));
     }
-    return list.map((s) => ({ id: kind === 'amb' ? s.bed : s.id, label: s.label, key: s.id }));
+    return list.map((s) => ({ id: kind === 'amb' ? s.bed : s.id, label: s.label, key: s.id, ripple: s.ripple }));
   }
   function layout() {
-    const ui = TABS.map(([, name], i) => ({ id: 'tab', i, x: 60 + i * 68, y: 14, w: 64, h: 10, label: AQ.t(name), on: i === T.tab }));
+    const ui = TABS.map(([, name], i) => ({ id: 'tab', i, x: 52 + i * 54, y: 14, w: 52, h: 10, label: AQ.t(name), on: i === T.tab }));
     ui.push({ id: 'back', x: 270, y: 2, w: 46, h: 10, label: AQ.t('ui.back') });
     items().forEach((it, i) => ui.push({ id: 'item', i, it, x: X0 + (i % COLS) * (CW + 2), y: Y0 + Math.floor(i / COLS) * STEP, w: CW, h: CH, label: it.label }));
     return ui;
@@ -150,9 +154,18 @@ AQ.SoundTest = (function () {
   function trigger(it) {
     const kind = TABS[T.tab][0];
     if (kind === 'sfx') A.play(it.id, { important: true });
+    else if (kind === 'hydro') { A.play(it.id, { important: true }); preview(it); }
     else if (kind === 'amb') AQ.Ambience.test = AQ.Ambience.test === it.id ? null : it.id;
     else if (it.stinger) AQ.Music.stinger(it.id);
     else AQ.Music.test = AQ.Music.test === it.id ? null : it.id;
+  }
+  // the ripple a hydrophone sound shows in the game (big while listening; an echo adds a fainter, later one)
+  function preview(it) {
+    const r = it.ripple, c = AQ.TUNING.hydrophone.ripple;
+    if (!r) return;
+    const add = (dx, dy, delay, faint) => T.ripples.push({ x: PREV.x + dx, y: PREV.y + dy, t: -delay, life: r.big ? c.bigLife : c.life, r1: r.big ? c.bigRadius : c.radius, a: faint ? c.faintAlpha : 1 });
+    add(0, 0, 0, false);
+    if (r.echo) add(r.echo.dx, r.echo.dy, r.echo.delay, true);
   }
   function setTab(i) { T.tab = (i + TABS.length) % TABS.length; T.sel = 0; A.play('menu_move'); }
   function close(game) {
@@ -165,6 +178,7 @@ AQ.SoundTest = (function () {
   T.update = function (dt, game) {
     const I = AQ.Input, m = I.mouse;
     T.ui = layout();
+    for (let i = T.ripples.length - 1; i >= 0; i--) if ((T.ripples[i].t += dt) > T.ripples[i].life) T.ripples.splice(i, 1);
     const n = items().length;
     if (I.rawPressed('Escape')) { close(game); return; }
     if (I.rawPressed('KeyQ', 'Tab')) setTab(T.tab + (I.isDown('ShiftLeft', 'ShiftRight') ? -1 : 1));
@@ -199,8 +213,16 @@ AQ.SoundTest = (function () {
       F().draw(g, (on ? '> ' : '') + r.label, r.x + 3, r.y + 1, on ? '#ffffff' : '#c3dfec', { shadow: false, max: r.w - 4 });
     }
     const kind = TABS[T.tab][0];
+    if (kind === 'hydro') {                                       // the ripple preview: what the game shows for the sound
+      F().draw(g, AQ.t('soundtest.ripple'), PREV.x, PREV.y - 34, '#5f7f96', { align: 'center', max: 300 });
+      for (const r of T.ripples) if (r.t >= 0) {
+        const k = r.t / r.life, rad = 1 + (r.r1 - 1) * k, a = (1 - k) * r.a;
+        AQ.Hydro.ring(g, r.x, r.y, rad, a * 0.9, AQ.TUNING.hydrophone.ripple.color);
+        if (r.r1 > 20 && k > 0.25) AQ.Hydro.ring(g, r.x, r.y, rad * 0.6, a * 0.5, AQ.TUNING.hydrophone.ripple.color);
+      }
+    }
     // (the font has no '_': ids show it as a space, as they always looked)
-    if (cur) F().draw(g, AQ.t(`soundtest.info.${kind === 'sfx' ? 'sfx' : kind === 'amb' ? 'amb' : cur.stinger ? 'stinger' : 'music'}`, { id: cur.key.replace(/_/g, ' '), rec: A.hasRecording(cur.key) ? AQ.t('soundtest.recording') : '' }), 8, 162, '#8fb6cc');
+    if (cur) F().draw(g, AQ.t(`soundtest.info.${kind === 'sfx' || kind === 'hydro' ? 'sfx' : kind === 'amb' ? 'amb' : cur.stinger ? 'stinger' : 'music'}`, { id: cur.key.replace(/_/g, ' '), rec: A.hasRecording(cur.key) ? AQ.t('soundtest.recording') : '' }), 8, 162, '#8fb6cc');
     F().draw(g, AQ.t('soundtest.footer'), 160, 172, '#5f7f96', { align: 'center' });
   };
   return T;

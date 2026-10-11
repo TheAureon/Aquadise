@@ -164,7 +164,7 @@ in the black side bars, so keep shapes bold and simple with a dark outline.
 
 | key | frame | frames | anchor | notes |
 |---|---|---|---|---|
-| `ui.touch` | 16 × 16 | 12 (one picture per frame, drawn by frame number) | centre | frame 0 is the round button base (a dark see-through disc with a pale rim), drawn under every icon; icons: 1 jump (up arrow), 2 bait (a pellet), 3 sneak (footprints), 4 interact (an open hand), 5 menu (three bars), 6 close (x), 7 back (arrow), 8 view (an eye), 9 shutter (a camera), 10 left, 11 right. Icons in pale white (interact in warm yellow), inside the rim. |
+| `ui.touch` | 16 × 16 | 13 (one picture per frame, drawn by frame number) | centre | frame 0 is the round button base (a dark see-through disc with a pale rim), drawn under every icon; icons: 1 jump (up arrow), 2 bait (a pellet), 3 sneak (footprints), 4 interact (an open hand), 5 menu (three bars), 6 close (x), 7 back (arrow), 8 view (an eye), 9 shutter (a camera), 10 left, 11 right, 12 listen (an ear with two pale-cyan sound waves: the hydrophone's hold-to-listen button, also the hydrophone tips' icon). Icons in pale white (interact in warm yellow), inside the rim. |
 | `ui.stick` | 32 × 32 | 2 | centre | the joystick: 0 the ring (thin pale rim, faint dark fill, four small direction dots), 1 the knob (a pale blue ball, half the ring's size) |
 
 The tip box itself is drawn in code (a dark navy panel with a warm yellow top edge and a small ×).

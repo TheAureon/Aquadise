@@ -1,6 +1,7 @@
 // Audio engine: everything is generated in code with the Web Audio API (no audio files needed).
 //
-//   AQ.Audio.play(id, opts)   one-shot sound effect      (opts: { vol, pan, delay, rare })
+//   AQ.Audio.play(id, opts)   one-shot sound effect      (opts: { vol, pan, delay, rare, lp, key })
+//   AQ.Audio.playAt(id, x, y, opts)  the same from a spot in the world (stereo, distance fade, duller far away)
 //   AQ.Audio.music(id)        ask for a music piece      (the music director in src/music.js decides)
 //   AQ.Audio.register(id, def) add a sound: { kind: 'sfx'|'amb'|'music', label, fn | start }
 //
@@ -40,9 +41,10 @@ AQ.Audio = (function () {
     if (!A.ready) return;
     const st = A.settings(), t = A.ctx.currentTime, k = fast ? 0.02 : 0.15;
     A.master.gain.setTargetAtTime(st.mute ? 0 : cfg().master, t, k);
-    A.musicBus.gain.setTargetAtTime(st.music * (A.duck || 1), t, k * 2);
+    const lis = A.listen != null ? A.listen : 1;                  // LISTEN (src/hydrophone.js) ducks music + ambience
+    A.musicBus.gain.setTargetAtTime(st.music * (A.duck || 1) * lis, t, k * 2);
     A.sfxBus.gain.setTargetAtTime(st.sfx, t, k);
-    A.ambBus.gain.setTargetAtTime(st.sfx * cfg().ambienceLevel, t, k);
+    A.ambBus.gain.setTargetAtTime(st.sfx * cfg().ambienceLevel * lis, t, k);
   };
   A.setVolume = function (which, v) {
     A.settings()[which] = Math.max(0, Math.min(1, Math.round(v * 10) / 10));
@@ -132,19 +134,45 @@ AQ.Audio = (function () {
     const s = A.sounds[id] || (rec ? { id } : null);
     if (!s || (!s.fn && !rec)) return;
     // the same sound fired many times in a blink plays once
-    const t = A.ctx.currentTime, min = s.minGap != null ? s.minGap : 0.05;
-    if (A.last[id] && t - A.last[id] < min) return;
+    // (opts.key: rate-limit per caller instead of per sound, so two creatures can call at once)
+    const t = A.ctx.currentTime, min = s.minGap != null ? s.minGap : 0.05, rk = opts.key || id;
+    if (A.last[rk] && t - A.last[rk] < min) return;
     if (A.voices >= cfg().maxVoices && !s.important && !opts.important) return;
-    A.last[id] = t;
+    A.last[rk] = t;
     try {
       const out = A.ctx.createGain(); out.gain.value = opts.vol != null ? opts.vol : 1;
       let node = out;
-      if (opts.pan && A.ctx.createStereoPanner) { const p = A.ctx.createStereoPanner(); p.pan.value = Math.max(-1, Math.min(1, opts.pan)); out.connect(p); node = p; }
+      if (opts.lp) { const f = A.ctx.createBiquadFilter(); f.type = 'lowpass'; f.frequency.value = opts.lp; f.Q.value = 0.6; node.connect(f); node = f; }
+      if (opts.pan && A.ctx.createStereoPanner) { const p = A.ctx.createStereoPanner(); p.pan.value = Math.max(-1, Math.min(1, opts.pan)); node.connect(p); node = p; }
       node.connect(s.bus === 'music' ? A.musicBus : s.bus === 'amb' ? A.ambBus : A.sfxBus);
       const dur = (rec ? playBuffer(rec, out, t + 0.01 + (opts.delay || 0)) : s.fn(A.ctx, out, t + 0.01 + (opts.delay || 0), opts) || 1) + (opts.delay || 0);
       A.voice(dur);
       setTimeout(() => { try { node.disconnect(); out.disconnect(); } catch (e) {} }, (dur + 0.5) * 1000);
     } catch (e) { /* a sound must never break the game */ }
+  };
+  // A sound from a spot in the world (x, y), heard from the player: panned left / right, quieter with
+  // distance, duller (lower lowpass) far away, and silent beyond opts.range. opts: { range, key, vol }.
+  // It goes through play(), so volume, mute, the rate limit and the underwater muffling all apply.
+  A.playAt = function (id, x, y, opts = {}) {
+    const P = AQ.Game && AQ.Game.player;
+    if (!P) return;
+    const c = cfg().spatial, range = opts.range || c.range, dx = x - P.x, d = Math.hypot(dx, y - P.y);
+    if (d > range) return;
+    const k = d / range, near = 1 - k;
+    A.play(id, {
+      key: opts.key, delay: opts.delay,
+      pan: Math.max(-1, Math.min(1, dx / c.panWidth)) * c.panMax,
+      vol: (opts.vol != null ? opts.vol : 1) * (c.minVol + (1 - c.minVol) * near * near),
+      lp: Math.round(c.farCutoff * Math.pow(c.nearCutoff / c.farCutoff, near))
+    });
+  };
+  // LISTEN (src/hydrophone.js): k = how loud music + ambience stay (1 = normal)
+  A.setListen = function (k) {
+    if (A.listen === k) return;
+    A.listen = k;
+    if (A.ready) { const t = A.ctx.currentTime, st = A.settings(), lis = k;
+      A.musicBus.gain.setTargetAtTime(st.music * (A.duck || 1) * lis, t, 0.05);
+      A.ambBus.gain.setTargetAtTime(st.sfx * cfg().ambienceLevel * lis, t, 0.05); }
   };
   // ---------------------------------------------------------------- recordings (AQ.data.audioFiles)
   // An effect mapped to recordings plays one of them (picked at random, with a tiny pitch change so

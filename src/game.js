@@ -42,7 +42,7 @@ AQ.Game = (function () {
     const start = AQ.data.world.playerStart;
     G.player = new AQ.Player(start[0], start[1]);
     if (save) AQ.Save.apply(save, G);
-    else if (AQ.Panes) AQ.Panes.debugTopUp();   // TESTING ONLY flag (a loaded save does this in Save.apply)
+    else { if (AQ.Panes) AQ.Panes.debugTopUp(); if (AQ.Hydro) AQ.Hydro.debugTopUp(); }   // TESTING ONLY flags (a loaded save does this in Save.apply)
     AQ.Lang.refresh();                          // the saved LANGUAGE, else the browser's (if we have it), else English
     // a brand-new game has tutorial progress from the start, so its saves are never mistaken for an older save
     if (!AQ.State.tutorial) AQ.State.tutorial = { seen: {} };
@@ -151,6 +151,7 @@ AQ.Game = (function () {
     } else if (G.state === 'guide') {
       AQ.Guide.update(dt, G);
     }
+    if (AQ.Hydro && G.player) AQ.Hydro.update(dt, G);   // the hydrophone: ripples, LISTEN (ends by itself off the sea / in menus)
     if (AQ.SoundDirector) AQ.SoundDirector.update(dt, G);
     AQ.Transition.update(dt);
     if (AQ.Breeding && G.state !== 'loading') AQ.Breeding.update(dt);   // tanks live on wherever you are
@@ -204,6 +205,7 @@ AQ.Game = (function () {
     if (!title && AQ.ShootingStars) AQ.ShootingStars.drawWater(ctx, G);   // a star's glow passing through the water
     if (!title && AQ.Starfall) AQ.Starfall.draw(ctx, G);                   // falling stars + light columns over landings
     if (!title && AQ.Dive) AQ.Dive.drawWorld(ctx, G);                      // the guided dive's glowing marker
+    if (!title && AQ.Hydro) AQ.Hydro.draw(ctx, G);                         // hydrophone ripples, LISTEN dim + edge arrows
     AQ.Render.heavyHaze(G.player.heavy || 0);
     AQ.Terrain.drawGlow(ctx, cam);
     if (title) { if (G.state === 'log') AQ.LogUI.draw(ctx, G); else if (G.state === 'guide') AQ.Guide.draw(ctx); else AQ.Title.draw(ctx, G); return; }

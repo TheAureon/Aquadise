@@ -15,7 +15,7 @@ AQ.Player = (function () {
 
   Player.prototype.maxSpeed = function () {
     const T = AQ.TUNING.swim;
-    return T.maxSpeed * (1 + (this.speedLevel - 1) * T.boostPerLevel) * (this.sneaking ? T.sneakMult : 1) * (this.heavy > 0 ? U.lerp(1, AQ.TUNING.upgrades.heavySlow, this.heavy) : 1);
+    return T.maxSpeed * (1 + (this.speedLevel - 1) * T.boostPerLevel) * (this.sneaking ? T.sneakMult : 1) * (this.heavy > 0 ? U.lerp(1, AQ.TUNING.upgrades.heavySlow, this.heavy) : 1) * (this.listenMul || 1);   // (listenMul: LISTEN slows you, src/hydrophone.js)
   };
   Player.prototype.baseMax = function () { return AQ.TUNING.swim.maxSpeed; };
   // 0..~1.4 "how loud/fast" the player is, relative to base max speed. Creatures read this.
@@ -66,7 +66,7 @@ AQ.Player = (function () {
       const max = this.maxSpeed(), sp = Math.hypot(this.vx, this.vy);
       if (sp > max && this.stun <= 0) { const f = Math.max(max / sp, Math.exp(-7 * dt)); this.vx *= f; this.vy *= f; }
     } else {
-      const wmax = Wk.max * mult * (this.sneaking ? Wk.sneakMult : 1);
+      const wmax = Wk.max * mult * (this.sneaking ? Wk.sneakMult : 1) * (this.listenMul || 1);
       const ctl = this.mode === 'walk' ? 1 : Wk.airControl;
       if (ax.x) this.vx += ax.x * Wk.accel * mult * ctl * dt;
       else if (this.mode === 'walk') this.vx *= Math.exp(-Wk.friction * dt);

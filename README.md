@@ -25,6 +25,7 @@ npx http-server -c-1 .      # or: python3 -m http.server
 | net                 | left-click (aims at the mouse)           |
 | pry a stuck creature| keep holding left-click after the swing  |
 | drop bait           | B / K, or right-click                    |
+| listen (hydrophone 1+, in the sea) | hold Q                    |
 | interact (beam up/down, open a tank) | E                         |
 | climb a ladder      | W / S (or Up / Down) on a ladder         |
 | building: whole-view toggle | V                                |
@@ -49,6 +50,7 @@ and the controls sit in the black side bars where there's room, or over the game
 | sneak | **SNEAK** (footprints) turns it on / off; it lights up and SNEAKING shows in the HUD |
 | net | tap the game where you want to swing; keep the finger down after the swing to pry. A quick tap in the joystick area swings there too |
 | drop bait | **BAIT** (sea only) |
+| listen | hold **LISTEN** (an ear; in the sea, once you have a hydrophone) |
 | interact (beam up/down, a tank, the directory) | **INTERACT** (a hand) shows up whenever the game shows a prompt |
 | log, map, guide, help, mute, pause, settings | **MENU** (top corner) opens a panel with all of them |
 
@@ -103,6 +105,33 @@ browsers won't let a page save pictures made from file:// images.
   dive before the water gets heavy: you slow down, the view softens and you drift back up, never
   any damage). Limits are in `upgrades.depthLimitY`; level 0 reaches everything except the bottom of the
   trench's rounded floor, which each level lets you sink a little further into (level 3 reaches the bottom).
+- **The HYDROPHONE (EAR, the fifth upgrade, levels 0-3):** found in chests like the others (older
+  saves start at 0). It shows as an **EAR** row with pips under DEEP in the HUD (SNEAKING moved below
+  it). The toast says "HYDROPHONE! (EAR LV n)" and a sonar blip plays, with a big ripple at the chest.
+  - **Hearing:** some hidden creatures call now and then. A call is heard within
+    `hydrophone.range` world px (100 / 200 / 340 / 520 for EAR 0-3): it plays from where it is
+    (panned left / right, quieter and duller the further away it is, silent beyond the range:
+    `AQ.Audio.playAt`, tuned in `audio.spatial`), and a small ripple shows there. The ripple's centre is
+    a little vague (up to `hydrophone.jitter` 16 px off), less so close up and with a better hydrophone.
+    A call you hear off screen shows a short arrow at the screen's edge pointing to it.
+  - **Nothing needs hearing:** every call that makes a sound also shows a ripple or an edge arrow at
+    the same range, so with the sound off (or for a player who can't hear) the game is the same.
+  - **LISTEN (EAR 1+):** hold **Q** (`keys.listen`; on touch, hold the ear button beside SNEAK). The
+    world dims a little, music and ambience fade down, you move at 60% speed (`listen.slow`), every
+    source in range pulses with big ripples, and sources off screen get an arrow at the screen's edge
+    (bigger and brighter = closer). Letting go brings everything back smoothly. It never pauses the
+    game and the net still works; leaving the sea or opening any menu ends it.
+  - Sounds (SONAR BLIP, LISTEN START, LISTEN STOP, TEST CALL) are on their own **HYDROPHONE** tab in the
+    Sound Test, which also plays the ripple each one shows. They follow the volume, mute, the rate limit
+    and the underwater muffling like every other sound.
+  - Tips: the first hydrophone ("Hold Q to listen.") and the first call you hear. The Guide's
+    "Upgrades and chests" page has an EAR line.
+  - Tuning: `AQ.TUNING.hydrophone` (ranges, jitter, ripple sizes and timing, `listen.fade` / `duck` /
+    `slow` / `dim` / `pulseEvery`, edge arrow sizes) and `AQ.TUNING.audio.spatial`.
+  - **Testing:** set `debug.hydrophone: true` in `src/config.js`. Every game you load or start has EAR 3,
+    four testing sources near the start call every few seconds (needing EAR 0, 1, 2 and 3), and an
+    overlay shows every hidden sound source's true position (magenta crosses with labels; dim ones are
+    out of your hearing), your level and range.
 - **The collection-log button:** the discovered counter in the HUD's top-right corner ("31/77") is also
   a button, with a small book beside it. Click or tap it to open the collection log, just like L (which
   still works, as do the touch MENU and the title screen). It still shows the count exactly as before.
@@ -121,7 +150,7 @@ browsers won't let a page save pictures made from file:// images.
     counter, or press L"; on touch, "tap the counter") mention it.
   - Tuning: `AQ.TUNING.logButton` (`pulseEvery` 6 s, `pulseSeconds` 1.2 s, `touchPx` 44).
 - **Glass panes (building material):** the one material used for every tank. Every chest holds 2-4
-  panes on top of its upgrade; once all four upgrades are maxed, a chest holds only panes ("You found
+  panes on top of its upgrade; once all five upgrades are maxed, a chest holds only panes ("You found
   3 glass panes!"). The amount shows in the chest's toast. A small counter (a pane icon and the
   number) sits in the top-right corner of the HUD under the clock, once you've found any, and on the
   TANKS overview. Saved with the game; older saves start with 0. The first time you get some, a tip
@@ -229,7 +258,7 @@ browsers won't let a page save pictures made from file:// images.
   length, angle, tints, underwater glow, sound volume).
 - **No fail state.** Hostile creatures only knock you back. Air is unlimited.
 - **Progression** comes only from chests: a bigger net (3 levels) and faster swimming (3 levels),
-  the LAMP and DEEP upgrades, and glass panes for building bigger tanks.
+  the LAMP, DEEP and EAR (hydrophone) upgrades, and glass panes for building bigger tanks.
   Six chests exist at a time, and they despawn and respawn around the world.
 - **Getting to the aquarium.** Walk left off the far edge of Tide Pools (by the little signpost)
   and the screen fades to a separate hill scene. Walk up the hill and stand in the UFO's beam,
@@ -557,6 +586,7 @@ src/aquarium.js       tanks, decorating, creature life + moods, info card, overv
 src/vibe.js           tank happiness (stars), helping/missing reasons, unlock milestones
 src/logbutton.js      the HUD counter as the collection-log button (hover, press, touch area, gentle glow)
 src/panes.js          glass panes: the building material for the tanks (count, add, spend, the counter)
+src/hydrophone.js     the HYDROPHONE upgrade: hearing hidden callers, ripples, edge arrows, LISTEN
 src/pairs.js          ONE PAIR EACH: which creatures a tank shows (a pair of every species) and the moves
 src/release.js        releasing creatures: which ones need a second look, RELEASE EXTRAS' choice, removing them
 src/transition.js     reusable fade-to-black scene transition (AQ.Transition.go)

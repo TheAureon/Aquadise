@@ -254,7 +254,7 @@ AQ.manifest = {
    "anims": {
     "idle": {
      "row": 0,
-     "frames": 12,
+     "frames": 13,
      "fps": 1
     }
    },

@@ -61,7 +61,7 @@ AQ.Save = (function () {
     AQ.State.collection = st.collection || {};
     AQ.State.plants = st.plants || {};
     AQ.State.tanks = st.tanks || {};
-    AQ.State.upgrades = Object.assign({ net: 1, speed: 1, lantern: 0, depth: 0 }, st.upgrades || {});   // older saves: new upgrades at 0
+    AQ.State.upgrades = Object.assign({ net: 1, speed: 1, lantern: 0, depth: 0, hydro: 0 }, st.upgrades || {});   // older saves: new upgrades at 0
     AQ.State.panes = typeof st.panes === 'number' && st.panes >= 0 ? Math.floor(st.panes) : 0;   // older saves: no glass panes yet
     AQ.State.unlocks = st.unlocks || {};      // older saves: nothing unlocked yet, best stars 0
     AQ.State.tankBest = st.tankBest || {};
@@ -83,6 +83,7 @@ AQ.Save = (function () {
     if (AQ.Sex) AQ.Sex.migrate();              // older saves: give caught creatures a sex, fill ♂/♀ log slots
     if (AQ.Nursery) AQ.Nursery.migrate();      // older saves: babies + eggs move into the Universal Nursery (if there's room)
     if (AQ.Panes) AQ.Panes.debugTopUp();       // TESTING ONLY flag: 100 glass panes
+    if (AQ.Hydro) AQ.Hydro.debugTopUp();       // TESTING ONLY flag: hydrophone at max
     // where you were: scene + spot (older saves have no scene -> the sea world). Validated against
     // that scene's map at boot (AQ.Scenes.restore), which falls back to a safe spot if needed.
     game.scene = (data.scene && AQ.Scenes.list[data.scene]) ? data.scene : 'world';
@@ -151,9 +152,10 @@ AQ.Save = (function () {
     AQ.State.clock = { hour: AQ.TUNING.clock.startHour };          // a new game starts in the bright mid-morning
     AQ.State.starfall = { night: 0, lastStar: 0, phase: null, plan: null, landings: [] };
     if (AQ.Creatures) AQ.Creatures.list.filter((c) => c.landing).forEach((c) => { c.fadedOut = true; AQ.Creatures.remove(c); });   // no stars waiting in a new game
-    AQ.State.upgrades = { net: 1, speed: 1, lantern: 0, depth: 0 };
+    AQ.State.upgrades = { net: 1, speed: 1, lantern: 0, depth: 0, hydro: 0 };
     AQ.State.panes = 0;
     if (AQ.Panes) AQ.Panes.debugTopUp();
+    if (AQ.Hydro) AQ.Hydro.debugTopUp();
     game.upgrades = AQ.State.upgrades;
     const st = AQ.data.world.playerStart, P = game.player;
     P.x = st[0]; P.y = st[1]; P.vx = P.vy = 0; P.speedLevel = 1;

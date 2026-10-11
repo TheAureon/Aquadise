@@ -215,6 +215,34 @@ var AQ = (typeof AQ !== 'undefined') ? AQ : {};
     return 0.6;
   }, { important: true, minGap: 0.5 });
 
+  // ---------------------------------------------------------------- the hydrophone (src/hydrophone.js; its own Sound Test tab)
+  // (`ripple`: how the Sound Test previews the ripple this sound shows in the game: { big, echo })
+  // a chest's hydrophone: a sonar blip (a round ping, a fainter return ping) over a soft low hum
+  reg('up_hydro', 'hydro', (c, o, t) => {
+    H.tone(c, o, t, { f: 880, f2: 820, glide: 0.4, a: 0.004, d: 0.55, v: 0.09 });
+    H.tone(c, o, t + 0.42, { f: 880, f2: 820, glide: 0.4, a: 0.004, d: 0.45, v: 0.035 });
+    H.tone(c, o, t, { f: 110, a: 0.2, d: 1.1, v: 0.05, type: 'triangle', lp: 400 });
+    return 1.3;
+  }, { important: true, ripple: { big: true } });
+  // LISTEN starts: a soft hush, like cupping your ears underwater (a low swell + filtered breath)
+  reg('listen_on', 'hydro', (c, o, t) => {
+    H.noise(c, o, t, { ft: 'lowpass', f: 300, f2: 1100, a: 0.12, d: 0.3, v: 0.05 });
+    H.tone(c, o, t, { f: 196, f2: 262, glide: 0.25, a: 0.1, d: 0.35, v: 0.035, type: 'triangle', lp: 900 });
+    return 0.5;
+  }, { minGap: 0.15, ripple: { big: true } });
+  // LISTEN ends: the same, falling away
+  reg('listen_off', 'hydro', (c, o, t) => {
+    H.noise(c, o, t, { ft: 'lowpass', f: 1100, f2: 300, a: 0.03, d: 0.25, v: 0.035 });
+    H.tone(c, o, t, { f: 262, f2: 196, glide: 0.2, a: 0.03, d: 0.25, v: 0.025, type: 'triangle', lp: 900 });
+    return 0.35;
+  }, { minGap: 0.15 });
+  // a testing sound source (debug.hydrophone): a plain two-note boop
+  reg('call_test', 'hydro', (c, o, t) => {
+    H.tone(c, o, t, { f: m(69), a: 0.01, d: 0.18, v: 0.07, type: 'triangle', lp: 1600 });
+    H.tone(c, o, t + 0.16, { f: m(64), a: 0.01, d: 0.22, v: 0.06, type: 'triangle', lp: 1600 });
+    return 0.45;
+  }, { minGap: 0.3, ripple: {} });
+
   // ---------------------------------------------------------------- aquarium
   // EXPAND: soft glass panes set into place (muted taps) and a warm rising shimmer as the tank grows
   reg('build', 'aquarium', (c, o, t) => {

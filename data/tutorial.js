@@ -34,7 +34,7 @@ AQ.data.tutorial = {
   guide: [
     { id: 'moving', icon: 'player', scale: 2, lines: 5 },
     { id: 'catching', icon: 'creature.glasswinged_minnow', lines: 6 },
-    { id: 'chests', icon: 'chest', needs: 'Chests', lines: 6, lineNeeds: { 6: 'Panes' } },
+    { id: 'chests', icon: 'chest', needs: 'Chests', lines: 7, lineNeeds: { 6: 'Hydro', 7: 'Panes' } },
     { id: 'daynight', icon: 'ui:1', lines: 5, lineNeeds: { 4: 'Starfall', 5: 'Starfall' } },
     { id: 'aquarium', icon: 'misc.ufo', lines: 5 },
     { id: 'tanks', icon: 'decor.castle', lines: 9, lineNeeds: { 6: 'Panes', 8: 'Pairs', 9: 'Release' } },
@@ -65,6 +65,8 @@ AQ.data.tutorial = {
     { id: 'bumped', on: ['bumped'], where: 'play', known: ['bumped'], icon: 'ui:0' },
     { id: 'panes', on: ['panes'], where: 'any', needs: 'Panes', known: ['panes'], icon: 'ui.pane' },
     { id: 'wideTank', on: ['wideTank'], where: 'tank', icon: 'ui.pane' },
-    { id: 'tankTab', on: ['tankTab'], where: 'tank', icon: 'ui:3' }
+    { id: 'tankTab', on: ['tankTab'], where: 'tank', icon: 'ui:3' },
+    { id: 'hydro', on: ['hydro'], where: 'play', needs: 'Hydro', known: ['hydro'], icon: 'ui.touch:12' },
+    { id: 'heard', on: ['heard'], where: 'play', needs: 'Hydro', known: ['hydro'], icon: 'ui.touch:12' }
   ]
 };

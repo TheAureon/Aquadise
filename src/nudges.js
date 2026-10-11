@@ -48,7 +48,7 @@ AQ.Nudges = (function () {
   // keys that do something in the sea: everything else pressed there "does nothing"
   function usefulKeys() {
     const T = AQ.TUNING, K = AQ.Keys, out = new Set();
-    ['left', 'right', 'up', 'down', 'jump', 'sneak', 'bait', 'log', 'map', 'help', 'pause', 'guide', 'mute'].forEach((a) => K.list(a).forEach((c) => out.add(c)));
+    ['left', 'right', 'up', 'down', 'jump', 'sneak', 'bait', 'log', 'map', 'help', 'pause', 'guide', 'mute', 'listen'].forEach((a) => K.list(a).forEach((c) => out.add(c)));
     const d = T.debug;
     if (d.timeSkip) out.add(d.timeSkipKey);
     if (d.starKeys) { out.add(d.fallStarKey); out.add(d.showerKey); }
@@ -159,7 +159,7 @@ AQ.Nudges = (function () {
     const cur = N.cur;
     N.ui = [];
     if (!cur || game.state !== 'play' || game.scene !== 'world') { N.rect = null; return; }
-    const maxW = AQ.TUNING.tips.maxWidth, lines = wrapPx(AQ.t(cur.key).toUpperCase(), maxW - 34);
+    const maxW = AQ.Tips ? AQ.Tips.boxMax('play') : AQ.TUNING.tips.maxWidth, lines = wrapPx(AQ.t(cur.key).toUpperCase(), maxW - 34);
     const bw = cur.button ? Math.max(64, F().width(AQ.t('redo.btn')) + 8) : 0;
     const w = Math.min(maxW, Math.max(...lines.map((l) => F().width(l)), bw) + 34), h = Math.max(lines.length * 7 + 8, 20) + (cur.button ? 13 : 0);
     const x = Math.round(160 - w / 2), y = 16;

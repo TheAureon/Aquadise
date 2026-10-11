@@ -39,6 +39,7 @@ AQ.Chests = (function () {
     if (up.speed < AQ.TUNING.speedMaxLevel) opts.push('speed');
     if ((up.lantern || 0) < AQ.TUNING.upgrades.lanternMax) opts.push('lantern');
     if ((up.depth || 0) < AQ.TUNING.upgrades.depthMax) opts.push('depth');
+    if ((up.hydro || 0) < AQ.TUNING.hydrophone.max) opts.push('hydro');
     if (!opts.length) return null;
     const pick = R.pick(opts);
     up[pick] = (up[pick] || 0) + 1;
@@ -60,11 +61,16 @@ AQ.Chests = (function () {
           const what = reward(game), panes = AQ.Panes ? AQ.Panes.roll() : 0;
           AQ.FX.sparkle(c.x, c.y - 8, '#ffe36b', 18);
           AQ.Audio.play('chest');
-          if (what) AQ.Audio.play({ net: 'up_net', speed: 'up_speed', lantern: 'up_lantern', depth: 'up_depth' }[what], { delay: 0.75 });
+          if (what) AQ.Audio.play({ net: 'up_net', speed: 'up_speed', lantern: 'up_lantern', depth: 'up_depth', hydro: 'up_hydro' }[what], { delay: 0.75 });
           if (what === 'net') AQ.HUD.toast(AQ.t('chest.net', { n: game.upgrades.net }), '#ffe36b', 3.5);
           else if (what === 'speed') AQ.HUD.toast(AQ.t('chest.speed', { n: game.upgrades.speed }), '#7ef0c0', 3.5);
           else if (what === 'lantern') AQ.HUD.toast(AQ.t('chest.lantern', { n: game.upgrades.lantern }), '#ffe9a8', 3.5);
           else if (what === 'depth') AQ.HUD.toast(AQ.t('chest.depth', { n: game.upgrades.depth }), '#9fd8ff', 3.5);
+          else if (what === 'hydro') {
+            AQ.HUD.toast(AQ.t('chest.hydro', { n: game.upgrades.hydro }), '#9ff3ff', 3.5);
+            if (AQ.Hydro) AQ.Hydro.ripple(c.x, c.y - 8, true);     // the sonar blip, seen as well as heard
+            if (game.upgrades.hydro === 1 && AQ.Tips) AQ.Tips.event('hydro');
+          }
           // glass panes: on top of the upgrade (their own toast), or on their own once every upgrade is maxed
           if (panes) {
             AQ.Panes.add(panes);

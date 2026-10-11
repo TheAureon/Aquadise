@@ -64,7 +64,8 @@ AQ.LangData = (function () {
       getter(pg, 'title', () => t(`guide.${pg.id}.title`));
       getter(pg, 'lines', () => Array.from({ length: n }, (_, i) => (needs[i + 1] ? { needs: needs[i + 1], text: t(`guide.${pg.id}.${i + 1}`) } : t(`guide.${pg.id}.${i + 1}`))));
     });
-    T.tips.forEach((tip) => getter(tip, 'lines', () => [t(`tip.${tip.id}`)]));
+    // (a tip can have its own wording with touch controls too: tip.<id>.touch)
+    T.tips.forEach((tip) => getter(tip, 'lines', () => [AQ.Touch && AQ.Touch.active() && AQ.Lang.has(`tip.${tip.id}.touch`, 'en') ? t(`tip.${tip.id}.touch`) : t(`tip.${tip.id}`)]));
     // music labels (the sound test)
     ['pieces', 'stingers'].forEach((grp) => Object.keys(D.music[grp]).forEach((id) => getter(D.music[grp][id], 'label', () => t(`music.${id}`))));
   };

@@ -46,6 +46,22 @@ AQ.HUD = (function () {
     ctx.globalAlpha = 1;
   }
 
+  // one row per upgrade: label + pips (lit = your level)
+  function upgradeRows(up) {
+    return [
+      [AQ.t('hud.net'), up.net, AQ.TUNING.net.maxLevel, '#ffd56b'], [AQ.t('hud.speed'), up.speed, AQ.TUNING.speedMaxLevel, '#7ef0c0'],
+      [AQ.t('hud.lamp'), up.lantern || 0, AQ.TUNING.upgrades.lanternMax, '#ffe9a8'], [AQ.t('hud.deep'), up.depth || 0, AQ.TUNING.upgrades.depthMax, '#9fd8ff'],
+      [AQ.t('hud.ear'), up.hydro || 0, AQ.TUNING.hydrophone.max, '#9ff3ff']
+    ];
+  }
+  const pipsX = (rows) => Math.max(23, 4 + Math.min(60, Math.max(...rows.map((r) => AQ.Font.width(r[0])))) + 4);   // pips sit after the longest label
+  // how far right the upgrade rows reach (px): the tip and nudge boxes at the top stay clear of them
+  H.leftWidth = function () {
+    const up = AQ.Game && AQ.Game.upgrades;
+    if (!up) return 0;
+    const rows = upgradeRows(up);
+    return pipsX(rows) + Math.max(...rows.map((r) => r[2])) * 5;
+  };
   H.draw = function (ctx, game) {
     const F = AQ.Font, vw = AQ.TUNING.view.w, vh = AQ.TUNING.view.h;
     // biome name: fades in, lingers briefly, fades out
@@ -57,13 +73,8 @@ AQ.HUD = (function () {
     // upgrades as quiet pips (top-left)
     const up = game.upgrades;
     if (up) {
-      // one row per upgrade: label + pips (lit = your level)
-      const rows = [
-        [AQ.t('hud.net'), up.net, AQ.TUNING.net.maxLevel, '#ffd56b'], [AQ.t('hud.speed'), up.speed, AQ.TUNING.speedMaxLevel, '#7ef0c0'],
-        [AQ.t('hud.lamp'), up.lantern || 0, AQ.TUNING.upgrades.lanternMax, '#ffe9a8'], [AQ.t('hud.deep'), up.depth || 0, AQ.TUNING.upgrades.depthMax, '#9fd8ff']
-      ];
+      const rows = upgradeRows(up), px = pipsX(rows);
       ctx.globalAlpha = 0.85;
-      const px = Math.max(23, 4 + Math.min(60, Math.max(...rows.map((r) => F.width(r[0])))) + 4);   // pips sit after the longest label
       rows.forEach(([label, lvl, max, col], r) => {
         const y = 4 + r * 7;
         F.draw(ctx, label, 4, y, '#cfeaf5', { shadow: SH, max: 60 });
@@ -88,7 +99,8 @@ AQ.HUD = (function () {
       F.draw(ctx, `${c.discovered}/${c.total}`, vw - 4, 4, '#ffe9a8', { align: 'right', shadow: SH });
       ctx.globalAlpha = 1;
     }
-    if (game.player.sneaking) { ctx.globalAlpha = 0.8; F.draw(ctx, AQ.t('hud.sneaking'), 4, 34, '#9fe8ff', { shadow: SH }); ctx.globalAlpha = 1; }
+    // (no wider than the rows above it, so it stays clear of the tip box)
+    if (game.player.sneaking) { ctx.globalAlpha = 0.8; F.draw(ctx, AQ.t('hud.sneaking'), 4, 41, '#9fe8ff', { shadow: SH, max: H.leftWidth() - 3 }); ctx.globalAlpha = 1; }
     // toasts: at most two, newest at the bottom
     const shown = game.state === 'pause' ? [] : H.toasts.slice(-2), helpOn = H.showHelp && H.helpT > 0;   // (paused: the pause screen speaks)
     const base = helpOn ? vh - 28 : vh - 20;                     // above the controls hint while it's showing
