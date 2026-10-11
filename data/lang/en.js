@@ -216,8 +216,8 @@ AQ.langFiles.en = {
 
   // ---------------------------------------------------------------- the controls help line
   'help.1': 'MOVE {k:move}  JUMP {k:jump}  SNEAK {k:sneak}  NET {k:net} (HOLD TO PRY)  MUTE {k:mute}',
-  'help.2': 'BAIT {k:bait}  INTERACT {k:interact}  LOG {k:log} / COUNTER  MAP {k:map}  GUIDE {k:guide}',   // COUNTER = the 31/83 button, top right
-  'help.touch.1': 'STICK: MOVE   JUMP   SNEAK (TAP ON / OFF)',
+  'help.2': 'BAIT {k:bait}  INTERACT {k:interact}  LOG {k:log} / COUNTER  MAP {k:map}  GUIDE {k:guide}  LISTEN {k:listen}',   // COUNTER = the 31/83 button, top right
+  'help.touch.1': 'STICK: MOVE   JUMP   SNEAK (TAP ON / OFF)   EAR: LISTEN (HOLD)',
   'help.touch.2': 'TAP: NET (HOLD TO PRY)  BAIT  HAND: INTERACT  COUNTER: LOG  MENU: MAP, GUIDE',
 
   // ---------------------------------------------------------------- the CONTROLS panel
@@ -239,6 +239,8 @@ AQ.langFiles.en = {
   'controls.8.keys': '{k:pause}',
   'controls.9': 'MUTE SOUND',
   'controls.9.keys': '{k:mute}',
+  'controls.10': 'LISTEN (HYDROPHONE)',
+  'controls.10.keys': 'HOLD {k:listen}',
 
   // ---------------------------------------------------------------- one-time tips
   'tip.noticed': 'Creatures notice how close and how fast you come. Hold {k:sneak} to sneak up slowly and quietly.',
@@ -399,6 +401,13 @@ AQ.langFiles.en = {
   'guide.breeding.6': 'Grown babies wear a cap: GRADUATE sends one to its own tank\'s storage.',
   'guide.breeding.7': 'About 1 in {inv:breeding.variantChance} babies is a rare color (✦).',
   'guide.breeding.8': 'AUTO-GRADUATE (SETTINGS > OPTIONS) sends grown babies home by themselves.',
+  'guide.listen.title': 'Listening',
+  'guide.listen.1': 'Some creatures hide and call. Each call shows a ripple where it came from.',
+  'guide.listen.2': 'Off screen, an arrow at the edge points to it. You never need the sound.',
+  'guide.listen.3': 'EAR (a hydrophone, from chests) hears further; some callers need EAR 1, 2 or 3.',
+  'guide.listen.4': 'Hold {k:listen} (touch: the ear button) to LISTEN: the sea goes quiet and you slow down,',
+  'guide.listen.5': 'and everything you can hear shows big ripples, with arrows for ones off screen.',
+  'guide.listen.6': 'Net where the ripple was. A near miss makes it go quiet and move.',
   'guide.log.title': 'The log',
   'guide.log.1': 'The counter in the top right (with the book) or {k:log} opens your log.',
   'guide.log.2': 'SPECIES: every species by biome, with a hint for each.',

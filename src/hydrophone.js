@@ -96,10 +96,11 @@ AQ.Hydro = (function () {
     const target = H.listening ? 1 : 0, was = H.k;
     H.k = target > H.k ? Math.min(1, H.k + dt / L.fade) : Math.max(0, H.k - dt / L.fade);
     if (!inSea(game) && game.state !== 'pause' && game.state !== 'map' && game.state !== 'log' && game.state !== 'guide') H.k = 0;   // left the sea: at once
-    if (H.k !== was || (H.k === 0 && was !== 0)) AQ.Audio.setListen(H.k * (1 - L.duck));
+    if (H.k !== was) AQ.Audio.setListen(1 - H.k * L.duck);      // music + ambience: full at k 0, (1 - duck) while listening
     if (game.player) game.player.listenMul = U.lerp(1, L.slow, H.k);
     // testing sources
     if (dbg() && inSea(game)) debugSources(dt, game);
+    if (game.scene !== 'world' || game.state === 'title') { H.ripples.length = H.flashes.length = H.pulses.length = 0; return; }   // (nothing follows you off the sea)
     if (!inSea(game)) return;
     // listening: every source in range pulses now and then (big ripples at the guessed spot)
     if (H.listening) for (const s of H.sources()) {
@@ -128,10 +129,27 @@ AQ.Hydro = (function () {
   }
 
   // ---------------------------------------------------------------- drawing (after the lighting, screen px)
+  // a ring of single pixels (a little flattened, like a ripple seen from the side). Each size and colour
+  // is drawn once into a small cached canvas, so many ripples cost one drawImage each.
+  const ringCache = new Map();
+  function ringImage(r, col) {
+    const key = col + '|' + r;
+    let c = ringCache.get(key);
+    if (c) return c;
+    const w = r * 2 + 3, h = Math.ceil(r * 1.5) + 3, n = Math.max(12, Math.round(r * 5));
+    c = document.createElement('canvas'); c.width = w; c.height = h;
+    const x = c.getContext('2d'); x.fillStyle = col;
+    for (let i = 0; i < n; i++) { const a = i / n * Math.PI * 2; x.fillRect(Math.round(r + 1 + Math.cos(a) * r), Math.round(h / 2 + Math.sin(a) * r * 0.75), 1, 1); }
+    c.ox = r + 1; c.oy = Math.floor(h / 2);
+    if (ringCache.size > 400) ringCache.clear();
+    ringCache.set(key, c);
+    return c;
+  }
   function ring(g, cx, cy, r, alpha, col) {
-    const n = Math.max(12, Math.round(r * 5));
-    g.fillStyle = col; g.globalAlpha = alpha;
-    for (let i = 0; i < n; i++) { const a = i / n * Math.PI * 2; g.fillRect(Math.round(cx + Math.cos(a) * r), Math.round(cy + Math.sin(a) * r * 0.75), 1, 1); }
+    if (alpha <= 0.01) return;
+    const img = ringImage(Math.max(1, Math.round(r)), col);
+    g.globalAlpha = Math.min(1, alpha);
+    g.drawImage(img, Math.round(cx) - img.ox, Math.round(cy) - img.oy);
     g.globalAlpha = 1;
   }
   H.ring = ring;
@@ -186,6 +204,5 @@ AQ.Hydro = (function () {
       g.strokeStyle = 'rgba(255,79,216,0.25)'; g.beginPath(); g.ellipse(Math.round(P().x - l), Math.round(P().y - t), H.range(), H.range(), 0, 0, Math.PI * 2); g.stroke();
     }
   };
-  H.end = function () { H.listening = false; H.k = 0; AQ.Audio.setListen(1); if (AQ.Game && AQ.Game.player) AQ.Game.player.listenMul = 1; };
   return H;
 })();

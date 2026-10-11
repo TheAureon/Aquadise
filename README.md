@@ -124,8 +124,12 @@ browsers won't let a page save pictures made from file:// images.
   - Sounds (SONAR BLIP, LISTEN START, LISTEN STOP, TEST CALL) are on their own **HYDROPHONE** tab in the
     Sound Test, which also plays the ripple each one shows. They follow the volume, mute, the rate limit
     and the underwater muffling like every other sound.
-  - Tips: the first hydrophone ("Hold Q to listen.") and the first call you hear. The Guide's
-    "Upgrades and chests" page has an EAR line.
+  - Tips: the first hydrophone ("Hold Q to listen.") and the first call you hear. The Guide has a
+    LISTENING page (and an EAR line on "Upgrades and chests"); the help line and the title's
+    CONTROLS list mention LISTEN.
+  - Nothing of it shows on the hill or in the building (ripples and arrows are cleared when you leave
+    the sea). Ripple rings are drawn once per size into small cached canvases: with the maximum of 60
+    ripples on screen while listening, the hydrophone's drawing takes about 0.3 ms a frame.
   - Tuning: `AQ.TUNING.hydrophone` (ranges, jitter, ripple sizes and timing, `listen.fade` / `duck` /
     `slow` / `dim` / `pulseEvery`, edge arrow sizes) and `AQ.TUNING.audio.spatial`.
   - **Testing:** set `debug.hydrophone: true` in `src/config.js`. Every game you load or start has EAR 3,

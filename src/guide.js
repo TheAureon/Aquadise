@@ -67,6 +67,10 @@ AQ.Guide = (function () {
       g.save(); g.translate(cx, cy); g.scale(3, 3); AQ.Assets.draw(g, 'ui.icons', 'idle', 0, 0, { frame: +icon.slice(3) }); g.restore();
       return;
     }
+    if (/^ui\.touch:/.test(icon)) {               // a touch-button icon (no button base): the hydrophone's ear
+      g.save(); g.translate(cx, cy); g.scale(3, 3); AQ.Assets.draw(g, 'ui.touch', 'idle', 0, 0, { frame: +icon.slice(9) }); g.restore();
+      return;
+    }
     const e = AQ.Assets.entry(icon); if (!e) return;
     const v = e.vis || [0, 0, e.fw - 1, e.fh - 1], vw = v[2] - v[0] + 1, vh = v[3] - v[1] + 1;
     const sc = force || Math.max(1, Math.min(3, Math.floor(Math.min(52 / vw, 52 / vh))));

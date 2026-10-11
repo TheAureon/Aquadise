@@ -28,7 +28,7 @@ var AQ = (typeof AQ !== 'undefined') ? AQ : {};
 AQ.data = AQ.data || {};
 
 AQ.data.tutorial = {
-  helpLines: 2, touchHelpLines: 2, controls: 9,
+  helpLines: 2, touchHelpLines: 2, controls: 10,
   nudges: { spam: 12, drought: 12, mash: 12 },   // friendly nudges: how many lines of each kind (nudge.<kind>.<n>, src/nudges.js)
   dive: { prompt: { lines: 2 }, steps: ['move', 'jump', 'swim', 'sneak', 'net', 'catch', 'bait', 'log', 'done'], nice: 4 },
   guide: [
@@ -39,6 +39,7 @@ AQ.data.tutorial = {
     { id: 'aquarium', icon: 'misc.ufo', lines: 5 },
     { id: 'tanks', icon: 'decor.castle', lines: 9, lineNeeds: { 6: 'Panes', 8: 'Pairs', 9: 'Release' } },
     { id: 'breeding', icon: 'ui:3', needs: 'Breeding', lines: 8 },
+    { id: 'listen', icon: 'ui.touch:12', needs: 'Hydro', lines: 6 },
     { id: 'log', icon: 'ui:4', lines: 5, lineNeeds: { 4: 'Bottles', 5: 'Bottles' } },
     { id: 'photo', icon: 'ui:6', lines: 5 },
     { id: 'settings', icon: 'ui:5', lines: 6 }

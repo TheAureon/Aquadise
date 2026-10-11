@@ -252,7 +252,8 @@ AQ.Title = (function () {
       pill(g, box, 'rgba(6,20,38,0.92)', 'rgba(110,240,239,0.6)');
       F().draw(g, AQ.t('title.controls'), 160, 71, '#6ef0ef', { align: 'center', shadow: false });
       const rows = AQ.data.tutorial.controls.map(([a, b]) => [a, AQ.Keys.fill(b)]);   // data/tutorial.js, keys from the bindings
-      rows.forEach(([a, b], i) => { const bw = F().drawnWidth(b, 150); F().draw(g, a, 50, 82 + i * 9, '#9fd3ee', { shadow: false, max: 220 - bw - 6 }); F().draw(g, b, 270, 82 + i * 9, '#ffffff', { align: 'right', shadow: false, max: 150 }); });
+      const step = Math.min(9, Math.floor((box.h - 20) / rows.length));   // (a longer list packs a little closer)
+      rows.forEach(([a, b], i) => { const bw = F().drawnWidth(b, 150); F().draw(g, a, 50, 82 + i * step, '#9fd3ee', { shadow: false, max: 220 - bw - 6 }); F().draw(g, b, 270, 82 + i * step, '#ffffff', { align: 'right', shadow: false, max: 150 }); });
       return;
     }
     T.items.forEach((it, i) => {
