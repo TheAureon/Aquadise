@@ -704,7 +704,7 @@ AQ.Behaviors = (function () {
   //           burst (calls in a row, e.g. 3 chirps) + burstGap s, echo { dx, dy, delay } (a fainter,
   //           later, offset second ripple), quiet [min,max] s after a near miss, moveTime s, alpha
   //           (how see-through it is in cover), color (ripple color), edgePulse (the screen's edges
-  //           pulse gently with each call it makes while you can hear it)
+  //           pulse gently with each call it makes while you can hear it), calm (near misses don't scare it)
   const callsOf = (p) => { const v = p.callsPerSpot || [2, 4]; return Array.isArray(v) ? R.int(v[0], v[1]) : v; };
   B.tracker = {
     init(c) {
@@ -765,7 +765,7 @@ AQ.Behaviors = (function () {
     },
     // a swing that came close but missed (src/catching.js): it goes quiet and moves
     nearMiss(c) {
-      if (c.moveT > 0) return;
+      if (c.moveT > 0 || c.p.calm) return;
       B.tracker.move(c, U.rangeOf(c.p.quiet || [5, 8]));
     }
   };

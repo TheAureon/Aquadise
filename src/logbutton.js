@@ -1,4 +1,4 @@
-// The collection-log button: the discovered counter in the HUD's top-right corner ("31/77", src/hud.js)
+// The collection-log button: the discovered counter in the HUD's top-right corner ("31/83", src/hud.js)
 // with a small book beside it. Clicking or tapping it opens the collection log, exactly like the log key.
 //   - It shows the counter exactly as before; hover lights it up, holding it down presses it in.
 //   - A click on it is used up: it never swings the net or reaches anything underneath.

@@ -21,7 +21,8 @@
 //               on its spot catches it; a near miss makes it go quiet and move. Faint shimmer within ~60 px.
 //               params: spots, spotAt (floor|wall|ceiling|reef|water), spotR, callEvery [min,max],
 //               callsPerSpot [min,max], sound (sfx id, group 'hydro'), burst + burstGap, echo { dx, dy, delay },
-//               quiet [min,max], moveTime, alpha, color (ripple), edgePulse (screen edges pulse with each call)
+//               quiet [min,max], moveTime, alpha, color (ripple), edgePulse (screen edges pulse with each call),
+//               calm (a near miss doesn't scare it off: it stays put and keeps calling)
 //   requires_hydro                       tracker: hydrophone (EAR) level needed to hear / see its calls (default 0;
 //                                        log tag "needs hydrophone n"); it can still be netted by chance close up
 //   active                               optional 'night' | 'day': only out at those hours (default: always)
@@ -376,6 +377,34 @@ AQ.data.creatures = [
     params: { decoyDist: 11, decoyColor: '#f0ff8a', alpha: 0.55, glow: 28 },
     sprite_size: 'small', color: '#4a6a3a', accent: '#e8ff7a', art: { shape: 'frog', glow: true }, light: { r: 12, color: '#e8ff8a' },
     spawn: { n: 2, at: 'floor' } },
+
+  // ------------------------------------------------------------------ Hidden callers (the hydrophone update)
+  // tracker: hidden at a few spots, calling now and then (src/hydrophone.js shows every call as a ripple).
+  // requires_hydro = the hydrophone (EAR) level needed to hear and see its calls.
+  { id: 'chime_shrimp', likes: ['coral', 'hideout'], biome: 'coral', category: 'crustacean', catch_behavior: 'tracker', requires_hydro: 0,
+    params: { spots: 3, spotAt: 'floor', spotR: 60, callEvery: [3, 5], callsPerSpot: [3, 4], sound: 'call_chime', quiet: [5, 7], moveTime: 1.2, alpha: 0.12, color: '#ffe0f0' },
+    sprite_size: 'small', color: '#f4a6a0', accent: '#fff1c8', art: { shape: 'shrimp' },
+    spawn: { n: 1, at: 'floor', area: [740, 880] } },                 // near where you first dive in
+  { id: 'chirrup_frog', likes: ['roots', 'plant'], biome: 'mangrove', category: 'amphibian', catch_behavior: 'tracker', requires_hydro: 1, active: 'night',
+    params: { spots: 3, spotAt: 'floor', spotR: 80, callEvery: [4, 6], callsPerSpot: [2, 3], burst: 3, burstGap: 0.28, sound: 'call_chirrup', quiet: [5, 8], moveTime: 1.2, alpha: 0.1, color: '#e8ffb0' },
+    sprite_size: 'small', color: '#7fae5a', accent: '#f0e08a', art: { shape: 'frog', throat: true },
+    spawn: { n: 1, at: 'floor' } },
+  { id: 'hollow_piper', likes: ['pillar', 'metal'], biome: 'ruins', category: 'fish', catch_behavior: 'tracker', requires_hydro: 1,
+    params: { spots: 4, spotAt: 'wall', spotR: 110, callEvery: [4, 7], callsPerSpot: [2, 3], sound: 'call_hum', quiet: [6, 8], moveTime: 1.8, alpha: 0.1, color: '#ffe6b0' },
+    sprite_size: 'mediumlong', color: '#a89a78', accent: '#d8c8a0', art: { shape: 'fish', pipe: true, long: 1.3, tall: 0.55 },
+    spawn: { n: 1, at: 'wall' } },
+  { id: 'echoshell_snail', likes: ['rock', 'crystal'], biome: 'cave', category: 'gastropod', catch_behavior: 'tracker', requires_hydro: 2,
+    params: { spots: 3, spotAt: 'floor', spotR: 90, callEvery: [4, 6], callsPerSpot: [2, 4], sound: 'call_echo', echo: { dx: 26, dy: -10, delay: 0.55 }, quiet: [6, 9], moveTime: 1.6, alpha: 0.1, color: '#d8e8ff' },
+    sprite_size: 'small', color: '#9fb0c8', accent: '#e0e8f8', art: { shape: 'snail', echo: true },
+    spawn: { n: 1, at: 'floor' } },
+  { id: 'murmur_seal', likes: ['ice', 'rock'], biome: 'ice', category: 'mammal', catch_behavior: 'tracker', requires_hydro: 2,
+    params: { spots: 3, spotAt: 'ceiling', spotR: 120, callEvery: [5, 8], callsPerSpot: [4, 6], sound: 'call_lullaby', calm: true, moveTime: 2, alpha: 0.15, color: '#e8f0ff' },
+    sprite_size: 'medium', color: '#d8dce6', accent: '#a8b4c8', art: { shape: 'seal' },
+    spawn: { n: 1, at: 'ceiling', y: [100, 260] } },                     // under the floes
+  { id: 'deep_drummer', likes: ['rock', 'hideout'], biome: 'trench', category: 'fish', catch_behavior: 'tracker', requires_hydro: 3,
+    params: { spots: 3, spotAt: 'water', spotR: 110, callEvery: [3, 4.5], callsPerSpot: [3, 5], sound: 'call_drum', edgePulse: true, quiet: [6, 9], moveTime: 3, alpha: 0.12, color: '#ffc8b0' },
+    sprite_size: 'large', color: '#5a4a6a', accent: '#c88a6a', art: { shape: 'fish', drum: true, tall: 1.35, long: 0.95 },
+    spawn: { n: 1, at: 'water', y: [780, 1150] } },
 
   // ------------------------------------------------------------------ Starfall (night events only)
   // No wild spawn: `event` creatures only appear where a falling star lands (src/starfall.js).

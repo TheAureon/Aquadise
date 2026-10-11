@@ -128,6 +128,16 @@
       for (let i = -1; i <= 1; i++) p.set(Math.round(cx + i * len * 0.2), Math.round(cy + h * 0.28), (o.frame + i + 3) % 4 === 0 ? WHITE : o.a);
       p.set(Math.round(tailX - tailL * 0.8), Math.round(cy + wig * 0.5), o.frame % 2 ? WHITE : o.a);
     }
+    if (o.pipe) {                       // a long tube snout and a row of dark holes along the side, like a flute (Hollow Piper)
+      p.rect(Math.round(cx + len / 2 - 1), Math.round(cy - 1), Math.round(W * 0.14), 2, o.c);
+      p.set(Math.round(cx + len / 2 - 1 + W * 0.14), Math.round(cy - 1), mul(o.c, 0.6));
+      for (let i = -2; i <= 1; i++) p.set(Math.round(cx + i * len * 0.16), Math.round(cy - h * 0.05), mul(o.c, 0.45));
+    }
+    if (o.drum) {                       // a round, taut pale drum-skin patch on its flank with a darker rim (Deep Drummer)
+      const dr = Math.max(2, h * 0.3), dx = Math.round(cx - len * 0.05), dy = Math.round(cy);
+      p.circle(dx, dy, dr + 1, mul(o.c, 0.7)); p.circle(dx, dy, dr, mix(o.a, WHITE, 0.25));
+      if (o.frame % 2 === 0) p.circle(dx, dy, Math.max(1, dr * 0.45), mix(o.a, WHITE, 0.55));   // the skin trembles with the beat
+    }
     if (o.blackEye) { const ex = Math.round(cx + len * 0.27), ey = Math.round(cy - h * 0.12); p.rect(ex, ey, W >= 20 ? 2 : 1, W >= 20 ? 2 : 1, BLACK); }
     else if (!o.eyeless) eye(p, Math.round(cx + len * 0.27), Math.round(cy - h * 0.12), W >= 20);
     p.outline();
@@ -211,6 +221,38 @@
     p.outline();
   };
 
+  // A small shrimp: a curled, segmented body, a fanned tail, little legs and two long antennae with
+  // tiny pale bell tips (Chime Shrimp). Faces right.
+  S.shrimp = function (p, o) {
+    const W = p.w, H = p.h, ph = o.t * Math.PI * 2, kick = o.moving ? Math.sin(ph * 2) : Math.sin(ph) * 0.4;
+    const pts = [[0.24, 0.62], [0.32, 0.54], [0.42, 0.5], [0.53, 0.5], [0.63, 0.53], [0.72, 0.56]];
+    p.tri([W * 0.22, H * 0.62], [W * 0.08, H * 0.5 + kick], [W * 0.1, H * 0.74 - kick], o.a);   // tail fan
+    pts.forEach(([u, v], i) => p.circle(W * u, H * v, H * (0.09 + i * 0.012), i % 2 ? mul(o.c, 0.9) : o.c));
+    for (let i = 0; i < 4; i++) p.line(W * (0.4 + i * 0.08), H * 0.6, W * (0.38 + i * 0.08) + (i % 2 ? kick : -kick) * 0.6, H * 0.72, mul(o.c, 0.75));   // legs
+    p.shade(0.25);
+    eye(p, Math.round(W * 0.76), Math.round(H * 0.5), false);
+    p.outline();
+    const tip = (o.frame % 2) ? WHITE : o.a;
+    p.line(W * 0.8, H * 0.5, W * 0.95, H * 0.28 + kick * 0.5, mul(o.c, 0.8)); p.set(W * 0.95, H * 0.28 + kick * 0.5, tip);   // antennae with bell tips
+    p.line(W * 0.78, H * 0.48, W * 0.86, H * 0.22, mul(o.c, 0.8)); p.set(W * 0.86, H * 0.22, o.a);
+  };
+  // A seal pup: a round, plump body, a small head with big dark eyes and whiskers, front and back
+  // flippers (Murmur Seal Pup). Faces right.
+  S.seal = function (p, o) {
+    const W = p.w, H = p.h, ph = o.t * Math.PI * 2, b = Math.sin(ph) * (o.moving ? 1 : 0.5);
+    p.tri([W * 0.2, H * 0.6], [W * 0.06, H * 0.5 + b], [W * 0.08, H * 0.72 - b], mul(o.c, 0.85));   // back flippers
+    p.ellipse(W * 0.46, H * 0.58, W * 0.3, H * 0.2, o.c);
+    p.circle(W * 0.74, H * 0.5, H * 0.16, o.c);
+    p.ellipse(W * 0.46, H * 0.68, W * 0.22, H * 0.07, mix(o.c, WHITE, 0.3));      // pale belly
+    p.tri([W * 0.56, H * 0.66], [W * 0.5, H * 0.8 + b], [W * 0.62, H * 0.76], mul(o.c, 0.85));   // front flipper
+    [[0.36, 0.5], [0.44, 0.56], [0.3, 0.6]].forEach(([u, v]) => p.set(W * u, H * v, o.a));   // soft spots
+    p.shade(0.2);
+    p.rect(Math.round(W * 0.76), Math.round(H * 0.45), 2, 2, BLACK); p.set(Math.round(W * 0.76), Math.round(H * 0.45), WHITE);   // a big dark eye
+    p.set(Math.round(W * 0.88), Math.round(H * 0.53), BLACK);
+    p.outline(0.3);
+    p.set(Math.round(W * 0.92), Math.round(H * 0.56), alpha(WHITE, 200)); p.set(Math.round(W * 0.93), Math.round(H * 0.52), alpha(WHITE, 200));   // whiskers
+  };
+
   S.snail = function (p, o) {
     const W = p.w, H = p.h, ph = o.t * Math.PI * 2, stretch = o.moving ? Math.round(Math.sin(ph)) : 0;
     p.ellipse(W * 0.52 + stretch * 0.5, H * 0.8, W * 0.38 + stretch * 0.5, H * 0.1, o.c);
@@ -219,6 +261,7 @@
     p.circle(W * 0.44, H * 0.54, W * 0.27, o.a);
     p.shade();
     for (let a = 0; a < 10; a += 0.2) { const r = W * 0.24 * (1 - a / 11); p.set(W * 0.44 + Math.cos(a) * r, H * 0.54 + Math.sin(a) * r, mul(o.a, 0.68)); }
+    if (o.echo) for (const k of [0.45, 0.75]) for (let a = -2.2; a < -0.5; a += 0.12) p.set(W * 0.44 + Math.cos(a) * W * 0.27 * k, H * 0.54 + Math.sin(a) * W * 0.27 * k, mix(o.a, WHITE, 0.6));   // pale ripple rings on the shell (Echoshell Snail)
     p.set(W * 0.86 + stretch, H * 0.54, BLACK);
     p.outline();
     if (o.glass) for (let i = 0; i < p.d.length; i += 4) if (p.d[i + 3]) p.d[i + 3] = 170;
@@ -452,6 +495,7 @@
     p.ellipse(W * 0.54, H * 0.68 - leap * 2, W * 0.18, H * 0.08, o.a);
     p.shade();
     eye(p, Math.round(W * 0.68), Math.round(H * 0.4 - leap * 2), false);
+    if (o.throat) { const r = 1 + (o.frame % 2) * 1.2; p.circle(W * 0.72, H * 0.54 - leap * 2, r, mix(o.a, WHITE, 0.35)); }   // a vocal sac that swells and shrinks (Chirrup Frog)
     p.outline();
     if (o.glow) [[0.42, 0.5], [0.52, 0.46], [0.6, 0.5], [0.36, 0.6]].forEach(([x, y], i) => p.set(W * x, H * y - leap * 2, i % 2 ? WHITE : o.a));
   };

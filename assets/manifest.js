@@ -11033,6 +11033,978 @@ AQ.manifest = {
     13
    ]
   },
+  "creature.chime_shrimp": {
+   "file": "sprites/creatures/chime_shrimp.png",
+   "fw": 16,
+   "fh": 16,
+   "anchor": [
+    8,
+    8
+   ],
+   "anims": {
+    "idle": {
+     "row": 0,
+     "frames": 4,
+     "fps": 5
+    },
+    "move": {
+     "row": 1,
+     "frames": 4,
+     "fps": 10
+    }
+   },
+   "vis": [
+    1,
+    4,
+    14,
+    12
+   ]
+  },
+  "creature.chime_shrimp.v": {
+   "file": "sprites/creatures/chime_shrimp_v.png",
+   "fw": 16,
+   "fh": 16,
+   "anchor": [
+    8,
+    8
+   ],
+   "anims": {
+    "idle": {
+     "row": 0,
+     "frames": 4,
+     "fps": 5
+    },
+    "move": {
+     "row": 1,
+     "frames": 4,
+     "fps": 10
+    }
+   },
+   "vis": [
+    1,
+    4,
+    14,
+    12
+   ]
+  },
+  "creature.chime_shrimp.v.m": {
+   "file": "sprites/creatures/chime_shrimp_v_m.png",
+   "fw": 16,
+   "fh": 16,
+   "anchor": [
+    8,
+    8
+   ],
+   "anims": {
+    "idle": {
+     "row": 0,
+     "frames": 4,
+     "fps": 5
+    },
+    "move": {
+     "row": 1,
+     "frames": 4,
+     "fps": 10
+    }
+   },
+   "vis": [
+    1,
+    4,
+    14,
+    12
+   ]
+  },
+  "creature.chime_shrimp.baby.v": {
+   "file": "sprites/creatures/chime_shrimp_baby_v.png",
+   "fw": 16,
+   "fh": 16,
+   "anchor": [
+    8,
+    8
+   ],
+   "anims": {
+    "idle": {
+     "row": 0,
+     "frames": 4,
+     "fps": 5
+    },
+    "move": {
+     "row": 1,
+     "frames": 4,
+     "fps": 10
+    }
+   },
+   "vis": [
+    3,
+    5,
+    13,
+    11
+   ]
+  },
+  "creature.chime_shrimp.baby": {
+   "file": "sprites/creatures/chime_shrimp_baby.png",
+   "fw": 16,
+   "fh": 16,
+   "anchor": [
+    8,
+    8
+   ],
+   "anims": {
+    "idle": {
+     "row": 0,
+     "frames": 4,
+     "fps": 5
+    },
+    "move": {
+     "row": 1,
+     "frames": 4,
+     "fps": 10
+    }
+   },
+   "vis": [
+    3,
+    5,
+    13,
+    11
+   ]
+  },
+  "creature.chime_shrimp.m": {
+   "file": "sprites/creatures/chime_shrimp_m.png",
+   "fw": 16,
+   "fh": 16,
+   "anchor": [
+    8,
+    8
+   ],
+   "anims": {
+    "idle": {
+     "row": 0,
+     "frames": 4,
+     "fps": 5
+    },
+    "move": {
+     "row": 1,
+     "frames": 4,
+     "fps": 10
+    }
+   },
+   "vis": [
+    1,
+    4,
+    14,
+    12
+   ]
+  },
+  "creature.chirrup_frog": {
+   "file": "sprites/creatures/chirrup_frog.png",
+   "fw": 16,
+   "fh": 16,
+   "anchor": [
+    8,
+    8
+   ],
+   "anims": {
+    "idle": {
+     "row": 0,
+     "frames": 4,
+     "fps": 5
+    },
+    "move": {
+     "row": 1,
+     "frames": 4,
+     "fps": 10
+    }
+   },
+   "vis": [
+    1,
+    3,
+    14,
+    12
+   ]
+  },
+  "creature.chirrup_frog.v": {
+   "file": "sprites/creatures/chirrup_frog_v.png",
+   "fw": 16,
+   "fh": 16,
+   "anchor": [
+    8,
+    8
+   ],
+   "anims": {
+    "idle": {
+     "row": 0,
+     "frames": 4,
+     "fps": 5
+    },
+    "move": {
+     "row": 1,
+     "frames": 4,
+     "fps": 10
+    }
+   },
+   "vis": [
+    1,
+    3,
+    14,
+    12
+   ]
+  },
+  "creature.chirrup_frog.v.m": {
+   "file": "sprites/creatures/chirrup_frog_v_m.png",
+   "fw": 16,
+   "fh": 16,
+   "anchor": [
+    8,
+    8
+   ],
+   "anims": {
+    "idle": {
+     "row": 0,
+     "frames": 4,
+     "fps": 5
+    },
+    "move": {
+     "row": 1,
+     "frames": 4,
+     "fps": 10
+    }
+   },
+   "vis": [
+    1,
+    3,
+    14,
+    12
+   ]
+  },
+  "creature.chirrup_frog.baby.v": {
+   "file": "sprites/creatures/chirrup_frog_baby_v.png",
+   "fw": 16,
+   "fh": 16,
+   "anchor": [
+    8,
+    8
+   ],
+   "anims": {
+    "idle": {
+     "row": 0,
+     "frames": 4,
+     "fps": 5
+    },
+    "move": {
+     "row": 1,
+     "frames": 4,
+     "fps": 10
+    }
+   },
+   "vis": [
+    1,
+    3,
+    14,
+    12
+   ]
+  },
+  "creature.chirrup_frog.baby": {
+   "file": "sprites/creatures/chirrup_frog_baby.png",
+   "fw": 16,
+   "fh": 16,
+   "anchor": [
+    8,
+    8
+   ],
+   "anims": {
+    "idle": {
+     "row": 0,
+     "frames": 4,
+     "fps": 5
+    },
+    "move": {
+     "row": 1,
+     "frames": 4,
+     "fps": 10
+    }
+   },
+   "vis": [
+    1,
+    3,
+    14,
+    12
+   ]
+  },
+  "creature.chirrup_frog.m": {
+   "file": "sprites/creatures/chirrup_frog_m.png",
+   "fw": 16,
+   "fh": 16,
+   "anchor": [
+    8,
+    8
+   ],
+   "anims": {
+    "idle": {
+     "row": 0,
+     "frames": 4,
+     "fps": 5
+    },
+    "move": {
+     "row": 1,
+     "frames": 4,
+     "fps": 10
+    }
+   },
+   "vis": [
+    1,
+    3,
+    14,
+    12
+   ]
+  },
+  "creature.hollow_piper": {
+   "file": "sprites/creatures/hollow_piper.png",
+   "fw": 28,
+   "fh": 24,
+   "anchor": [
+    14,
+    12
+   ],
+   "anims": {
+    "idle": {
+     "row": 0,
+     "frames": 4,
+     "fps": 5
+    },
+    "move": {
+     "row": 1,
+     "frames": 4,
+     "fps": 10
+    }
+   },
+   "vis": [
+    1,
+    7,
+    26,
+    17
+   ]
+  },
+  "creature.hollow_piper.v": {
+   "file": "sprites/creatures/hollow_piper_v.png",
+   "fw": 28,
+   "fh": 24,
+   "anchor": [
+    14,
+    12
+   ],
+   "anims": {
+    "idle": {
+     "row": 0,
+     "frames": 4,
+     "fps": 5
+    },
+    "move": {
+     "row": 1,
+     "frames": 4,
+     "fps": 10
+    }
+   },
+   "vis": [
+    1,
+    7,
+    26,
+    17
+   ]
+  },
+  "creature.hollow_piper.v.m": {
+   "file": "sprites/creatures/hollow_piper_v_m.png",
+   "fw": 28,
+   "fh": 24,
+   "anchor": [
+    14,
+    12
+   ],
+   "anims": {
+    "idle": {
+     "row": 0,
+     "frames": 4,
+     "fps": 5
+    },
+    "move": {
+     "row": 1,
+     "frames": 4,
+     "fps": 10
+    }
+   },
+   "vis": [
+    1,
+    7,
+    26,
+    17
+   ]
+  },
+  "creature.hollow_piper.baby.v": {
+   "file": "sprites/creatures/hollow_piper_baby_v.png",
+   "fw": 28,
+   "fh": 24,
+   "anchor": [
+    14,
+    12
+   ],
+   "anims": {
+    "idle": {
+     "row": 0,
+     "frames": 4,
+     "fps": 5
+    },
+    "move": {
+     "row": 1,
+     "frames": 4,
+     "fps": 10
+    }
+   },
+   "vis": [
+    4,
+    8,
+    25,
+    16
+   ]
+  },
+  "creature.hollow_piper.baby": {
+   "file": "sprites/creatures/hollow_piper_baby.png",
+   "fw": 28,
+   "fh": 24,
+   "anchor": [
+    14,
+    12
+   ],
+   "anims": {
+    "idle": {
+     "row": 0,
+     "frames": 4,
+     "fps": 5
+    },
+    "move": {
+     "row": 1,
+     "frames": 4,
+     "fps": 10
+    }
+   },
+   "vis": [
+    4,
+    8,
+    25,
+    16
+   ]
+  },
+  "creature.hollow_piper.m": {
+   "file": "sprites/creatures/hollow_piper_m.png",
+   "fw": 28,
+   "fh": 24,
+   "anchor": [
+    14,
+    12
+   ],
+   "anims": {
+    "idle": {
+     "row": 0,
+     "frames": 4,
+     "fps": 5
+    },
+    "move": {
+     "row": 1,
+     "frames": 4,
+     "fps": 10
+    }
+   },
+   "vis": [
+    1,
+    7,
+    26,
+    17
+   ]
+  },
+  "creature.echoshell_snail": {
+   "file": "sprites/creatures/echoshell_snail.png",
+   "fw": 16,
+   "fh": 16,
+   "anchor": [
+    8,
+    8
+   ],
+   "anims": {
+    "idle": {
+     "row": 0,
+     "frames": 4,
+     "fps": 5
+    },
+    "move": {
+     "row": 1,
+     "frames": 4,
+     "fps": 10
+    }
+   },
+   "vis": [
+    1,
+    4,
+    14,
+    14
+   ]
+  },
+  "creature.echoshell_snail.v": {
+   "file": "sprites/creatures/echoshell_snail_v.png",
+   "fw": 16,
+   "fh": 16,
+   "anchor": [
+    8,
+    8
+   ],
+   "anims": {
+    "idle": {
+     "row": 0,
+     "frames": 4,
+     "fps": 5
+    },
+    "move": {
+     "row": 1,
+     "frames": 4,
+     "fps": 10
+    }
+   },
+   "vis": [
+    1,
+    4,
+    14,
+    14
+   ]
+  },
+  "creature.echoshell_snail.v.m": {
+   "file": "sprites/creatures/echoshell_snail_v_m.png",
+   "fw": 16,
+   "fh": 16,
+   "anchor": [
+    8,
+    8
+   ],
+   "anims": {
+    "idle": {
+     "row": 0,
+     "frames": 4,
+     "fps": 5
+    },
+    "move": {
+     "row": 1,
+     "frames": 4,
+     "fps": 10
+    }
+   },
+   "vis": [
+    1,
+    4,
+    14,
+    14
+   ]
+  },
+  "creature.echoshell_snail.baby.v": {
+   "file": "sprites/creatures/echoshell_snail_baby_v.png",
+   "fw": 16,
+   "fh": 16,
+   "anchor": [
+    8,
+    8
+   ],
+   "anims": {
+    "idle": {
+     "row": 0,
+     "frames": 4,
+     "fps": 5
+    },
+    "move": {
+     "row": 1,
+     "frames": 4,
+     "fps": 10
+    }
+   },
+   "vis": [
+    4,
+    5,
+    14,
+    12
+   ]
+  },
+  "creature.echoshell_snail.baby": {
+   "file": "sprites/creatures/echoshell_snail_baby.png",
+   "fw": 16,
+   "fh": 16,
+   "anchor": [
+    8,
+    8
+   ],
+   "anims": {
+    "idle": {
+     "row": 0,
+     "frames": 4,
+     "fps": 5
+    },
+    "move": {
+     "row": 1,
+     "frames": 4,
+     "fps": 10
+    }
+   },
+   "vis": [
+    4,
+    5,
+    14,
+    12
+   ]
+  },
+  "creature.echoshell_snail.m": {
+   "file": "sprites/creatures/echoshell_snail_m.png",
+   "fw": 16,
+   "fh": 16,
+   "anchor": [
+    8,
+    8
+   ],
+   "anims": {
+    "idle": {
+     "row": 0,
+     "frames": 4,
+     "fps": 5
+    },
+    "move": {
+     "row": 1,
+     "frames": 4,
+     "fps": 10
+    }
+   },
+   "vis": [
+    1,
+    4,
+    14,
+    14
+   ]
+  },
+  "creature.murmur_seal": {
+   "file": "sprites/creatures/murmur_seal.png",
+   "fw": 24,
+   "fh": 24,
+   "anchor": [
+    12,
+    12
+   ],
+   "anims": {
+    "idle": {
+     "row": 0,
+     "frames": 4,
+     "fps": 5
+    },
+    "move": {
+     "row": 1,
+     "frames": 4,
+     "fps": 10
+    }
+   },
+   "vis": [
+    1,
+    7,
+    21,
+    19
+   ]
+  },
+  "creature.murmur_seal.v": {
+   "file": "sprites/creatures/murmur_seal_v.png",
+   "fw": 24,
+   "fh": 24,
+   "anchor": [
+    12,
+    12
+   ],
+   "anims": {
+    "idle": {
+     "row": 0,
+     "frames": 4,
+     "fps": 5
+    },
+    "move": {
+     "row": 1,
+     "frames": 4,
+     "fps": 10
+    }
+   },
+   "vis": [
+    1,
+    7,
+    21,
+    19
+   ]
+  },
+  "creature.murmur_seal.v.m": {
+   "file": "sprites/creatures/murmur_seal_v_m.png",
+   "fw": 24,
+   "fh": 24,
+   "anchor": [
+    12,
+    12
+   ],
+   "anims": {
+    "idle": {
+     "row": 0,
+     "frames": 4,
+     "fps": 5
+    },
+    "move": {
+     "row": 1,
+     "frames": 4,
+     "fps": 10
+    }
+   },
+   "vis": [
+    1,
+    7,
+    21,
+    19
+   ]
+  },
+  "creature.murmur_seal.baby.v": {
+   "file": "sprites/creatures/murmur_seal_baby_v.png",
+   "fw": 24,
+   "fh": 24,
+   "anchor": [
+    12,
+    12
+   ],
+   "anims": {
+    "idle": {
+     "row": 0,
+     "frames": 4,
+     "fps": 5
+    },
+    "move": {
+     "row": 1,
+     "frames": 4,
+     "fps": 10
+    }
+   },
+   "vis": [
+    5,
+    9,
+    18,
+    17
+   ]
+  },
+  "creature.murmur_seal.baby": {
+   "file": "sprites/creatures/murmur_seal_baby.png",
+   "fw": 24,
+   "fh": 24,
+   "anchor": [
+    12,
+    12
+   ],
+   "anims": {
+    "idle": {
+     "row": 0,
+     "frames": 4,
+     "fps": 5
+    },
+    "move": {
+     "row": 1,
+     "frames": 4,
+     "fps": 10
+    }
+   },
+   "vis": [
+    5,
+    9,
+    18,
+    17
+   ]
+  },
+  "creature.murmur_seal.m": {
+   "file": "sprites/creatures/murmur_seal_m.png",
+   "fw": 24,
+   "fh": 24,
+   "anchor": [
+    12,
+    12
+   ],
+   "anims": {
+    "idle": {
+     "row": 0,
+     "frames": 4,
+     "fps": 5
+    },
+    "move": {
+     "row": 1,
+     "frames": 4,
+     "fps": 10
+    }
+   },
+   "vis": [
+    1,
+    7,
+    21,
+    19
+   ]
+  },
+  "creature.deep_drummer": {
+   "file": "sprites/creatures/deep_drummer.png",
+   "fw": 32,
+   "fh": 32,
+   "anchor": [
+    16,
+    16
+   ],
+   "anims": {
+    "idle": {
+     "row": 0,
+     "frames": 4,
+     "fps": 5
+    },
+    "move": {
+     "row": 1,
+     "frames": 4,
+     "fps": 10
+    }
+   },
+   "vis": [
+    4,
+    1,
+    27,
+    26
+   ]
+  },
+  "creature.deep_drummer.v": {
+   "file": "sprites/creatures/deep_drummer_v.png",
+   "fw": 32,
+   "fh": 32,
+   "anchor": [
+    16,
+    16
+   ],
+   "anims": {
+    "idle": {
+     "row": 0,
+     "frames": 4,
+     "fps": 5
+    },
+    "move": {
+     "row": 1,
+     "frames": 4,
+     "fps": 10
+    }
+   },
+   "vis": [
+    4,
+    1,
+    27,
+    26
+   ]
+  },
+  "creature.deep_drummer.v.m": {
+   "file": "sprites/creatures/deep_drummer_v_m.png",
+   "fw": 32,
+   "fh": 32,
+   "anchor": [
+    16,
+    16
+   ],
+   "anims": {
+    "idle": {
+     "row": 0,
+     "frames": 4,
+     "fps": 5
+    },
+    "move": {
+     "row": 1,
+     "frames": 4,
+     "fps": 10
+    }
+   },
+   "vis": [
+    4,
+    1,
+    27,
+    26
+   ]
+  },
+  "creature.deep_drummer.baby.v": {
+   "file": "sprites/creatures/deep_drummer_baby_v.png",
+   "fw": 32,
+   "fh": 32,
+   "anchor": [
+    16,
+    16
+   ],
+   "anims": {
+    "idle": {
+     "row": 0,
+     "frames": 4,
+     "fps": 5
+    },
+    "move": {
+     "row": 1,
+     "frames": 4,
+     "fps": 10
+    }
+   },
+   "vis": [
+    8,
+    7,
+    23,
+    24
+   ]
+  },
+  "creature.deep_drummer.baby": {
+   "file": "sprites/creatures/deep_drummer_baby.png",
+   "fw": 32,
+   "fh": 32,
+   "anchor": [
+    16,
+    16
+   ],
+   "anims": {
+    "idle": {
+     "row": 0,
+     "frames": 4,
+     "fps": 5
+    },
+    "move": {
+     "row": 1,
+     "frames": 4,
+     "fps": 10
+    }
+   },
+   "vis": [
+    8,
+    7,
+    23,
+    24
+   ]
+  },
+  "creature.deep_drummer.m": {
+   "file": "sprites/creatures/deep_drummer_m.png",
+   "fw": 32,
+   "fh": 32,
+   "anchor": [
+    16,
+    16
+   ],
+   "anims": {
+    "idle": {
+     "row": 0,
+     "frames": 4,
+     "fps": 5
+    },
+    "move": {
+     "row": 1,
+     "frames": 4,
+     "fps": 10
+    }
+   },
+   "vis": [
+    4,
+    1,
+    27,
+    26
+   ]
+  },
   "creature.starfall_minnow": {
    "file": "sprites/creatures/starfall_minnow.png",
    "fw": 12,

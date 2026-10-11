@@ -61,9 +61,9 @@ AQ.Hydro = (function () {
     if (src.sound) AQ.Audio.playAt(src.sound, src.x, src.y, { range: H.range(), key: src.key || src.sound, vol: opts.vol });
     ripple(g.x, g.y, false, src.color, opts.faint);
     if (!onScreen(g.x, g.y, 4)) flash(g.x, g.y, d);
-    if (opts.echo) {                                     // an echo: a fainter ripple a moment later, a little way off
-      const e = opts.echo;
-      setTimeout(() => { if (H.hears(src)) { ripple(g.x + e.dx, g.y + e.dy, false, src.color, true); if (src.echoSound) AQ.Audio.playAt(src.echoSound, src.x + e.dx, src.y + e.dy, { range: H.range(), key: (src.key || src.sound) + ':echo', vol: 0.6 }); } }, e.delay * 1000);
+    if (opts.echo) {                                     // an echo: a fainter ripple a moment later, a little way off (either side)
+      const e = opts.echo, sx = R() < 0.5 ? -1 : 1, ex = e.dx * sx, ey = e.dy;
+      setTimeout(() => { if (H.hears(src)) { ripple(g.x + ex, g.y + ey, false, src.color, true); if (src.echoSound) AQ.Audio.playAt(src.echoSound, src.x + ex, src.y + ey, { range: H.range(), key: (src.key || src.sound) + ':echo', vol: 0.6 }); } }, e.delay * 1000);
     }
     if (!H.heardAny) { H.heardAny = true; if (AQ.Tips) AQ.Tips.event('heard'); }
     return true;

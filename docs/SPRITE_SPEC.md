@@ -169,6 +169,20 @@ in the black side bars, so keep shapes bold and simple with a dark outline.
 
 The tip box itself is drawn in code (a dark navy panel with a warm yellow top edge and a small ×).
 
+## Hidden callers (the hydrophone update)
+
+These follow every rule above (sizes, rows, anchors, ♂ / juvenile / rare-variant sheets). They hide
+nearly see-through in the sea, so their real art can be subtle; in a tank they show normally.
+
+| key | size class | placeholder | notes |
+|---|---|---|---|
+| `creature.chime_shrimp` | small (16 × 16) | `shrimp` (new) | a curled, segmented pink body, fanned tail, little legs, two long antennae with tiny pale bell tips that glint every other frame |
+| `creature.chirrup_frog` | small (16 × 16) | `frog` + `throat` | a green frog whose pale vocal sac swells and shrinks frame to frame |
+| `creature.hollow_piper` | mediumlong (28 × 24) | `fish` + `pipe` | a long thin tube-snouted fish with a row of dark holes along its side, like a flute |
+| `creature.echoshell_snail` | small (16 × 16) | `snail` + `echo` | a pale blue-grey snail with two pale ripple rings on its shell |
+| `creature.murmur_seal` | medium (24 × 24) | `seal` (new) | a plump pale seal pup: small head, big dark eye, whiskers, soft spots, flippers |
+| `creature.deep_drummer` | large (32 × 32) | `fish` + `drum` | a deep-bodied dusky fish with a round, taut drum-skin patch on its flank that trembles |
+
 ## Using a different layout
 
 If a generated sheet needs a different frame size or frame count, edit its entry in

@@ -243,6 +243,35 @@ var AQ = (typeof AQ !== 'undefined') ? AQ : {};
     return 0.45;
   }, { minGap: 0.3, ripple: {} });
 
+  // the hidden callers' calls (tracker creatures; played from where they are with AQ.Audio.playAt)
+  // Chime Shrimp: "tink-tink", two tiny high bells
+  reg('call_chime', 'hydro', (c, o, t) => { H.bell(c, o, t, m(93), 0.05, 0.35); H.bell(c, o, t + 0.16, m(93), 0.04, 0.4); return 0.6; }, { minGap: 0.4, ripple: {} });
+  // Chirrup Frog: one bright chirp (it calls three in a row, then pauses)
+  reg('call_chirrup', 'hydro', (c, o, t) => {
+    H.tone(c, o, t, { type: 'triangle', f: 1100, f2: 1700, glide: 0.07, a: 0.005, d: 0.09, v: 0.06, lp: 2600 });
+    return 0.15;
+  }, { minGap: 0.12, ripple: { burst: 3, gap: 0.28 } });
+  // Hollow Piper: a low, breathy hum, like wind across a pipe
+  reg('call_hum', 'hydro', (c, o, t) => {
+    H.tone(c, o, t, { type: 'triangle', f: 98, f2: 104, glide: 0.9, a: 0.25, d: 0.8, v: 0.11, lp: 500 });
+    H.tone(c, o, t, { f: 196, a: 0.3, d: 0.7, v: 0.03 });
+    H.noise(c, o, t, { ft: 'bandpass', f: 400, q: 2, a: 0.25, d: 0.7, v: 0.03 });
+    return 1.1;
+  }, { minGap: 0.8, ripple: {} });
+  // Echoshell Snail: a soft plink... and its echo a moment later (the echo plays the same, fainter)
+  reg('call_echo', 'hydro', (c, o, t) => { H.bell(c, o, t, m(81), 0.06, 0.9); return 1; }, { minGap: 0.3, ripple: { echo: { dx: 26, dy: -10, delay: 0.55 } } });
+  // Murmur Seal Pup: a three-note lullaby hum
+  reg('call_lullaby', 'hydro', (c, o, t) => {
+    [[m(64), 0], [m(67), 0.45], [m(62), 0.9]].forEach(([f, d]) => H.tone(c, o, t + d, { f, a: 0.12, d: 0.5, v: 0.05, lp: 1200 }));
+    return 1.6;
+  }, { minGap: 1.2, ripple: {} });
+  // Deep Drummer: a slow heartbeat, lub-dub (the screen's edges pulse with it)
+  reg('call_drum', 'hydro', (c, o, t) => {
+    H.tone(c, o, t, { f: 70, f2: 42, glide: 0.18, a: 0.01, d: 0.3, v: 0.22 });
+    H.tone(c, o, t + 0.24, { f: 62, f2: 38, glide: 0.18, a: 0.01, d: 0.28, v: 0.16 });
+    return 0.7;
+  }, { minGap: 0.6, ripple: { big: true, edge: true } });
+
   // ---------------------------------------------------------------- aquarium
   // EXPAND: soft glass panes set into place (muted taps) and a warm rising shimmer as the tank grows
   reg('build', 'aquarium', (c, o, t) => {

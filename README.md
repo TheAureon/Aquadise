@@ -132,7 +132,7 @@ browsers won't let a page save pictures made from file:// images.
     four testing sources near the start call every few seconds (needing EAR 0, 1, 2 and 3), and an
     overlay shows every hidden sound source's true position (magenta crosses with labels; dim ones are
     out of your hearing), your level and range.
-- **The collection-log button:** the discovered counter in the HUD's top-right corner ("31/77") is also
+- **The collection-log button:** the discovered counter in the HUD's top-right corner ("31/83") is also
   a button, with a small book beside it. Click or tap it to open the collection log, just like L (which
   still works, as do the touch MENU and the title screen). It still shows the count exactly as before.
   - **Looks:** it lights up on hover with a tooltip, "COLLECTION LOG (L)" (the key name follows the
@@ -231,6 +231,20 @@ browsers won't let a page save pictures made from file:// images.
   (the screen's edges pulse gently with each call). The log shows "needs hydrophone n" and "Hides
   and calls" lines. Hidden callers make no creature-voice sounds (their call is the only cue, and it
   is always also shown). Swings that miss count toward the net-spam nudge like any other.
+- **Six hidden callers (the hydrophone update, roster 83):** each hides (nearly see-through), calls
+  with its own sound and ripple, and has a log hint, likes, field notes and a message bottle you can
+  reach without any upgrade. Their calls are on the Sound Test's HYDROPHONE tab.
+  - **Chime Shrimp** (Coral Shelf, crustacean, EAR 0): "tink-tink" every 3-5 s, moving between three
+    crevices just past where you first dive in.
+  - **Chirrup Frog** (Mangrove, amphibian, night only, EAR 1): three chirps (three ripples), then a pause.
+  - **Hollow Piper** (Sunken Ruins, fish, EAR 1): a low hum that moves between walls, pipes and hull openings.
+  - **Echoshell Snail** (Flooded Cave, gastropod, EAR 2): each call makes two ripples, the real one
+    and a fainter, later echo a little to one side.
+  - **Murmur Seal Pup** (Ice Shelf, mammal, EAR 2): a lullaby hum just under the floes; it doesn't
+    startle (`calm`), so it's easy to net once found.
+  - **Deep Drummer** (Trench, large slow fish, EAR 3): a heartbeat thump; the screen's edges pulse
+    gently with each beat while you can hear it, with a big ripple.
+  - Tuning: each one's `params` in `data/creatures.js`; their sounds are `call_*` in `src/sfx.js`.
 - **Nine new creatures:** Auroravein Squid (ice, night), Moonshell Crab (tide pools,
   night), Ribbonmane (kelp, mirror), Candlepolyp (coral plant, blooms at night), Skyleap Flyfish
   (open ocean, mid-air), Sail Turtle (open ocean), Pressure Tortoise (bottom of the trench, depth 3),
