@@ -18,6 +18,7 @@ AQ.langFiles.en = {
 
   // ---------------------------------------------------------------- general buttons and words
   'ui.soundMuted': 'Sound muted ({key} to unmute)',   // {key} = the mute key
+  'ui.soundMuted.touch': 'Sound muted (MENU > SOUND ON to unmute)',
   'ui.soundOn': 'Sound on',
   'ui.minutes': '{n} MIN',
   'ui.seconds': '{n} SEC',
@@ -41,10 +42,12 @@ AQ.langFiles.en = {
   'title.guide': 'GUIDE',
   'title.settings': 'SETTINGS',
   'title.newConfirm': 'START OVER? CLICK AGAIN',
+  'title.newConfirm.touch': 'START OVER? TAP AGAIN',
   'title.new': 'NEW GAME',
   'title.tagline': 'A COZY DIVE INTO AN UNDERWATER WORLD',
   'title.progress': '{n}/{total} FOUND  {done} COMPLETE',
   'title.howTo': 'ARROWS + ENTER OR CLICK',
+  'title.howTo.touch': 'TAP TO CHOOSE',
 
   // ---------------------------------------------------------------- settings panel
   'settings.language': 'LANGUAGE',
@@ -78,6 +81,7 @@ AQ.langFiles.en = {
   'settings.swapped': 'SWAPPED',
   'settings.title': 'SETTINGS',
   'settings.foot.sound': '{key}: QUICK MUTE ANYWHERE',   // {key} = the mute key
+  'settings.foot.sound.touch': 'MENU > MUTE: QUICK MUTE ANYWHERE',
   'settings.foot.touchOn': 'TOUCH CONTROLS ARE ON',
   'settings.foot.touchOff': 'TOUCH CONTROLS ARE OFF RIGHT NOW',
   'settings.foot.saved': 'SAVED WITH YOUR GAME',
@@ -90,12 +94,16 @@ AQ.langFiles.en = {
   'soundtest.ripple': 'WHAT YOU SEE IN THE GAME:',   // over the ripple preview on the HYDROPHONE tab
   'soundtest.title': 'SOUND TEST',
   'soundtest.muted': 'MUTED - PRESS {key}',
+  'soundtest.muted.touch': 'MUTED - UNMUTE IN SETTINGS',
   'soundtest.info.sfx': 'ID: {id}{rec}',   // the selected sound: {id} = its id, {rec} = the RECORDING mark if it has one
   'soundtest.info.amb': 'ID: {id}{rec}  (LOOPS - CLICK AGAIN TO STOP)',
+  'soundtest.info.amb.touch': 'ID: {id}{rec}  (LOOPS - TAP AGAIN TO STOP)',
   'soundtest.info.stinger': 'ID: {id}{rec}  (PLAYS OVER THE MUSIC)',
   'soundtest.info.music': 'ID: {id}{rec}  (CLICK AGAIN TO STOP)',
+  'soundtest.info.music.touch': 'ID: {id}{rec}  (TAP AGAIN TO STOP)',
   'soundtest.recording': '  (RECORDING)',
   'soundtest.footer': 'CLICK / ENTER: PLAY   Q/E: SWITCH LIST   ESC: BACK',
+  'soundtest.footer.touch': 'TAP: PLAY   TABS: SWITCH LIST   BACK: LEAVE',
 
   // ---------------------------------------------------------------- pause menu
   'pause.resume': 'RESUME',
@@ -104,6 +112,7 @@ AQ.langFiles.en = {
   'pause.settings': 'SETTINGS',
   'pause.home': 'HOME',
   'pause.wipeConfirm': 'CLICK AGAIN TO WIPE',
+  'pause.wipeConfirm.touch': 'TAP AGAIN TO WIPE',
   'pause.reset': 'RESET SAVE',
   'pause.title': 'PAUSED',
   'pause.autosave': 'PROGRESS SAVES AUTOMATICALLY',
@@ -430,6 +439,7 @@ AQ.langFiles.en = {
   'guide.book': 'FIELD GUIDE',
   'guide.pageOf': 'PAGE {n} OF {total}',
   'guide.footer': 'LEFT / RIGHT: TURN    ESC / {k:guide}: CLOSE',
+  'guide.footer.touch': 'SWIPE OR < >: TURN    CLOSE: LEAVE',
 
   // ---------------------------------------------------------------- the sea: places and doors
   'world.door': 'DOOR',
@@ -480,7 +490,9 @@ AQ.langFiles.en = {
   'station.directory': 'TANK DIRECTORY',
   'station.tend': 'TEND THE {tank} TANK',
   'station.followRobot': '{key}: FOLLOW ROBOT',   // {key} = the whole-building view key
+  'station.followRobot.touch': 'EYE BUTTON: FOLLOW ROBOT',
   'station.seeAll': '{key}: SEE ALL TANKS',   // {key} = the whole-building view key
+  'station.seeAll.touch': 'EYE BUTTON: SEE ALL TANKS',
   'station.empty': 'EMPTY',   // an empty tank window in the building
 
   // ---------------------------------------------------------------- the hill
@@ -492,7 +504,9 @@ AQ.langFiles.en = {
   'map.title': 'MAP',
   'map.you': 'YOU',
   'map.legend': 'GOLD = CHESTS   {map} / {esc}: CLOSE',
+  'map.legend.touch': 'GOLD = CHESTS   TAP TO CLOSE',
   'map.legendStar': 'GOLD = CHESTS   SPARKLE = FALLEN STAR   {map} / {esc}: CLOSE',
+  'map.legendStar.touch': 'GOLD = CHESTS   SPARKLE = FALLEN STAR   TAP TO CLOSE',
 
   // ---------------------------------------------------------------- chests and upgrades
   'chest.net': 'BIGGER NET! (LV {n})',
@@ -509,7 +523,9 @@ AQ.langFiles.en = {
 
   // ---------------------------------------------------------------- message bottles
   'bottle.found': 'Message in a bottle! Field notes on {name} ({key})',   // {key} = the log key
+  'bottle.found.touch': 'Message in a bottle! Field notes on {name} (tap the counter)',
   'bottle.foundMystery': 'Message in a bottle! Field notes on a mystery creature ({key})',   // {key} = the log key
+  'bottle.foundMystery.touch': 'Message in a bottle! Field notes on a mystery creature (tap the counter)',
   'bottle.count': 'Bottles found {n}/{total}',
 
   // ---------------------------------------------------------------- catching messages
@@ -1397,6 +1413,7 @@ AQ.langFiles.en = {
   'tank.tab.fishHintNursery': 'BABIES IN THE NURSERY',
   'tank.tab.tankHint': 'TANK SIZE AND EXPAND',
   'tank.stripHint': 'WHERE YOU ARE IN THE TANK: CLICK OR DRAG',
+  'tank.stripHint.touch': 'WHERE YOU ARE IN THE TANK: TAP OR DRAG',
   'tank.size.level': 'SIZE {n}/{max}',   // the TANK tab: this tank's size level
   'tank.size.expand': 'EXPAND: {n}',   // the button: {n} = glass panes it costs (a pane icon follows)
   'tank.size.maxBtn': 'MAX SIZE',
@@ -1478,7 +1495,9 @@ AQ.langFiles.en = {
   'release.done': 'Goodbye, {name}! Released into the sea.',
   'release.doneMany': { one: 'Released 1 creature into the sea.', other: 'Released {n} creatures into the sea.' },
   'tank.flipBtn': 'FLIP (X)',
+  'tank.flipBtn.touch': 'FLIP',
   'tank.layerBtn': 'LAYER: {layer} (Z)',
+  'tank.layerBtn.touch': 'LAYER: {layer}',
   'tank.putBack': 'PUT BACK',
   'tank.remove': 'REMOVE',
   'tank.done': 'DONE',
@@ -1517,7 +1536,9 @@ AQ.langFiles.en = {
   'tank.item.lovedMore': '♥ LOVED BY {names} +{n}',
   'tank.item.theme': 'FITS THIS TANK\'S THEME',
   'tank.item.stock': '{n} IN STOCK - CLICK OR DRAG INTO THE TANK',
+  'tank.item.stock.touch': '{n} IN STOCK - TAP OR DRAG INTO THE TANK',
   'tank.item.place': 'CLICK OR DRAG INTO THE TANK',
+  'tank.item.place.touch': 'TAP OR DRAG INTO THE TANK',
   'tank.item.new': 'NEW',
   'tank.fish.in': 'IN',
   'tank.fish.out': 'OUT',
@@ -1525,13 +1546,19 @@ AQ.langFiles.en = {
   'tank.fish.none': 'NO CREATURES FROM THIS BIOME YET',
   'tank.item.none': 'NOTHING HERE YET',
   'tank.fish.toStorage': '{name}: CLICK TO MOVE TO STORAGE',
+  'tank.fish.toStorage.touch': '{name}: TAP TO MOVE TO STORAGE',
   'tank.fish.toTank': '{name}: CLICK TO MOVE INTO TANK',
+  'tank.fish.toTank.touch': '{name}: TAP TO MOVE INTO TANK',
   'tank.letGo': 'LET GO IN THE TANK TO PLACE IT',
   'tank.clickToPlace': 'CLICK IN THE TANK TO PLACE   (OR DRAG)',
+  'tank.clickToPlace.touch': 'TAP IN THE TANK TO PLACE   (OR DRAG)',
   'tank.emptyHint': 'CATCH CREATURES FROM THIS BIOME TO FILL THIS TANK',
   'tank.clickCreature': 'CLICK A CREATURE TO LEARN ABOUT IT',
+  'tank.clickCreature.touch': 'TAP A CREATURE TO LEARN ABOUT IT',
   'tank.decorHover': '{name}:  DRAG TO MOVE   RIGHT CLICK: REMOVE   X: FLIP   Z: LAYER',
+  'tank.decorHover.touch': '{name}:  DRAG TO MOVE   TAP IT: FLIP, LAYER, REMOVE',
   'tank.undoHint': 'UNDO LAST DECOR CHANGE (U)',
+  'tank.undoHint.touch': 'UNDO LAST DECOR CHANGE',
   'tank.clearHint': 'REMOVE ALL DECOR FROM THIS TANK',
 
   // ---------------------------------------------------------------- decorations
@@ -1689,7 +1716,9 @@ AQ.langFiles.en = {
   'nursery.tray.baby': 'BABY',
   'nursery.noBabies': 'NO BABIES YET',
   'nursery.tray.hoverGrown': '{name}: GROWN UP - CLICK FOR ITS CARD',
+  'nursery.tray.hoverGrown.touch': '{name}: GROWN UP - TAP FOR ITS CARD',
   'nursery.tray.hoverGrowing': '{name}: GROWS UP IN {time} - CLICK FOR ITS CARD',
+  'nursery.tray.hoverGrowing.touch': '{name}: GROWS UP IN {time} - TAP FOR ITS CARD',
   'nursery.btn.growing': 'STILL GROWING: {time} TO GO',
   'nursery.btn.send': 'SEND IT TO THE {tank} TANK\'S STORAGE',
   'nursery.btn.noneGrown': 'NOBODY IS GROWN UP YET',
@@ -1714,7 +1743,9 @@ AQ.langFiles.en = {
   'photo.couldNotSave': 'COULD NOT SAVE',
   'photo.frameCaption': '{frame} + CAPTION',
   'photo.help1': '{k:photoSnap} / CLICK: SNAP     {k:photoFreeze}: FREEZE     {k:photoIcons}: HEARTS + MOOD ICONS',
+  'photo.help1.touch': 'TAP THE TANK OR SNAP: TAKE THE PHOTO     FREEZE: HOLD THE MOMENT',
   'photo.help2': '{k:photoFrame}: FRAME STYLE     {k:photoCaption}: CAPTION     {k:photo} / ESC: LEAVE PHOTO MODE',
+  'photo.help2.touch': 'ICONS, FRAME, CAPTION: THE BUTTONS ABOVE     EXIT: LEAVE PHOTO MODE',
   'photo.help3': 'PHOTOS SAVE AS PNG DOWNLOADS ({n}X PIXELS)',
 
   // ---------------------------------------------------------------- the TANKS overview / directory
@@ -1739,6 +1770,7 @@ AQ.langFiles.en = {
   'overview.hover': '{tank}: {line}',   // {line} = the tank's top reason, with + or -
   'overview.hoverNext': '{tank}: {line}  NEXT UNLOCK {n} STARS',
   'overview.help': 'TOP ROW = PREDATOR WING   CLICK A TANK TO VISIT IT   (T / ESC: BACK)',
+  'overview.help.touch': 'TOP ROW = PREDATOR WING   TAP A TANK TO VISIT IT   (BACK: RETURN)',
 
   // ---------------------------------------------------------------- the collection log
   'log.tab.species': 'SPECIES',
@@ -1756,17 +1788,26 @@ AQ.langFiles.en = {
   'log.notesFound': 'FIELD NOTES FOUND',
   'log.noNotes': 'NO FIELD NOTES YET',
   'log.key.move': 'WASD',
+  'log.key.move.touch': 'TAP',
   'log.key.enter': 'ENTER',
+  'log.key.enter.touch': 'TAP AGAIN',
   'log.key.biome': 'Q/E',
+  'log.key.biome.touch': '< >',
   'log.key.tabs': 'LEFT/RIGHT',
+  'log.key.tabs.touch': 'TAP',
   'log.key.esc': 'ESC',
+  'log.key.esc.touch': 'CLOSE',
   'log.key.wheel': 'WHEEL',
+  'log.key.wheel.touch': 'DRAG',
   'log.key.pick': 'W/S',
+  'log.key.pick.touch': 'TAP',
   'log.do.move': 'MOVE',
+  'log.do.move.touch': 'SELECT',
   'log.do.open': 'OPEN',
   'log.do.biome': 'BIOME',
   'log.do.tabs': 'TABS',
   'log.do.close': 'CLOSE',
+  'log.do.close.touch': '(TOP RIGHT)',
   'log.do.scroll': 'SCROLL',
   'log.do.pick': 'PICK A NOTE',
   'log.do.browse': 'PREV / NEXT SPECIES',

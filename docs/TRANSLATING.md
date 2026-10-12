@@ -40,6 +40,9 @@ on the right translated. Translators never need to touch the game code.
 ## The rules for translated text
 
 - **Keep the keys** (the left side) exactly as they are.
+- **Touch versions:** a key ending in `.touch` (like `map.legend.touch`) is the same text for phones
+  and tablets ("TAP TO CLOSE" instead of "M / ESC: CLOSE"); the game shows it while touch controls are
+  on. Translate it like any other line. If you leave it out, your translation of the plain key is used.
 - **Keep every `{placeholder}`.** Move them anywhere in the sentence, but don't translate or drop
   them:
   - `{name}`, `{n}`, `{tank}`... are filled in by the game;

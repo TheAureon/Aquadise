@@ -6,6 +6,7 @@
 // English; a key missing everywhere draws nothing (never the raw key) and is listed in AQ.Lang.missing
 // (tools/check-game.js --keys finds those before players do).
 //
+// Touch: while touch controls are on, `<key>.touch` (when it exists) is used instead of `<key>`.
 // Placeholders: {name}, {n}... are filled from the values passed in (anything else in braces, like the
 // key-name tokens {k:jump} or the config numbers {c:...}, is left for the code that fills those in).
 // Plurals: a value can be { one: '...', other: '...' } (and any of zero / two / few / many, the
@@ -76,7 +77,15 @@ AQ.Lang = (function () {
     return forms[f] != null ? forms[f] : forms.other != null ? forms.other : forms.one;
   };
   const fill = (s, vars) => (vars ? String(s).replace(/\{(\w+)\}/g, (m, k) => (vars[k] != null ? String(vars[k]) : m)) : String(s));
+  // Touch wording: while touch controls are on, a key with a `<key>.touch` version uses that instead
+  // ("TAP TO CLOSE" for "M / ESC: CLOSE"). A language that translated the key but not its touch version
+  // keeps its own words rather than switching to English.
+  const touchOn = () => !!(AQ.Touch && AQ.Touch.active && AQ.Touch.active());
   L.t = function (key, vars, code = L.code) {
+    if (touchOn() && !key.endsWith('.touch')) {
+      const tk = key + '.touch';
+      if (L.has(tk, code) || (L.has(tk, 'en') && (!L.has(key, code) || (L.extra && L.extra[code])))) key = tk;
+    }
     let v = raw(key, code);
     if (v == null) { L.missing.add(key); return ''; }
     if (typeof v === 'object') v = L.plural(vars && vars.n != null ? vars.n : 1, v);

@@ -90,6 +90,7 @@ AQ.Touch = (function () {
   const over = (a, b) => a.x < b.x + b.w && a.x + a.w > b.x && a.y < b.y + b.h && a.y + a.h > b.y;
   T.sizeMult = () => 1;
   function gameRect() { const r = (gameCanvas || document.getElementById('game')).getBoundingClientRect(); return { x: r.left, y: r.top, w: r.width, h: r.height, s: r.width / AQ.TUNING.view.w }; }
+  T.toGamePx = (px) => px / gameRect().s;                                          // screen px -> game px (sizes in config are screen px)
   T.toScreen = function (r) { const g = gameRect(); return { x: g.x + r.x * g.s, y: g.y + r.y * g.s, w: r.w * g.s, h: r.h * g.s }; };
   // game things the controls must never cover or steal touches from (a tap there goes to the game)
   function exclusions(game) {
@@ -101,9 +102,10 @@ AQ.Touch = (function () {
   // which controls show right now
   function shown(game) {
     if (!T.active() || T.portrait || !game) return {};
-    if (game.state === 'map') return { menu: true };
+    if (game.state === 'map') return { menu: true, close: true };                 // (a tap anywhere on the map closes it too)
     if (game.state !== 'play') return {};
-    return { menu: true, stick: true, jump: true, sneak: true, bait: game.scene === 'world', interact: interactUp(), listen: game.scene === 'world' && !!AQ.Hydro && AQ.Hydro.unlocked() };
+    return { menu: true, stick: true, jump: true, sneak: true, bait: game.scene === 'world', interact: interactUp(), listen: game.scene === 'world' && !!AQ.Hydro && AQ.Hydro.unlocked(),
+      view: game.scene === 'station' };                                             // the building's whole view (the V key)
   }
   function interactUp() { const p = AQ.Scenes && AQ.Scenes.promptAt; return !!p && AQ.Render.t - p.t < cfg().interactLinger && AQ.Render.t >= p.t; }
   function layout(game) {
@@ -121,6 +123,8 @@ AQ.Touch = (function () {
     L.buttons.push(btn('bait', cx, cy - size - gap, size));
     L.buttons.push(btn('sneak', cx, cy - 2 * (size + gap), size));
     L.buttons.push(btn('listen', cx + inw * (size + gap), cy - 2 * (size + gap), size));   // hold to LISTEN (hydrophone 1+, the sea)
+    L.buttons.push(btn('view', cx + inw * (size + gap), cy - 2 * (size + gap), size));     // (same place, in the building: see all the tanks)
+    L.buttons.push(btn('close', cx, cy, size));                                             // the map: close it
     // INTERACT takes BAIT's place when there's no bait (prompts only come up on the hill and in the station);
     // otherwise it sits beside JUMP
     if (shown(game).bait) L.buttons.push(btn('interact', cx + inw * (size + gap), cy, size));
@@ -143,7 +147,8 @@ AQ.Touch = (function () {
 
   // ---------------------------------------------------------------- the virtual keys each button holds
   const keyOf = (action) => AQ.Keys.list(action).find((c) => !/^Mouse/.test(c));
-  const CODES = { jump: () => keyOf('jump'), bait: () => keyOf('bait'), interact: () => keyOf('interact'), listen: () => keyOf('listen') };
+  const CODES = { jump: () => keyOf('jump'), bait: () => keyOf('bait'), interact: () => keyOf('interact'), listen: () => keyOf('listen'),
+    view: () => AQ.TUNING.station.zoomKey, close: () => keyOf('map') };
   function setSneak(on) {
     const code = keyOf('sneak');
     T.sneakOn = on;
@@ -172,8 +177,10 @@ AQ.Touch = (function () {
     if (sh.stick && inR(L.zone, x, y) && !L.ex.some((r) => inR(r, x, y)) && !(T.menuOpen)) {
       p.role = 'stick'; p.bx = x; p.by = y; stickTo(p); return;
     }
-    // 3) a tap on the game: the left mouse button there
-    if (!tapHeld()) { p.role = 'tap'; AQ.Input.touchMouse(x, y, 'down'); }
+    // 3) the map: a tap anywhere closes it (there's nothing on it to tap)
+    if (game && game.state === 'map' && !T.menuOpen) { p.role = 'none'; game.state = 'play'; AQ.Audio.play('menu_move'); return; }
+    // 4) a tap on the game: the left mouse button there (a tap just beside a small button counts as on it)
+    if (!tapHeld()) { const at = snap(game, x, y); p.role = 'tap'; p.dx = at.x - x; p.dy = at.y - y; AQ.Input.touchMouse(at.x, at.y, 'down'); }
   }
   function onMove(e) {
     const p = T.pointers.get(e.pointerId);
@@ -181,7 +188,7 @@ AQ.Touch = (function () {
     if (e.cancelable) e.preventDefault();
     p.x = e.clientX; p.y = e.clientY;
     if (p.role === 'stick') { stickTo(p); T.lastUse = now(); }
-    else if (p.role === 'tap') AQ.Input.touchMouse(p.x, p.y, 'move');
+    else if (p.role === 'tap') AQ.Input.touchMouse(p.x + (p.dx || 0), p.y + (p.dy || 0), 'move');   // (a snapped tap keeps its offset)
   }
   function onUp(e) {
     const p = T.pointers.get(e.pointerId);
@@ -190,6 +197,36 @@ AQ.Touch = (function () {
     release(p, false, e.type === 'pointercancel');
     T.pointers.delete(e.pointerId);
   }
+  // ---------------------------------------------------------------- bigger hit areas for small buttons
+  // The buttons the current screen has (game px). A tap that lands on none of them but within
+  // touch.snapPx screen px of one is moved onto the nearest (only ever one: the nearest wins, so two
+  // small buttons never share a tap area). Nothing changes how they look, or anything with a mouse.
+  function targets(game) {
+    const st = game.state, A = AQ.Aquarium;
+    if (T.menuOpen) return T.menuUi;
+    if (AQ.Redo && AQ.Redo.dialog) return AQ.Redo.ui;
+    if (AQ.SaveFile && AQ.SaveFile.panel) return AQ.SaveFile.ui;
+    if (st === 'title') return AQ.Title.panel === 'sound' ? AQ.SoundUI.ui : AQ.Title.panel ? [] : AQ.Title.items;
+    if (st === 'pause') return AQ.PauseUI.panel === 'sound' ? AQ.SoundUI.ui : AQ.PauseUI.ui;
+    if (st === 'soundtest') return AQ.SoundTest.ui;
+    if (st === 'guide') return AQ.Guide.ui;
+    if (st === 'log') return AQ.LogUI.ui;
+    if (st === 'aquarium') return A.photo.on ? A.photo.ui : A.ui;
+    if (st === 'play') return (AQ.Dive ? AQ.Dive.ui : []).concat(AQ.Nudges ? AQ.Nudges.ui : []);
+    return [];
+  }
+  function snap(game, x, y) {
+    if (!game) return { x, y };
+    const list = (targets(game) || []).filter((r) => r && !r.text && r.w > 0 && r.h > 0 && r.x != null).map((r) => T.toScreen(r));
+    if (!list.length || list.some((r) => inR(r, x, y))) return { x, y };
+    if (game.state === 'aquarium' && !AQ.Aquarium.photo.on && inR(T.toScreen(AQ.Aquarium.tankRect()), x, y)) return { x, y };   // the water is for placing and netting
+    const dist = (r) => Math.hypot(x - clamp(x, r.x, r.x + r.w), y - clamp(y, r.y, r.y + r.h));
+    let best = null, bd = cfg().snapPx;
+    for (const r of list) { const d = dist(r); if (d < bd) { bd = d; best = r; } }
+    return best ? { x: best.x + best.w / 2, y: best.y + best.h / 2 } : { x, y };
+  }
+  T.snap = snap;
+
   function pressButton(id, p) {
     const I = AQ.Input;
     if (id === 'sneak') { setSneak(!T.sneakOn); AQ.Audio.play('menu_move'); return; }
@@ -207,7 +244,7 @@ AQ.Touch = (function () {
       if (!quiet && !cancelled && now() - p.t0 < c.tapSeconds && Math.hypot(p.x - p.x0, p.y - p.y0) < c.tapSlopPx && !tapHeld()) {
         I.touchMouse(p.x0, p.y0, 'down'); I.touchMouse(p.x0, p.y0, 'up');
       }
-    } else if (p.role === 'tap' && !quiet) I.touchMouse(cancelled ? null : p.x, cancelled ? null : p.y, cancelled ? 'cancel' : 'up');
+    } else if (p.role === 'tap' && !quiet) I.touchMouse(cancelled ? null : p.x + (p.dx || 0), cancelled ? null : p.y + (p.dy || 0), cancelled ? 'cancel' : 'up');
     p.role = 'none';
   }
   // the floating joystick: the ring appears where the thumb lands and follows it if it slides past the edge
@@ -288,7 +325,7 @@ AQ.Touch = (function () {
     AQ.Font.draw(ctx, text, 2, 2, '#ffe9a8', { shadow: false });
     ctx.globalAlpha = 1;
   }
-  const FRAME = { jump: 1, bait: 2, sneak: 3, interact: 4, menu: 5, listen: 12 };
+  const FRAME = { jump: 1, bait: 2, sneak: 3, interact: 4, menu: 5, close: 6, view: 8, listen: 12 };
   T.drawOverlay = function (game) {
     if (!ctx) return;
     ctx.setTransform(1, 0, 0, 1, 0, 0);

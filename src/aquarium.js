@@ -23,6 +23,7 @@ AQ.Aquarium = (function () {
     A.camX = U.clamp(A.camMem[A.biome] || 0, 0, maxCam());
   }
   const SIZE_RANK = { tiny: 0, small: 1, medium: 2, mediumlong: 2, wide: 2, tall: 2, large: 3, widelarge: 3, huge: 4 };
+  A.tankRect = () => ({ x: TANK.x, y: TANK.y, w: TANK.w, h: TANK.h });   // the water (touch: taps there are never snapped to a button)
   const TRAY_Y = 149, CELL = 26, NCELL = 36;     // NCELL: the nursery's FISH tray (room for a GRADUATE button)
 
   const styleOf = (id) => Object.assign({}, AQ.data.tankStyles.default, AQ.data.tankStyles[id] || {});

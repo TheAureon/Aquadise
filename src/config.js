@@ -231,7 +231,10 @@ AQ.TUNING = {
     pressedAlpha: 0.95,       // a button being held
     interactLinger: 0.25,     // seconds the INTERACT button stays after its prompt goes (no flicker at the edge)
     tapSeconds: 0.22,         // a touch in the joystick zone this quick...
-    tapSlopPx: 12             // ...that moved less than this is a tap on the game instead (swings the net there)
+    tapSlopPx: 12,            // ...that moved less than this is a tap on the game instead (swings the net there)
+    snapPx: 14,               // a tap this close (screen px) to a small on-screen button counts as on it (menus, the tank screen...)
+    dragScrollPx: 6,          // the log's lists: a finger that moves this far (screen px) scrolls the list instead
+    swipePx: 40               // the Guide: a sideways swipe this long (screen px) turns the page
   },
   // The guided first dive (src/dive.js; the text is dive.* in data/lang/en.js).
   dive: {

@@ -54,6 +54,25 @@ and the controls sit in the black side bars where there's room, or over the game
 | interact (beam up/down, a tank, the directory) | **INTERACT** (a hand) shows up whenever the game shows a prompt |
 | log, map, guide, help, mute, pause, settings | **MENU** (top corner) opens a panel with all of them |
 
+Every other screen works by tapping its own buttons, and:
+
+- **The map:** a tap anywhere (or the X button) closes it.
+- **The building:** an eye button beside the hand shows the whole building (the V key) and back.
+- **The log:** drag a list with a finger to scroll it (the wheel's job). A tap selects a card; tapping
+  the selected card again (without dragging) opens its page.
+- **The Guide:** swipe sideways across the book to turn the page (or the < > buttons).
+- **Settings:** the volume bars can be dragged as well as tapped.
+- **The tank screen:** tap the stars for the "what's helping / missing" box (it stays until your next
+  tap); tap a tray item, then the water, to place it; tap a placed piece for FLIP / LAYER / PUT BACK /
+  REMOVE (right-click's job); tap a creature for its card. FEED, UNDO, CLEAR, TANKS, PHOTO, LOG, BACK
+  and the < > tank switches are all buttons. Photo mode has buttons for every toggle, SNAP and EXIT.
+- **Small buttons are easier to hit:** a tap that misses a button by up to `touch.snapPx` (14 screen
+  px) counts as on the nearest one, so two buttons never share a tap. They look the same, and a mouse
+  is unaffected. (Taps in the tank's water are never moved.)
+- **Wording:** any text with a touch version in `data/lang/` (the key name plus `.touch`, like
+  `map.legend.touch`) uses it while touch controls are on, so screen hints say TAP instead of naming
+  keys ("TAP TO CLOSE", "FLIP" instead of "FLIP (X)").
+
 Keyboard and mouse keep working at the same time. **SWAP SIDES** (same settings tab) puts the
 joystick on the right and the buttons on the left. The controls fade when you haven't touched them
 for a few seconds. Sizes, positions, fading and the joystick's feel are in `AQ.TUNING.touch`. To try

@@ -48,6 +48,15 @@ AQ.Guide = (function () {
     if (I.rawPressed('Escape') || AQ.Keys.pressed('guide')) { G.close(game); return; }
     if (I.rawPressed('ArrowLeft', 'KeyA')) turn(-1);
     if (I.rawPressed('ArrowRight', 'KeyD')) turn(1);
+    // touch: swipe sideways across the book to turn the page (left = next, like a real page)
+    if (AQ.Touch && AQ.Touch.active()) {
+      if (m.pressed[0] && !G.hover) G.swipe = { x: m.x, y: m.y };
+      if (G.swipe && m.released[0]) {
+        const dx = m.x - G.swipe.x, dy = m.y - G.swipe.y;
+        if (Math.abs(dx) >= AQ.Touch.toGamePx(AQ.TUNING.touch.swipePx) && Math.abs(dx) > Math.abs(dy) * 1.5) turn(dx < 0 ? 1 : -1);
+        G.swipe = null;
+      }
+    }
     if (m.pressed[0] && G.hover) {
       if (G.hover.id === 'prev') turn(-1);
       else if (G.hover.id === 'next') turn(1);

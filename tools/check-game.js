@@ -64,7 +64,9 @@ function keyCheck() {
     // 3) keys built in code from a prefix: `creature.${id}.name`, or marked LANG_PREFIX: 'sfx.'
     for (const m of src.matchAll(/`([a-z][a-zA-Z0-9_]*\.(?:[a-zA-Z0-9_]+\.)*)\$\{/g)) prefixes.add(m[1]);
   }
-  const unused = keys.filter((k) => !used.has(k) && ![...prefixes].some((p) => k.startsWith(p)));
+  const usedKey = (k) => used.has(k) || [...prefixes].some((p) => k.startsWith(p));
+  // a touch version (`<key>.touch`, src/lang.js) is used wherever its key is
+  const unused = keys.filter((k) => !usedKey(k) && !(k.endsWith('.touch') && usedKey(k.slice(0, -6))));
   console.log(`\nLanguage keys: ${keys.length} in en.js (${used.size} used by name, the rest through ${prefixes.size} key prefixes built in code).`);
   if (missing.length) { console.log(`MISSING from en.js (${missing.length}):`); missing.forEach((m) => console.log('  ' + m)); }
   else console.log('Every key used in the code exists in en.js.');

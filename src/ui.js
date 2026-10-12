@@ -239,7 +239,23 @@ AQ.LogUI = (function () {
     }
     L.ui = layout();
     L.hover = L.ui.find((r) => m.x >= r.x && m.y >= r.y && m.x < r.x + r.w && m.y < r.y + r.h && (!r.clip || (m.y >= r.clip.y0 && m.y < r.clip.y1)));
-    const moved = m.x !== L.mx || m.y !== L.my || m.pressed[0];   // the mouse only takes over when it moves
+    // touch: drag a list with a finger to scroll it (instead of the wheel); a tap still selects
+    const touch = AQ.Touch && AQ.Touch.active();
+    if (touch) {
+      const key = L.tab === 'species' ? 'scroll' : L.tab === 'variants' ? 'vscroll' : 'nscroll';
+      if (m.pressed[0] && !(L.hover && /^(tab|prev|next|dot|up|down|close)$/.test(L.hover.id))) L.drag = { y: m.y, s: L[key], on: false };
+      if (L.drag && m.down[0]) {
+        const dy = m.y - L.drag.y;
+        if (!L.drag.on && Math.abs(dy) >= AQ.Touch.toGamePx(AQ.TUNING.touch.dragScrollPx)) { L.drag.on = true; L.pendingOpen = null; }
+        if (L.drag.on) {
+          const rows = L.tab === 'species' ? rowsOf(entries(biomes()[L.biomeIdx])) : L.tab === 'variants' ? variantRows() : noteRows();
+          L[key] = U.clamp(L.drag.s - dy, 0, maxScroll(rows, L.tab === 'species' ? VIEW_H : L.tab === 'variants' ? VVIEW_H : NVIEW_H));
+          L[key === 'scroll' ? 'sy' : key === 'vscroll' ? 'vsy' : 'nsy'] = L[key];   // the list follows the finger exactly
+        }
+      }
+    }
+    const dragging = !!(L.drag && L.drag.on);
+    const moved = !dragging && (m.x !== L.mx || m.y !== L.my || m.pressed[0]);   // the mouse only takes over when it moves
     const moved2 = L.hover && L.hover.id === 'cell' && L.hover.i !== L.sel;   // this click is only selecting it
     if (L.hover && moved && L.hover.id === 'cell') L.sel = L.hover.i;
     if (L.hover && moved && L.hover.id === 'vcell') L.vsel = L.hover.i;
@@ -248,7 +264,7 @@ AQ.LogUI = (function () {
     if (m.pressed[0] && L.hover) {
       const h = L.hover;
       if (h.id === 'tab') setTab(h.tab);
-      if (h.id === 'cell' && h.i === L.sel && !moved2) openEntry(h.d);            // click the selected one again: its entry page
+      if (h.id === 'cell' && h.i === L.sel && !moved2) { if (touch) L.pendingOpen = h.d; else openEntry(h.d); }   // click the selected one again: its entry page (touch: when the finger lifts without dragging)
       if (h.id === 'prev') setBiome(-1);
       if (h.id === 'next') setBiome(1);
       if (h.id === 'dot' && h.k !== L.biomeIdx) setBiome(h.k - L.biomeIdx);
@@ -257,6 +273,8 @@ AQ.LogUI = (function () {
       if (h.id === 'down') L[k] += 30;                                  // clamped by layout()
       if (h.id === 'close') L.close(game);
     }
+    // touch: the finger lifted (after the press above, in case both came in one frame)
+    if (touch && m.released[0]) { if (L.pendingOpen && !dragging && L.ui) openEntry(L.pendingOpen); L.pendingOpen = null; L.drag = null; }
   };
 
   // ---------------------------------------------------------------- drawing helpers

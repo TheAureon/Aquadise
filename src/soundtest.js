@@ -89,8 +89,11 @@ AQ.SoundUI = (function () {
     S.hover = S.ui.find((r) => !r.text && m.x >= r.x && m.y >= r.y && m.x < r.x + r.w && m.y < r.y + r.h);
     if (S.hover && (m.x !== S.mx || m.y !== S.my)) S.sel = Math.max(0, ord.indexOf(S.hover.row));
     S.mx = m.x; S.my = m.y;
+    // a volume bar can be dragged too (handy with a finger)
+    if (S.barDrag && m.down[0]) { const r = S.ui.find((u) => u.id === S.barDrag); if (r) { const v = Math.round(AQ.U.clamp((m.x - r.x + 3) / r.w, 0, 1) * 10) / 10; if (v !== A.settings()[r.row]) { A.setVolume(r.row, v); A.play('menu_move'); } } }
+    else S.barDrag = null;
     if (m.pressed[0] && S.hover) {
-      if (S.hover.bar != null) { A.setVolume(S.hover.row, (m.x - S.hover.x + 3) / S.hover.w); A.play('menu_move'); }
+      if (S.hover.bar != null) { A.setVolume(S.hover.row, (m.x - S.hover.x + 3) / S.hover.w); A.play('menu_move'); S.barDrag = S.hover.id; }
       else activate(S.hover.id, game, onBack, onTest);
     } else if (I.rawPressed('Enter', 'Space')) {
       const row = ord[S.sel];

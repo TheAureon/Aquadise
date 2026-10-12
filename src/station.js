@@ -297,7 +297,8 @@ AQ.Station = (function () {
     if (St.mode === 'walk' && !AQ.Transition.active) {
       const F = AQ.Font, txt = AQ.t(St.zoomedOut() ? 'station.followRobot' : 'station.seeAll', { key: AQ.Keys.name('stationView') });
       const helpOn = AQ.HUD.showHelp && AQ.HUD.helpT > 0;              // above the controls hint while it's showing
-      ctx.globalAlpha = 0.75; F.draw(ctx, txt, 316, helpOn ? 158 : 172, '#cfe8ff', { align: 'right', shadow: 'rgba(4,12,24,0.85)' }); ctx.globalAlpha = 1;
+      const touch = AQ.Touch && AQ.Touch.active();                     // (touch: centred, clear of the on-screen buttons in the corners)
+      ctx.globalAlpha = 0.75; F.draw(ctx, txt, touch ? 160 : 316, helpOn ? 158 : 172, '#cfe8ff', { align: touch ? 'center' : 'right', shadow: 'rgba(4,12,24,0.85)', max: touch ? 180 : 312 }); ctx.globalAlpha = 1;
     }
   };
   function drawPrompt(ctx, P, left, top, z) {
