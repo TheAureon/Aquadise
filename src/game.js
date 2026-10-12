@@ -171,7 +171,7 @@ AQ.Game = (function () {
     if (G.state === 'aquarium' || (G.state === 'log' && AQ.LogUI.from === 'aquarium')) {
       AQ.Aquarium.draw(ctx, G);
       if (G.state === 'log') AQ.LogUI.draw(ctx, G);
-      else if (AQ.Tips) AQ.Tips.draw(ctx, G);
+      else { if (AQ.Tips) AQ.Tips.draw(ctx, G); if (AQ.Badges) AQ.Badges.drawToast(ctx, G); }
       return;
     }
     const title = G.state === 'title' || (G.state === 'log' && AQ.LogUI.from === 'title') || (G.state === 'guide' && AQ.Guide.from === 'title');
@@ -218,6 +218,7 @@ AQ.Game = (function () {
     if (G.state === 'play' && AQ.Tips) AQ.Tips.draw(ctx, G);
     if (G.state === 'play' && AQ.Dive) AQ.Dive.draw(ctx, G);
     if (G.state === 'play' && AQ.Nudges) AQ.Nudges.draw(ctx, G);
+    if (AQ.Badges) AQ.Badges.drawToast(ctx, G);                         // a badge's toast (it waits while anything is in the way)
     if (G.state === 'map') AQ.MapUI.draw(ctx, G);
     if (G.state === 'log') AQ.LogUI.draw(ctx, G);
     if (G.state === 'pause') AQ.PauseUI.draw(ctx, G);

@@ -144,6 +144,8 @@ const SCREENS = [
   ['log-entry', () => { AQ.LogUI.entry = AQ.data.creatures.find((d) => d.id === 'bladefin_perch'); }],
   ['log-variants', () => { AQ.LogUI.entry = null; AQ.LogUI.tab = 'variants'; }],
   ['log-notes', () => { AQ.LogUI.tab = 'notes'; }],
+  ['log-badges', () => { AQ.LogUI.tab = 'badges'; ['first_catch', 'collector', 'enthusiastic'].forEach((id) => { AQ.State.badges.earned[id] = { tier: id === 'collector' ? 2 : 1, at: [new Date().toISOString(), new Date().toISOString()] }; }); }],
+  ['badge-toast', () => { AQ.LogUI.close(AQ.Game); AQ.Game.state = 'play'; AQ.Badges.cur = { b: AQ.data.badges.find((b) => b.id === 'collector'), tier: 2, kind: 'badge_big', t: 1, life: 4 }; }],
   ['GUIDE', null],                                       // every guide page (expanded below)
   ['touch-controls', () => { const G = AQ.Game; AQ.State.settings.touchControls = 'on'; AQ.Touch.refresh(); G.state = 'play'; AQ.Scenes.restore(G, 'world', 300, 80); }],
   ['touch-menu', () => { AQ.Touch.menuOpen = true; }],

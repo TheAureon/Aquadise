@@ -99,11 +99,14 @@ AQ.Badges = (function () {
   // the progress toward the next tier (or the last one, when complete); null for plain event badges
   B.progress = function (b) {
     const c = b.cond;
-    if (c.event && !c.also) return null;
-    const cond = c.event ? c.also : c, tiers = c.event ? [{ target: c.also.target }] : B.tiers(b);
-    const k = Math.min(B.tier(b.id), tiers.length - 1);
-    return progressOf(cond, tiers[k].target);
+    if (c.event) return null;                                         // (an event either happened or not: no bar)
+    const tiers = B.tiers(b), k = Math.min(B.tier(b.id), tiers.length - 1);
+    return progressOf(c, tiers[k].target);
   };
+  // earned (or a new tier) but not looked at yet in the log's BADGES tab: the NEW dot (saved)
+  B.unseen = () => list().filter((b) => B.tier(b.id) > (S().seen[b.id] || 0)).length;
+  B.isNew = (id) => B.tier(id) > (S().seen[id] || 0);
+  B.markSeen = () => { let ch = false; for (const b of list()) { const t = B.tier(b.id); if (t > (S().seen[b.id] || 0)) { S().seen[b.id] = t; ch = true; } } if (ch) AQ.Save && AQ.Save.dirty(); };
   B.count = () => ({ earned: list().filter((b) => B.earned(b.id)).length, total: list().length });
 
   // ---------------------------------------------------------------- awarding
@@ -119,9 +122,82 @@ AQ.Badges = (function () {
     if (!silent) B.announce(b, tier, from);
     return true;
   }
-  // a new badge (or tier) to show: src/achievements.js stage 2 queues these as toasts with a chime
-  B.announce = function (b, tier) {
-    if (AQ.HUD) AQ.HUD.toast(AQ.t('badge.toast', { name: B.name(b, tier) }), '#ffe36b', 4);
+  // ---------------------------------------------------------------- the toast + chime queue
+  // A new badge (or tier) waits in a queue; one toast at a time with a short gap, each with its chime
+  // (a bigger one for a higher tier or Aquadise, a hushed one for a hidden badge). Three or more waiting
+  // at once become one summary ("3 new badges!"). Nothing shows during a scene change, in photo mode or
+  // while a menu or dialog is open: they wait until it's free.
+  B.queue = []; B.cur = null; B.gap = 0;
+  const chimeOf = (b, tier) => (b.hidden ? 'badge_hidden' : (tier > 1 || b.id === 'aquadise') ? 'badge_big' : 'badge');
+  B.announce = function (b, tier) { B.queue.push({ b, tier, kind: chimeOf(b, tier) }); };
+  function free(game) {
+    if (!game || (game.state !== 'play' && game.state !== 'aquarium')) return false;
+    if (AQ.Transition && AQ.Transition.active) return false;
+    if (AQ.Redo && AQ.Redo.dialog) return false;
+    if (AQ.Touch && AQ.Touch.menuOpen) return false;
+    const A = AQ.Aquarium;
+    if (game.state === 'aquarium' && A && (A.photo.on || A.dialog)) return false;
+    return true;
+  }
+  B.toastFree = free;
+  function updateToasts(dt, game) {
+    const c = cfg();
+    if (!free(game)) return;                                          // (a toast up when a menu opens waits too)
+    if (B.cur) { B.cur.t += dt; if (B.cur.t >= B.cur.life) { B.cur = null; B.gap = c.toastGap; } return; }
+    B.gap -= dt;
+    if (B.gap > 0 || !B.queue.length) return;
+    if (B.queue.length >= c.summaryAt) {
+      const n = B.queue.length, big = B.queue.some((q) => q.kind === 'badge_big');
+      B.cur = { summary: n, kind: big ? 'badge_big' : 'badge', t: 0, life: c.toastSeconds };
+      B.queue.length = 0;
+    } else B.cur = Object.assign(B.queue.shift(), { t: 0, life: c.toastSeconds });
+    AQ.Audio.play(B.cur.kind);
+    if (AQ.Tips) AQ.Tips.event('badge');
+  }
+  // the toast box: centred, under the tip box and above the HUD toasts (y = badges.toastY)
+  B.drawToastBox = function (g, q, y) {
+    const F = AQ.Font, text = q.summary ? AQ.t('badge.summary', { n: q.summary }) : AQ.t('badge.toast', { name: B.name(q.b, q.tier) });
+    const w = Math.min(300, F.width(text) + 26), x = Math.round(160 - w / 2), h = 16;
+    const a = Math.max(0, Math.min(1, q.t * 5, (q.life - q.t) * 2.5));
+    g.save(); g.globalAlpha = a;
+    g.fillStyle = 'rgba(6,18,34,0.94)'; g.fillRect(x, y, w, h);
+    g.fillStyle = q.kind === 'badge_hidden' ? '#c9a8ff' : '#ffd25a'; g.fillRect(x, y, w, 1);
+    g.fillStyle = 'rgba(255,210,90,0.25)'; g.fillRect(x, y + h - 1, w, 1);
+    if (q.summary) B.drawIcon(g, { id: '_', icon: 'crown', group: 'final' }, x + 10, y + 8, true);
+    else B.drawIcon(g, q.b, x + 10, y + 8, true, q.tier);
+    F.draw(g, text, x + 19, y + 5, q.kind === 'badge_big' ? '#ffe9a8' : '#fff6dc', { shadow: false, max: w - 23 });
+    // a few sparkles around it (REDUCE FLASHING: still, softer ones)
+    const calm = AQ.U.calm(), tt = performance.now() / 1000;
+    for (let i = 0; i < 4; i++) {
+      const on = calm || Math.floor(tt * 4 + i * 1.7) % 3 === 0;
+      if (!on) continue;
+      g.globalAlpha = a * (calm ? 0.35 : 0.9);
+      g.fillStyle = '#fff6c8';
+      const sx = i % 2 ? x + w + 2 : x - 3, sy = y + 2 + (i < 2 ? 0 : 10);
+      g.fillRect(sx, sy, 1, 1); if (!calm) { g.fillRect(sx - 1, sy + 1, 3, 1); g.fillRect(sx, sy + 2, 1, 1); }
+    }
+    g.restore();
+  };
+  B.drawToast = function (g, game) {
+    if (!B.cur || !free(game)) return;
+    B.drawToastBox(g, B.cur, cfg().toastY);
+  };
+
+  // ---------------------------------------------------------------- icons
+  // A badge's icon: the sprite 'badge.<icon>' (frame by tier mark), or a simple plaque in its group's
+  // colour while there's no art. shown false: a dark silhouette (not earned yet).
+  const GROUP_COL = { first: '#7ef0c0', collect: '#9fd8ff', aquarium: '#ff9fc0', breed: '#ffc890', explore: '#ffe36b', sky: '#c9a8ff', skill: '#a8f0ff', final: '#ffd25a' };
+  B.TIER_COL = ['#c98a4a', '#cfd8e0', '#ffd25a', '#9ff3ff'];          // bronze, silver, gold, (a 4th tier) pale gem
+  B.groupCol = (g) => GROUP_COL[g] || '#ffd25a';
+  B.drawIcon = function (g, b, cx, cy, shown, tier) {
+    const key = 'badge.' + b.icon, e = AQ.Assets && AQ.Assets.entry(key);
+    if (e) { AQ.Assets.draw(g, key, 'idle', cx, cy, { frame: shown ? 0 : 1 }); }
+    else {
+      g.fillStyle = shown ? '#2a2414' : '#0f1d2b'; g.fillRect(cx - 5, cy - 5, 11, 11);
+      g.fillStyle = shown ? B.groupCol(b.group) : '#1d3446'; g.fillRect(cx - 4, cy - 4, 9, 9);
+      g.fillStyle = shown ? '#fff6dc' : '#27455c'; g.fillRect(cx - 1, cy - 2, 3, 5);
+    }
+    if (shown && b.tiers && tier) { g.fillStyle = B.TIER_COL[Math.min(tier, 4) - 1]; g.fillRect(cx + 3, cy + 3, 3, 3); }   // the tier mark
   };
   // check a counter or computed badge now (and its tiers)
   function evaluate(b, silent) {
@@ -219,6 +295,7 @@ AQ.Badges = (function () {
   B.update = function (dt, game) {
     debugKeys(game);
     if (!game || game.state === 'title' || game.state === 'loading') return;
+    updateToasts(dt, game);
     // the one-time "welcome back" (once you're actually playing)
     if (B.pendingWelcome && game.state === 'play' && !(AQ.Transition && AQ.Transition.active)) {
       if (AQ.HUD) AQ.HUD.toast(AQ.t('badge.welcomeBack', { n: B.pendingWelcome }), '#ffe36b', 6);
@@ -248,8 +325,8 @@ AQ.Badges = (function () {
       const b = list().find((x) => B.tier(x.id) < B.maxTier(x));
       if (b) award(b, B.tier(b.id) + 1, false); else if (AQ.HUD) AQ.HUD.toast(AQ.t('debug.badgesAll'), '#cfe8ff');
     }
-    if (I.wasPressed(d.badgeAllKey)) { list().forEach((b) => award(b, B.maxTier(b), true)); B.announceMany && B.announceMany(list().length); if (AQ.HUD) AQ.HUD.toast(AQ.t('debug.badgesAwarded'), '#cfe8ff'); }
-    if (I.wasPressed(d.badgeResetKey)) { const keep = { counters: S().counters, sets: S().sets }; AQ.State.badges = Object.assign(fresh(), keep); if (AQ.HUD) AQ.HUD.toast(AQ.t('debug.badgesReset'), '#cfe8ff'); B.t = cfg().checkSeconds; }
+    if (I.wasPressed(d.badgeAllKey)) { list().forEach((b) => award(b, B.maxTier(b), false)); if (AQ.HUD) AQ.HUD.toast(AQ.t('debug.badgesAwarded'), '#cfe8ff'); }   // (a summary toast)
+    if (I.wasPressed(d.badgeResetKey)) { const keep = { counters: S().counters, sets: S().sets }; AQ.State.badges = Object.assign(fresh(), keep); B.queue.length = 0; B.cur = null; if (AQ.HUD) AQ.HUD.toast(AQ.t('debug.badgesReset'), '#cfe8ff'); B.t = cfg().checkSeconds; }
     if (I.wasPressed(d.badgeOverlayKey)) B.overlay = !B.overlay;
   }
   // the counters overlay (testing only)

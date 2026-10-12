@@ -127,7 +127,8 @@ AQ.SoundTest = (function () {
   const T = { tab: 0, sel: 0, ui: [], from: 'title' };
   // (the hydrophone's sounds have their own tab: they're sfx with group 'hydro', and playing one also shows
   // the ripple the game draws for it, since every hydrophone sound is also seen)
-  const TABS = [['sfx', 'soundtest.effects'], ['amb', 'soundtest.ambience'], ['music', 'soundtest.music'], ['hydro', 'soundtest.hydro']];
+  const TABS = [['sfx', 'soundtest.effects'], ['amb', 'soundtest.ambience'], ['music', 'soundtest.music'], ['hydro', 'soundtest.hydro'], ['badges', 'soundtest.badges']];
+  const OWN_TAB = ['hydro', 'badges'];                             // sfx groups with a tab of their own
   const PREV = { x: 160, y: 126 };                                 // where the ripple preview plays (hydrophone tab)
   T.ripples = []; T.pulses = [];
   const COLS = 4, CW = 76, CH = 8, STEP = 9, X0 = 8, Y0 = 28;
@@ -139,7 +140,7 @@ AQ.SoundTest = (function () {
   function items() {
     const kind = TABS[T.tab][0];
     if (kind === 'music') return AQ.Music.catalog().map((p) => ({ id: p.id, label: p.label, stinger: p.stinger, key: 'music:' + p.id.split(':')[0] }));
-    const list = kind === 'hydro' ? A.list('sfx').filter((s) => s.group === 'hydro') : A.list(kind).filter((s) => kind !== 'sfx' || s.group !== 'hydro');
+    const list = OWN_TAB.indexOf(kind) >= 0 ? A.list('sfx').filter((s) => s.group === kind) : A.list(kind).filter((s) => kind !== 'sfx' || OWN_TAB.indexOf(s.group) < 0);
     if (kind === 'sfx') {
       const order = [];
       list.forEach((s) => { if (order.indexOf(s.group) < 0) order.push(s.group); });
@@ -148,7 +149,7 @@ AQ.SoundTest = (function () {
     return list.map((s) => ({ id: kind === 'amb' ? s.bed : s.id, label: s.label, key: s.id, ripple: s.ripple }));
   }
   function layout() {
-    const ui = TABS.map(([, name], i) => ({ id: 'tab', i, x: 52 + i * 54, y: 14, w: 52, h: 10, label: AQ.t(name), on: i === T.tab }));
+    const ui = TABS.map(([, name], i) => ({ id: 'tab', i, x: 8 + i * 61, y: 14, w: 59, h: 10, label: AQ.t(name), on: i === T.tab }));
     ui.push({ id: 'back', x: 270, y: 2, w: 46, h: 10, label: AQ.t('ui.back') });
     items().forEach((it, i) => ui.push({ id: 'item', i, it, x: X0 + (i % COLS) * (CW + 2), y: Y0 + Math.floor(i / COLS) * STEP, w: CW, h: CH, label: it.label }));
     return ui;
@@ -158,6 +159,7 @@ AQ.SoundTest = (function () {
     const kind = TABS[T.tab][0];
     if (kind === 'sfx') A.play(it.id, { important: true });
     else if (kind === 'hydro') { A.play(it.id, { important: true }); preview(it); }
+    else if (kind === 'badges') { A.play(it.id, { important: true }); T.toastPreview = { id: it.id, t: 0 }; }   // with the toast it plays under
     else if (kind === 'amb') AQ.Ambience.test = AQ.Ambience.test === it.id ? null : it.id;
     else if (it.stinger) AQ.Music.stinger(it.id);
     else AQ.Music.test = AQ.Music.test === it.id ? null : it.id;
@@ -221,6 +223,11 @@ AQ.SoundTest = (function () {
       F().draw(g, (on ? '> ' : '') + r.label, r.x + 3, r.y + 1, on ? '#ffffff' : '#c3dfec', { shadow: false, max: r.w - 4 });
     }
     const kind = TABS[T.tab][0];
+    if (kind === 'badges' && T.toastPreview && AQ.Badges) {        // the toast this chime plays under
+      F().draw(g, AQ.t('soundtest.ripple'), 160, 92, '#5f7f96', { align: 'center', max: 300 });
+      const id = T.toastPreview.id, b = AQ.data.badges.find((x) => x.id === (id === 'badge_hidden' ? 'second_chances' : id === 'badge_big' ? 'aquadise' : 'sneaky_steps'));
+      AQ.Badges.drawToastBox(g, { b, tier: 1, kind: id, t: 1, life: 4 }, 110);
+    }
     if (kind === 'hydro') {                                       // the ripple preview: what the game shows for the sound
       F().draw(g, AQ.t('soundtest.ripple'), PREV.x, PREV.y - 34, '#5f7f96', { align: 'center', max: 300 });
       for (const p of T.pulses) AQ.Hydro.drawEdgePulse(g, p);
@@ -231,7 +238,7 @@ AQ.SoundTest = (function () {
       }
     }
     // (the font has no '_': ids show it as a space, as they always looked)
-    if (cur) F().draw(g, AQ.t(`soundtest.info.${kind === 'sfx' || kind === 'hydro' ? 'sfx' : kind === 'amb' ? 'amb' : cur.stinger ? 'stinger' : 'music'}`, { id: cur.key.replace(/_/g, ' '), rec: A.hasRecording(cur.key) ? AQ.t('soundtest.recording') : '' }), 8, 162, '#8fb6cc');
+    if (cur) F().draw(g, AQ.t(`soundtest.info.${kind === 'sfx' || OWN_TAB.indexOf(kind) >= 0 ? 'sfx' : kind === 'amb' ? 'amb' : cur.stinger ? 'stinger' : 'music'}`, { id: cur.key.replace(/_/g, ' '), rec: A.hasRecording(cur.key) ? AQ.t('soundtest.recording') : '' }), 8, 162, '#8fb6cc');
     F().draw(g, AQ.t('soundtest.footer'), 160, 172, '#5f7f96', { align: 'center' });
   };
   return T;

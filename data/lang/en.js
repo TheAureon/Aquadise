@@ -91,6 +91,7 @@ AQ.langFiles.en = {
   'soundtest.ambience': 'AMBIENCE',
   'soundtest.music': 'MUSIC',
   'soundtest.hydro': 'HYDROPHONE',   // the hydrophone's sounds (each also shows its ripple)
+  'soundtest.badges': 'BADGES',   // the badge chimes (each plays with its toast)
   'soundtest.ripple': 'WHAT YOU SEE IN THE GAME:',   // over the ripple preview on the HYDROPHONE tab
   'soundtest.title': 'SOUND TEST',
   'soundtest.muted': 'MUTED - PRESS {key}',
@@ -273,6 +274,7 @@ AQ.langFiles.en = {
   'tip.bumped': 'Just a bump! Nothing in the sea can hurt you. Some creatures only nudge you back a little.',
   'tip.panes': 'Glass panes! Every chest holds a few. They are for building: on a tank\'s TANK tab, EXPAND makes it bigger. Your count is in the top right corner.',
   'tip.tankTab': 'The TANK tab: EXPAND makes this tank bigger with glass panes, ONE PAIR EACH shows one ♂ and one ♀ of every species, and RELEASE EXTRAS returns spare ones to the sea (it always asks).',
+  'tip.badge': 'A badge! Badges are little keepsakes for things you have done. See them all in your log, on the BADGES tab.',
   'tip.hydro': 'A HYDROPHONE! Some creatures hide and call now and then: a ripple shows where. Hold {k:listen} to listen.',
   'tip.hydro.touch': 'A HYDROPHONE! Some creatures hide and call now and then: a ripple shows where. Hold the ear button to listen.',
   'tip.heard': 'A call! Something hidden is nearby, right about where the ripple was. A better hydrophone hears further.',
@@ -1776,6 +1778,9 @@ AQ.langFiles.en = {
   'log.tab.species': 'SPECIES',
   'log.tab.variants': 'VARIANTS',
   'log.tab.notes': 'NOTES',
+  'log.tab.badges': 'BADGES',
+  'log.badgesCount': 'BADGES {n}/{total}',
+  'log.badges.intro': 'KEEPSAKES FOR THINGS YOU HAVE DONE',
   'log.title': 'COLLECTION LOG',
   'log.bottles': 'BOTTLES FOUND {n}/{total}',
   'log.done': 'DONE',
@@ -1911,6 +1916,9 @@ AQ.langFiles.en = {
   'sfx.listen_on': 'LISTEN START',
   'sfx.listen_off': 'LISTEN STOP',
   'sfx.call_test': 'TEST CALL',
+  'sfx.badge': 'BADGE CHIME',
+  'sfx.badge_big': 'BIG BADGE CHIME',
+  'sfx.badge_hidden': 'SECRET BADGE CHIME',
   'sfx.call_chime': 'CHIME SHRIMP',
   'sfx.call_chirrup': 'CHIRRUP FROG',
   'sfx.call_hum': 'HOLLOW PIPER',
@@ -1981,6 +1989,16 @@ AQ.langFiles.en = {
   // ---------------------------------------------------------------- badges (data/achievements.js, src/achievements.js)
   // keep names to about 18 characters and descriptions to two short lines; {n} = the target
   'badge.toast': 'BADGE: {name}',
+  'badge.secretName': 'A SECRET BADGE',
+  'badge.secretShort': 'A SECRET',
+  'badge.secretDesc': 'This one is a secret. You will know it when it happens.',
+  'badge.earnedOn': 'EARNED {date}',
+  'badge.progressText': '{n}/{total}',
+  'badge.earned': 'EARNED',
+  'badge.maxTier': 'TOP TIER',
+  'badge.notYet': 'NOT YET',
+  'badge.new': 'NEW',
+  'badge.summary': { one: '{n} new badge!', other: '{n} new badges!' },
   'badge.tierName': '{name} {tier}',   // a tiered badge's level: {tier} = I, II, III, IV
   'badge.welcomeBack': { one: 'Welcome back! You\'ve already earned {n} badge.', other: 'Welcome back! You\'ve already earned {n} badges.' },
   'badge.group.first': 'First Steps',

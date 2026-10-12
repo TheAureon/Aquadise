@@ -102,7 +102,11 @@ AQ.TUNING = {
     deepestY: 1276,           // world y of "the deepest point" (the trench's very bottom; DEEP 3 reaches it)
     vibingSeconds: 300,       // Just Vibing: this long on one tank screen
     happyTankMin: 5,          // Happy Little Tank: at least this many creatures, all happy at once
-    happyCheckSeconds: 2      // ...checked this often while a tank is open
+    happyCheckSeconds: 2,     // ...checked this often while a tank is open
+    toastSeconds: 4,          // a badge's toast stays this long...
+    toastGap: 0.6,            // ...with this gap before the next one
+    summaryAt: 3,             // this many waiting at once become one "3 new badges!" toast
+    toastY: 118               // where the badge toast sits (game px from the top: under the tip box, above the HUD toasts)
   },
 
   bait: { lifetime: 22, sinkSpeed: 7, lureRadius: 95 },

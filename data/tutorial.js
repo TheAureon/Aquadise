@@ -67,6 +67,7 @@ AQ.data.tutorial = {
     { id: 'panes', on: ['panes'], where: 'any', needs: 'Panes', known: ['panes'], icon: 'ui.pane' },
     { id: 'wideTank', on: ['wideTank'], where: 'tank', icon: 'ui.pane' },
     { id: 'tankTab', on: ['tankTab'], where: 'tank', icon: 'ui:3' },
+    { id: 'badge', on: ['badge'], where: 'any', needs: 'Badges', known: ['badge'], icon: 'ui:2' },
     { id: 'hydro', on: ['hydro'], where: 'play', needs: 'Hydro', known: ['hydro'], icon: 'ui.touch:12' },
     { id: 'heard', on: ['heard'], where: 'play', needs: 'Hydro', known: ['hydro'], icon: 'ui.touch:12' }
   ]

@@ -272,6 +272,22 @@ var AQ = (typeof AQ !== 'undefined') ? AQ : {};
     return 0.7;
   }, { minGap: 0.6, ripple: { big: true, edge: true } });
 
+  // ---------------------------------------------------------------- badges (src/achievements.js; their own Sound Test tab)
+  // a badge: a soft, bright three-note chime (rising, like a little "ta-da")
+  reg('badge', 'badges', (c, o, t) => run(c, o, t, [79, 84, 88], 0.09, 0.05, 0.8) + 0.1, { minGap: 0.6, important: true });
+  // a higher tier or the Aquadise badge: the same, bigger (a fourth note, a warm pad and a sparkle)
+  reg('badge_big', 'badges', (c, o, t) => {
+    [m(67), m(72), m(76)].forEach((f) => H.tone(c, o, t, { f, a: 0.15, d: 1.4, v: 0.025, type: 'triangle', lp: 2000 }));
+    const d = run(c, o, t, [79, 84, 88, 91], 0.1, 0.055, 1.0);
+    for (let i = 0; i < 4; i++) H.bell(c, o, t + 0.45 + i * 0.06, m(96 + i * 2), 0.018, 0.4);
+    return d + 0.3;
+  }, { minGap: 0.6, important: true });
+  // a hidden badge: a hushed, breathy version, a little lower
+  reg('badge_hidden', 'badges', (c, o, t) => {
+    H.noise(c, o, t, { ft: 'lowpass', f: 900, a: 0.2, d: 0.6, v: 0.02 });
+    return run(c, o, t + 0.05, [74, 79, 83], 0.13, 0.03, 1.0) + 0.1;
+  }, { minGap: 0.6, important: true });
+
   // ---------------------------------------------------------------- aquarium
   // EXPAND: soft glass panes set into place (muted taps) and a warm rising shimmer as the tank grows
   reg('build', 'aquarium', (c, o, t) => {

@@ -3,14 +3,15 @@ var AQ = (typeof AQ !== 'undefined') ? AQ : {};
 
 AQ.LogUI = (function () {
   const U = AQ.U, F = () => AQ.Font;
-  const L = { from: 'play', tab: 'species', biomeIdx: 0, sel: 0, scroll: 0, vsel: 0, vscroll: 0, nsel: 0, nscroll: 0, entry: null, ui: [],
-    sy: 0, vsy: 0, nsy: 0 };   // scroll / vscroll / nscroll: target offsets in px; sy / vsy / nsy: the eased offsets drawn
-  const TABS = [['species', 'log.tab.species', 42], ['variants', 'log.tab.variants', 46], ['notes', 'log.tab.notes', 34]];
+  const L = { from: 'play', tab: 'species', biomeIdx: 0, sel: 0, scroll: 0, vsel: 0, vscroll: 0, nsel: 0, nscroll: 0, bsel: 0, bscroll: 0, entry: null, ui: [],
+    sy: 0, vsy: 0, nsy: 0, bsy: 0, newIds: {} };   // scroll / vscroll / nscroll / bscroll: target offsets in px; sy / vsy / nsy / bsy: the eased offsets drawn
+  const TABS = [['species', 'log.tab.species', 36], ['variants', 'log.tab.variants', 40], ['notes', 'log.tab.notes', 28], ['badges', 'log.tab.badges', 32]];
   // one look for every tab: header bar (title, tabs, bottles, close), a context row, the content, a footer hint
   const C = { bg: '#06101c', bar: '#0b1a2c', line: '#1c3a52', panel: '#0d2236', title: '#ffe9a8', text: '#d8eef8', dim: '#8aa4b8', info: '#9fd3ee', hint: '#4f6f86', good: '#7ef0c0', warn: '#ffcf8a', gold: '#ffd25a' };
   const COLS = 5, CELL_H = 47, HEAD_H = 10, VIEW_H = 94;            // species grid area (y 30..124)
   const VCOLS = 4, VROW_H = 33, VVIEW_H = 110;                      // variants cards area (y 30..140)
   const NROW_H = 10, NVIEW_H = 134;                                  // notes list (left column, y 30..164)
+  const BCOLS = 3, BROW_H = 24, BVIEW_H = 110;                       // badges cards area (y 30..140)
   const WHEEL = 0.3;                                                 // px scrolled per px of wheel / trackpad movement
   const sil = new Map();
   const catLabel = (c) => (AQ.Lang.has(`category.${c}`, 'en') ? AQ.t(`category.${c}`) : c);   // a creature kind (data/lang/ category.<kind>)
@@ -81,6 +82,21 @@ AQ.LogUI = (function () {
     });
     return rows;
   }
+  // rows of the badges list: a heading per group (earned/total), then rows of BCOLS cards. A hidden
+  // badge shows (as "???") among the others; tiers count once.
+  function badgeRows() {
+    const rows = [], B = AQ.Badges;
+    let i = 0;
+    if (!B) return rows;
+    AQ.data.badgeGroups.forEach((grp) => {
+      const list = AQ.data.badges.filter((b) => b.group === grp);
+      if (!list.length) return;
+      rows.push({ type: 'head', h: HEAD_H, label: AQ.t(`badge.group.${grp}`).toUpperCase(), count: `${list.filter((b) => B.earned(b.id)).length}/${list.length}` });
+      for (let k = 0; k < list.length; k += BCOLS) rows.push({ type: 'cells', h: BROW_H, items: list.slice(k, k + BCOLS).map((b) => ({ d: b, i: i++ })) });
+    });
+    return rows;
+  }
+  L.badgeRows = badgeRows;
   // Lists scroll by pixels: the target offset moves in steps (wheel, keys, arrows) and the drawn
   // offset glides after it, so rows slide in and out under a clip instead of jumping.
   const tops = (rows) => { const t = []; let y = 0; rows.forEach((r) => { t.push(y); y += r.h; }); t.push(y); return t; };
@@ -125,14 +141,24 @@ AQ.LogUI = (function () {
     const here = from === 'aquarium' ? AQ.Aquarium.biome : from === 'title' || game.scene !== 'world' ? 'tide_pools' : AQ.World.biomeAt(game.player.x, game.player.y).id;
     L.biomeIdx = Math.max(0, biomes().findIndex((b) => b.id === here));
     L.sel = 0; L.scroll = 0; L.sy = 0; L.entry = null;
+    if (L.tab === 'badges') seeBadges();
   };
+  // the BADGES tab: the cards that are new get a NEW tag while you look; the NEW dots go away
+  function seeBadges() {
+    const B = AQ.Badges; if (!B) return;
+    L.newIds = {};
+    AQ.data.badges.forEach((b) => { if (B.isNew(b.id)) L.newIds[b.id] = true; });
+    B.markSeen();
+  }
+  // open straight on the BADGES tab (the trophy wall)
+  L.openBadges = function (game, from) { L.tab = 'badges'; L.open(game, from); };
   L.close = function (game) {
     AQ.Audio.play('log_close');
     if (AQ.Tips) AQ.Tips.event('logClosed');      // its tip waits until you're back out (no tips inside menus)
     if (L.from === 'title') { AQ.Title.open(game); return; }
     game.state = L.from === 'aquarium' ? 'aquarium' : 'play';
   };
-  function setTab(t) { if (t === L.tab) return; L.tab = t; AQ.Audio.play('page_turn'); }
+  function setTab(t) { if (t === L.tab) return; L.tab = t; AQ.Audio.play('page_turn'); if (t === 'badges') seeBadges(); }
   function openEntry(d) { L.entry = d; AQ.Audio.play('page_turn'); }
   // entry page < >: the previous / next species in this biome; the list's selection follows along
   function stepEntry(k) {
@@ -178,6 +204,15 @@ AQ.LogUI = (function () {
       });
       if (L.vscroll > 0) ui.push({ id: 'up', x: 311, y: 30, w: 8, h: 9, label: '' });
       if (L.vscroll < maxS) ui.push({ id: 'down', x: 311, y: 131, w: 8, h: 9, label: '' });
+    } else if (L.tab === 'badges') {
+      const rows = badgeRows(), maxS = maxScroll(rows, BVIEW_H);
+      L.bscroll = U.clamp(L.bscroll, 0, maxS);
+      placeRows(ui, rows, L.bsy, 30, BVIEW_H, (row, y) => {
+        if (row.type === 'head') ui.push({ id: 'head', x: 8, y, w: 302, h: HEAD_H - 2, label: row.label, count: row.count });
+        else row.items.forEach((it, c) => ui.push({ id: 'bcell', i: it.i, d: it.d, x: 8 + c * 101, y, w: 99, h: BROW_H - 3 }));
+      });
+      if (L.bscroll > 0) ui.push({ id: 'up', x: 311, y: 30, w: 8, h: 9, label: '' });
+      if (L.bscroll < maxS) ui.push({ id: 'down', x: 311, y: 131, w: 8, h: 9, label: '' });
     } else if (L.tab === 'notes') {
       const rows = noteRows(), maxS = maxScroll(rows, NVIEW_H);
       L.nscroll = U.clamp(L.nscroll, 0, maxS);
@@ -196,7 +231,7 @@ AQ.LogUI = (function () {
     const I = AQ.Input, m = I.mouse;
     // the drawn offsets glide toward their targets
     const k = 1 - Math.exp(-dt * 16);
-    for (const [cur, to] of [['sy', 'scroll'], ['vsy', 'vscroll'], ['nsy', 'nscroll']]) {
+    for (const [cur, to] of [['sy', 'scroll'], ['vsy', 'vscroll'], ['nsy', 'nscroll'], ['bsy', 'bscroll']]) {
       L[cur] += (L[to] - L[cur]) * k;
       if (Math.abs(L[to] - L[cur]) < 0.4) L[cur] = L[to];
     }
@@ -231,6 +266,12 @@ AQ.LogUI = (function () {
       if (I.wasPressed('ArrowUp', 'KeyW')) [L.nsel, L.nscroll] = stepRows(rows, L.nsel, L.nscroll, -1, NVIEW_H);
       if (I.wasPressed('ArrowDown', 'KeyS')) [L.nsel, L.nscroll] = stepRows(rows, L.nsel, L.nscroll, 1, NVIEW_H);
       if (m.wheelPx) L.nscroll = U.clamp(L.nscroll + m.wheelPx * WHEEL, 0, maxScroll(rows, NVIEW_H));
+    } else if (L.tab === 'badges') {
+      const rows = badgeRows(), n = rows.reduce((a, r) => a + (r.items ? r.items.length : 0), 0);
+      if (side && n) { L.bsel = U.clamp(L.bsel + side, 0, n - 1); L.bscroll = reveal(rows, L.bsel, L.bscroll, BVIEW_H); }
+      if (I.wasPressed('ArrowUp', 'KeyW')) [L.bsel, L.bscroll] = stepRows(rows, L.bsel, L.bscroll, -1, BVIEW_H);
+      if (I.wasPressed('ArrowDown', 'KeyS')) [L.bsel, L.bscroll] = stepRows(rows, L.bsel, L.bscroll, 1, BVIEW_H);
+      if (m.wheelPx) L.bscroll = U.clamp(L.bscroll + m.wheelPx * WHEEL, 0, maxScroll(rows, BVIEW_H));
     } else if (L.tab === 'variants') {
       const rows = variantRows(), n = rows.reduce((a, r) => a + (r.items ? r.items.length : 0), 0);
       if (side && n) { L.vsel = U.clamp(L.vsel + side, 0, n - 1); L.vscroll = reveal(rows, L.vsel, L.vscroll, VVIEW_H); }
@@ -243,15 +284,15 @@ AQ.LogUI = (function () {
     // touch: drag a list with a finger to scroll it (instead of the wheel); a tap still selects
     const touch = AQ.Touch && AQ.Touch.active();
     if (touch) {
-      const key = L.tab === 'species' ? 'scroll' : L.tab === 'variants' ? 'vscroll' : 'nscroll';
+      const key = L.tab === 'species' ? 'scroll' : L.tab === 'variants' ? 'vscroll' : L.tab === 'badges' ? 'bscroll' : 'nscroll';
       if (m.pressed[0] && !(L.hover && /^(tab|prev|next|dot|up|down|close)$/.test(L.hover.id))) L.drag = { y: m.y, s: L[key], on: false };
       if (L.drag && m.down[0]) {
         const dy = m.y - L.drag.y;
         if (!L.drag.on && Math.abs(dy) >= AQ.Touch.toGamePx(AQ.TUNING.touch.dragScrollPx)) { L.drag.on = true; L.pendingOpen = null; }
         if (L.drag.on) {
-          const rows = L.tab === 'species' ? rowsOf(entries(biomes()[L.biomeIdx])) : L.tab === 'variants' ? variantRows() : noteRows();
-          L[key] = U.clamp(L.drag.s - dy, 0, maxScroll(rows, L.tab === 'species' ? VIEW_H : L.tab === 'variants' ? VVIEW_H : NVIEW_H));
-          L[key === 'scroll' ? 'sy' : key === 'vscroll' ? 'vsy' : 'nsy'] = L[key];   // the list follows the finger exactly
+          const rows = L.tab === 'species' ? rowsOf(entries(biomes()[L.biomeIdx])) : L.tab === 'variants' ? variantRows() : L.tab === 'badges' ? badgeRows() : noteRows();
+          L[key] = U.clamp(L.drag.s - dy, 0, maxScroll(rows, L.tab === 'species' ? VIEW_H : L.tab === 'variants' ? VVIEW_H : L.tab === 'badges' ? BVIEW_H : NVIEW_H));
+          L[{ scroll: 'sy', vscroll: 'vsy', bscroll: 'bsy', nscroll: 'nsy' }[key]] = L[key];   // the list follows the finger exactly
         }
       }
     }
@@ -261,6 +302,7 @@ AQ.LogUI = (function () {
     if (L.hover && moved && L.hover.id === 'cell') L.sel = L.hover.i;
     if (L.hover && moved && L.hover.id === 'vcell') L.vsel = L.hover.i;
     if (L.hover && moved && L.hover.id === 'ncell') L.nsel = L.hover.i;
+    if (L.hover && moved && L.hover.id === 'bcell') L.bsel = L.hover.i;
     L.mx = m.x; L.my = m.y;
     if (m.pressed[0] && L.hover) {
       const h = L.hover;
@@ -269,7 +311,7 @@ AQ.LogUI = (function () {
       if (h.id === 'prev') setBiome(-1);
       if (h.id === 'next') setBiome(1);
       if (h.id === 'dot' && h.k !== L.biomeIdx) setBiome(h.k - L.biomeIdx);
-      const k = L.tab === 'species' ? 'scroll' : L.tab === 'variants' ? 'vscroll' : 'nscroll';
+      const k = L.tab === 'species' ? 'scroll' : L.tab === 'variants' ? 'vscroll' : L.tab === 'badges' ? 'bscroll' : 'nscroll';
       if (h.id === 'up') L[k] = Math.max(0, L[k] - 30);
       if (h.id === 'down') L[k] += 30;                                  // clamped by layout()
       if (h.id === 'close') L.close(game);
@@ -341,8 +383,12 @@ AQ.LogUI = (function () {
     g.fillStyle = C.bar; g.fillRect(0, 0, 320, 14); g.fillStyle = C.line; g.fillRect(0, 14, 320, 1);
     F().draw(g, AQ.t('log.title'), 6, 4, C.title, { shadow: false, max: 60 });   // (the tabs start at x 68)
     const bp = AQ.Bottles ? AQ.Bottles.progress() : { found: 0, total: 0 };
-    F().draw(g, AQ.t('log.bottles', { n: bp.found, total: bp.total }), 276, 4, C.info, { align: 'right', shadow: false, max: 276 - 200 });   // (the tabs end near x 196)
+    const bc = AQ.Badges ? AQ.Badges.count() : null;               // (the BADGES tab: badges earned instead of bottles)
+    F().draw(g, L.tab === 'badges' && bc ? AQ.t('log.badgesCount', { n: bc.earned, total: bc.total }) : AQ.t('log.bottles', { n: bp.found, total: bp.total }), 276, 4, C.info, { align: 'right', shadow: false, max: 276 - 210 });   // (the tabs end near x 206)
     for (const r of L.ui) if (r.id === 'tab' || r.id === 'close') AQ.Aquarium.button(g, r, L.hover === r);
+    // the NEW dot on the BADGES tab while there are badges you haven't looked at
+    const bt = L.ui.find((r) => r.id === 'tab' && r.tab === 'badges');
+    if (bt && AQ.Badges && L.tab !== 'badges' && AQ.Badges.unseen()) newDot(g, bt.x + bt.w - 3, bt.y - 1);
     g.fillStyle = C.line; g.fillRect(0, 168, 320, 1);              // footer separator
     if (L.entry) { drawEntry(g, L.entry); return; }
     for (const r of L.ui) {
@@ -352,8 +398,58 @@ AQ.LogUI = (function () {
     }
     if (L.tab === 'species') drawSpecies(g);
     else if (L.tab === 'variants') drawVariants(g);
+    else if (L.tab === 'badges') drawBadges(g);
     else drawNotes(g);
   };
+  // a small "NEW" dot (pulses gently; steady with REDUCE FLASHING)
+  function newDot(g, x, y) {
+    const on = AQ.U.calm() || Math.floor(performance.now() / 600) % 2 === 0;
+    g.fillStyle = '#3a1020'; g.fillRect(x - 1, y - 1, 5, 5);
+    g.fillStyle = on ? '#ff6f9a' : '#d84f7a'; g.fillRect(x, y, 3, 3);
+  }
+  L.newDot = newDot;
+
+  // BADGES tab: every badge by group; earned ones in colour, the rest as silhouettes with what they need
+  function drawBadges(g) {
+    const B = AQ.Badges, n = B.count(), rows = badgeRows(), it = rows.flatMap((r) => r.items || []).find((x) => x.i === L.bsel);
+    F().draw(g, AQ.t('log.badges.intro'), 6, 19, C.dim, { max: 250 });
+    F().draw(g, `${n.earned}/${n.total}`, 316, 19, C.gold, { align: 'right' });
+    g.fillStyle = C.panel; g.fillRect(4, 142, 312, 24); g.fillStyle = C.line; g.fillRect(4, 142, 312, 1);
+    if (it) {
+      const b = it.d, tier = B.tier(b.id), got = tier > 0, secret = b.hidden && !got;
+      const name = secret ? AQ.t('badge.secretName') : B.name(b, Math.max(1, tier)).toUpperCase();
+      F().draw(g, name, 9, 146, got ? C.gold : C.dim, { max: 180 });
+      // right: when it was earned, or how far along
+      const e = (AQ.State.badges.earned || {})[b.id], p = B.progress(b);
+      let right = '';
+      if (got) right = AQ.t('badge.earnedOn', { date: AQ.Lang.date(new Date(e.at[e.at.length - 1])) });
+      if (p && tier < B.maxTier(b) && !secret) right = (got ? right + '   ' : '') + AQ.t('badge.progressText', { n: Math.min(p.value, p.target), total: p.target });
+      if (right) F().draw(g, right, 311, 146, got ? C.good : C.info, { align: 'right', max: 120 });
+      const desc = secret ? AQ.t('badge.secretDesc') : got && tier >= B.maxTier(b) ? B.desc(b, tier) : B.desc(b, tier + 1);
+      wrap(desc, 75).slice(0, 2).forEach((l, i) => F().draw(g, l, 9, 154 + i * 7, C.text));
+    }
+    footer(g, [['log.key.move', 'log.do.move'], ['log.key.wheel', 'log.do.scroll'], ['log.key.tabs', 'log.do.tabs'], ['log.key.esc', 'log.do.close']]);
+  }
+  function drawBadgeCell(g, r) {
+    const B = AQ.Badges, b = r.d, tier = B.tier(b.id), got = tier > 0, sel = r.i === L.bsel, secret = b.hidden && !got, max = B.maxTier(b);
+    g.fillStyle = sel ? '#1f4862' : got ? '#2a2a1c' : '#0f2335'; g.fillRect(r.x, r.y, r.w, r.h);
+    B.drawIcon(g, b, r.x + 8, r.y + 10, got, tier);
+    const name = secret ? '???' : B.name(b, Math.max(1, tier)).toUpperCase();
+    F().draw(g, fitText(name, r.w - 20), r.x + 17, r.y + 3, got ? '#ffe9a8' : sel ? '#c3dfec' : '#7f9cb0', { shadow: false });
+    // second line: a secret, the tier and its bar, a progress bar with numbers, or "earned"
+    const y2 = r.y + 12, p = secret ? null : B.progress(b);
+    if (secret) F().draw(g, AQ.t('badge.secretShort'), r.x + 17, y2, '#5a6f86', { shadow: false, max: r.w - 20 });
+    else if (p && tier < max && (p.target > 1 || tier > 0)) {
+      const w = 34, k = Math.max(0, Math.min(1, p.value / p.target));
+      g.fillStyle = '#0a1622'; g.fillRect(r.x + 17, y2 + 1, w, 4);
+      g.fillStyle = got ? B.TIER_COL[Math.min(tier, 4) - 1] : '#3f8fb0'; g.fillRect(r.x + 17, y2 + 1, Math.round(w * k), 4);
+      F().draw(g, `${Math.min(p.value, p.target)}/${p.target}`, r.x + 17 + w + 4, y2, C.dim, { shadow: false, max: r.w - w - 24 });
+    } else if (got) F().draw(g, max > 1 ? AQ.t('badge.maxTier') : AQ.t('badge.earned'), r.x + 17, y2, C.good, { shadow: false, max: r.w - 20 });
+    else F().draw(g, AQ.t('badge.notYet'), r.x + 17, y2, '#5a6f86', { shadow: false, max: r.w - 20 });
+    if (L.newIds[b.id]) F().draw(g, AQ.t('badge.new'), r.x + r.w - 2, r.y + 12, '#ff9fc0', { align: 'right', shadow: false });
+    if (sel) outline(g, r, '#5fc6d9');
+    else if (L.hover === r) outline(g, r, '#2f6684');
+  }
   function drawItem(g, r) {
     {
       if (r.id === 'up' || r.id === 'down') arrows(g, r);
@@ -361,6 +457,7 @@ AQ.LogUI = (function () {
       else if (r.id === 'cell') drawCell(g, r);
       else if (r.id === 'vcell') drawVariantCell(g, r);
       else if (r.id === 'ncell') drawNoteCell(g, r);
+      else if (r.id === 'bcell') drawBadgeCell(g, r);
       else if (r.id === 'dot') drawDot(g, r);
       else AQ.Aquarium.button(g, r, L.hover === r);
     }

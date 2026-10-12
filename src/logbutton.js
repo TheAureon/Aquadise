@@ -100,6 +100,7 @@ AQ.LogButton = (function () {
     book(ctx, r.x + 2, r.y + 1 + dy, B.hover || pressed ? '#fff3c8' : '#ffe9a8', B.hover || pressed ? null : SH);
     F().draw(ctx, r.txt, AQ.TUNING.view.w - 4, 4 + dy, B.hover || pressed ? '#fff6dc' : '#ffe9a8', { align: 'right', shadow: B.hover || pressed ? false : SH });
     ctx.globalAlpha = 1;
+    if (AQ.Badges && AQ.Badges.unseen() && AQ.LogUI.newDot) AQ.LogUI.newDot(ctx, r.x - 1, r.y - 1);   // badges you haven't looked at yet
     // the tooltip (mouse only): just left of the button
     if (B.hover && !pressed) {
       const tip = AQ.t('hud.logTip', { key: AQ.Keys.name('log') }), w = F().width(tip) + 6, x = r.x - w - 3;

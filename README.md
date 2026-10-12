@@ -570,6 +570,23 @@ Proud Parent, Rainbow Collector, Treasure Hunter, Bottle Collector).
   and see one message the first time they play: "Welcome back! You've already earned 14 badges". Counters
   that were never tracked start from what the save shows (chests from your upgrades, panes from what you
   have and have built, decorations from your tanks, births from graduates and the nursery), or 0.
+- **The BADGES tab** in the collection log (beside SPECIES, VARIANTS, NOTES; same keys, wheel, finger drag
+  and tabs): the header shows "BADGES 12/75" (tiers count once). Badges are grouped under headings. Earned
+  ones show their icon in colour; the rest a dark silhouette with a progress bar and numbers ("18/77")
+  where there's something to count, or NOT YET; hidden ones show "???" and "A SECRET". Tiered badges are
+  one card with their level, a bar to the next target and a bronze / silver / gold mark. The selected
+  badge's full description, its progress and the date it was earned sit in the panel at the bottom.
+- **NEW dot:** on the BADGES tab and the log button (the counter in the top right) while there are
+  badges you haven't looked at (saved, so it survives closing the game). Opening the tab clears it, and
+  the new cards wear a NEW tag while you look.
+- **The toast:** "BADGE: Sneaky Steps" with its icon, for 4 seconds, centred between the tip box and the
+  HUD's toasts. Badges wait in a queue and show one at a time with a short gap; three or more at once
+  become one "3 new badges!". Nothing shows during a scene change, in photo mode or while a menu or
+  dialog is open: they wait. With REDUCE FLASHING the sparkles around it stay still and soft.
+- **The chime:** a soft three-note chime, a bigger one for a higher tier or Aquadise, a hushed one for a
+  hidden badge (one per toast, so they never overlap). They're on the Sound Test's BADGES tab, which also
+  shows the toast each one plays under. A tip explains badges the first time you earn one.
+- Tuning: `badges.toastSeconds`, `toastGap`, `summaryAt` (3), `toastY`.
 - **Checking the data:** `node tools/check-badges.js` reports duplicate ids, unknown species / biomes /
   families / checks, events nobody sends, counters nobody counts, tiers out of order, badges that can't
   be reached and missing text.
