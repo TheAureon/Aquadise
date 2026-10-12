@@ -1343,6 +1343,37 @@
     else { p.rect(cx, 0, 1, 12, Y); p.rect(0, 6, 12, 1, Y); p.rect(cx - 1, 5, 3, 3, hex('#ffffff')); p.set(2, 2, B); p.set(9, 9, B); p.set(9, 2, B); }
     p.outline(0.3);
   };
+  // Badge icons (12 x 12, 6 frames): a round medallion in its category's colour with a pale symbol.
+  // Frame 0 earned, 1 not earned yet (a dark silhouette), 2-5 earned with a tier mark in the lower right
+  // corner (bronze, silver, gold, and a pale gem for a 4th tier). o.icon picks the symbol.
+  const BADGE_ICONS = {
+    shell: '#ffb08a', fish: '#7fd0ff', heart: '#ff8fb8', egg: '#ffd8a0', bottle: '#8ff0c8', moon: '#b8a8ff',
+    star: '#ffd25a', camera: '#9fb8d8', crown: '#ffcf4a', ear: '#7ff0f0', secret: '#c9a8ff'
+  };
+  S.badgeicon = function (p, o) {
+    const f = o.frame, base = hex(BADGE_ICONS[o.icon] || '#ffd25a'), rim = mul(base, 0.6), sym = hex('#fff6dc'), c = 5.5;
+    p.ellipse(c, c, 5.5, 5.5, rim); p.ellipse(c, c, 4.6, 4.6, base);
+    p.ellipse(c - 1.2, c - 1.6, 2, 1.2, mix(base, WHITE, 0.35));                               // a soft shine
+    const ic = o.icon;
+    if (ic === 'shell') { for (let i = -2; i <= 2; i++) p.line(c, 8, c + i * 1.6, 3.5, sym); p.rect(4, 8, 4, 1, sym); }
+    else if (ic === 'fish') { p.ellipse(c + 0.5, c, 2.6, 1.6, sym); p.tri([3, c], [1.5, 3.5], [1.5, 7.5], sym); p.set(7, 5, rim); }
+    else if (ic === 'heart') { p.circle(4, 4.5, 1.5, sym); p.circle(7, 4.5, 1.5, sym); p.tri([2.5, 5], [8.5, 5], [5.5, 8.5], sym); }
+    else if (ic === 'egg') { p.ellipse(c, 6, 2.2, 3, sym); p.set(5, 4, mix(sym, base, 0.4)); }
+    else if (ic === 'bottle') { p.rect(4, 5, 3, 4, sym); p.rect(5, 3, 1, 2, sym); p.set(5, 2, hex('#c9a46a')); p.set(5, 7, rim); }
+    else if (ic === 'moon') { p.circle(c, c, 3, sym); p.circle(c + 1.5, c - 1, 2.6, base); }
+    else if (ic === 'star') { p.tri([c, 2], [4, 6], [7, 6], sym); p.tri([2, 5], [9, 5], [c, 7.5], sym); p.tri([c, 6], [3, 9], [c - 0.5, 6.5], sym); p.tri([c, 6], [8, 9], [c + 0.5, 6.5], sym); }
+    else if (ic === 'camera') { p.rect(2, 4, 7, 5, sym); p.rect(4, 3, 3, 1, sym); p.circle(c, 6.5, 1.3, rim); }
+    else if (ic === 'crown') { p.rect(2, 6, 7, 3, sym); p.tri([2, 6], [2, 3], [4, 6], sym); p.tri([4, 6], [c, 2.5], [7, 6], sym); p.tri([7, 6], [9, 3], [9, 6], sym); p.set(5, 7, hex('#ff8fb8')); }
+    else if (ic === 'ear') { for (let a = -2.4; a < 2.4; a += 0.12) p.set(4.5 + Math.cos(a) * 2, 5 + Math.sin(a) * 2.6, sym); p.rect(5, 7, 1, 2, sym); p.set(8, 4, sym); p.set(8, 6, sym); }
+    else { p.rect(4, 3, 4, 1, sym); p.set(7, 4, sym); p.rect(6, 5, 1, 2, sym); p.set(6, 8, sym); }     // a "?"
+    p.outline(0.3);
+    if (f === 1) { for (let i = 0; i < p.d.length; i += 4) if (p.d[i + 3]) { p.d[i] = 38; p.d[i + 1] = 62; p.d[i + 2] = 84; } return; }   // not earned: a silhouette
+    if (f >= 2) {                                                                               // the tier mark
+      const tc = hex(['#c98a4a', '#cfd8e0', '#ffd25a', '#9ff3ff'][f - 2]);
+      p.rect(8, 8, 4, 4, [30, 22, 14, 255]); p.rect(9, 9, 2, 2, tc); p.set(9, 9, mix(tc, WHITE, 0.5));
+    }
+  };
+
   // Guided-dive markers: a soft glowing ring that pulses (16 x 16, 4 frames) and a small arrow that bobs
   // (8 x 8, 4 frames), both a pale warm gold.
   S.uimarker = function (p, o) {

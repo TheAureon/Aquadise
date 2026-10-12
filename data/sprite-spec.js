@@ -26,7 +26,8 @@ AQ.data.spriteSpec = {
     beam:     { idle: { row: 0, frames: 4, fps: 8 } },          // drawn stretched to the beam's size
     still:    { idle: { row: 0, frames: 1, fps: 1 } },          // backdrops and repeating tiles
     bottle:   { idle: { row: 0, frames: 4, fps: 4 } },          // message bottle: a glint runs along the glass
-    uiicons:  { idle: { row: 0, frames: 7, fps: 1 } },          // tutorial tip icons: one picture per frame (drawn by frame number)
+    uiicons:  { idle: { row: 0, frames: 7, fps: 1 } },
+    badgeicon: { idle: { row: 0, frames: 6, fps: 1 } },        // badge icons: 0 earned, 1 not yet (silhouette), 2-5 earned + tier mark          // tutorial tip icons: one picture per frame (drawn by frame number)
     uimarker: { idle: { row: 0, frames: 4, fps: 5 } },          // guided-dive marker ring / arrow (pulse / bob)
     uitouch:  { idle: { row: 0, frames: 13, fps: 1 } },         // touch buttons: a round base + one icon per frame
     uistick:  { idle: { row: 0, frames: 2, fps: 1 } },          // touch joystick: 0 ring, 1 knob
@@ -35,5 +36,5 @@ AQ.data.spriteSpec = {
   },
   // anchor = the pixel inside a frame that sits on the entity's world position
   anchors: { creature: 'center', plant: 'bottom', decor: 'bottom', player: 'center', chest: 'bottom', bait: 'center',
-             prop: 'bottom', propanim: 'bottom', ufo: 'center', beam: 'top', still: 'topleft', bottle: 'bottom', uiicons: 'center', uimarker: 'center', uitouch: 'center', uistick: 'center', uigradcap: 'center', uipane: 'center' }
+             prop: 'bottom', propanim: 'bottom', ufo: 'center', beam: 'top', still: 'topleft', bottle: 'bottom', uiicons: 'center', badgeicon: 'center', uimarker: 'center', uitouch: 'center', uistick: 'center', uigradcap: 'center', uipane: 'center' }
 };

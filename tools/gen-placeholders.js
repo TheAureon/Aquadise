@@ -59,6 +59,8 @@ add('misc.beam', 'sprites/scene/beam.png', 'beam', [32, 96], { shape: 'beam', fi
 add('ui.marker', 'sprites/ui/marker.png', 'uimarker', [16, 16], { shape: 'uimarker', fit: false });
 add('ui.arrow', 'sprites/ui/arrow.png', 'uimarker', [8, 8], { shape: 'uiarrow', fit: false });
 add('ui.icons', 'sprites/ui/icons.png', 'uiicons', [12, 12], { shape: 'uiicons', fit: false });
+// badge icons (data/achievements.js `icon`): one sheet per icon, 6 frames (earned, not yet, tier marks I-IV)
+for (const icon of ['shell', 'fish', 'heart', 'egg', 'bottle', 'moon', 'star', 'camera', 'crown', 'ear', 'secret']) add(`badge.${icon}`, `sprites/ui/badge_${icon}.png`, 'badgeicon', [12, 12], { shape: 'badgeicon', icon, fit: false });
 add('ui.touch', 'sprites/ui/touch.png', 'uitouch', [16, 16], { shape: 'uitouch', fit: false });
 add('ui.stick', 'sprites/ui/stick.png', 'uistick', [32, 32], { shape: 'uistick', fit: false });
 add('ui.gradcap', 'sprites/ui/gradcap.png', 'uigradcap', [8, 8], { shape: 'uigradcap', fit: false });

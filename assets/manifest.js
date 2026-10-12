@@ -243,6 +243,248 @@ AQ.manifest = {
     11
    ]
   },
+  "badge.shell": {
+   "file": "sprites/ui/badge_shell.png",
+   "fw": 12,
+   "fh": 12,
+   "anchor": [
+    6,
+    6
+   ],
+   "anims": {
+    "idle": {
+     "row": 0,
+     "frames": 6,
+     "fps": 1
+    }
+   },
+   "vis": [
+    0,
+    0,
+    11,
+    11
+   ]
+  },
+  "badge.fish": {
+   "file": "sprites/ui/badge_fish.png",
+   "fw": 12,
+   "fh": 12,
+   "anchor": [
+    6,
+    6
+   ],
+   "anims": {
+    "idle": {
+     "row": 0,
+     "frames": 6,
+     "fps": 1
+    }
+   },
+   "vis": [
+    0,
+    0,
+    11,
+    11
+   ]
+  },
+  "badge.heart": {
+   "file": "sprites/ui/badge_heart.png",
+   "fw": 12,
+   "fh": 12,
+   "anchor": [
+    6,
+    6
+   ],
+   "anims": {
+    "idle": {
+     "row": 0,
+     "frames": 6,
+     "fps": 1
+    }
+   },
+   "vis": [
+    0,
+    0,
+    11,
+    11
+   ]
+  },
+  "badge.egg": {
+   "file": "sprites/ui/badge_egg.png",
+   "fw": 12,
+   "fh": 12,
+   "anchor": [
+    6,
+    6
+   ],
+   "anims": {
+    "idle": {
+     "row": 0,
+     "frames": 6,
+     "fps": 1
+    }
+   },
+   "vis": [
+    0,
+    0,
+    11,
+    11
+   ]
+  },
+  "badge.bottle": {
+   "file": "sprites/ui/badge_bottle.png",
+   "fw": 12,
+   "fh": 12,
+   "anchor": [
+    6,
+    6
+   ],
+   "anims": {
+    "idle": {
+     "row": 0,
+     "frames": 6,
+     "fps": 1
+    }
+   },
+   "vis": [
+    0,
+    0,
+    11,
+    11
+   ]
+  },
+  "badge.moon": {
+   "file": "sprites/ui/badge_moon.png",
+   "fw": 12,
+   "fh": 12,
+   "anchor": [
+    6,
+    6
+   ],
+   "anims": {
+    "idle": {
+     "row": 0,
+     "frames": 6,
+     "fps": 1
+    }
+   },
+   "vis": [
+    0,
+    0,
+    11,
+    11
+   ]
+  },
+  "badge.star": {
+   "file": "sprites/ui/badge_star.png",
+   "fw": 12,
+   "fh": 12,
+   "anchor": [
+    6,
+    6
+   ],
+   "anims": {
+    "idle": {
+     "row": 0,
+     "frames": 6,
+     "fps": 1
+    }
+   },
+   "vis": [
+    0,
+    0,
+    11,
+    11
+   ]
+  },
+  "badge.camera": {
+   "file": "sprites/ui/badge_camera.png",
+   "fw": 12,
+   "fh": 12,
+   "anchor": [
+    6,
+    6
+   ],
+   "anims": {
+    "idle": {
+     "row": 0,
+     "frames": 6,
+     "fps": 1
+    }
+   },
+   "vis": [
+    0,
+    0,
+    11,
+    11
+   ]
+  },
+  "badge.crown": {
+   "file": "sprites/ui/badge_crown.png",
+   "fw": 12,
+   "fh": 12,
+   "anchor": [
+    6,
+    6
+   ],
+   "anims": {
+    "idle": {
+     "row": 0,
+     "frames": 6,
+     "fps": 1
+    }
+   },
+   "vis": [
+    0,
+    0,
+    11,
+    11
+   ]
+  },
+  "badge.ear": {
+   "file": "sprites/ui/badge_ear.png",
+   "fw": 12,
+   "fh": 12,
+   "anchor": [
+    6,
+    6
+   ],
+   "anims": {
+    "idle": {
+     "row": 0,
+     "frames": 6,
+     "fps": 1
+    }
+   },
+   "vis": [
+    0,
+    0,
+    11,
+    11
+   ]
+  },
+  "badge.secret": {
+   "file": "sprites/ui/badge_secret.png",
+   "fw": 12,
+   "fh": 12,
+   "anchor": [
+    6,
+    6
+   ],
+   "anims": {
+    "idle": {
+     "row": 0,
+     "frames": 6,
+     "fps": 1
+    }
+   },
+   "vis": [
+    0,
+    0,
+    11,
+    11
+   ]
+  },
   "ui.touch": {
    "file": "sprites/ui/touch.png",
    "fw": 16,

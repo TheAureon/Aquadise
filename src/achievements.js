@@ -191,7 +191,7 @@ AQ.Badges = (function () {
   B.groupCol = (g) => GROUP_COL[g] || '#ffd25a';
   B.drawIcon = function (g, b, cx, cy, shown, tier) {
     const key = 'badge.' + b.icon, e = AQ.Assets && AQ.Assets.entry(key);
-    if (e) { AQ.Assets.draw(g, key, 'idle', cx, cy, { frame: shown ? 0 : 1 }); }
+    if (e) { AQ.Assets.draw(g, key, 'idle', cx, cy, { frame: !shown ? 1 : (b.tiers && tier ? 1 + Math.min(tier, 4) : 0) }); return; }   // (the tier mark is in the art)
     else {
       g.fillStyle = shown ? '#2a2414' : '#0f1d2b'; g.fillRect(cx - 5, cy - 5, 11, 11);
       g.fillStyle = shown ? B.groupCol(b.group) : '#1d3446'; g.fillRect(cx - 4, cy - 4, 9, 9);

@@ -85,7 +85,7 @@ AQ.Guide = (function () {
     const sc = force || Math.max(1, Math.min(3, Math.floor(Math.min(52 / vw, 52 / vh))));
     const mx = Math.round((v[0] + v[2] + 1) / 2), my = Math.round((v[1] + v[3] + 1) / 2);
     g.save(); g.translate(cx, cy); g.scale(sc, sc);
-    AQ.Assets.draw(g, icon, 'idle', e.anchor[0] - mx, e.anchor[1] - my, { t: AQ.Render.t });
+    AQ.Assets.draw(g, icon, 'idle', e.anchor[0] - mx, e.anchor[1] - my, /^badge\./.test(icon) ? { frame: 0 } : { t: AQ.Render.t });   // (a badge icon: its earned frame, not a cycle)
     g.restore();
   }
   G.draw = function (g) {

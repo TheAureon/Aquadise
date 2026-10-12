@@ -598,6 +598,12 @@ Proud Parent, Rainbow Collector, Treasure Hunter, Bottle Collector).
   Plaques earned while you were away pop into place one after another with a little sparkle (softer with
   REDUCE FLASHING) the next time you see the wall. The whole-building view takes in the wing too, with a
   TROPHY WALL label; the ladders, tanks, directory and beam pad are where they were.
+- **Icons:** `badge.<icon>` sprites (`tools/gen-placeholders.js`): a medallion per kind (shell, fish,
+  heart, egg, bottle, moon, star, camera, crown, ear, secret), with a silhouette frame for badges not
+  earned yet and tier-mark frames; `docs/SPRITE_SPEC.md` says how to swap in real icons. The Guide has a
+  BADGES page and a tip explains them the first time you earn one.
+- **Performance:** the checks from the save take 0.1-2.5 ms every 3 seconds (never per frame); the game
+  stays at 60 fps in the sea and in the building with the wall full and plaques popping in.
 - **Checking the data:** `node tools/check-badges.js` reports duplicate ids, unknown species / biomes /
   families / checks, events nobody sends, counters nobody counts, tiers out of order, badges that can't
   be reached and missing text.

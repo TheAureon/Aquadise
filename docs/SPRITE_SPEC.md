@@ -183,6 +183,26 @@ nearly see-through in the sea, so their real art can be subtle; in a tank they s
 | `creature.murmur_seal` | medium (24 × 24) | `seal` (new) | a plump pale seal pup: small head, big dark eye, whiskers, soft spots, flippers |
 | `creature.deep_drummer` | large (32 × 32) | `fish` + `drum` | a deep-bodied dusky fish with a round, taut drum-skin patch on its flank that trembles |
 
+## Badges
+
+Each badge in `data/achievements.js` names an `icon`; the picture is the sprite `badge.<icon>`
+(`assets/sprites/ui/badge_<icon>.png`), 12 × 12, anchored in the centre, **6 frames in one row**:
+
+| frame | shows |
+|---|---|
+| 0 | earned |
+| 1 | not earned yet: a dark silhouette of the same picture (no colour) |
+| 2-5 | earned, with the tier mark in the lower right corner (bronze, silver, gold, a pale gem for a 4th tier) |
+
+The placeholder (`badgeicon` in `src/placeholder-art.js`) is a round medallion in the icon's colour with
+a pale symbol: `shell` (coral pink, a fan shell), `fish` (blue), `heart` (pink), `egg` (peach), `bottle`
+(mint, a message bottle), `moon` (lavender, a crescent), `star` (gold), `camera` (steel blue), `crown`
+(gold, Aquadise and Gold Standard), `ear` (cyan, the hydrophone badges) and `secret` (violet, a "?").
+To use real art, draw the same 6 frames into `badge_<icon>.png` and mark the manifest entry
+`custom: true`. A new icon name needs one line in `tools/gen-placeholders.js` (the list of icons) and its
+name in `tools/check-badges.js` (ICONS). Badge cards, toasts and the BADGES tab use these frames; the
+trophy wall's plaques are drawn in code (below).
+
 ## The trophy wall (badges)
 
 The trophy wing's shell, back wall and floor reuse the building's tiles (`tile.station_hull`,
