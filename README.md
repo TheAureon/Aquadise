@@ -587,6 +587,17 @@ Proud Parent, Rainbow Collector, Treasure Hunter, Bottle Collector).
   hidden badge (one per toast, so they never overlap). They're on the Sound Test's BADGES tab, which also
   shows the toast each one plays under. A tip explains badges the first time you earn one.
 - Tuning: `badges.toastSeconds`, `toastGap`, `summaryAt` (3), `toastY`.
+- **The trophy wall** (aquarium building): the ground floor now runs on, through a doorway past the right
+  ladder, into a small **trophy wing** (`AQ.data.station.wing` and `trophyWall` in `data/scenes.js`). Its
+  wall has one shelf per group (First Steps, Collecting, Aquarium, Breeding, Exploring, Sky, Skill), a
+  small gold plaque for every badge earned (bronze / silver / gold for a tiered badge's highest tier, a
+  dot in the group's colour) and a faint empty slot for each one still to earn (`badges.trophyEmptySlots`:
+  false hides them). Hidden badges only appear once earned. The Aquadise badge is a cup on top, and the
+  count ("12/75") sits at the top right. Standing in front of it shows "SEE YOUR BADGES": interact (or the
+  touch hand button) opens the log's BADGES tab. Hovering a plaque (or tapping it) shows its name.
+  Plaques earned while you were away pop into place one after another with a little sparkle (softer with
+  REDUCE FLASHING) the next time you see the wall. The whole-building view takes in the wing too, with a
+  TROPHY WALL label; the ladders, tanks, directory and beam pad are where they were.
 - **Checking the data:** `node tools/check-badges.js` reports duplicate ids, unknown species / biomes /
   families / checks, events nobody sends, counters nobody counts, tiers out of order, badges that can't
   be reached and missing text.

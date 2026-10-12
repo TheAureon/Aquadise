@@ -106,6 +106,7 @@ AQ.TUNING = {
     toastSeconds: 4,          // a badge's toast stays this long...
     toastGap: 0.6,            // ...with this gap before the next one
     summaryAt: 3,             // this many waiting at once become one "3 new badges!" toast
+    trophyEmptySlots: true,   // the trophy wall shows a faint empty slot for every badge still to earn (false: earned ones only)
     toastY: 118               // where the badge toast sits (game px from the top: under the tip box, above the HUD toasts)
   },
 

@@ -5,7 +5,7 @@ var AQ = (typeof AQ !== 'undefined') ? AQ : {};
 AQ.data = AQ.data || {};
 
 AQ.data.station = {
-  width: 760, height: 476,                  // whole scene, including the space around the building
+  width: 900, height: 476,                  // whole scene, including the space around the building
   hull: { x: 60, y: 56, w: 640, h: 372, thick: 8 },
   floors: [402, 316, 230, 144],             // ground floor, 2nd, 3rd, 4th (predator wing)
   floorThick: 8,
@@ -25,6 +25,10 @@ AQ.data.station = {
     { floor: 3, x: 180, tank: 'pred_reef' }, { floor: 3, x: 280, tank: 'pred_open' }, { floor: 3, x: 380, tank: 'pred_deep' },
     { floor: 3, x: 480, tank: 'pred_cave' }, { floor: 3, x: 580, tank: 'pred_swamp' }
   ],
+  // the trophy wing: a small room off the ground floor's right end (through a doorway in the hull),
+  // holding the TROPHY WALL (badges, src/achievements.js). x / w: its outer shell; top: its roof
+  wing: { x: 700, w: 150, top: 316 },
+  trophyWall: { x0: 712, x1: 838, top: 345, row: 8 },   // the shelves (one per badge group), inside the wing
   pad: { x: 572 },                          // the beam pad (ground floor)
   console: { x: 496 },                      // the tank directory (ground floor)
   windows: [                                // portholes in the back wall, [x, floor] (centre)
@@ -36,6 +40,6 @@ AQ.data.station = {
   plants: [[110, 0], [528, 0], [650, 1], [110, 2], [650, 3]],   // potted plants, [x, floor]
   signs: [                                  // [id, x, floor, colour] (text: data/lang/ sign.<id>)
     ['directory', 496, 0, '#ffe08a'], ['beampad', 572, 0, '#9feff0'],
-    ['station', 380, 2, '#ffd0e0'], ['predators', 380, 3, '#ffb0a0']
+    ['station', 380, 2, '#ffd0e0'], ['predators', 380, 3, '#ffb0a0'], ['trophies', 768, 0, '#ffd25a']
   ]
 };

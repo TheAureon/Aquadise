@@ -483,6 +483,7 @@ AQ.langFiles.en = {
   // ---------------------------------------------------------------- signs in the building
   'sign.directory': 'DIRECTORY',
   'sign.beampad': 'BEAM PAD',
+  'sign.trophies': 'TROPHY WALL',
   'sign.station': 'AQUARIUM STATION',
   'sign.predators': 'PREDATOR WING',
 
@@ -493,6 +494,7 @@ AQ.langFiles.en = {
   'station.tend': 'TEND THE {tank} TANK',
   'station.followRobot': '{key}: FOLLOW ROBOT',   // {key} = the whole-building view key
   'station.followRobot.touch': 'EYE BUTTON: FOLLOW ROBOT',
+  'station.trophies': 'SEE YOUR BADGES',   // the prompt at the trophy wall
   'station.seeAll': '{key}: SEE ALL TANKS',   // {key} = the whole-building view key
   'station.seeAll.touch': 'EYE BUTTON: SEE ALL TANKS',
   'station.empty': 'EMPTY',   // an empty tank window in the building

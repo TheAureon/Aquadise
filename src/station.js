@@ -18,6 +18,13 @@ AQ.Station = (function () {
     W.fillRect(h.x, h.y, h.w, T);                                        // roof
     W.fillRect(h.x, h.y, T, h.h); W.fillRect(h.x + h.w - T, h.y, T, h.h); // side walls
     W.fillRect(h.x, L.floors[0], h.w, h.y + h.h - L.floors[0]);           // ground floor + underside
+    const wg = L.wing;
+    if (wg) {                                                            // the trophy wing off the ground floor
+      W.fillRect(h.x + h.w - T, wg.top + T, T, L.floors[0] - wg.top - T, AQ.World.AIR);   // a doorway through the hull
+      W.fillRect(wg.x, wg.top, wg.w, T);                                 // its roof...
+      W.fillRect(wg.x + wg.w - T, wg.top, T, h.y + h.h - wg.top);        // ...end wall...
+      W.fillRect(wg.x, L.floors[0], wg.w, h.y + h.h - L.floors[0]);      // ...and floor
+    }
     for (let i = 1; i < L.floors.length; i++) W.fillRect(h.x, L.floors[i], h.w, L.floorThick);
     L.ladders.forEach((ld) => {
       const top = L.floors[ld.floor + 1], bottom = L.floors[ld.floor];
@@ -29,7 +36,9 @@ AQ.Station = (function () {
   };
   St.world = () => W;
   St.zoneName = () => AQ.t('station.name');
-  St.valid = (x, y) => W.standable(x, y) && W.boxHits(x, y + 3, 5, 4) && x > L.hull.x + 10 && x < L.hull.x + L.hull.w - 10 && y > L.hull.y && y < L.floors[0];
+  // the building's outline: the hull, plus the trophy wing
+  St.bounds = () => { const h = L.hull, wg = L.wing; return { x: h.x, y: h.y, w: (wg ? Math.max(h.x + h.w, wg.x + wg.w) : h.x + h.w) - h.x, h: h.h }; };
+  St.valid = (x, y) => { const b = St.bounds(); return W.standable(x, y) && W.boxHits(x, y + 3, 5, 4) && x > b.x + 10 && x < b.x + b.w - 10 && y > L.hull.y && y < L.floors[0]; };
 
   // tank slots straight from data/scenes.js (b = the tank def, or null for an empty slot)
   function layoutTanks() {
@@ -51,6 +60,7 @@ AQ.Station = (function () {
     if (fl < 0 || P.mode !== 'walk') return null;
     if (fl === 0 && Math.abs(P.x - L.pad.x) < 13) return { kind: 'pad', text: AQ.t('station.beamDown') };
     if (fl === 0 && Math.abs(P.x - L.console.x) < 11) return { kind: 'console', text: AQ.t('station.directory') };
+    if (fl === 0 && L.trophyWall && P.x > L.trophyWall.x0 + 4 && P.x < L.trophyWall.x1 - 4) return { kind: 'trophy', text: AQ.t('station.trophies') };
     const t = tanks.find((k) => k.b && k.floor === fl && Math.abs(P.x - k.x) < 26);
     if (t) return { kind: 'tank', tank: t, text: AQ.t('station.tend', { tank: (t.b.short || t.b.name).toUpperCase() }) };
     return null;
@@ -62,12 +72,14 @@ AQ.Station = (function () {
     if (!tanks.length) layoutTanks();
     if (St.mode === 'walk') {
       if (input.wasPressed(AQ.TUNING.station.zoomKey)) St.toggleZoom();
+      trophyHover();
       P.update(dt, W, input);
       const n = nearby(P);
       if (n && input.wasPressed(...AQ.TUNING.interactKeys)) {
         if (n.kind === 'pad') { St.mode = 'beamout'; St.t = 0; P.vx = 0; P.x = L.pad.x; }
         else if (n.kind === 'tank') { AQ.Aquarium.open(game, 'station', n.tank.b.id); return; }
         else if (n.kind === 'console') { AQ.Aquarium.open(game, 'station', AQ.Aquarium.biome || 'tide_pools'); AQ.Aquarium.openOverview(); return; }
+        else if (n.kind === 'trophy') { AQ.LogUI.openBadges(game, 'play'); return; }      // the log's BADGES tab
       }
     } else if (St.mode === 'beamin' || St.mode === 'beamout') {
       P.t += dt; P.anim = 'stand';
@@ -101,6 +113,24 @@ AQ.Station = (function () {
     g.fillStyle = pat('tile.station_hull', '#8a96a6'); g.fillRect(h.x, h.y, h.w, h.h);
     g.fillStyle = pat('tile.station_wall', '#2c3e52'); g.fillRect(inner.x0, inner.y0, inner.x1 - inner.x0, L.floors[0] - inner.y0);
     g.restore();
+    const wg = L.wing;
+    if (wg) {                                                             // the trophy wing: its shell (rounded outer corners) and inside
+      const x1 = wg.x + wg.w, y1 = h.y + h.h, c = 10;
+      g.save(); g.beginPath();
+      g.moveTo(wg.x - 1, wg.top); g.lineTo(x1 - c, wg.top); g.arc(x1 - c, wg.top + c, c, -Math.PI / 2, 0);
+      g.lineTo(x1, y1 - c); g.arc(x1 - c, y1 - c, c, 0, Math.PI / 2); g.lineTo(wg.x - 1, y1); g.closePath(); g.clip();
+      g.fillStyle = pat('tile.station_hull', '#8a96a6'); g.fillRect(wg.x - 1, wg.top, wg.w + 1, y1 - wg.top);
+      g.restore();
+      g.fillStyle = pat('tile.station_wall', '#2c3e52'); g.fillRect(h.x + h.w - T, wg.top + T, x1 - T - (h.x + h.w - T), L.floors[0] - wg.top - T);
+      g.fillStyle = 'rgba(255,210,120,0.06)'; g.fillRect(wg.x, wg.top + T, wg.w - T, L.floors[0] - wg.top - T);   // a warm, gallery-like glow
+      g.save(); g.beginPath(); g.rect(h.x + h.w - 14, L.floors[0], 15, y1 - L.floors[0]); g.clip();               // (fill the hull's rounded corner where they join)
+      g.fillStyle = pat('tile.station_hull', '#8a96a6'); g.fillRect(h.x + h.w - 14, L.floors[0], 15, y1 - L.floors[0]); g.restore();
+      // the wall's wooden backing board and its shelves (the plaques are drawn live: src/station.js drawTrophyWall)
+      const tw = L.trophyWall, rows = AQ.data.badgeGroups.filter((x) => x !== 'final').length;
+      g.fillStyle = '#3a2a1e'; g.fillRect(tw.x0 - 3, tw.top - 3, tw.x1 - tw.x0 + 6, rows * tw.row + 4);
+      g.fillStyle = '#4a3626'; g.fillRect(tw.x0 - 2, tw.top - 2, tw.x1 - tw.x0 + 4, rows * tw.row + 2);
+      for (let r = 0; r < rows; r++) { g.fillStyle = '#7a5a3a'; g.fillRect(tw.x0 - 2, tw.top + r * tw.row + 6, tw.x1 - tw.x0 + 4, 1); g.fillStyle = '#2e2016'; g.fillRect(tw.x0 - 2, tw.top + r * tw.row + 7, tw.x1 - tw.x0 + 4, 1); }
+    }
     // portholes in the back wall: cut out so space shows through
     const holes = L.windows.map(([wx, fl]) => ({ x: wx, y: L.floors[fl] - 50, r: 11 }));
     g.save(); g.globalCompositeOperation = 'destination-out'; g.fillStyle = '#000';
@@ -115,10 +145,11 @@ AQ.Station = (function () {
     });
     // floors (tile), with the ladder holes left open
     const floorT = AQ.Assets.sprites['tile.station_floor'];
-    L.floors.forEach((fy) => {
-      for (let x = inner.x0; x < inner.x1; x += 32) {
-        if (floorT) g.drawImage(floorT.img, 0, 0, Math.min(32, inner.x1 - x), 8, x, fy, Math.min(32, inner.x1 - x), 8);
-        else { g.fillStyle = '#9aa8b4'; g.fillRect(x, fy, 32, 8); }
+    L.floors.forEach((fy, fi) => {
+      const xEnd = fi === 0 && L.wing ? L.wing.x + L.wing.w - T : inner.x1;   // (the ground floor runs on into the trophy wing)
+      for (let x = inner.x0; x < xEnd; x += 32) {
+        if (floorT) g.drawImage(floorT.img, 0, 0, Math.min(32, xEnd - x), 8, x, fy, Math.min(32, xEnd - x), 8);
+        else { g.fillStyle = '#9aa8b4'; g.fillRect(x, fy, Math.min(32, xEnd - x), 8); }
       }
     });
     L.ladders.forEach((ld) => {
@@ -136,6 +167,7 @@ AQ.Station = (function () {
       const ceil = i === L.floors.length - 1 ? inner.y0 : L.floors[i + 1] + L.floorThick;
       for (let x = inner.x0 + 40; x < inner.x1 - 20; x += 96) { g.fillStyle = '#3a4a5a'; g.fillRect(x - 5, ceil, 10, 2); g.fillStyle = '#ffe6a8'; g.fillRect(x - 4, ceil + 2, 8, 1); }
     });
+    if (L.wing) { const lx = L.wing.x + L.wing.w / 2 - 4, ly = L.wing.top + T; g.fillStyle = '#3a4a5a'; g.fillRect(lx - 5, ly, 10, 2); g.fillStyle = '#ffe6a8'; g.fillRect(lx - 4, ly + 2, 8, 1); }
     // signs
     const sign = (x, y, text, col) => { const w = Math.min(F().width(text), 68) + 6; g.fillStyle = '#16283a'; g.fillRect(x - w / 2, y - 2, w, 9); g.fillStyle = col; g.fillRect(x - w / 2, y - 2, w, 1); F().draw(g, text, x, y, col, { align: 'center', shadow: false, max: 68 }); };   // signs stay narrow: a long name squeezes
     (L.signs || []).forEach(([id, sx, fl, col]) => sign(sx, L.floors[fl] - (fl === 0 ? 66 : 72), AQ.t(`sign.${id}`), col));
@@ -264,6 +296,7 @@ AQ.Station = (function () {
     if (zoomAmt <= 0) {
       renderScene(ctx, game, cam.left(), cam.top(), 320, 180);
       drawPrompt(ctx, P, cam.left(), cam.top(), 1);
+      drawTrophyTip(ctx, cam.left(), cam.top());
     } else {
       // render the whole building once, then show a (scaled) window of it
       if (!full) { full = document.createElement('canvas'); full.width = L.width; full.height = L.height; }
@@ -271,7 +304,7 @@ AQ.Station = (function () {
       noLabels = zoomAmt > 0.5;                                           // shrunk labels blur; redrawn crisp below
       renderScene(fg, game, 0, 0, L.width, L.height);
       noLabels = false;
-      const h = L.hull, e = ease(zoomAmt);
+      const h = St.bounds(), e = ease(zoomAmt);
       const fit = Math.min(320 / (h.w + cfg.zoomMargin * 2), 180 / (h.h + cfg.zoomMargin * 2));
       const z = U.lerp(1, fit, e);
       const cx = U.lerp(cam.x, h.x + h.w / 2, e), cy = U.lerp(cam.y, h.y + h.h / 2, e);
@@ -290,6 +323,7 @@ AQ.Station = (function () {
         // a full nursery: its warning mark, crisp and full size over the shrunk building
         const nt = AQ.Nursery && AQ.Nursery.full() && tanks.find((tk) => tk.b && AQ.Nursery.is(tk.b.id));
         if (nt) AQ.Nursery.drawWarning(ctx, Math.round((nt.x - sx) * z) - 3, Math.round((nt.y - 44 - sy) * z) + 1, AQ.Render.t);
+        if (L.wing) F().draw(ctx, AQ.t('sign.trophies'), Math.round((L.wing.x + L.wing.w / 2 - 4 - sx) * z), Math.round((L.trophyWall.top - 16 - sy) * z) - 4, '#ffe9a8', { align: 'center', shadow: 'rgba(4,12,24,0.9)', max: 70 });   // the trophy wing
         ctx.globalAlpha = 1;
       }
       drawPrompt(ctx, P, sx, sy, z);
@@ -305,6 +339,79 @@ AQ.Station = (function () {
     const n = St.mode === 'walk' && !AQ.Transition.active && nearby(P);
     if (n) AQ.Scenes.prompt(ctx, (P.x - left) * z, (P.y - top) * z - 10 - 12 * z, n.text);
   }
+
+  // ---------------------------------------------------------------- the trophy wall (badges)
+  // One shelf per badge group (data/achievements.js), a plaque for every badge earned (bronze / silver /
+  // gold for a tiered one's highest tier) and a faint empty slot for each one still to come (hidden
+  // badges only once earned; badges.trophyEmptySlots off hides the empty slots). Aquadise stands on top.
+  // Plaques earned while you were away pop into place, with a little sparkle, when you next see the wall.
+  function wallSlots() {
+    const tw = L.trophyWall, B = AQ.Badges, out = [];
+    if (!tw || !B) return out;
+    const groups = AQ.data.badgeGroups.filter((x) => x !== 'final');
+    groups.forEach((grp, r) => {
+      const list = AQ.data.badges.filter((b) => b.group === grp), step = 6, w = list.length * step - 2;
+      const x0 = Math.round((tw.x0 + tw.x1) / 2 - w / 2);
+      list.forEach((b, k) => out.push({ b, x: x0 + k * step, y: tw.top + r * tw.row, w: 4, h: 5 }));
+    });
+    const fin = AQ.data.badges.find((b) => b.group === 'final');
+    if (fin) out.push({ b: fin, x: tw.x0 + 2, y: tw.top - 14, w: 7, h: 9, big: true });   // the final goal: a cup on top, left of the sign
+    return out;
+  }
+  const popping = new Map();                                               // id -> seconds since its pop started
+  function drawTrophyWall(ctx, left, vw) {
+    const B = AQ.Badges, tw = L.trophyWall;
+    if (!B || !tw) return;
+    const st = AQ.State.badges, shown = st.wall || (st.wall = {}), empty = AQ.TUNING.badges.trophyEmptySlots, calm = AQ.U.calm(), t = AQ.Render.t;
+    const visible = tw.x1 > left - 4 && tw.x0 < left + vw + 4;
+    let delay = 0;
+    for (const s of wallSlots()) {
+      const tier = B.tier(s.b.id), was = shown[s.b.id] || 0;
+      if (tier > was && visible && !popping.has(s.b.id)) {                  // earned while you were away: pops in (one after another)
+        popping.set(s.b.id, -delay); delay += 0.12; shown[s.b.id] = tier; AQ.Save && AQ.Save.dirty();
+      }
+      if (tier < was) shown[s.b.id] = tier;                                 // (reset by the testing keys)
+      const p = popping.get(s.b.id);
+      if (tier === 0 || (p != null && p < 0) || (tier > (shown[s.b.id] || 0))) {
+        if (!(s.b.hidden && tier === 0) && empty) { ctx.fillStyle = 'rgba(255,240,200,0.10)'; ctx.fillRect(s.x, s.y, s.w, 1); ctx.fillRect(s.x, s.y + s.h - 1, s.w, 1); ctx.fillRect(s.x, s.y, 1, s.h); ctx.fillRect(s.x + s.w - 1, s.y, 1, s.h); }
+        continue;
+      }
+      let k = 1;
+      if (p != null) { k = Math.min(1, p / 0.35); if (p >= 0 && p - 1 / 60 < 0) AQ.FX.sparkle(s.x + s.w / 2, s.y + s.h / 2, '#ffe9a8', calm ? 2 : 6); }
+      const col = s.b.tiers ? B.TIER_COL[Math.min(tier, 4) - 1] : '#ffd25a', w = Math.max(1, Math.round(s.w * k)), h = Math.max(1, Math.round(s.h * k));
+      const x = Math.round(s.x + (s.w - w) / 2), y = Math.round(s.y + s.h - h);
+      ctx.fillStyle = 'rgba(0,0,0,0.35)'; ctx.fillRect(x + 1, y + 1, w, h);
+      ctx.fillStyle = col; ctx.fillRect(x, y, w, h);
+      if (k >= 1) {
+        ctx.fillStyle = B.groupCol(s.b.group); ctx.fillRect(x + 1, y + 1, w - 2, s.big ? 4 : 2);   // the badge's little colour mark
+        if (s.big) { ctx.fillStyle = col; ctx.fillRect(x - 1, y + 1, 1, 3); ctx.fillRect(x + w, y + 1, 1, 3); }   // cup handles
+        if (!calm && (Math.floor(t * 0.7 + s.x * 0.37) % 9) === 0) { ctx.fillStyle = '#fffbe8'; ctx.fillRect(x, y, 1, 1); }   // a slow glint
+      }
+    }
+    for (const [id, p] of popping) { const n = p + 1 / 60; if (n > 0.5) popping.delete(id); else popping.set(id, n); }
+    // the count, top right of the wall
+    const n = B.count();
+    F().draw(ctx, `${n.earned}/${n.total}`, tw.x1, tw.top - 11, '#ffe9a8', { align: 'right', shadow: false });
+  }
+  // a tiny tooltip with the badge's name (mouse hover, or where a finger last tapped)
+  let tipSlot = null;
+  function trophyHover() {
+    tipSlot = null;
+    if (St.zoomedOut() || !L.trophyWall) return;
+    const m = AQ.Input.mouse, wx = m.x + AQ.Camera.left(), wy = m.y + AQ.Camera.top(), B = AQ.Badges;
+    for (const s of wallSlots()) {
+      if (wx >= s.x - 1 && wx < s.x + s.w + 1 && wy >= s.y - 1 && wy < s.y + s.h + 1 && !(s.b.hidden && !B.earned(s.b.id))) { tipSlot = s; break; }
+    }
+  }
+  function drawTrophyTip(ctx, left, top) {
+    if (!tipSlot) return;
+    const B = AQ.Badges, s = tipSlot, got = B.earned(s.b.id), text = (got ? B.name(s.b) : B.name(s.b, 1)).toUpperCase() + (got ? '' : '  ' + AQ.t('badge.notYet'));
+    const w = Math.min(200, F().width(text) + 6), x = Math.round(U.clamp(s.x - left + s.w / 2 - w / 2, 2, 318 - w)), y = Math.round(s.y - top - 11);
+    ctx.fillStyle = 'rgba(6,18,34,0.92)'; ctx.fillRect(x, y, w, 9);
+    ctx.fillStyle = got ? '#ffd25a' : '#5fc6d9'; ctx.fillRect(x, y, w, 1);
+    F().draw(ctx, text, x + 3, y + 2, got ? '#ffe9a8' : '#c3dfec', { shadow: false, max: w - 6 });
+  }
+  St.wallSlots = wallSlots;
 
   function renderScene(ctx, game, left, top, vw, vh) {
     const t = AQ.Render.t, P = game.player;
@@ -329,6 +436,7 @@ AQ.Station = (function () {
     });
     ctx.restore();
     tanks.forEach((tk) => drawTank(ctx, tk));
+    drawTrophyWall(ctx, left, vw);
     AQ.Assets.draw(ctx, 'misc.console', 'idle', L.console.x, L.floors[0], { t });
     AQ.Assets.draw(ctx, 'misc.beampad', 'idle', L.pad.x, L.floors[0] + 2, AQ.U.calm() ? { frame: 0 } : { t });
     // the pad's idle shimmer, brighter while beaming

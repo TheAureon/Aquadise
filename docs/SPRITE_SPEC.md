@@ -183,6 +183,13 @@ nearly see-through in the sea, so their real art can be subtle; in a tank they s
 | `creature.murmur_seal` | medium (24 × 24) | `seal` (new) | a plump pale seal pup: small head, big dark eye, whiskers, soft spots, flippers |
 | `creature.deep_drummer` | large (32 × 32) | `fish` + `drum` | a deep-bodied dusky fish with a round, taut drum-skin patch on its flank that trembles |
 
+## The trophy wall (badges)
+
+The trophy wing's shell, back wall and floor reuse the building's tiles (`tile.station_hull`,
+`tile.station_wall`, `tile.station_floor`). The wooden shelves, the plaques (4 × 5 px, bronze / silver /
+gold with a dot in the badge group's colour) and the Aquadise cup are drawn in code in
+`src/station.js` (`drawTrophyWall`); badge icons themselves are `badge.<icon>` sprites (see Badges).
+
 ## Using a different layout
 
 If a generated sheet needs a different frame size or frame count, edit its entry in
