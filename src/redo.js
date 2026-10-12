@@ -91,6 +91,7 @@ AQ.Redo = (function () {
     const d = R.dialog; R.dialog = null;
     if (!d) return;
     AQ.Audio.play('menu_select');
+    if (AQ.Badges) AQ.Badges.event('redo');                     // (a hidden badge)
     if (d.tips && AQ.Tips) AQ.Tips.reset();                   // only if you said YES
     const begin = () => {
       game.state = 'play';

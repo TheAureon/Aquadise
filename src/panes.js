@@ -17,6 +17,7 @@ AQ.Panes = (function () {
   P.add = function (n) {
     if (!(n > 0)) return;
     AQ.State.panes = P.count() + Math.floor(n);
+    if (AQ.Badges) AQ.Badges.add('panes', Math.floor(n));   // (a badge: panes collected in all)
     AQ.State.flags = AQ.State.flags || {}; AQ.State.flags.panes = true;
     if (AQ.Tips) AQ.Tips.event('panes');
     AQ.Save && AQ.Save.dirty();

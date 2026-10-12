@@ -36,6 +36,8 @@ AQ.Aquarium = (function () {
   // ---------------------------------------------------------------- open / close
   A.open = function (game, from, biome) {
     A.returnTo = from || 'play';
+    A.vibeT = 0;                                   // (Just Vibing: time on one tank screen)
+    if (AQ.Badges) AQ.Badges.event('tank');
     game.state = 'aquarium';
     if (biome) { if (A.biome !== biome) A.fish = []; A.biome = biome; }
     if (!A.biome) {
@@ -616,7 +618,20 @@ AQ.Aquarium = (function () {
     }
 
     simulate(dt, tank);
+    badgeChecks(dt);
   };
+  // badges: Just Vibing (one tank screen for a while) and Happy Little Tank (checked now and then, not per frame)
+  function badgeChecks(dt) {
+    if (!AQ.Badges) return;
+    const c = AQ.TUNING.badges;
+    A.vibeT = (A.vibeT || 0) + dt;
+    if (A.vibeT >= c.vibingSeconds) { A.vibeT = -1e9; AQ.Badges.event('vibing'); }
+    A.happyT = (A.happyT || 0) - dt;
+    if (A.happyT > 0) return;
+    A.happyT = c.happyCheckSeconds;
+    const fish = A.fish.filter((f) => f.moodId && !f.leaving);
+    if (fish.length >= c.happyTankMin && fish.every((f) => f.moodId === 'happy' || f.moodId === 'delighted')) AQ.Badges.event('happyTank');
+  }
 
   // ---------------------------------------------------------------- scrolling a bigger tank
   // Keys (AQ.TUNING.keys scrollLeft / scrollRight: arrows and A / D), dragging the water with the mouse or
@@ -677,6 +692,7 @@ AQ.Aquarium = (function () {
   }
 
   function switchTank(dir) {
+    A.vibeT = 0;
     const list = biomes();
     const i = list.findIndex((b) => b.id === A.biome);
     putBack();                                   // a carried piece goes back into the tank it came from
@@ -690,6 +706,7 @@ AQ.Aquarium = (function () {
     const L = AQ.TUNING.aquarium;
     A.shaker = { t: 0, x: camPx() + R.range(70, 250), dir: R.chance(0.5) ? 1 : -1, dropT: 0.15, left: L.feedPellets };
     AQ.Audio.play('feed');
+    if (AQ.Badges) AQ.Badges.event('feed');
   }
   function updateShaker(dt) {
     const s = A.shaker; if (!s) return;
@@ -841,6 +858,7 @@ AQ.Aquarium = (function () {
   }
   // ---------------------------------------------------------------- ONE PAIR EACH (src/pairs.js)
   function onePairEach() {
+    if (AQ.Badges) AQ.Badges.event('onePair');
     const tank = AQ.Collection.tank(A.biome), T = AQ.t;
     if (!tank.creatures.length && !tank.storage.length) { note(T('pairs.none'), '#cfe8ff'); return; }
     const plan = AQ.Pairs.plan(A.biome), lines = [];
@@ -1138,7 +1156,7 @@ AQ.Aquarium = (function () {
     if (h.flip) item.flip = true;
     if (h.layer) item.layer = h.layer;
     if (h.fromTank) { tank.decor.splice(Math.min(h.index, tank.decor.length), 0, item); pushUndo({ t: 'move', uid: item.uid, prev: h.orig }); }
-    else { tank.decor.push(item); pushUndo({ t: 'add', uid: item.uid }); }
+    else { tank.decor.push(item); pushUndo({ t: 'add', uid: item.uid }); if (AQ.Badges) { AQ.Badges.add('decorPlaced'); AQ.Badges.addTo('decorTypes', h.id); AQ.Badges.event('decor'); } }
     AQ.FX.puff(m.x, y - 2, 'rgba(240,230,200,0.6)', 4);
     AQ.Audio.play('place');
     // keep holding base decor for quick multi-placement; plants need stock
@@ -1488,6 +1506,7 @@ AQ.Aquarium = (function () {
   function snap(tank) {
     const P = A.photo, b = AQ.Tanks.get(A.biome);
     AQ.Audio.play('shutter');
+    if (AQ.Badges) { AQ.Badges.addTo('photoTanks', A.biome); AQ.Badges.event('photo'); }
     P.flash = AQ.U.calm() ? AQ.TUNING.calm.photoFlashSeconds : pcfg().flashSeconds;   // REDUCE FLASHING: a soft, slow fade
     P.flashLen = P.flash;
     if (!AQ.U.calm() && AQ.Tips) AQ.Tips.event('flash');

@@ -127,6 +127,7 @@ AQ.Nudges = (function () {
     if (!line) return false;
     N.cur = { type, key: `nudge.${type}.${line}`, t: 0, life: cfg().showSeconds, code, button: type === 'drought' && cfg().droughtRedoButton && !!AQ.Redo };
     N.lastShown = N.t; N.shown.push(N.t);
+    if (type === 'spam' && AQ.Badges) AQ.Badges.event('nudgeSpam');   // (a hidden badge)
     AQ.Audio.play('tip_new');
     return true;
   }

@@ -43,7 +43,9 @@ AQ.Player = (function () {
     const grounded = this.vy >= -1 && world.boxHits(this.x, this.y + 1.5, hb.w / 2, hb.h / 2);
     // deep enough to submerge your chest -> swim; shallow puddles are just splashed through
     const submerged = world.water(this.x, this.y - (Wk.swimDepth - hb.h / 2)) || (world.water(this.x, this.y) && !grounded);
+    const wasSwim = this.mode === 'swim';
     this.mode = submerged ? 'swim' : grounded ? 'walk' : 'air';
+    if (this.mode === 'swim' && !wasSwim && AQ.Badges) AQ.Badges.event('swim');   // (a badge: the first swim)
     this.inAir = !world.water(this.x, this.y);
     const jumpKey = this.stun <= 0 && input.wasPressed(...KB.jump, ...KB.up);
 

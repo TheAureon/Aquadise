@@ -117,6 +117,7 @@ AQ.LogUI = (function () {
 
   // ---------------------------------------------------------------- open / close
   L.open = function (game, from) {
+    if (AQ.Badges) AQ.Badges.event('log');
     AQ.Audio.play('log_open');
     if (AQ.Dive) AQ.Dive.event('log');
     L.from = from || game.state;

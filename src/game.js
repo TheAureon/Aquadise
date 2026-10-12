@@ -42,7 +42,7 @@ AQ.Game = (function () {
     const start = AQ.data.world.playerStart;
     G.player = new AQ.Player(start[0], start[1]);
     if (save) AQ.Save.apply(save, G);
-    else { if (AQ.Panes) AQ.Panes.debugTopUp(); if (AQ.Hydro) AQ.Hydro.debugTopUp(); }   // TESTING ONLY flags (a loaded save does this in Save.apply)
+    else { if (AQ.Panes) AQ.Panes.debugTopUp(); if (AQ.Hydro) AQ.Hydro.debugTopUp(); if (AQ.Badges) AQ.Badges.newGame(); }   // TESTING ONLY flags (a loaded save does this in Save.apply)
     AQ.Lang.refresh();                          // the saved LANGUAGE, else the browser's (if we have it), else English
     // a brand-new game has tutorial progress from the start, so its saves are never mistaken for an older save
     if (!AQ.State.tutorial) AQ.State.tutorial = { seen: {} };
@@ -152,6 +152,7 @@ AQ.Game = (function () {
       AQ.Guide.update(dt, G);
     }
     if (AQ.Hydro && G.player) AQ.Hydro.update(dt, G);   // the hydrophone: ripples, LISTEN (ends by itself off the sea / in menus)
+    if (AQ.Badges && G.player) AQ.Badges.update(dt, G);   // badges: events come in from the game; checks every few seconds
     if (AQ.SoundDirector) AQ.SoundDirector.update(dt, G);
     AQ.Transition.update(dt);
     if (AQ.Breeding && G.state !== 'loading') AQ.Breeding.update(dt);   // tanks live on wherever you are
@@ -220,6 +221,7 @@ AQ.Game = (function () {
     if (G.state === 'map') AQ.MapUI.draw(ctx, G);
     if (G.state === 'log') AQ.LogUI.draw(ctx, G);
     if (G.state === 'pause') AQ.PauseUI.draw(ctx, G);
+    if (AQ.Badges) AQ.Badges.drawOverlay(ctx);   // (testing only: every badge counter)
     if (AQ.Touch) AQ.Touch.drawGame(ctx);             // the touch MENU panel
   }
 

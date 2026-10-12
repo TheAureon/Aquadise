@@ -548,6 +548,38 @@ browsers won't let a page save pictures made from file:// images.
     that biome. There is no currency or shop.
   - **Overview (TANKS):** stars, species count and who's nervous or hungry, for every tank.
 
+## Badges
+
+Badges (achievements) are a cozy extra: none is missable, timed or lost, none is ever required for
+anything, and nothing about them changes the game. There are 75, in groups: First Steps, Collecting,
+Aquarium, Breeding, Exploring, Day/Night/Sky, Skill and Quirks (two of them hidden) and the final goal,
+Aquadise (every species, both sexes, every rare color). Six have tiers (Collector I-IV, Glass Collector,
+Proud Parent, Rainbow Collector, Treasure Hunter, Bottle Collector).
+
+- **The data** is `data/achievements.js`: each badge is one entry (id, group, icon, hidden, the reserved
+  `reward` field, and a condition). Conditions are reusable kinds, so new badges need no code: a
+  **counter** the game keeps (`{ counter: 'chests' }`, with a `target` or `tiers`), a **check** worked out
+  from the save (`{ check: 'discovered', where: { biome: 'coral' } }`, target `'all'`), or a one-time
+  **event** (`{ event: 'catch', match: { sneaking: true } }`, optionally `also` a check for older saves).
+  Names and descriptions are `badge.<id>.name` / `.desc` in `data/lang/en.js`.
+- **The engine** is `src/achievements.js` (`AQ.Badges`). The game calls it in a few places
+  (`AQ.Badges.event('catch', {...})`, `add('chests')`, `addTo('biomes', id)`). Event badges are checked
+  when their event happens; checks from the save run every `badges.checkSeconds` (3 s; about 1 ms).
+- **Saved** in the save file (`badges`: earned badges with their tier and dates, and the new counters), so
+  EXPORT / IMPORT SAVE carry it. **Older saves** earn everything their progress already shows, silently,
+  and see one message the first time they play: "Welcome back! You've already earned 14 badges". Counters
+  that were never tracked start from what the save shows (chests from your upgrades, panes from what you
+  have and have built, decorations from your tanks, births from graduates and the nursery), or 0.
+- **Checking the data:** `node tools/check-badges.js` reports duplicate ids, unknown species / biomes /
+  families / checks, events nobody sends, counters nobody counts, tiers out of order, badges that can't
+  be reached and missing text.
+- Tuning: `AQ.TUNING.badges` (`checkSeconds`, `envSeconds`, `deepestY` for Deep Diver, `vibingSeconds`
+  for Just Vibing, `happyTankMin`).
+- **Testing:** set `debug.badges: true` in `src/config.js`. Then **7** awards the next badge (or tier),
+  **8** awards every badge, **9** resets every badge (the counters stay, so badges your save already shows
+  come back within a few seconds, as they would for a player), and **0** shows / hides an overlay with
+  every counter and check.
+
 ## Sound and music
 
 Everything you hear is generated in code: soft effects, a quiet ambience bed for each place, and
@@ -635,6 +667,8 @@ src/aquarium.js       tanks, decorating, creature life + moods, info card, overv
 src/vibe.js           tank happiness (stars), helping/missing reasons, unlock milestones
 src/logbutton.js      the HUD counter as the collection-log button (hover, press, touch area, gentle glow)
 src/panes.js          glass panes: the building material for the tanks (count, add, spend, the counter)
+src/achievements.js   badges: events, counters, checks from the save, awarding, older saves catching up
+data/achievements.js  the badges, one entry each (checked by tools/check-badges.js)
 src/hydrophone.js     the HYDROPHONE upgrade: hearing hidden callers, ripples, edge arrows, LISTEN
 src/pairs.js          ONE PAIR EACH: which creatures a tank shows (a pair of every species) and the moves
 src/release.js        releasing creatures: which ones need a second look, RELEASE EXTRAS' choice, removing them

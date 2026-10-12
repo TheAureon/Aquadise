@@ -24,7 +24,7 @@ AQ.Save = (function () {
     if (d.v > S.VERSION) return 'newer';
     const st = d.state, obj = (o) => o == null || (typeof o === 'object' && !Array.isArray(o));
     if (!st || typeof st !== 'object' || Array.isArray(st)) return 'damaged';
-    if (!['collection', 'plants', 'tanks', 'upgrades', 'unlocks', 'tankBest', 'settings', 'log', 'flags', 'bottles', 'clock', 'starfall', 'tutorial'].every((k) => obj(st[k]))) return 'damaged';
+    if (!['collection', 'plants', 'tanks', 'upgrades', 'unlocks', 'tankBest', 'settings', 'log', 'flags', 'bottles', 'clock', 'starfall', 'tutorial', 'badges'].every((k) => obj(st[k]))) return 'damaged';
     if (st.collection && Object.values(st.collection).some((n) => typeof n !== 'number')) return 'damaged';
     if (st.tanks && Object.values(st.tanks).some((t) => !t || typeof t !== 'object' || (t.creatures != null && !Array.isArray(t.creatures)))) return 'damaged';
     if (st.clock && st.clock.hour != null && typeof st.clock.hour !== 'number') return 'damaged';
@@ -82,6 +82,9 @@ AQ.Save = (function () {
     else { AQ.State.tutorial = { seen: {}, diveAsked: true }; if (AQ.Tips) AQ.Tips.inferFromProgress(); }
     if (AQ.Sex) AQ.Sex.migrate();              // older saves: give caught creatures a sex, fill ♂/♀ log slots
     if (AQ.Nursery) AQ.Nursery.migrate();      // older saves: babies + eggs move into the Universal Nursery (if there's room)
+    // badges: a save from before badges existed earns everything its progress shows, silently
+    if (st.badges && typeof st.badges === 'object' && st.badges.earned) AQ.State.badges = st.badges;
+    if (AQ.Badges) AQ.Badges.loaded(!(st.badges && st.badges.earned));
     if (AQ.Panes) AQ.Panes.debugTopUp();       // TESTING ONLY flag: 100 glass panes
     if (AQ.Hydro) AQ.Hydro.debugTopUp();       // TESTING ONLY flag: hydrophone at max
     // where you were: scene + spot (older saves have no scene -> the sea world). Validated against
@@ -154,6 +157,7 @@ AQ.Save = (function () {
     if (AQ.Creatures) AQ.Creatures.list.filter((c) => c.landing).forEach((c) => { c.fadedOut = true; AQ.Creatures.remove(c); });   // no stars waiting in a new game
     AQ.State.upgrades = { net: 1, speed: 1, lantern: 0, depth: 0, hydro: 0 };
     AQ.State.panes = 0;
+    if (AQ.Badges) AQ.Badges.newGame();        // a new game's badges start from nothing
     if (AQ.Panes) AQ.Panes.debugTopUp();
     if (AQ.Hydro) AQ.Hydro.debugTopUp();
     game.upgrades = AQ.State.upgrades;

@@ -46,6 +46,7 @@ AQ.Gulls = (function () {
     const birds = [];
     for (let i = 0; i < n; i++) birds.push({ ox: -dir * i * R.range(7, 11) + R.range(-2, 2), oy: Math.abs(i - (n - 1) / 2) * R.range(2, 4) + R.range(-1, 1), ph: R.range(0, 6) });
     const startSX = dir > 0 ? -20 : 340;
+    if (AQ.Badges) AQ.Badges.add('gulls');   // (a badge: flocks seen)
     G.flocks.push({ x: startSX + camL * c.parallax, y: R.range(14, Math.max(16, Math.min(70, bottom - 12))), dir, speed: R.range(c.speed[0], c.speed[1]), t: 0, alpha: 0, birds });
     // a faint, far-off cry as they pass (ambience volume, rate-limited in its sound entry)
     AQ.Audio.play('gull_far', { vol: c.cryVolume, pan: dir * -0.4 });

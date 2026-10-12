@@ -58,6 +58,7 @@ AQ.Chests = (function () {
         if (Math.hypot(P.x - c.x, P.y - (c.y - 6)) < 13) {
           c.state = 'open'; c.t = 0;
           if (AQ.Tips) AQ.Tips.event('chest');
+          if (AQ.Badges) AQ.Badges.add('chests');
           const what = reward(game), panes = AQ.Panes ? AQ.Panes.roll() : 0;
           AQ.FX.sparkle(c.x, c.y - 8, '#ffe36b', 18);
           AQ.Audio.play('chest');

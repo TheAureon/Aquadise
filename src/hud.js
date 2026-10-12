@@ -13,7 +13,11 @@ AQ.HUD = (function () {
   H.update = function (dt, game) {
     const p = game.player;
     const zone = AQ.Scenes.zoneName(game);
-    if (zone !== H.lastZone) { H.lastZone = zone; H.banner = zone; H.bannerT = 0; }
+    if (zone !== H.lastZone) {
+      H.lastZone = zone; H.banner = zone; H.bannerT = 0;
+      const b = game.scene === 'world' && AQ.World.biomeAt(p.x, p.y);
+      if (b && AQ.Badges) AQ.Badges.addTo('biomes', b.id);   // (a badge: every part of the sea visited)
+    }
     H.bannerT += dt;
     H.helpT -= dt;
     for (let i = H.toasts.length - 1; i >= 0; i--) { H.toasts[i].t += dt; if (H.toasts[i].t > H.toasts[i].life) H.toasts.splice(i, 1); }

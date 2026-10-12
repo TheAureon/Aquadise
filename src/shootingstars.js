@@ -37,6 +37,7 @@ AQ.ShootingStars = (function () {
     if (bottom > 24) S.list.push(make(dir > 0 ? R.range(-10, 220) : R.range(100, 330), R.range(4, Math.max(8, Math.min(bottom - 30, 60))), dir));
     else if (game.scene === 'world') S.glows.push({ x: dir > 0 ? -40 : 360, dir, t: 0, life: R.range(1.4, 2.2), y: R.range(20, 70) });
     else return;
+    if (AQ.Badges) AQ.Badges.add('shootingStars');   // (a badge: shooting stars seen)
     if (!opts.quiet) whoosh(dir);
     if (!AQ.U.calm() && AQ.Tips) AQ.Tips.event('flash');
   };
@@ -59,6 +60,7 @@ AQ.ShootingStars = (function () {
           // start up-and-behind so the streak's middle crosses the window
           const mid = s.life * 0.5; s.x = h.x - s.vx * mid + R.range(-4, 4); s.y = h.y - s.vy * mid + R.range(-4, 4);
           S.space.push(s); whoosh(dir);
+          if (AQ.Badges) AQ.Badges.add('shootingStars');
         }
       }
       return;

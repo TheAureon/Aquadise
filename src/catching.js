@@ -119,7 +119,7 @@ AQ.Catching = (function () {
       const onBody = Math.hypot(cx - net.x, cy - net.y) <= net.r + c.r * 0.8;
       // a lure's glowing decoy: netting it only makes it puff and flicker
       if (!onBody && c.decoy && c.bhv.decoyHit && Math.hypot(c.decoy.x - net.x, c.decoy.y - net.y) <= net.r + 3) {
-        s.hits.add(c); c.bhv.decoyHit(c);
+        s.hits.add(c); c.bhv.decoyHit(c); c.lureStruck = true;   // (a badge: catch one without ever swinging at its light)
         if (!s.msg) { s.msg = true; AQ.HUD.toast(AQ.t(c.bhv.missKey), '#cfe8ff'); }
         continue;
       }
@@ -169,6 +169,10 @@ AQ.Catching = (function () {
       return;
     }
     const ctx = ctxFor(game, c);
+    // badges: how it was caught (sneaking, a bait nearby it came for, ...)
+    const bait = !!c.feeding || !!(K.bait && Math.hypot(K.bait.x - c.x, K.bait.y - c.y) < AQ.TUNING.bait.lureRadius);
+    if (AQ.Badges) AQ.Badges.event('catch', { id: c.def.id, sneaking: !!game.player.sneaking, bait, starfall: c.def.biome === 'starfall', caller: c.def.catch_behavior === 'tracker',
+      hydro: !!AQ.Hydro && AQ.Hydro.level() >= 1, lureStruck: !!c.lureStruck });
     if (c.bhv.onCaught) c.bhv.onCaught(c, ctx);
     AQ.Creatures.remove(c);
     const isNew = AQ.Collection.recordCatch(c.def, c.sex);

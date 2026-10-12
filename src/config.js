@@ -95,6 +95,16 @@ AQ.TUNING = {
     debugEvery: 2.5           // (testing sources only) seconds between their calls
   },
 
+  // Badges (src/achievements.js, data/achievements.js). They never change gameplay.
+  badges: {
+    checkSeconds: 3,          // badges worked out from the save (species, stars...) are checked this often
+    envSeconds: 0.5,          // "being there" badges (night, sunrise, a meteor shower, the deepest point) this often
+    deepestY: 1276,           // world y of "the deepest point" (the trench's very bottom; DEEP 3 reaches it)
+    vibingSeconds: 300,       // Just Vibing: this long on one tank screen
+    happyTankMin: 5,          // Happy Little Tank: at least this many creatures, all happy at once
+    happyCheckSeconds: 2      // ...checked this often while a tank is open
+  },
+
   bait: { lifetime: 22, sinkSpeed: 7, lureRadius: 95 },
 
   stealth: {
@@ -201,6 +211,11 @@ AQ.TUNING = {
     hydrophone: false,        // TESTING ONLY: true sets the hydrophone to max level (EAR 3, topped up whenever a game loads
                               //   or starts), adds 4 calling testing sources near the start (needing EAR 0..3), and draws
                               //   every hidden sound source's true position (magenta crosses + labels + your hearing range)
+    badges: false,            // TESTING ONLY: true adds four keys (any screen):
+    badgeNextKey: 'Digit7',   //   7 = award the next badge (or its next tier)
+    badgeAllKey: 'Digit8',    //   8 = award every badge (all tiers)
+    badgeResetKey: 'Digit9',  //   9 = reset every badge (the counters stay)
+    badgeOverlayKey: 'Digit0',//   0 = show / hide an overlay with every badge counter and check
     forceTouch: false         // TESTING ONLY: true shows the touch controls and makes the mouse act as a finger
   },                          //   (drag in the stick zone = joystick, click the on-screen buttons), to try them on a PC
   // Text that doesn't fit (long translations): it is squeezed sideways down to this much of its width,

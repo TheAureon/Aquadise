@@ -54,7 +54,7 @@ AQ.Hill = (function () {
       P.update(dt, W, input);
       // back down to Tide Pools off the right edge
       if (P.x >= G.w - 10 && input.axis().x > 0 && !AQ.Transition.active) AQ.Scenes.go(game, 'world', 'fromHill');
-      if (inBeam(P) && input.wasPressed(...AQ.TUNING.interactKeys)) { H.mode = 'lift'; P.vx = P.vy = 0; }
+      if (inBeam(P) && input.wasPressed(...AQ.TUNING.interactKeys)) { H.mode = 'lift'; P.vx = P.vy = 0; if (AQ.Badges) AQ.Badges.event('ufo'); }
     } else if (H.mode === 'lift') {
       // the beam carries you up into the UFO
       P.t += dt; P.anim = 'jump';

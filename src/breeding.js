@@ -98,6 +98,7 @@ AQ.Breeding = (function () {
     if (rare) { e.variant = true; AQ.Sex.logOf(id).variant = true; }
     nursery().tank().creatures.push(e);
     AQ.Sex.logOf(id).bred = true;
+    if (AQ.Badges) { AQ.Badges.add('births'); AQ.Badges.event('baby'); }
     AQ.Audio.play('baby');
     if (AQ.Tips) AQ.Tips.event('baby');
     announce(AQ.t(rare ? 'breed.bornRare' : 'breed.born', { name: d.name }));
@@ -165,6 +166,7 @@ AQ.Breeding = (function () {
         tank.court = { a: p[0].uid, b: p[1].uid, id: p[0].id, progress: 0 };
         AQ.Audio.play('court');
         if (AQ.Tips) AQ.Tips.event('court');
+        if (AQ.Badges) AQ.Badges.event('court');
         changed = true;
         continue;
       }
