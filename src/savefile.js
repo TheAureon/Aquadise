@@ -4,6 +4,10 @@
 //     as always), downloaded, or through the share sheet on phones; then "Backup saved!" with WHERE IS IT?
 //   - RESTORE A BACKUP: choose a backup file (.aquadise, or an older .json save), checked carefully,
 //     confirmed, then loaded through the usual loading + migration (the page reloads into it)
+//   - BACK UP TO ONE FILE / UPDATE MY BACKUP (browsers with the File System Access API: Chrome, Edge):
+//     asks once where to keep one backup file, remembers it (IndexedDB), then writes over that same file
+//   - COPY SAVE CODE / PASTE SAVE CODE: the save as a line of text (compressed, with a version and a
+//     checksum), for a note or an email; pasted back, it goes through the same checks as a file
 //   - ERASE MY PROGRESS, small and apart, asking twice and offering a backup first
 // Also the recovery choice when the save can't be read (with the SAFETY COPY: the automatic hidden copy
 // of the previous save, src/save.js). Words for players: BACK UP / RESTORE, never export / import.
@@ -125,11 +129,12 @@ AQ.SaveFile = (function () {
   SF.fileName = (d) => `Aquadise-backup-${stamp(d)}.aquadise`;
   SF.MIME = 'application/octet-stream';
   const touchy = () => !!(AQ.Touch && AQ.Touch.active()) || /iPhone|iPad|iPod|Android/i.test(navigator.userAgent || '');
-  // the backup's contents (it records itself as the last backup, so a restore keeps that date)
-  SF.backupText = function (game, kind) {
+  // the backup's contents (it records itself as the last backup, so a restore keeps that date). The game's
+  // own "last backup" only changes once the backup really happened (SF.backedUp), never on a cancel.
+  SF.backupText = function (game, kind, compact) {
     const b = backups(), prev = { lastAt: b.lastAt, kind: b.kind };
     b.lastAt = new Date().toISOString(); b.kind = kind || 'file';
-    try { return JSON.stringify(S().snapshot(game), null, 1); } catch (e) { Object.assign(b, prev); throw e; }
+    try { return JSON.stringify(S().snapshot(game), null, compact ? undefined : 1); } finally { b.lastAt = prev.lastAt; b.kind = prev.kind; if (prev.lastAt === undefined) delete b.lastAt; if (prev.kind === undefined) delete b.kind; }
   };
   SF.backedUp = function (kind) {
     const b = backups(); b.lastAt = new Date().toISOString(); b.kind = kind || 'file';
@@ -173,6 +178,177 @@ AQ.SaveFile = (function () {
       return true;
     } catch (e) { return false; }
   }
+
+  // ---------------------------------------------------------------- one backup file (Chrome, Edge)
+  // BACK UP TO ONE FILE asks once where to keep the file (the browser's own save dialog, with a suggested
+  // name), then remembers that file (its handle, kept in IndexedDB, per browser) and offers UPDATE MY BACKUP,
+  // which writes over it. If the browser wants permission again, the game asks with a click and says why;
+  // if the file was moved or deleted, it says so and offers to choose again. Browsers without
+  // showSaveFilePicker (Safari, Firefox, phones) never see the button.
+  const DB = 'aquadise', STORE = 'handles', KEY = 'onefile';
+  SF.one = null;                                                   // { handle, name } once chosen
+  SF.oneSupported = () => {
+    try { return !SF.oneBroken && typeof window.showSaveFilePicker === 'function' && window.isSecureContext !== false && window.self === window.top; } catch (e) { return false; }
+  };
+  function idb(mode, fn) {
+    return new Promise((resolve) => {
+      let req;
+      try { req = indexedDB.open(DB, 1); } catch (e) { resolve(null); return; }
+      req.onupgradeneeded = () => { try { req.result.createObjectStore(STORE); } catch (e) { /* already there */ } };
+      req.onerror = req.onblocked = () => resolve(null);
+      req.onsuccess = () => {
+        try {
+          const db = req.result, tx = db.transaction(STORE, mode), r = fn(tx.objectStore(STORE));
+          tx.oncomplete = () => { db.close(); resolve(r && 'result' in r ? r.result : true); };
+          tx.onerror = tx.onabort = () => { db.close(); resolve(null); };
+        } catch (e) { resolve(null); }
+      };
+    });
+  }
+  // on boot: the file this browser remembers (nothing happens without support or storage)
+  SF.loadOneFile = function () {
+    if (!SF.oneSupported() || typeof indexedDB === 'undefined') return Promise.resolve(null);
+    return idb('readonly', (st) => st.get(KEY)).then((v) => { if (v && v.handle) SF.one = { handle: v.handle, name: v.name || v.handle.name }; return SF.one; });
+  };
+  const rememberOne = (handle) => { SF.one = { handle, name: handle.name }; if (typeof indexedDB !== 'undefined') idb('readwrite', (st) => st.put({ handle, name: handle.name }, KEY)); };
+  // choose where (first time, or again): the browser's save dialog
+  function oneChoose(game) {
+    let text;
+    try { text = SF.backupText(game, 'onefile'); } catch (e) { message('save.backupFailed', ['save.backupFailed.1', 'save.nothingChanged']); return; }
+    SF.panel = { kind: 'msg', title: 'save.backingUp', lines: ['save.oneMoment'], buttons: [['ok', 'ui.ok']] };
+    inGesture(() => {
+      let picker;
+      try {
+        picker = window.showSaveFilePicker({ suggestedName: cfg().oneFileName, types: [{ description: AQ.t('save.one.type'), accept: { 'application/octet-stream': ['.aquadise'] } }] });
+      } catch (e) { picker = Promise.reject(e); }
+      picker.then((handle) => writeOne(handle, text).then(() => {
+        rememberOne(handle); SF.backedUp('onefile');
+        SF.panel = { kind: 'msg', title: 'save.backedUp', lines: [['save.backedUp.1', { file: handle.name }], 'save.one.saved.2'], buttons: [['ok', 'ui.ok']] };
+        AQ.Audio.play('menu_select');
+      }), (e) => {
+        if (e && e.name === 'AbortError') { SF.panel = { kind: 'msg', title: 'save.one.notChosen', lines: ['save.one.notChosen.1'], buttons: [['ok', 'ui.ok']] }; return; }   // closed the dialog
+        if (e && e.name === 'SecurityError') SF.oneBroken = true;  // not allowed in this page: the button goes away
+        message('save.backupFailed', ['save.backupFailed.1', 'save.backupFailed.2']);
+      }).catch(() => message('save.backupFailed', ['save.backupFailed.1', 'save.backupFailed.2']));
+    });
+  }
+  function writeOne(handle, text) {
+    return handle.createWritable().then((w) => w.write(text).then(() => w.close()));
+  }
+  // UPDATE MY BACKUP: check the file is still there and allowed, then write over it
+  function oneUpdate(game, asked) {
+    const one = SF.one; if (!one) { oneChoose(game); return; }
+    const h = one.handle, opts = { mode: 'readwrite' };
+    SF.panel = { kind: 'msg', title: 'save.backingUp', lines: ['save.oneMoment'], buttons: [['ok', 'ui.ok']] };
+    inGesture(() => {
+      const perm = asked ? (h.requestPermission ? h.requestPermission(opts) : Promise.resolve('granted')) : (h.queryPermission ? h.queryPermission(opts) : Promise.resolve('granted'));
+      perm.then((state) => {
+        if (state !== 'granted') {
+          if (asked) { SF.panel = { kind: 'msg', title: 'save.one.denied', lines: [['save.one.denied.1', { file: one.name }], 'save.nothingChanged'], buttons: [['onechoose', 'save.one.otherBtn'], ['ok', 'ui.ok']] }; return; }
+          SF.panel = { kind: 'msg', title: 'save.one.allow', lines: [['save.one.allow.1', { file: one.name }], 'save.one.allow.2'], buttons: [['oneallow', 'save.one.allowBtn'], ['cancel', 'ui.cancel']] };
+          return;
+        }
+        // still there? (moved or deleted files can't be read)
+        return h.getFile().then(() => {
+          let text;
+          try { text = SF.backupText(game, 'onefile'); } catch (e) { message('save.backupFailed', ['save.backupFailed.1', 'save.nothingChanged']); return; }
+          return writeOne(h, text).then(() => {
+            SF.backedUp('onefile');
+            SF.panel = { kind: 'msg', title: 'save.one.updated', lines: [['save.one.updated.1', { file: one.name }]], buttons: [['onechoose', 'save.one.otherBtn'], ['ok', 'ui.ok']] };
+            AQ.Audio.play('menu_select');
+          });
+        }, (e) => { if (e && (e.name === 'NotFoundError' || e.name === 'NotReadableError' || e.name === 'InvalidStateError')) oneMissing(one); else throw e; });
+      }).catch((e) => {
+        if (e && e.name === 'NotFoundError') { oneMissing(one); return; }
+        if (e && e.name === 'NotAllowedError') { SF.panel = { kind: 'msg', title: 'save.one.denied', lines: [['save.one.denied.1', { file: one.name }], 'save.nothingChanged'], buttons: [['onechoose', 'save.one.otherBtn'], ['ok', 'ui.ok']] }; return; }
+        message('save.backupFailed', ['save.backupFailed.1', 'save.backupFailed.2']);
+      });
+    });
+  }
+  function oneMissing(one) {
+    SF.panel = { kind: 'msg', title: 'save.one.missing', lines: [['save.one.missing.1', { file: one.name }], 'save.one.missing.2'], buttons: [['onechoose', 'save.one.againBtn'], ['cancel', 'ui.cancel']] };
+  }
+  SF.oneChoose = oneChoose; SF.oneUpdate = oneUpdate;
+
+  // ---------------------------------------------------------------- save codes
+  // A save code is the save as one line of text: AQ1.<z|j>.<length>.<checksum>.<data>
+  //   AQ1       the code's version (a newer one is refused kindly, like a newer backup)
+  //   z / j     the data is compressed (CompressionStream 'deflate') / not (older browsers)
+  //   length    how many characters the data has (so a cut-off code can be told apart from a damaged one)
+  //   checksum  CRC-32 of the data (8 hex digits): any changed character is caught
+  //   data      base64url (letters, digits, - and _: safe in notes, emails and chats)
+  // Spaces and line breaks are ignored when pasting (emails like to wrap long lines).
+  const CODE_VER = 1;
+  const CRC = (() => { const t = []; for (let n = 0; n < 256; n++) { let c = n; for (let k = 0; k < 8; k++) c = c & 1 ? 0xedb88320 ^ (c >>> 1) : c >>> 1; t[n] = c >>> 0; } return t; })();
+  const crc32 = (str) => { let c = 0xffffffff; for (let i = 0; i < str.length; i++) c = CRC[(c ^ str.charCodeAt(i)) & 0xff] ^ (c >>> 8); return ((c ^ 0xffffffff) >>> 0).toString(16).padStart(8, '0'); };
+  const toB64 = (bytes) => { let s = ''; for (let i = 0; i < bytes.length; i += 0x8000) s += String.fromCharCode.apply(null, bytes.subarray(i, i + 0x8000)); return btoa(s).replace(/\+/g, '-').replace(/\//g, '_').replace(/=+$/, ''); };
+  const fromB64 = (str) => { let s = str.replace(/-/g, '+').replace(/_/g, '/'); while (s.length % 4) s += '='; const bin = atob(s), u = new Uint8Array(bin.length); for (let i = 0; i < bin.length; i++) u[i] = bin.charCodeAt(i); return u; };
+  const through = (bytes, Stream) => new Response(new Blob([bytes]).stream().pipeThrough(new Stream('deflate'))).arrayBuffer().then((b) => new Uint8Array(b));
+  SF.makeCode = function (json) {
+    const raw = new TextEncoder().encode(json);
+    const wrap = (type, bytes) => { const body = toB64(bytes); return `AQ${CODE_VER}.${type}.${body.length}.${crc32(body)}.${body}`; };
+    if (typeof CompressionStream !== 'function') return Promise.resolve(wrap('j', raw));
+    return through(raw, CompressionStream).then((z) => wrap('z', z), () => wrap('j', raw));
+  };
+  // read a code back into save text; rejects with { why, have, need }
+  SF.readCode = function (text) {
+    const s = String(text || '').replace(/\s+/g, ''), no = (why, more) => Promise.reject(Object.assign({ why }, more || {}));
+    if (!/^AQ\d/i.test(s)) return no('notcode');
+    const parts = s.split('.'), ver = parseInt(parts[0].slice(2), 10);
+    if (ver > CODE_VER) return no('newer');
+    if (parts.length < 5) return no('short');
+    if (parts.length > 5 || !/^[zj]$/.test(parts[1]) || !/^\d+$/.test(parts[2]) || !/^[0-9a-f]{8}$/i.test(parts[3])) return no('damaged');
+    const need = parseInt(parts[2], 10), body = parts[4];
+    if (body.length < need) return no('short', { have: body.length, need });
+    if (body.length > need || crc32(body) !== parts[3].toLowerCase() || !/^[A-Za-z0-9_-]*$/.test(body)) return no('damaged');
+    let bytes;
+    try { bytes = fromB64(body); } catch (e) { return no('damaged'); }
+    if (parts[1] === 'j') return Promise.resolve(new TextDecoder().decode(bytes));
+    if (typeof DecompressionStream !== 'function') return no('cantopen');
+    return through(bytes, DecompressionStream).then((b) => new TextDecoder().decode(b), () => no('damaged'));
+  };
+  const roughly = (n) => (n < 1000 ? Math.max(100, Math.round(n / 100) * 100) : Math.round(n / 1000) * 1000);
+  // COPY SAVE CODE: straight to the clipboard; if the browser won't allow it, the code in a box to copy by hand
+  SF.copyCode = function (game) {
+    let json;
+    try { json = SF.backupText(game, 'code', true); } catch (e) { message('save.backupFailed', ['save.code.failed.1', 'save.nothingChanged']); return; }
+    SF.panel = { kind: 'msg', title: 'save.code.making', lines: ['save.oneMoment'], buttons: [['ok', 'ui.ok']] };
+    inGesture(() => {
+      const made = SF.makeCode(json);
+      const copied = (code) => { SF.backedUp('code'); SF.lastCode = code;
+        SF.panel = { kind: 'msg', title: 'save.code.copied', lines: [['save.code.copied.1', { n: roughly(code.length) }], 'save.code.copied.2'], buttons: [['codeshow', 'save.code.showBtn'], ['ok', 'ui.ok']] };
+        AQ.Audio.play('menu_select'); };
+      const byHand = (code) => { SF.backedUp('code'); SF.lastCode = code; SF.textBox('copy', code, game); };
+      let tried;
+      // ClipboardItem with a promise keeps the click's permission while the code is being made (Safari needs it)
+      try {
+        if (window.ClipboardItem && navigator.clipboard && navigator.clipboard.write) {
+          tried = navigator.clipboard.write([new ClipboardItem({ 'text/plain': made.then((c) => new Blob([c], { type: 'text/plain' })) })]);
+        }
+      } catch (e) { tried = null; }
+      (tried || Promise.reject(new Error('no ClipboardItem')))
+        .catch(() => made.then((c) => (navigator.clipboard && navigator.clipboard.writeText ? navigator.clipboard.writeText(c) : Promise.reject(new Error('no clipboard')))))
+        .then(() => made.then(copied), () => made.then(byHand, () => message('save.backupFailed', ['save.code.failed.1', 'save.nothingChanged'])));
+    });
+  };
+  // PASTE SAVE CODE: a box to paste into; the code is checked, then the usual confirm + restore
+  SF.pasteCode = (game) => SF.textBox('paste', '', game, (v, g) => SF.restoreCode(v, g));
+  const CODE_REFUSE = {
+    notcode: (e) => ['save.code.notCode', ['save.code.notCode.1', 'save.nothingChanged']],
+    short: (e) => ['save.code.short', [e.need ? ['save.code.short.1', { have: roughly(e.have), need: roughly(e.need) }] : 'save.code.short.0', 'save.code.short.2']],
+    damaged: () => ['save.code.damaged', ['save.code.damaged.1', 'save.nothingChanged']],
+    newer: () => ['save.newer', ['save.code.newer.1', 'save.nothingChanged']],
+    cantopen: () => ['save.code.cantOpen', ['save.code.cantOpen.1', 'save.nothingChanged']]
+  };
+  SF.restoreCode = function (text, game) {
+    const s = String(text || '').trim();
+    if (s[0] === '{') return Promise.resolve(SF.restoreText(s, game));   // a whole save pasted as text works too
+    return SF.readCode(s).then((json) => SF.restoreText(json, game), (e) => {
+      const r = (CODE_REFUSE[e && e.why] || CODE_REFUSE.damaged)(e || {});
+      SF.panel = { kind: 'msg', title: r[0], lines: r[1], buttons: e && (e.why === 'short' || e.why === 'damaged' || e.why === 'notcode') ? [['codepaste', 'save.code.againBtn'], ['ok', 'ui.ok']] : [['ok', 'ui.ok']] };
+      return false;
+    });
+  };
 
   // ---------------------------------------------------------------- WHERE IS IT? (steps for this browser)
   SF.browser = function () {
@@ -267,16 +443,22 @@ AQ.SaveFile = (function () {
   // from: 'title' | 'pause'. On the title screen with no save, RESTORE is the one to press.
   SF.openHub = function (game, from) {
     SF.panel = { kind: 'hub', from, title: 'save.hub' };
-    SF.sel = SF.hasProgress() ? 0 : 1;
+    SF.sel = SF.hasProgress() ? 0 : hubLayout().findIndex((r) => r.id === 'file');
     AQ.Audio.play('menu_select');
   };
   SF.hasProgress = () => (AQ.Title && AQ.Title.hasProgress ? AQ.Title.hasProgress() : Object.keys(AQ.State.collection || {}).length > 0);
   function hubLayout() {
     const x = HUB.x, y = HUB.y, w = HUB.w, cx = x + w / 2, prog = SF.hasProgress();
-    const ui = [
-      { id: 'backup', x: cx - 90, y: y + 52, w: 180, h: 15, label: AQ.t('save.backupBtn'), big: true, off: !prog },
-      { id: 'file', x: cx - 90, y: y + 71, w: 180, h: 15, label: AQ.t('save.restoreBtn'), big: true }
-    ];
+    let yy = y + 50;
+    const big = (id, label, off) => { ui.push({ id, x: cx - 90, y: yy, w: 180, h: 14, label: AQ.t(label), big: true, off }); yy += 17; };
+    const ui = [];
+    big('backup', 'save.backupBtn', !prog);
+    if (SF.oneSupported()) big('onefile', SF.one ? 'save.one.updateBtn' : 'save.one.btn', !prog);   // hidden where the browser can't
+    big('file', 'save.restoreBtn', false);
+    // save codes: two small ones side by side
+    ui.push({ id: 'codecopy', x: cx - 90, y: yy, w: 88, h: 10, label: AQ.t('save.code.copyBtn'), off: !prog });
+    ui.push({ id: 'codepaste', x: cx + 2, y: yy, w: 88, h: 10, label: AQ.t('save.code.pasteBtn') });
+    SF.hubTextY = yy + 15;
     ui.push({ id: 'erase', x: x + 8, y: y + HUB.h - 15, w: 84, h: 10, label: AQ.t('save.eraseBtn'), small: true, warn: true, off: !prog });
     ui.push({ id: 'close', x: x + w - 58, y: y + HUB.h - 15, w: 50, h: 10, label: AQ.t('ui.close') });
     return ui;
@@ -285,7 +467,8 @@ AQ.SaveFile = (function () {
     const failed = S().failed || S().blocked;
     const out = [[failed ? 'save.status.cant' : 'save.status.auto', null, failed ? '#ffcf8a' : '#d8eef8']];
     if (!failed) out.push(['save.status.lastSaved', { when: SF.ago(S().lastSavedAt) }, '#9fd3ee']);
-    out.push(['save.status.lastBackup', { when: SF.lastBackup() ? SF.ago(SF.lastBackup(), true) : AQ.t('save.ago.never') }, SF.reminderDue() ? '#ffe9a8' : '#9fd3ee']);
+    const kind = SF.lastBackup() && /^(file|onefile|code)$/.test(backups().kind || '') ? backups().kind : null;   // which kind of backup: a file, the one file, a code
+    out.push([kind ? `save.status.lastBackup.${kind}` : 'save.status.lastBackup', { when: SF.lastBackup() ? SF.ago(SF.lastBackup(), true) : AQ.t('save.ago.never') }, SF.reminderDue() ? '#ffe9a8' : '#9fd3ee']);
     if (SF.persisted && !failed) out.push(['save.status.persisted', null, '#8ff0b0']);
     return out;
   }
@@ -325,8 +508,9 @@ AQ.SaveFile = (function () {
       } else AQ.Aquarium.button(g, Object.assign({}, r, { on: lit && !r.warn }), lit);
     });
     // the plain explainer (and, with nothing saved yet, where to restore)
-    const hint = AQ.t(prog ? 'save.explain' : 'save.explainNew');
-    wrapPx(hint.toUpperCase(), w - 24).slice(0, 3).forEach((l, i) => F().draw(g, l, cx, y + 93 + i * 8, '#8aa4b8', { align: 'center', shadow: false }));
+    const hint = AQ.t(prog ? 'save.explain' : 'save.explainNew'), ty = SF.hubTextY || y + 93, room = y + HUB.h - 22 - ty;
+    const hl = wrapPx(hint.toUpperCase(), w - 24), hlh = hl.length * 8 <= room ? 8 : 7;
+    hl.slice(0, Math.floor(room / hlh)).forEach((l, i) => F().draw(g, l, cx, ty + i * hlh, '#8aa4b8', { align: 'center', shadow: false }));
     g.fillStyle = '#1c3a52'; g.fillRect(x + 6, y + HUB.h - 20, w - 12, 1);
   }
 
@@ -338,7 +522,7 @@ AQ.SaveFile = (function () {
     SF.panel = { kind: 'erase', title: 'save.eraseSure', lines: ['save.eraseSure.1'], buttons: [['erase2', 'save.eraseBtnFinal'], ['hub', 'ui.cancel']] };
   }
 
-  // ---------------------------------------------------------------- the paste box (save codes: stage 3 uses it)
+  // ---------------------------------------------------------------- the save code box (copy by hand / paste)
   // A real text box over the game (typing goes to it, not the game).
   SF.textBox = function (mode, text, game, onDone) {
     SF.closeBox();
@@ -355,9 +539,9 @@ AQ.SaveFile = (function () {
     const row = document.createElement('div'); row.style.cssText = 'display:flex;gap:8px;justify-content:flex-end;margin-top:8px';
     const btn = (label, fn, main) => { const b = document.createElement('button'); b.textContent = label; b.style.cssText = `font:14px monospace;padding:8px 14px;cursor:pointer;border:1px solid #6ef0ef;color:#e8fbff;background:${main ? '#2e7d96' : '#16334a'}`; b.addEventListener('click', fn); row.appendChild(b); return b; };
     if (mode === 'paste') btn(T('save.box.restore'), () => { const v = box.value.trim(); SF.closeBox(); if (v) (onDone || SF.restoreText)(v, game || AQ.Game); else SF.panel = null; }, true);
-    btn(T(mode === 'copy' ? 'ui.close' : 'ui.cancel'), () => { SF.closeBox(); SF.panel = null; });
+    btn(T(mode === 'copy' ? 'ui.close' : 'ui.cancel'), boxDone);
     // Esc closes it (typing here never reaches the game, so the box listens for itself)
-    wrap.addEventListener('keydown', (e) => { if (e.key === 'Escape') { e.preventDefault(); SF.closeBox(); SF.panel = null; } });
+    wrap.addEventListener('keydown', (e) => { if (e.key === 'Escape') { e.preventDefault(); boxDone(); } });
     wrap.appendChild(head); wrap.appendChild(box); wrap.appendChild(row);
     document.body.appendChild(wrap);
     SF.box = wrap;
@@ -365,6 +549,8 @@ AQ.SaveFile = (function () {
     setTimeout(() => { box.focus(); if (mode === 'copy') box.select(); }, 30);
   };
   SF.closeBox = function () { if (SF.box) { SF.box.remove(); SF.box = null; } };
+  // closing the box: back to SAVE & BACKUP if that's where it came from
+  const boxDone = () => { SF.closeBox(); if (SF.from && !S().blocked) SF.openHub(AQ.Game, SF.from); else SF.panel = null; };
 
   // ---------------------------------------------------------------- panel input + drawing
   const BOX_W = 248;
@@ -393,8 +579,8 @@ AQ.SaveFile = (function () {
       layout();
       SF.hover = SF.ui.find((r) => m.x >= r.x && m.y >= r.y && m.x < r.x + r.w && m.y < r.y + r.h);
       if (SF.panel.kind === 'box') {                               // the text box over the game has the input
-        if (I.rawPressed('Escape')) { I.consume('Escape'); SF.closeBox(); SF.panel = null; }
-        else if (m.pressed[0] && SF.hover) { m.pressed[0] = false; SF.closeBox(); SF.panel = null; }
+        if (I.rawPressed('Escape')) { I.consume('Escape'); boxDone(); }
+        else if (m.pressed[0] && SF.hover) { m.pressed[0] = false; boxDone(); }
         return true;
       }
       pick = m.pressed[0] && SF.hover ? SF.hover.id : null;
@@ -406,12 +592,18 @@ AQ.SaveFile = (function () {
     const p = SF.panel, back = () => (S().blocked ? SF.openRecover() : p.from || SF.from ? SF.openHub(game, p.from || SF.from) : (SF.panel = null));
     if (p.kind === 'hub') SF.from = p.from;
     if (p.kind === 'remind') SF.from = null;
-    if (pick !== 'backup' && pick !== 'file') AQ.Audio.play('menu_select');
+    if (!/^(backup|file|onefile|oneallow|onechoose|codecopy)$/.test(pick)) AQ.Audio.play('menu_select');
     if (pick === 'close') { SF.panel = null; SF.from = null; }
     else if (pick === 'ok' || pick === 'cancel' || pick === 'hub') back();
     else if (pick === 'backup') SF.backUp(game);
     else if (pick === 'file') { SF.panel = null; SF.chooseFile(game); }
     else if (pick === 'where') whereIsIt();
+    else if (pick === 'onefile') (SF.one ? oneUpdate : oneChoose)(game);
+    else if (pick === 'oneallow') oneUpdate(game, true);              // the click the browser needs to ask again
+    else if (pick === 'onechoose') oneChoose(game);
+    else if (pick === 'codecopy') SF.copyCode(game);
+    else if (pick === 'codepaste') SF.pasteCode(game);
+    else if (pick === 'codeshow') SF.textBox('copy', SF.lastCode || '', game);
     else if (pick === 'later') { backups().snoozeUntil = new Date(Date.now() + cfg().remindLaterDays * 86400000).toISOString(); AQ.Save && AQ.Save.dirty(); SF.panel = null; }
     else if (pick === 'noremind') { AQ.State.settings = AQ.State.settings || {}; AQ.State.settings.backupReminders = false; AQ.Save && AQ.Save.dirty(); message('save.remindOffDone', ['save.remindOffDone.1']); }
     else if (pick === 'erase') eraseAsk();

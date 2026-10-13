@@ -509,5 +509,6 @@ AQ.TUNING = {
     remindSpecies: 10,                     // ...or this many species
     remindDays: 7,                         // ...and no backup yet, or the last one older than this many days
     remindLaterDays: 7,                    // LATER: asks again after this many days
-    tipAfterPlaySeconds: 3600 },           // the one-time tip about backups, after this much play
+    tipAfterPlaySeconds: 3600,             // the one-time tip about backups, after this much play
+    oneFileName: 'Aquadise-backup.aquadise' },   // BACK UP TO ONE FILE: the name suggested the first time (the player can change it)
 };

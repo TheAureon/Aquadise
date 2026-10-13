@@ -151,6 +151,9 @@ const SCREENS = [
   ['touch-menu', () => { AQ.Touch.menuOpen = true; }],
   ['save-hub', () => { AQ.SaveFile.openHub(AQ.Game, 'title'); }],
   ['save-remind', () => { AQ.SaveFile.showReminder(AQ.Game); }],
+  ['save-one', () => { if (!AQ.SaveFile.one) AQ.SaveFile.one = { name: 'Aquadise-backup.aquadise' }; AQ.SaveFile.openHub(AQ.Game, 'title'); }],
+  ['save-code-short', () => { AQ.SaveFile.restoreCode('AQ1.z.900.00000000.abcdef', AQ.Game); }],
+  ['save-code-bad', () => { AQ.SaveFile.restoreCode('not a code', AQ.Game); }],
   ['save-where', () => { AQ.SaveFile.lastFile = 'Aquadise-backup-2026-10-13-1224.aquadise'; AQ.SaveFile.whereIsIt(); }],
   ['save-panel', () => { AQ.Touch.menuOpen = false; AQ.State.settings.touchControls = 'off'; AQ.Touch.refresh(); AQ.Title.open(AQ.Game); AQ.SaveFile.openRecover(); }]
 ];

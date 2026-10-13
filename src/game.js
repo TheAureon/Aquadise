@@ -57,7 +57,7 @@ AQ.Game = (function () {
     AQ.Scenes.restore(G, G.scene, G.player.x, G.player.y);
     document.getElementById('loading').style.display = 'none';
     AQ.Title.open(G);
-    if (AQ.SaveFile) AQ.SaveFile.checkPersisted();
+    if (AQ.SaveFile) { AQ.SaveFile.checkPersisted(); AQ.SaveFile.loadOneFile(); }   // is the save kept? which one backup file this browser remembers
     if (AQ.Save && AQ.Save.blocked && AQ.SaveFile) AQ.SaveFile.openRecover();   // the save couldn't be read: ask, never overwrite silently
     requestAnimationFrame(loop);
   };
@@ -153,8 +153,8 @@ AQ.Game = (function () {
       AQ.Guide.update(dt, G);
     }
     if (AQ.Hydro && G.player) AQ.Hydro.update(dt, G);   // the hydrophone: ripples, LISTEN (ends by itself off the sea / in menus)
-    if (AQ.Badges && G.player) AQ.Badges.update(dt, G);
-    if (AQ.SaveFile && G.player) AQ.SaveFile.tick(dt, G);   // play time, keeping the save, the gentle backup reminder   // badges: events come in from the game; checks every few seconds
+    if (AQ.Badges && G.player) AQ.Badges.update(dt, G);   // badges: events come in from the game; checks every few seconds
+    if (AQ.SaveFile && G.player) AQ.SaveFile.tick(dt, G);   // play time, keeping the save, the gentle backup reminder
     if (AQ.SoundDirector) AQ.SoundDirector.update(dt, G);
     AQ.Transition.update(dt);
     if (AQ.Breeding && G.state !== 'loading') AQ.Breeding.update(dt);   // tanks live on wherever you are

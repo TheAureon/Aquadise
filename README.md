@@ -421,6 +421,26 @@ browsers won't let a page save pictures made from file:// images.
     this game understands) and refuses anything else with a friendly message, asks before replacing the
     current game, and loads it through the normal loading and migration. The current game becomes the
     safety copy.
+  - **BACK UP TO ONE FILE** (only where the browser can: Chrome and Edge on a computer, through the File
+    System Access API; the button is hidden everywhere else). The first time, the browser's own save
+    dialog asks where to keep the file (suggested name `saveFile.oneFileName`). The game remembers that
+    file (its handle, in IndexedDB, per browser) and the button becomes **UPDATE MY BACKUP**, which
+    writes over the same file without asking again. If the browser wants permission again, a calm "One
+    quick check" panel explains it and the ALLOW click asks the browser. If the file was moved, renamed
+    or deleted, "Can't find your backup file" offers CHOOSE AGAIN; USE ANOTHER FILE switches files. Closing
+    the dialog changes nothing. The file is the same backup as BACK UP MY GAME, so RESTORE A BACKUP reads it.
+  - **COPY SAVE CODE / PASTE SAVE CODE:** the save as one line of text, for a note or an email:
+    `AQ1.<z|j>.<length>.<checksum>.<data>` (code version; compressed with CompressionStream 'deflate', or
+    plain where that's missing; the data's length, so a cut-off code is told apart from a damaged one; a
+    CRC-32; base64url). A full collection is about 3,000 characters. COPY puts it on the clipboard and
+    says roughly how long it is; if the browser won't allow the clipboard, the code shows in a box to
+    copy by hand (SHOW CODE shows it again). PASTE opens a box; spaces and line breaks are ignored (emails
+    wrap long lines); a cut-off, damaged, unknown or newer code gets a friendly message (with TRY AGAIN);
+    a good one goes through the same checks, confirm and restore as a file. A whole save pasted as text
+    works too.
+  - **Last backup** counts all three kinds (a file, the one file, a code), and the status block says which
+    ("Last backup: today, as a save code"). A backup only counts once it really happened: a closed
+    dialog or a refused share changes nothing.
   - **ERASE MY PROGRESS** asks twice: first "Back up first?" (BACK UP FIRST / ERASE ANYWAY / CANCEL),
     then "Erase everything?". Backups already made are never touched.
   - **Safety:** before every save the previous good one is kept as the **SAFETY COPY** (an automatic
@@ -449,7 +469,7 @@ browsers won't let a page save pictures made from file:// images.
   - A one-time tip after `saveFile.tipAfterPlaySeconds` of play points to SAVE & BACKUP (skipped for
     players who already made a backup), and the Guide has a **Saving and backups** page.
   - Tuning: `saveFile.maxImportBytes`, `saveFile.gestureWaitMs`, `remindPlaySeconds`, `remindSpecies`,
-    `remindDays`, `remindLaterDays`, `tipAfterPlaySeconds`.
+    `remindDays`, `remindLaterDays`, `tipAfterPlaySeconds`, `oneFileName`.
 - **Key bindings in one place:** `AQ.TUNING.keys` in config.js (plus `interactKeys`, `audio.muteKey`,
   `photo.key`, `station.zoomKey`). The game reads them, and the help line, the title's CONTROLS panel
   and every tip show key names from them (`src/keys.js`), so changing a key changes the text too.
@@ -751,7 +771,7 @@ src/dive.js           the optional guided first dive: prompt, steps, checklist, 
 src/redo.js           REDO TUTORIAL: the question, the trip to the Tide Pools and back
 src/nudges.js         friendly nudges: noticing a stuck player (net spam, no catch, key mashing), rate limits
 src/guide.js          the GUIDE: a paged field-guide book (title, pause menu, help-line key)
-src/savefile.js       SAVE & BACKUP: backing up, restoring (checks + confirm), erasing, the save-recovery choice
+src/savefile.js       SAVE & BACKUP: backing up (file, one file, save code), restoring (checks + confirm), erasing, reminders, the save-recovery choice
 src/starfall.js       falling stars + meteor showers: nightly plan, landings, light columns, map/HUD marks
 src/bottles.js        message bottles: deterministic, reachable placement, pickup, glint
 assets/sprites-embedded.js   base64 copy of the sprites for file:// (tools/embed-sprites.js)
