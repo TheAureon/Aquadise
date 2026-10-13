@@ -38,6 +38,7 @@ AQ.Tips = (function () {
     graduated: () => !!(AQ.State.flags && AQ.State.flags.graduated),
     panes: () => (AQ.State.panes || 0) > 0 || !!(AQ.State.flags && AQ.State.flags.panes),
     hydro: () => ((AQ.State.upgrades || {}).hydro || 0) > 0,
+    backedUp: () => !!(AQ.State.backups && AQ.State.backups.lastAt),
     badge: () => !!(AQ.State.badges && Object.keys(AQ.State.badges.earned || {}).length)
   };
   function caught(test) { return Object.keys(AQ.State.collection || {}).some((id) => { const d = AQ.data.creatures.find((x) => x.id === id); return d && test(d); }); }

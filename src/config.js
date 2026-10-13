@@ -503,6 +503,11 @@ AQ.TUNING = {
   },
 
   save: { key: 'aquadise.save.v1', autosaveEvery: 10 },
-  saveFile: { maxImportBytes: 5000000,    // IMPORT SAVE refuses files bigger than this (a normal save is a few KB)
-    gestureWaitMs: 400 },                  // a download / file picker waits this long for the click to finish (browsers need it)
+  saveFile: { maxImportBytes: 5000000,    // RESTORE A BACKUP refuses files bigger than this (a normal save is a few KB)
+    gestureWaitMs: 400,                    // a download / file picker waits this long for the click to finish (browsers need it)
+    remindPlaySeconds: 3600,               // the backup reminder needs real progress: this much play...
+    remindSpecies: 10,                     // ...or this many species
+    remindDays: 7,                         // ...and no backup yet, or the last one older than this many days
+    remindLaterDays: 7,                    // LATER: asks again after this many days
+    tipAfterPlaySeconds: 3600 },           // the one-time tip about backups, after this much play
 };

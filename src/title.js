@@ -262,6 +262,7 @@ AQ.Title = (function () {
       const nudge = on ? Math.round(Math.sin(T.t * 5)) : 0;
       if (it.icon) icon(g, it.icon, it.x + 5 + nudge, it.y + 2, on ? '#6ef0ef' : '#7fb6cc');
       F().draw(g, it.label, it.x + it.w / 2 + (it.icon ? 5 : 0), it.y + 3, on ? '#ffffff' : '#c3dfec', { align: 'center', shadow: on ? false : SH, max: it.w - (it.icon ? 14 : 4) });
+      if (it.id === 'saves' && AQ.SaveFile) AQ.SaveFile.drawDot(g, it);   // a backup reminder is due
     });
     const c = AQ.Collection.progress();
     F().draw(g, AQ.t('title.progress', { n: c.discovered, total: c.total, done: c.complete }), 316, 172, '#7fa4ba', { align: 'right', shadow: SH, max: 150 });

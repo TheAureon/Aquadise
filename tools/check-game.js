@@ -150,6 +150,7 @@ const SCREENS = [
   ['touch-controls', () => { const G = AQ.Game; AQ.State.settings.touchControls = 'on'; AQ.Touch.refresh(); G.state = 'play'; AQ.Scenes.restore(G, 'world', 300, 80); }],
   ['touch-menu', () => { AQ.Touch.menuOpen = true; }],
   ['save-hub', () => { AQ.SaveFile.openHub(AQ.Game, 'title'); }],
+  ['save-remind', () => { AQ.SaveFile.showReminder(AQ.Game); }],
   ['save-where', () => { AQ.SaveFile.lastFile = 'Aquadise-backup-2026-10-13-1224.aquadise'; AQ.SaveFile.whereIsIt(); }],
   ['save-panel', () => { AQ.Touch.menuOpen = false; AQ.State.settings.touchControls = 'off'; AQ.Touch.refresh(); AQ.Title.open(AQ.Game); AQ.SaveFile.openRecover(); }]
 ];

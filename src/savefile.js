@@ -40,6 +40,68 @@ AQ.SaveFile = (function () {
   SF.lastBackup = () => backups().lastAt || null;
   SF.daysSinceBackup = () => { const b = SF.lastBackup(); return b ? (Date.now() - new Date(b).getTime()) / 86400000 : Infinity; };
 
+  // ---------------------------------------------------------------- play time, keeping the save, reminders
+  // Play time (AQ.State.backups.play, seconds playing in the sea / building / tanks; older saves start at 0).
+  // Once there's real progress (the first catch), the game quietly asks the browser to treat this site's
+  // storage as important (navigator.storage.persist): no prompt of our own; the result is one line in the
+  // status block, and only if the browser said yes. It doesn't protect against clearing browser data.
+  // The backup reminder: only with real progress (saveFile.remindPlaySeconds of play or remindSpecies
+  // species), no backup yet or the last one older than remindDays, on a calm screen (the title or the pause
+  // menu, never mid-play, mid-transition, on a tank screen or during the guided dive), once a session.
+  // BACK UP NOW / LATER (remindLaterDays) / DON'T REMIND ME (turned back on in SETTINGS > OPTIONS).
+  SF.remindersOn = () => !(AQ.State.settings && AQ.State.settings.backupReminders === false);
+  SF.playSeconds = () => backups().play || 0;
+  SF.realProgress = () => SF.playSeconds() >= cfg().remindPlaySeconds || AQ.Collection.progress().discovered >= cfg().remindSpecies;
+  SF.reminderDue = function () {
+    if (!SF.remindersOn() || !SF.realProgress()) return false;
+    if (SF.daysSinceBackup() < cfg().remindDays) return false;
+    return !(backups().snoozeUntil && Date.now() < new Date(backups().snoozeUntil).getTime());
+  };
+  let playAcc = 0;
+  SF.reminded = false;                                             // shown this session already
+  function calm(game) {
+    if (SF.panel || (AQ.Transition && AQ.Transition.active) || (AQ.Redo && AQ.Redo.dialog) || (AQ.Dive && (AQ.Dive.active() || AQ.Dive.prompt))) return false;
+    if (game.state === 'title') return !AQ.Title.panel;
+    if (game.state === 'pause') return !AQ.PauseUI.panel;
+    return false;
+  }
+  SF.tick = function (dt, game) {
+    if (game.state === 'play' || game.state === 'aquarium') {
+      playAcc += dt;
+      if (playAcc >= 1) {
+        const b = backups(), was = b.play || 0;
+        b.play = was + playAcc; playAcc = 0;
+        if (was < cfg().tipAfterPlaySeconds && b.play >= cfg().tipAfterPlaySeconds && AQ.Tips) AQ.Tips.event('backups');   // "an hour in: about backups"
+      }
+    }
+    if (!persistTried && Object.keys(AQ.State.collection || {}).length) askPersist();
+    if (!SF.reminded && calm(game) && SF.reminderDue()) { SF.reminded = true; SF.showReminder(game); }
+  };
+  SF.showReminder = function (game) {
+    SF.panel = { kind: 'remind', title: 'save.remind', lines: [SF.lastBackup() ? ['save.remind.old', { when: SF.ago(SF.lastBackup(), true) }] : 'save.remind.never', 'save.remind.2'],
+      buttons: [['backup', 'save.remindNow'], ['later', 'save.remindLater'], ['noremind', 'save.remindOff']], from: game.state };
+    AQ.Audio.play('tip_new');
+  };
+  // Asked once per browser (not per save: a backup restored somewhere else asks that browser too), so the
+  // note lives next to the save rather than in it. Firefox may show its own small question; the others
+  // decide by themselves. The answer is only kept for this session (SF.persisted), never in the save.
+  const ASKED = 'aquadise.persistAsked';
+  const ls = () => { try { return window.localStorage; } catch (e) { return null; } };
+  SF.persisted = false;
+  let persistTried = false;
+  function askPersist() {
+    persistTried = true;
+    const store = ls();
+    try { if (!store || store.getItem(ASKED)) return; store.setItem(ASKED, '1'); } catch (e) { return; }   // blocked storage: nothing to keep anyway
+    try {
+      if (navigator.storage && navigator.storage.persist) navigator.storage.persist().then((ok) => { SF.persisted = !!ok; }, () => {});
+    } catch (e) { /* not available: nothing to show */ }
+  }
+  // on boot: does the browser already keep this save? (it may have decided by itself, or said yes before)
+  SF.checkPersisted = function () {
+    try { if (navigator.storage && navigator.storage.persisted) navigator.storage.persisted().then((ok) => { SF.persisted = !!ok; }, () => {}); } catch (e) { /* fine */ }
+  };
+
   // ---------------------------------------------------------------- inside the click itself
   // Browsers only allow a download, the share sheet, the clipboard and the file picker during the click /
   // tap / key press itself, and some (Safari, phones, embedded pages) are strict about it. The game sees a
@@ -223,7 +285,8 @@ AQ.SaveFile = (function () {
     const failed = S().failed || S().blocked;
     const out = [[failed ? 'save.status.cant' : 'save.status.auto', null, failed ? '#ffcf8a' : '#d8eef8']];
     if (!failed) out.push(['save.status.lastSaved', { when: SF.ago(S().lastSavedAt) }, '#9fd3ee']);
-    out.push(['save.status.lastBackup', { when: SF.lastBackup() ? SF.ago(SF.lastBackup(), true) : AQ.t('save.ago.never') }, '#9fd3ee']);
+    out.push(['save.status.lastBackup', { when: SF.lastBackup() ? SF.ago(SF.lastBackup(), true) : AQ.t('save.ago.never') }, SF.reminderDue() ? '#ffe9a8' : '#9fd3ee']);
+    if (SF.persisted && !failed) out.push(['save.status.persisted', null, '#8ff0b0']);
     return out;
   }
   function hubUpdate(game) {
@@ -247,8 +310,9 @@ AQ.SaveFile = (function () {
     g.fillStyle = '#6ef0ef'; g.fillRect(x, y, w, 1);
     F().draw(g, AQ.t('save.hub'), cx, y + 5, '#fff6dc', { align: 'center', shadow: false, max: w - 10 });
     // how saving stands
+    const lines = hubLines(), lh = lines.length > 3 ? 7 : 8;
     g.fillStyle = '#0d2236'; g.fillRect(x + 6, y + 15, w - 12, 31);
-    hubLines().forEach(([k, v, col], i) => F().draw(g, AQ.t(k, v || undefined), x + 11, y + 19 + i * 8, col, { shadow: false, max: w - 22 }));
+    lines.forEach(([k, v, col], i) => F().draw(g, AQ.t(k, v || undefined), x + 11, y + 18 + i * lh, col, { shadow: false, max: w - 22 }));
     // the two big buttons (RESTORE lit when there's nothing to back up yet)
     const ui = SF.ui = SF.ui.length ? SF.ui : hubLayout(), prog = SF.hasProgress();
     ui.forEach((r, i) => {
@@ -341,12 +405,15 @@ AQ.SaveFile = (function () {
     I.consume('Escape', 'Enter'); m.pressed[0] = false;
     const p = SF.panel, back = () => (S().blocked ? SF.openRecover() : p.from || SF.from ? SF.openHub(game, p.from || SF.from) : (SF.panel = null));
     if (p.kind === 'hub') SF.from = p.from;
+    if (p.kind === 'remind') SF.from = null;
     if (pick !== 'backup' && pick !== 'file') AQ.Audio.play('menu_select');
     if (pick === 'close') { SF.panel = null; SF.from = null; }
     else if (pick === 'ok' || pick === 'cancel' || pick === 'hub') back();
     else if (pick === 'backup') SF.backUp(game);
     else if (pick === 'file') { SF.panel = null; SF.chooseFile(game); }
     else if (pick === 'where') whereIsIt();
+    else if (pick === 'later') { backups().snoozeUntil = new Date(Date.now() + cfg().remindLaterDays * 86400000).toISOString(); AQ.Save && AQ.Save.dirty(); SF.panel = null; }
+    else if (pick === 'noremind') { AQ.State.settings = AQ.State.settings || {}; AQ.State.settings.backupReminders = false; AQ.Save && AQ.Save.dirty(); message('save.remindOffDone', ['save.remindOffDone.1']); }
     else if (pick === 'erase') eraseAsk();
     else if (pick === 'erasebackup') SF.backUp(game, 'erase');
     else if (pick === 'erase1') eraseSure();
@@ -373,5 +440,14 @@ AQ.SaveFile = (function () {
   };
   // the small "can't save right now" line for the title / pause screens
   SF.statusLine = () => (S().failed ? AQ.t('save.cantSaveLine') : null);
+  // the pause menu's line: the last backup, only once it's been a while
+  SF.pauseLine = () => (SF.lastBackup() && SF.daysSinceBackup() > cfg().remindDays ? AQ.t('save.pauseLastBackup', { when: SF.ago(SF.lastBackup(), true) }) : null);
+  // the small dot on the SAVE & BACKUP button while a reminder is due
+  SF.drawDot = function (g, r) {
+    if (!SF.reminderDue()) return;
+    const x = r.x + r.w - 5, y = r.y + 2, on = AQ.U.calm() || Math.floor(performance.now() / 700) % 2 === 0;
+    g.fillStyle = '#3a2410'; g.fillRect(x - 1, y - 1, 5, 5);
+    g.fillStyle = on ? '#ffd25a' : '#d8a840'; g.fillRect(x, y, 3, 3);
+  };
   return SF;
 })();

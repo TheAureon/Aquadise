@@ -432,7 +432,24 @@ browsers won't let a page save pictures made from file:// images.
   - **Why it waits for the click to finish:** some browsers only allow a download, the file picker or the
     share sheet during the click or tap itself, and the game sees a click a frame later. So these run
     when the button is let go (`saveFile.gestureWaitMs`).
-  - Tuning: `saveFile.maxImportBytes`, `saveFile.gestureWaitMs`.
+  - **Keeping the save:** after the first catch the game quietly asks the browser to treat its storage as
+    important (`navigator.storage.persist`, once per browser; Firefox may show its own small question,
+    the others decide by themselves). If the browser says yes, the status block adds "Your browser will
+    try to keep this save safe." (and nothing if not). It makes the browser less likely to tidy the save
+    away when space runs low; it doesn't protect against clearing browser data, so backups still matter.
+    The answer is checked each session and never stored in the save.
+  - **Backup reminder:** only when all of these hold: real progress (`saveFile.remindPlaySeconds` of
+    play, counted in the save as `AQ.State.backups.play`, or `remindSpecies` species); no backup yet or
+    the last one older than `remindDays`; a calm screen (the title or pause menu with nothing else open,
+    never mid-play, mid-transition, on tank screens or in the guided dive); at most once a session. It
+    offers BACK UP NOW, LATER (asks again after `remindLaterDays`) and DON'T REMIND ME (off for good;
+    SETTINGS > OPTIONS > BACKUP REMINDERS turns it back on). While a reminder is due, the SAVE & BACKUP
+    button has a small dot and the last-backup line is highlighted. The pause menu shows "LAST BACKUP:
+    ..." only once the last backup is older than `remindDays`.
+  - A one-time tip after `saveFile.tipAfterPlaySeconds` of play points to SAVE & BACKUP (skipped for
+    players who already made a backup), and the Guide has a **Saving and backups** page.
+  - Tuning: `saveFile.maxImportBytes`, `saveFile.gestureWaitMs`, `remindPlaySeconds`, `remindSpecies`,
+    `remindDays`, `remindLaterDays`, `tipAfterPlaySeconds`.
 - **Key bindings in one place:** `AQ.TUNING.keys` in config.js (plus `interactKeys`, `audio.muteKey`,
   `photo.key`, `station.zoomKey`). The game reads them, and the help line, the title's CONTROLS panel
   and every tip show key names from them (`src/keys.js`), so changing a key changes the text too.

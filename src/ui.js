@@ -757,9 +757,10 @@ AQ.PauseUI = (function () {
     g.fillStyle = 'rgba(4,12,24,0.75)'; g.fillRect(0, 0, 320, 180);
     if (P.panel === 'sound') { AQ.SoundUI.draw(g); return; }
     F().draw(g, AQ.t('pause.title'), 160, 26, '#ffe9a8', { align: 'center' });
-    for (const r of P.ui) AQ.Aquarium.button(g, r, P.hover === r);
-    const warn = AQ.SaveFile && AQ.SaveFile.statusLine();
+    for (const r of P.ui) { AQ.Aquarium.button(g, r, P.hover === r); if (r.id === 'saves' && AQ.SaveFile) AQ.SaveFile.drawDot(g, r); }
+    const warn = AQ.SaveFile && AQ.SaveFile.statusLine(), old = AQ.SaveFile && AQ.SaveFile.pauseLine();
     F().draw(g, warn || AQ.t('pause.autosave'), 160, 162, warn ? '#ffcf8a' : '#8aa4b8', { align: 'center' });
+    if (old && !warn) F().draw(g, old, 160, 170, '#ffe9a8', { align: 'center' });   // (only once it's been a while)
     if (AQ.SaveFile) AQ.SaveFile.draw(g);
   };
   return P;
