@@ -16,6 +16,7 @@ AQ.Title = (function () {
     AQ.FX.list.length = 0;
   };
 
+  T.hasProgress = () => hasProgress();
   function hasProgress() {
     const S = AQ.State;
     return Object.keys(S.collection).length > 0 || S.upgrades.net > 1 || S.upgrades.speed > 1 || S.upgrades.lantern > 0 || S.upgrades.depth > 0 || S.upgrades.hydro > 0 || (AQ.Game && AQ.Game.scene && AQ.Game.scene !== 'world');
@@ -34,10 +35,8 @@ AQ.Title = (function () {
     const rows = items.filter((it) => it.pair !== 'r').length + 1, y0 = 80 - (rows - 4) * 6;
     let row = -1;
     items.forEach((it) => { if (it.pair !== 'r') row++; Object.assign(it, it.pair ? { x: it.pair === 'l' ? 108 : 161, y: y0 + row * 14, w: 51, h: 11, half: true } : { x: 108, y: y0 + row * 14, w: 104, h: 11 }); });
-    // save files share the last row: EXPORT SAVE | IMPORT SAVE (src/savefile.js)
-    const yl = y0 + (row + 1) * 14;
-    items.push({ id: 'export', label: AQ.t('ui.exportSave'), x: 108, y: yl, w: 51, h: 11, half: true });
-    items.push({ id: 'import', label: AQ.t('ui.importSave'), x: 161, y: yl, w: 51, h: 11, half: true });
+    // SAVE & BACKUP (src/savefile.js), full width on the last row
+    items.push({ id: 'saves', label: AQ.t('title.saves'), icon: 'disk', x: 108, y: y0 + (row + 1) * 14, w: 104, h: 11 });
     return items;
   }
 
@@ -110,8 +109,7 @@ AQ.Title = (function () {
     else if (it.id === 'controls') T.panel = 'controls';
     else if (it.id === 'guide') AQ.Guide.open(game, 'title');
     else if (it.id === 'redo') AQ.Redo.ask(game, 'title');
-    else if (it.id === 'export') AQ.SaveFile.exportSave(game);
-    else if (it.id === 'import') AQ.SaveFile.pickImport(game);
+    else if (it.id === 'saves') AQ.SaveFile.openHub(game, 'title');
     else if (it.id === 'sound') { T.panel = 'sound'; AQ.SoundUI.open(); }
   }
   function start(game) {
@@ -163,6 +161,7 @@ AQ.Title = (function () {
     fish: ['.......', '..###.#', '.#####.', '##.####', '.#####.', '..###.#', '.......'],
     book: ['.##.##.', '#..#..#', '#..#..#', '#..#..#', '#..#..#', '.##.##.', '...#...'],
     pad:  ['.......', '.#####.', '#.#...#', '###.#.#', '#.#...#', '.#####.', '.......'],
+    disk: ['...#...', '...#...', '.#.#.#.', '..###..', '...#...', '#.....#', '#######'],   // save & backup: an arrow into a tray
     note: ['...####', '...#..#', '...#..#', '...#..#', '.###.##', '####.##', '.##....']
   };
   function icon(g, name, x, y, col) {
@@ -269,6 +268,7 @@ AQ.Title = (function () {
     F().draw(g, AQ.t('title.howTo'), 4, 172, '#7fa4ba', { shadow: SH, max: 150 });
     const warn = AQ.SaveFile && AQ.SaveFile.statusLine();
     if (warn) F().draw(g, warn, 160, 164, '#ffcf8a', { align: 'center', shadow: SH });
+    else if (!T.panel && !hasProgress()) { const it = T.items.find((x) => x.id === 'saves'); if (it) F().draw(g, AQ.t('title.restoreHint'), 160, it.y + 14, '#9fd3ee', { align: 'center', shadow: SH, max: 200 }); }   // "Have a backup? Restore it here." 
     T.drawFade(g);
     if (AQ.SaveFile) AQ.SaveFile.draw(g);
   };

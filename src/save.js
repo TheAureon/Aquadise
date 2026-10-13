@@ -72,6 +72,8 @@ AQ.Save = (function () {
     if (AQ.Tanks) AQ.Tanks.migrate();
     AQ.State.flags = st.flags || {};
     AQ.State.bottles = st.bottles || {};       // older saves: no bottles found yet
+    AQ.State.backups = st.backups && typeof st.backups === 'object' ? st.backups : {};   // when the last backup was made (older saves: never)
+    S.lastSavedAt = data.savedAt || null;
     AQ.State.clock = st.clock && typeof st.clock.hour === 'number' ? st.clock : { hour: AQ.TUNING.clock.startHour };   // saves keep their time (very old ones without a clock start mid-morning)
     // falling stars (night count, tonight's plan, stars still waiting); older saves start at night 0
     const sf = st.starfall;
@@ -101,7 +103,7 @@ AQ.Save = (function () {
       const prev = store.getItem(key());
       if (prev) { try { if (S.check(S.parse(prev)) === 'ok') store.setItem(backupKey(), prev); } catch (e) { /* unreadable: never copied over the backup */ } }
       store.setItem(key(), JSON.stringify(S.snapshot(game)));
-      S.isDirty = false;
+      S.isDirty = false; S.lastSavedAt = new Date().toISOString();
       if (S.failed) { S.failed = false; if (AQ.HUD) AQ.HUD.toast(AQ.t('save.worksAgain'), '#8ff0b0', 3); }
       return true;
     } catch (e) {
@@ -157,6 +159,7 @@ AQ.Save = (function () {
     if (AQ.Creatures) AQ.Creatures.list.filter((c) => c.landing).forEach((c) => { c.fadedOut = true; AQ.Creatures.remove(c); });   // no stars waiting in a new game
     AQ.State.upgrades = { net: 1, speed: 1, lantern: 0, depth: 0, hydro: 0 };
     AQ.State.panes = 0;
+    AQ.State.backups = {};                     // a new game hasn't been backed up yet
     if (AQ.Badges) AQ.Badges.newGame();        // a new game's badges start from nothing
     if (AQ.Panes) AQ.Panes.debugTopUp();
     if (AQ.Hydro) AQ.Hydro.debugTopUp();

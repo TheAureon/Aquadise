@@ -731,16 +731,13 @@ AQ.PauseUI = (function () {
   P.update = function (dt, game) {
     const I = AQ.Input, m = I.mouse;
     if (P.panel === 'sound') { AQ.SoundUI.update(game, () => { P.panel = null; }, () => AQ.SoundTest.open(game, 'pause')); return; }
-    P.confirm = Math.max(0, P.confirm - dt);
     if (AQ.SaveFile && AQ.SaveFile.update(game)) return;        // a save-file panel (import confirm, messages) is up
-    const T = AQ.t, rows = [['resume', T('pause.resume')], ['help', T('pause.help')], ['guide', T('pause.guide')], ['redo', T('redo.btn')], ['sound', T('pause.settings')], ['files'], ['home', T('pause.home')]];
+    const T = AQ.t, rows = [['resume', T('pause.resume')], ['help', T('pause.help')], ['guide', T('pause.guide')], ['redo', T('redo.btn')], ['sound', T('pause.settings')], ['saves', T('title.saves')], ['home', T('pause.home')]];
     P.ui = [];
     rows.forEach(([id, label], i) => {
       const y = 38 + i * 14;
-      if (id === 'files') { P.ui.push({ id: 'export', x: 110, y, w: 49, h: 12, label: T('ui.exportSave') }, { id: 'import', x: 161, y, w: 49, h: 12, label: T('ui.importSave') }); return; }
       P.ui.push({ id, x: 110, y, w: 100, h: 12, label });
     });
-    P.ui.push({ id: 'reset', x: 110, y: 38 + rows.length * 14 + 4, w: 100, h: 12, label: T(P.confirm > 0 ? 'pause.wipeConfirm' : 'pause.reset') });
     if (I.wasPressed('Escape')) { game.state = 'play'; return; }
     const prev = P.hover;
     P.hover = P.ui.find((r) => m.x >= r.x && m.y >= r.y && m.x < r.x + r.w && m.y < r.y + r.h);
@@ -750,12 +747,10 @@ AQ.PauseUI = (function () {
       if (P.hover.id === 'resume') game.state = 'play';
       if (P.hover.id === 'help') { AQ.HUD.helpT = 12; game.state = 'play'; }
       if (P.hover.id === 'guide') AQ.Guide.open(game, 'pause');
-      if (P.hover.id === 'export') AQ.SaveFile.exportSave(game);
-      if (P.hover.id === 'import') AQ.SaveFile.pickImport(game);
+      if (P.hover.id === 'saves') AQ.SaveFile.openHub(game, 'pause');
       if (P.hover.id === 'redo' && AQ.Redo) AQ.Redo.ask(game, 'pause');   // asks first, then works from anywhere
       if (P.hover.id === 'sound') { P.panel = 'sound'; AQ.SoundUI.open(); }
       if (P.hover.id === 'home') { AQ.Save.save(game); AQ.Title.open(game); }
-      if (P.hover.id === 'reset') { if (P.confirm > 0) AQ.Save.reset(); else P.confirm = 3; }
     }
   };
   P.draw = function (g) {

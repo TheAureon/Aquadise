@@ -400,27 +400,38 @@ browsers won't let a page save pictures made from file:// images.
   the meteor-shower sparkle, tank nervous drops, the photo REC dot, NEW labels, the selected-creature
   marker and the Variants outline. A one-time tip mentions it the first time a flash plays; the
   Guide's Sound page too. Tuning: `AQ.TUNING.calm`.
-- **Save files and safety.** EXPORT SAVE and IMPORT SAVE are on the title screen and in the pause
-  menu.
-  - **Export** saves `Aquadise-save-YYYY-MM-DD.json` (it works even when the browser won't let the game
-    save). On a phone whose browser can share files, it opens the share sheet ("Save to Files",
-    Drive, a message...); everywhere else it's a download.
-  - **Why it waits for the click to finish:** some browsers only allow a download, the file picker, the
-    share sheet or the clipboard during the click or tap itself, and the game sees a click a frame later.
-    So these run when the button is let go (`saveFile.gestureWaitMs`).
-  - **COPY SAVE TEXT:** some browsers and embedded pages silently block downloads, so the export message
-    always offers COPY SAVE TEXT. It copies the save to the clipboard, or, if the clipboard is blocked too,
-    shows it in a text box to copy by hand.
-  - **Import** asks CHOOSE FILE or PASTE TEXT (a text box for save text copied that way). Either way the
-    save is checked carefully (an Aquadise save, the right structure, a version this game understands)
-    and refuses anything else with a friendly message, then asks before replacing your save; the
-    imported save loads through the normal loading and migration, just like an old save, and your
-    previous save becomes the backup. Saves carry a version number (`AQ.Save.VERSION`, now 3; the
-    original v1 saves still load). Before every save the previous good one is kept as a backup. If your
-    save can't be read, the title asks whether to restore the backup (or import a file) or start fresh,
-    and the unreadable save is never overwritten: starting fresh keeps it aside
-    (`aquadise.save.v1.unreadable`). If the browser blocks saving (e.g. private browsing), the game
-    keeps running, says so once, and the title / pause screens show a small note.
+- **SAVE & BACKUP** (one button, full width, on the title screen and in the pause menu;
+  `src/savefile.js`). The game uses plain words: BACK UP and RESTORE, never export / import.
+  - **The panel:** a status block ("Your progress saves automatically in this browser.", "Last saved:
+    just now / 3 minutes ago", "Last backup: never / today / 3 days ago"; the last backup's time is kept
+    in the save, `AQ.State.backups`, and survives a restore), two big buttons, BACK UP MY GAME and
+    RESTORE A BACKUP, a short explainer, and a small ERASE MY PROGRESS apart at the bottom. On the title
+    screen with no save, RESTORE is the highlighted one ("Have a backup? Restore it here."). Keys
+    (up / down / Enter / Esc), the mouse and touch all work.
+  - **BACK UP MY GAME** makes `Aquadise-backup-YYYY-MM-DD-HHMM.aquadise` (local time to the minute, so a
+    second backup the same day never gets the same name) with the same save data inside as always. It
+    uses the generic file type `application/octet-stream`, so browsers keep the `.aquadise` ending
+    instead of adding `.json` or `.txt` (checked in Chromium: the download is named exactly that). On a
+    phone that can share files it opens the share sheet; everywhere else it's a download. Then
+    "Backup saved!" with the file name, "Your browser put it in your Downloads folder." and **WHERE IS
+    IT?**: 3 short steps for the player's browser (Chrome, Edge, Firefox, Safari, iPhone / iPad,
+    Android, or a general answer) and a reminder to keep the file somewhere they'll remember.
+  - **RESTORE A BACKUP** opens the file picker (backups, and the older `Aquadise-save-DATE.json` files,
+    which still restore), checks the file carefully (an Aquadise save, the right structure, a version
+    this game understands) and refuses anything else with a friendly message, asks before replacing the
+    current game, and loads it through the normal loading and migration. The current game becomes the
+    safety copy.
+  - **ERASE MY PROGRESS** asks twice: first "Back up first?" (BACK UP FIRST / ERASE ANYWAY / CANCEL),
+    then "Erase everything?". Backups already made are never touched.
+  - **Safety:** before every save the previous good one is kept as the **SAFETY COPY** (an automatic
+    hidden copy). If your save can't be read, the title asks whether to use the safety copy (or restore a
+    backup) or start fresh, and the unreadable save is never overwritten: starting fresh keeps it aside
+    (`aquadise.save.v1.unreadable`). If the browser blocks saving (e.g. private browsing), the game keeps
+    running, says so once, the title / pause screens show a small note, and BACK UP MY GAME and RESTORE
+    still work (a restore then lasts for the session).
+  - **Why it waits for the click to finish:** some browsers only allow a download, the file picker or the
+    share sheet during the click or tap itself, and the game sees a click a frame later. So these run
+    when the button is let go (`saveFile.gestureWaitMs`).
   - Tuning: `saveFile.maxImportBytes`, `saveFile.gestureWaitMs`.
 - **Key bindings in one place:** `AQ.TUNING.keys` in config.js (plus `interactKeys`, `audio.muteKey`,
   `photo.key`, `station.zoomKey`). The game reads them, and the help line, the title's CONTROLS panel
@@ -566,7 +577,7 @@ Proud Parent, Rainbow Collector, Treasure Hunter, Bottle Collector).
   (`AQ.Badges.event('catch', {...})`, `add('chests')`, `addTo('biomes', id)`). Event badges are checked
   when their event happens; checks from the save run every `badges.checkSeconds` (3 s; about 1 ms).
 - **Saved** in the save file (`badges`: earned badges with their tier and dates, and the new counters), so
-  EXPORT / IMPORT SAVE carry it. **Older saves** earn everything their progress already shows, silently,
+  BACK UP MY GAME / RESTORE A BACKUP carry it. **Older saves** earn everything their progress already shows, silently,
   and see one message the first time they play: "Welcome back! You've already earned 14 badges". Counters
   that were never tracked start from what the save shows (chests from your upgrades, panes from what you
   have and have built, decorations from your tanks, births from graduates and the nursery), or 0.
@@ -723,7 +734,7 @@ src/dive.js           the optional guided first dive: prompt, steps, checklist, 
 src/redo.js           REDO TUTORIAL: the question, the trip to the Tide Pools and back
 src/nudges.js         friendly nudges: noticing a stuck player (net spam, no catch, key mashing), rate limits
 src/guide.js          the GUIDE: a paged field-guide book (title, pause menu, help-line key)
-src/savefile.js       EXPORT / IMPORT SAVE, import checks + confirm, the save-recovery choice
+src/savefile.js       SAVE & BACKUP: backing up, restoring (checks + confirm), erasing, the save-recovery choice
 src/starfall.js       falling stars + meteor showers: nightly plan, landings, light columns, map/HUD marks
 src/bottles.js        message bottles: deterministic, reachable placement, pickup, glint
 assets/sprites-embedded.js   base64 copy of the sprites for file:// (tools/embed-sprites.js)
