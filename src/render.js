@@ -81,7 +81,8 @@ AQ.Render = (function () {
     const ctx = R.ctx;
     R.sky = R.skyCols();
     const left = cam.left(), top = cam.top();
-    const COL = 8;
+    // one column per tint cell: the colour only changes every TC px sideways, so wider columns look the same
+    const COL = TC;
     const first = Math.floor(left / COL) * COL;
     for (let wx = first; wx < left + cam.w; wx += COL) {
       const off = wx - left;
@@ -92,8 +93,8 @@ AQ.Render = (function () {
     }
     const W = AQ.World;
   // light shafts near the surface
-    const seaY = W.sea - top;
-    if (seaY > -260 && seaY < cam.h) {
+    const seaY = W.sea - top, low = U.lowFx();
+    if (seaY > -260 && seaY < cam.h && !low) {                         // (LOW EFFECTS: no light shafts)
       ctx.save();
       ctx.globalAlpha = 0.045;
       ctx.fillStyle = '#e8fbff';
@@ -118,9 +119,9 @@ AQ.Render = (function () {
       }
       ctx.globalAlpha = 1;
     }
-    // drifting marine snow (parallax)
+    // drifting marine snow (parallax; LOW EFFECTS: none)
     ctx.fillStyle = 'rgba(220,240,255,0.22)';
-    for (const s of R.snow) {
+    if (!low) for (const s of R.snow) {
       const x = ((s.x - left * s.s) % 400 + 400) % 400 - 40;
       const y = ((s.y - top * s.s + R.t * s.v) % 220 + 220) % 220 - 20;
       if (top + y > W.sea) ctx.fillRect(Math.round(x), Math.round(y), 1, 1);
@@ -163,6 +164,9 @@ AQ.Render = (function () {
   };
 
   // lights: [{x, y, r, color?}] in world coords
+  // (the light's stepped rings: [radius fraction, how much darkness each ring lifts]; LOW EFFECTS: fewer, bigger steps)
+  const RINGS = [[1, 0.1], [0.9, 0.12], [0.8, 0.14], [0.7, 0.17], [0.6, 0.2], [0.5, 0.24], [0.4, 0.3], [0.3, 0.4]];
+  const RINGS_LOW = [[1, 0.28], [0.7, 0.4], [0.4, 0.62]];
   R.lighting = function (cam, lights, target) {
     R.darkness += (target - R.darkness) * 0.04;
     if (R.darkness < 0.02) return;
@@ -179,7 +183,7 @@ AQ.Render = (function () {
       if (x < -L.r || y < -L.r || x > cam.w + L.r || y > cam.h + L.r) continue;
       // stepped rings instead of smooth gradients keep it pixel-art
       const flick = L.flicker ? Math.sin(R.t * 3 + L.x) * 1.5 : 0;
-      [[1, 0.1], [0.9, 0.12], [0.8, 0.14], [0.7, 0.17], [0.6, 0.2], [0.5, 0.24], [0.4, 0.3], [0.3, 0.4]].forEach(([f, a]) => {
+      (U.lowFx() ? RINGS_LOW : RINGS).forEach(([f, a]) => {
         l.globalAlpha = a * (L.power || 1);
         l.beginPath(); l.arc(x, y, Math.max(1, Math.round(L.r * f + flick)), 0, Math.PI * 2); l.fill();
       });
@@ -187,7 +191,8 @@ AQ.Render = (function () {
     l.globalAlpha = 1;
     l.globalCompositeOperation = 'source-over';
     R.ctx.drawImage(R.light, 0, 0);
-    // coloured glow on top
+    // coloured glow on top (LOW EFFECTS: skipped)
+    if (U.lowFx()) return;
     R.ctx.save();
     R.ctx.globalCompositeOperation = 'lighter';
     for (const L of lights) {

@@ -30,6 +30,9 @@ AQ.U = (function () {
   U.R = U.rng(Date.now() & 0xffffffff);   // non-deterministic gameplay rng
   // REDUCE FLASHING (Sound settings): flashes, bursts and fast blinking are softened or held steady
   U.calm = () => !!(AQ.State && AQ.State.settings && AQ.State.settings.reduceFlashing);
+  // LOW EFFECTS (SETTINGS > OPTIONS): lighter lighting, fewer particles, no marine snow or light shafts, a
+  // cheaper whole-building view. For slow phones; saved with the game. Tuning: AQ.TUNING.lowEffects.
+  U.lowFx = () => !!(AQ.State && AQ.State.settings && AQ.State.settings.lowEffects);
   U.rangeOf = (v, r) => (Array.isArray(v) ? (r || U.R).range(v[0], v[1]) : v);
 
   // Hash-based value noise

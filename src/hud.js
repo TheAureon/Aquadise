@@ -2,7 +2,11 @@
 var AQ = (typeof AQ !== 'undefined') ? AQ : {};
 
 AQ.HUD = (function () {
-  const H = { banner: null, bannerT: 0, toasts: [], showHelp: true, helpT: 14, lastZone: '' };
+  const H = { banner: null, bannerT: 0, toasts: [], showHelp: true, helpT: 14, lastZone: '', helpAsked: false };
+  // The controls hint line: shown for the first moments, or when asked for (H, or MENU > HELP on touch).
+  // With touch controls the on-screen buttons replace it, so it only shows when asked for.
+  H.helpOn = () => H.showHelp && H.helpT > 0 && (H.helpAsked || !(AQ.Touch && AQ.Touch.active()));
+  H.askHelp = () => { H.showHelp = true; H.helpAsked = true; H.helpT = H.helpT > 0 ? 0 : 12; };
 
   H.toast = function (text, color = '#ffffff', time = 2.6) {
     H.toasts.push({ text, color, t: 0, life: time });
@@ -106,7 +110,7 @@ AQ.HUD = (function () {
     // (no wider than the rows above it, so it stays clear of the tip box)
     if (game.player.sneaking) { ctx.globalAlpha = 0.8; F.draw(ctx, AQ.t('hud.sneaking'), 4, 41, '#9fe8ff', { shadow: SH, max: H.leftWidth() - 3 }); ctx.globalAlpha = 1; }
     // toasts: at most two, newest at the bottom
-    const shown = game.state === 'pause' ? [] : H.toasts.slice(-2), helpOn = H.showHelp && H.helpT > 0;   // (paused: the pause screen speaks)
+    const shown = game.state === 'pause' ? [] : H.toasts.slice(-2), helpOn = H.helpOn();   // (paused: the pause screen speaks)
     const base = helpOn ? vh - 28 : vh - 20;                     // above the controls hint while it's showing
     shown.forEach((t, i) => {
       ctx.globalAlpha = Math.min(1, t.t * 5, (t.life - t.t) * 2.5);
@@ -114,7 +118,7 @@ AQ.HUD = (function () {
       ctx.globalAlpha = 1;
     });
     // help (first moments only, or when H is pressed)
-    if (H.showHelp && H.helpT > 0 && game.state !== 'pause') {
+    if (H.helpOn() && game.state !== 'pause') {
       ctx.globalAlpha = Math.min(1, H.helpT) * 0.9;
       const tut = AQ.data.tutorial, lines = (AQ.Touch && AQ.Touch.active() && tut.touchHelpLines ? tut.touchHelpLines : tut.helpLines).map(AQ.Keys.fill);    // help.* in data/lang/en.js; key names from the bindings
       lines.forEach((l, i) => F.draw(ctx, l, vw / 2, vh - 15 + i * 7, '#d8f3ff', { align: 'center', shadow: SH, max: vw - 4 }));

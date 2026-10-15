@@ -116,7 +116,7 @@ AQ.Title = (function () {
     AQ.FX.list.length = 0;
     game.state = 'play';
     AQ.Camera.snap(game.player, AQ.Scenes.worldOf(game));
-    AQ.HUD.helpT = 10; AQ.HUD.bannerT = 0; AQ.HUD.lastZone = '';
+    AQ.HUD.helpT = 10; AQ.HUD.helpAsked = false; AQ.HUD.bannerT = 0; AQ.HUD.lastZone = '';
   }
 
   // ---------------------------------------------------------------- logo

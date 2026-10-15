@@ -6,6 +6,7 @@
 //   AQ.Keys.down('sneak')        held now
 //   AQ.Keys.name('bait')         'B / K / RIGHT CLICK'   ('move' -> 'WASD' or 'ARROWS')
 //   AQ.Keys.fill('Hold {k:sneak} to sneak.')   -> 'Hold SHIFT to sneak.'
+// With touch controls on, names come from touchName.<action> in data/lang/ instead ('the SNEAK button').
 var AQ = (typeof AQ !== 'undefined') ? AQ : {};
 
 AQ.Keys = (function () {
@@ -34,7 +35,11 @@ AQ.Keys = (function () {
     if (/^(Shift|Control|Alt|Meta)(Left|Right)$/.test(code)) return AQ.t(`key.${code.replace(/(Left|Right)$/, '')}`);
     return code.toUpperCase();
   };
+  // With touch controls on, the touch name instead (touchName.<action> in data/lang/: "the JUMP button")
+  const touchName = (action) => (AQ.Touch && AQ.Touch.active() && AQ.Lang && AQ.Lang.has(`touchName.${action}`, 'en') ? AQ.t(`touchName.${action}`) : null);
   K.name = function (action) {
+    const tn = touchName(action);
+    if (tn != null) return tn;
     if (action === 'move') {
       // first binding of each direction: letters spell it ("WASD"), anything else joins up
       const first = ['up', 'left', 'down', 'right'].map((d) => K.codeName(K.list(d)[0] || ''));

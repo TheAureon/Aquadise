@@ -6,11 +6,13 @@ AQ.FX = (function () {
   const list = [];
   const FX = { list };
 
-  FX.add = function (p) { if (list.length < 600) list.push(Object.assign({ t: 0, vx: 0, vy: 0, life: 1 }, p)); };
+  const low = () => U.lowFx && U.lowFx();                             // LOW EFFECTS: fewer particles (AQ.TUNING.lowEffects)
+  FX.add = function (p) { if (list.length < (low() ? AQ.TUNING.lowEffects.maxParticles : 600)) list.push(Object.assign({ t: 0, vx: 0, vy: 0, life: 1 }, p)); };
+  const fewer = (n) => (low() ? Math.max(1, Math.round(n * AQ.TUNING.lowEffects.particleShare)) : n);
   FX.bubble = (x, y, big) => FX.add({ type: 'bubble', x, y, vy: -U.R.range(14, 24), life: 4, r: big ? 2 : U.R.chance(0.3) ? 1.5 : 1, ph: U.R() * 6 });
-  FX.sparkle = (x, y, color = '#fff7c2', n = 6) => { for (let i = 0; i < n; i++) { const a = U.R() * Math.PI * 2, s = U.R.range(10, 34); FX.add({ type: 'spark', x, y, vx: Math.cos(a) * s, vy: Math.sin(a) * s, life: U.R.range(0.35, 0.7), color }); } };
+  FX.sparkle = (x, y, color = '#fff7c2', n = 6) => { for (let i = 0, m = fewer(n); i < m; i++) { const a = U.R() * Math.PI * 2, s = U.R.range(10, 34); FX.add({ type: 'spark', x, y, vx: Math.cos(a) * s, vy: Math.sin(a) * s, life: U.R.range(0.35, 0.7), color }); } };
   FX.text = (x, y, str, color = '#fff') => FX.add({ type: 'text', x, y, vy: -12, life: 1.3, str, color });
-  FX.puff = (x, y, color = 'rgba(220,230,240,0.6)', n = 8) => { for (let i = 0; i < n; i++) FX.add({ type: 'puff', x: x + U.R.range(-4, 4), y: y + U.R.range(-3, 3), vx: U.R.range(-6, 6), vy: -U.R.range(4, 16), life: U.R.range(0.8, 1.6), color, r: U.R.range(1, 3) }); };
+  FX.puff = (x, y, color = 'rgba(220,230,240,0.6)', n = 8) => { for (let i = 0, m = fewer(n); i < m; i++) FX.add({ type: 'puff', x: x + U.R.range(-4, 4), y: y + U.R.range(-3, 3), vx: U.R.range(-6, 6), vy: -U.R.range(4, 16), life: U.R.range(0.8, 1.6), color, r: U.R.range(1, 3) }); };
   FX.trail = (x, y, color) => FX.add({ type: 'trail', x, y, life: 2.5, color });
 
   FX.update = function (dt, world) {

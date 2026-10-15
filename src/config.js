@@ -254,7 +254,17 @@ AQ.TUNING = {
     tapSlopPx: 12,            // ...that moved less than this is a tap on the game instead (swings the net there)
     snapPx: 14,               // a tap this close (screen px) to a small on-screen button counts as on it (menus, the tank screen...)
     dragScrollPx: 6,          // the log's lists: a finger that moves this far (screen px) scrolls the list instead
-    swipePx: 40               // the Guide: a sideways swipe this long (screen px) turns the page
+    swipePx: 40,              // the Guide: a sideways swipe this long (screen px) turns the page
+    sizes: { small: 0.8, medium: 1, large: 1.25 },   // CONTROL SIZE setting: multiplies the buttons and the joystick
+    vibrate: { catch: 25, unlock: [20, 60, 30] }    // VIBRATION setting: buzz patterns in ms (navigator.vibrate) for a catch / an unlock
+  },
+  // LOW EFFECTS (SETTINGS > OPTIONS, for slow phones): lighter lighting (3 light rings instead of 8, no
+  // coloured glow), no marine snow or light shafts, fewer particles, and the aquarium's whole-building view
+  // redrawn every few frames. Off by default.
+  lowEffects: {
+    maxParticles: 250,        // particles alive at once (normally 600)
+    particleShare: 0.5,       // sparkles and puffs: this share of the usual count
+    wholeViewEvery: 3         // the whole-building view redraws the building every this many frames
   },
   // The guided first dive (src/dive.js; the text is dive.* in data/lang/en.js).
   dive: {

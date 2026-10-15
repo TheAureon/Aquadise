@@ -17,7 +17,7 @@ AQ.Touch = (function () {
   const cfg = () => AQ.TUNING.touch;
   const set = () => (AQ.State.settings = AQ.State.settings || {});
   const now = () => performance.now() / 1000;
-  let canvas = null, ctx = null, dpr = 1, rotateEl = null, gameCanvas = null;
+  let canvas = null, ctx = null, dpr = 1, rotateEl = null, gameCanvas = null, lastSig = '';
 
   // ---------------------------------------------------------------- on / off
   T.mode = () => set().touchControls || 'auto';
@@ -75,6 +75,7 @@ AQ.Touch = (function () {
     const w = window.innerWidth, h = window.innerHeight;
     canvas.style.width = w + 'px'; canvas.style.height = h + 'px';
     canvas.width = Math.round(w * dpr); canvas.height = Math.round(h * dpr);
+    lastSig = '';                                                  // (resizing wipes the canvas: draw it again)
   }
   // portrait on a touch screen: "Rotate your device" (the game pauses while it shows)
   function checkPortrait() {
@@ -88,7 +89,9 @@ AQ.Touch = (function () {
   const clamp = (v, a, b) => Math.max(a, Math.min(b, v));
   const inR = (r, x, y) => !!r && x >= r.x && y >= r.y && x < r.x + r.w && y < r.y + r.h;
   const over = (a, b) => a.x < b.x + b.w && a.x + a.w > b.x && a.y < b.y + b.h && a.y + a.h > b.y;
-  T.sizeMult = () => 1;
+  // CONTROL SIZE (small / medium / large): scales every button and the joystick (touch.sizes)
+  T.sizeName = () => (cfg().sizes[set().controlSize] ? set().controlSize : 'medium');
+  T.sizeMult = () => cfg().sizes[T.sizeName()];
   function gameRect() { const r = (gameCanvas || document.getElementById('game')).getBoundingClientRect(); return { x: r.left, y: r.top, w: r.width, h: r.height, s: r.width / AQ.TUNING.view.w }; }
   T.toGamePx = (px) => px / gameRect().s;                                          // screen px -> game px (sizes in config are screen px)
   T.toScreen = function (r) { const g = gameRect(); return { x: g.x + r.x * g.s, y: g.y + r.y * g.s, w: r.w * g.s, h: r.h * g.s }; };
@@ -103,6 +106,7 @@ AQ.Touch = (function () {
   function shown(game) {
     if (!T.active() || T.portrait || !game) return {};
     if (game.state === 'map') return { menu: true, close: true };                 // (a tap anywhere on the map closes it too)
+    if (game.state === 'touchtest') return { stick: true, jump: true, bait: true, sneak: true, interact: true, listen: true };   // TOUCH TEST: all of them, to try
     if (game.state !== 'play') return {};
     return { menu: true, stick: true, jump: true, sneak: true, bait: game.scene === 'world', interact: interactUp(), listen: game.scene === 'world' && !!AQ.Hydro && AQ.Hydro.unlocked(),
       view: game.scene === 'station' };                                             // the building's whole view (the V key)
@@ -209,6 +213,7 @@ AQ.Touch = (function () {
     if (st === 'title') return AQ.Title.panel === 'sound' ? AQ.SoundUI.ui : AQ.Title.panel ? [] : AQ.Title.items;
     if (st === 'pause') return AQ.PauseUI.panel === 'sound' ? AQ.SoundUI.ui : AQ.PauseUI.ui;
     if (st === 'soundtest') return AQ.SoundTest.ui;
+    if (st === 'touchtest') return AQ.TouchTest.ui;
     if (st === 'guide') return AQ.Guide.ui;
     if (st === 'log') return AQ.LogUI.ui;
     if (st === 'aquarium') return A.photo.on ? A.photo.ui : A.ui;
@@ -267,7 +272,18 @@ AQ.Touch = (function () {
   function releaseKind(kind) { for (const [id, p] of T.pointers) if (p.kind === kind) { release(p, false, true); T.pointers.delete(id); } }
 
   // ---------------------------------------------------------------- every frame
+  // VIBRATION: a light buzz on catches and unlocks (touch.vibrate), only with touch controls on, only where
+  // the browser can (navigator.vibrate; iPhones can't, and stay silent). On by default.
+  T.canVibrate = () => typeof navigator !== 'undefined' && typeof navigator.vibrate === 'function';
+  T.vibrateOn = () => set().vibration !== false;
+  T.buzz = function (kind) {
+    if (!T.active() || !T.vibrateOn() || !T.canVibrate()) return;
+    const pat = cfg().vibrate[kind];
+    try { if (pat) navigator.vibrate(pat); } catch (e) { /* not allowed right now: silent */ }
+  };
+
   T.update = function (dt, game) {
+    if (T.active() && !T.tipSent && AQ.Tips) { T.tipSent = true; AQ.Tips.event('touch'); }   // the one-time "playing by touch" tip
     if (T.sneakOn && (T.sneakDirty || !AQ.Input.isDown(keyOf('sneak')))) { T.sneakDirty = false; AQ.Input.vPress(keyOf('sneak')); }
     if (T.menuOpen && (!T.active() || (game.state !== 'play' && game.state !== 'map'))) T.menuOpen = false;
   };
@@ -295,7 +311,7 @@ AQ.Touch = (function () {
     if (id === 'log' && AQ.LogUI) AQ.LogUI.open(game);
     else if (id === 'map') { if (game.scene === 'world') game.state = game.state === 'map' ? 'play' : 'map'; else AQ.HUD.toast(AQ.t('map.onlySea'), '#cfe8ff'); }
     else if (id === 'guide' && AQ.Guide) AQ.Guide.open(game, 'play');
-    else if (id === 'help') { AQ.HUD.showHelp = true; AQ.HUD.helpT = AQ.HUD.helpT > 0 ? 0 : 12; if (game.state === 'map') game.state = 'play'; }
+    else if (id === 'help') { AQ.HUD.askHelp(); if (game.state === 'map') game.state = 'play'; }
     else if (id === 'pause') game.state = 'pause';
     else if (id === 'settings') { game.state = 'pause'; AQ.PauseUI.panel = 'sound'; AQ.SoundUI.open(); AQ.SoundUI.tab = 'touch'; }
     return true;
@@ -326,16 +342,22 @@ AQ.Touch = (function () {
     ctx.globalAlpha = 1;
   }
   const FRAME = { jump: 1, bait: 2, sneak: 3, interact: 4, menu: 5, close: 6, view: 8, listen: 12 };
+  // (the overlay is a full-window, high-resolution canvas: it's only redrawn when something on it changed,
+  // which saves a slow phone a lot of work while the controls sit still)
   T.drawOverlay = function (game) {
     if (!ctx) return;
-    ctx.setTransform(1, 0, 0, 1, 0, 0);
-    ctx.clearRect(0, 0, canvas.width, canvas.height);
     const sh = shown(game);
-    if (!sh.menu) return;
-    ctx.imageSmoothingEnabled = false;
+    if (!Object.keys(sh).length) { if (lastSig) { ctx.setTransform(1, 0, 0, 1, 0, 0); ctx.clearRect(0, 0, canvas.width, canvas.height); lastSig = ''; } return; }
     const c = cfg(), L = T.L = layout(game), idle = now() - T.lastUse;
     const base = idle < c.idleFadeAfter ? c.activeAlpha : c.activeAlpha + (c.idleAlpha - c.activeAlpha) * Math.min(1, (idle - c.idleFadeAfter) / c.fadeSeconds);
     const held = new Set([...T.pointers.values()].filter((p) => p.role === 'btn').map((p) => p.btn));
+    const sig = [canvas.width, canvas.height, Object.keys(sh).join(), [...held].join(), T.sneakOn, T.menuOpen, base.toFixed(3), L.size, L.R, L.swap, L.g.x, L.g.w,
+      [...T.pointers.values()].map((p) => `${p.role}${Math.round(p.x)},${Math.round(p.y)},${Math.round(p.bx || 0)},${Math.round(p.by || 0)}`).join(';'), L.ex.map((r) => `${r.x | 0},${r.y | 0},${r.w | 0},${r.h | 0}`).join(';')].join('|');
+    if (sig === lastSig) return;
+    lastSig = sig;
+    ctx.setTransform(1, 0, 0, 1, 0, 0);
+    ctx.clearRect(0, 0, canvas.width, canvas.height);
+    ctx.imageSmoothingEnabled = false;
     for (const b of L.buttons) {
       if (!sh[b.id]) continue;
       const lit = held.has(b.id) || (b.id === 'sneak' && T.sneakOn) || (b.id === 'menu' && T.menuOpen);
@@ -356,7 +378,28 @@ AQ.Touch = (function () {
         sprite('ui.stick', 1, bx + Math.cos(ang) * live, by + Math.sin(ang) * live, L.R * 2, a);
       }
     }
+    if (game.state === 'touchtest') drawFingers();
     ctx.setTransform(1, 0, 0, 1, 0, 0);
   };
+  // TOUCH TEST: a numbered ring under every finger (gold: a button, cyan: the joystick, white: a tap)
+  function drawFingers() {
+    let n = 0;
+    for (const p of T.pointers.values()) {
+      n++;
+      const r = 26, col = p.role === 'btn' ? '#ffd25a' : p.role === 'stick' ? '#6ef0ef' : p.role === 'tap' ? '#ffffff' : '#8aa4b8';
+      ctx.setTransform(dpr, 0, 0, dpr, 0, 0);
+      ctx.globalAlpha = 0.9; ctx.strokeStyle = col; ctx.lineWidth = 3;
+      ctx.beginPath(); ctx.arc(p.x, p.y, r, 0, Math.PI * 2); ctx.stroke(); ctx.globalAlpha = 1;
+      label(String(n), p.x, p.y - r - 22, 1);
+    }
+  }
+  // TOUCH TEST: what's held right now (names: touchtest.btn.<id>)
+  T.heldNames = function () {
+    const out = [];
+    for (const p of T.pointers.values()) if (p.role === 'btn' && out.indexOf(p.btn) < 0) out.push(p.btn);
+    if (T.sneakOn && out.indexOf('sneak') < 0) out.push('sneak');
+    return out.map((id) => AQ.t(`touchtest.btn.${id}`));
+  };
+  T.leaveTest = function () { T.releaseAll(); setSneak(false); };
   return T;
 })();

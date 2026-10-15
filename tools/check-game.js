@@ -149,6 +149,7 @@ const SCREENS = [
   ['GUIDE', null],                                       // every guide page (expanded below)
   ['touch-controls', () => { const G = AQ.Game; AQ.State.settings.touchControls = 'on'; AQ.Touch.refresh(); G.state = 'play'; AQ.Scenes.restore(G, 'world', 300, 80); }],
   ['touch-menu', () => { AQ.Touch.menuOpen = true; }],
+  ['touch-test', () => { AQ.TouchTest.open(AQ.Game, 'title'); }],
   ['save-hub', () => { AQ.SaveFile.openHub(AQ.Game, 'title'); }],
   ['save-remind', () => { AQ.SaveFile.showReminder(AQ.Game); }],
   ['save-one', () => { if (!AQ.SaveFile.one) AQ.SaveFile.one = { name: 'Aquadise-backup.aquadise' }; AQ.SaveFile.openHub(AQ.Game, 'title'); }],

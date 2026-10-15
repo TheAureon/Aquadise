@@ -273,7 +273,7 @@ AQ.Station = (function () {
   // ---------------------------------------------------------------- optional zoomed-out view
   // V toggles between following the player and a view of the whole building (every tank at once).
   // You keep full control of the robot either way. Default + key: AQ.TUNING.station; the choice is saved.
-  let zoomAmt = -1, full = null, noLabels = false;
+  let zoomAmt = -1, full = null, noLabels = false, fullN = 0;
   St.zoomedOut = () => {
     const s = AQ.State.settings;
     return s && s.stationZoomOut != null ? s.stationZoomOut : AQ.TUNING.station.zoomedOutByDefault;
@@ -301,9 +301,14 @@ AQ.Station = (function () {
       // render the whole building once, then show a (scaled) window of it
       if (!full) { full = document.createElement('canvas'); full.width = L.width; full.height = L.height; }
       const fg = full.getContext('2d'); fg.imageSmoothingEnabled = false;
-      noLabels = zoomAmt > 0.5;                                           // shrunk labels blur; redrawn crisp below
-      renderScene(fg, game, 0, 0, L.width, L.height);
-      noLabels = false;
+      // LOW EFFECTS: the whole building is redrawn only every few frames (it moves slowly at this size)
+      const low = U.lowFx(), every = low ? AQ.TUNING.lowEffects.wholeViewEvery : 1;
+      fullN = (fullN + 1) % every;
+      if (fullN === 0 || zoomAmt < 1) {
+        noLabels = zoomAmt > 0.5;                                         // shrunk labels blur; redrawn crisp below
+        renderScene(fg, game, 0, 0, L.width, L.height);
+        noLabels = false;
+      }
       const h = St.bounds(), e = ease(zoomAmt);
       const fit = Math.min(320 / (h.w + cfg.zoomMargin * 2), 180 / (h.h + cfg.zoomMargin * 2));
       const z = U.lerp(1, fit, e);
@@ -312,7 +317,7 @@ AQ.Station = (function () {
       const sx = U.clamp(cx - sw / 2, 0, Math.max(0, L.width - sw)), sy = U.clamp(cy - sh / 2, 0, Math.max(0, L.height - sh));
       ctx.fillStyle = '#0b0f26'; ctx.fillRect(0, 0, 320, 180);
       ctx.save();
-      ctx.imageSmoothingEnabled = true; ctx.imageSmoothingQuality = 'high';   // soft downscale instead of dropped pixels
+      ctx.imageSmoothingEnabled = true; ctx.imageSmoothingQuality = low ? 'low' : 'high';   // soft downscale instead of dropped pixels
       ctx.drawImage(full, sx, sy, sw, sh, 0, 0, 320, 180);
       ctx.restore();
       if (zoomAmt > 0.5) {
@@ -330,7 +335,7 @@ AQ.Station = (function () {
     }
     if (St.mode === 'walk' && !AQ.Transition.active) {
       const F = AQ.Font, txt = AQ.t(St.zoomedOut() ? 'station.followRobot' : 'station.seeAll', { key: AQ.Keys.name('stationView') });
-      const helpOn = AQ.HUD.showHelp && AQ.HUD.helpT > 0;              // above the controls hint while it's showing
+      const helpOn = AQ.HUD.helpOn();              // above the controls hint while it's showing
       const touch = AQ.Touch && AQ.Touch.active();                     // (touch: centred, clear of the on-screen buttons in the corners)
       ctx.globalAlpha = 0.75; F.draw(ctx, txt, touch ? 160 : 316, helpOn ? 158 : 172, '#cfe8ff', { align: touch ? 'center' : 'right', shadow: 'rgba(4,12,24,0.85)', max: touch ? 180 : 312 }); ctx.globalAlpha = 1;
     }
@@ -435,7 +440,9 @@ AQ.Station = (function () {
       }
     });
     ctx.restore();
-    tanks.forEach((tk) => drawTank(ctx, tk));
+    // (only the tanks in view: a tank, its label and the nursery's glow reach at most 64 px past its centre
+    // sideways, 58 up and 10 down)
+    tanks.forEach((tk) => { if (tk.x + 66 >= left && tk.x - 66 <= left + vw && tk.y + 12 >= top && tk.y - 62 <= top + vh) drawTank(ctx, tk); });
     drawTrophyWall(ctx, left, vw);
     AQ.Assets.draw(ctx, 'misc.console', 'idle', L.console.x, L.floors[0], { t });
     AQ.Assets.draw(ctx, 'misc.beampad', 'idle', L.pad.x, L.floors[0] + 2, AQ.U.calm() ? { frame: 0 } : { t });

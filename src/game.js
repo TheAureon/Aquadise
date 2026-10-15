@@ -3,7 +3,7 @@ var AQ = (typeof AQ !== 'undefined') ? AQ : {};
 
 AQ.Game = (function () {
   const G = {
-    state: 'loading',     // loading | title | play | pause | aquarium | log | map | soundtest
+    state: 'loading',     // loading | title | play | pause | aquarium | log | map | soundtest | touchtest
     scene: 'world',       // where the player is: world | hill | station  (see src/scenes.js)
     time: 0,
     player: null,
@@ -124,7 +124,7 @@ AQ.Game = (function () {
           if (I.wasPressed(AQ.TUNING.debug.fallStarKey) && !AQ.Starfall.fall(G)) AQ.HUD.toast(AQ.t('debug.noStarSpot'), '#cfe8ff');
           if (I.wasPressed(AQ.TUNING.debug.showerKey)) AQ.Starfall.startShower(G);
         }
-        if (AQ.Keys.pressed('help')) { AQ.HUD.showHelp = true; AQ.HUD.helpT = AQ.HUD.helpT > 0 ? 0 : 12; }
+        if (AQ.Keys.pressed('help')) AQ.HUD.askHelp();
         if (AQ.Keys.pressed('map')) { if (inWorld) G.state = G.state === 'map' ? 'play' : 'map'; else AQ.HUD.toast(AQ.t('map.onlySea'), '#cfe8ff'); }
         if (I.wasPressed('Tab') && AQ.Aquarium && AQ.TUNING.debug.tabOpensAquarium) { AQ.Aquarium.open(G); I.endFrame(); return; }
         if (AQ.Keys.pressed('log') && AQ.LogUI) { AQ.LogUI.open(G); I.endFrame(); return; }
@@ -149,6 +149,8 @@ AQ.Game = (function () {
       AQ.Title.update(dt, G);
     } else if (G.state === 'soundtest') {
       AQ.SoundTest.update(dt, G);
+    } else if (G.state === 'touchtest') {
+      AQ.TouchTest.update(dt, G);
     } else if (G.state === 'guide') {
       AQ.Guide.update(dt, G);
     }
@@ -170,6 +172,7 @@ AQ.Game = (function () {
   function drawScene() {
     const ctx = AQ.Render.ctx, cam = AQ.Camera;
     if (G.state === 'soundtest') { AQ.SoundTest.draw(ctx); return; }
+    if (G.state === 'touchtest') { AQ.TouchTest.draw(ctx); return; }
     if (G.state === 'aquarium' || (G.state === 'log' && AQ.LogUI.from === 'aquarium')) {
       AQ.Aquarium.draw(ctx, G);
       if (G.state === 'log') AQ.LogUI.draw(ctx, G);

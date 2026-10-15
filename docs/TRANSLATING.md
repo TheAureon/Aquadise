@@ -46,7 +46,9 @@ on the right translated. Translators never need to touch the game code.
 - **Keep every `{placeholder}`.** Move them anywhere in the sentence, but don't translate or drop
   them:
   - `{name}`, `{n}`, `{tank}`... are filled in by the game;
-  - `{k:jump}` becomes the name of a key ("SPACE");
+  - `{k:jump}` becomes the name of a key ("SPACE"), or with touch controls on its touch name
+    (`touchName.jump`: "the JUMP button"). Translate the `touchName.*` lines so they fit into your
+    sentences the way the key names do;
   - `{c:...}` becomes a number from the settings.
   
   Example: `'A baby {name} was born!'` could become `'{name}: ein Baby ist geschlüpft!'`.

@@ -152,7 +152,7 @@ AQ.Badges = (function () {
       B.queue.length = 0;
     } else B.cur = Object.assign(B.queue.shift(), { t: 0, life: c.toastSeconds });
     AQ.Audio.play(B.cur.kind);
-    if (AQ.Tips) AQ.Tips.event('badge');
+    if (AQ.Tips) AQ.Tips.event('badge'); if (AQ.Touch) AQ.Touch.buzz('unlock');   // a light buzz (touch, VIBRATION on)
   }
   // the toast box: centred, under the tip box and above the HUD toasts (y = badges.toastY)
   B.drawToastBox = function (g, q, y) {

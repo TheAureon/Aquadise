@@ -71,13 +71,43 @@ Every other screen works by tapping its own buttons, and:
   is unaffected. (Taps in the tank's water are never moved.)
 - **Wording:** any text with a touch version in `data/lang/` (the key name plus `.touch`, like
   `map.legend.touch`) uses it while touch controls are on, so screen hints say TAP instead of naming
-  keys ("TAP TO CLOSE", "FLIP" instead of "FLIP (X)").
+  keys ("TAP TO CLOSE", "FLIP" instead of "FLIP (X)"). Key names in tips, the Guide, the guided dive and
+  the CONTROLS panel (`{k:jump}`) come from one set of **touch names**, `touchName.<action>` in
+  `data/lang/en.js` ("the JUMP button", "the joystick", "a tap", "MENU > MAP"): change a word there and
+  every sentence follows. Sentences that need other words by touch (SNEAK is a tap on / tap off, there's
+  no hovering) have their own `.touch` version. The keyboard hint line at the bottom doesn't show by
+  itself on touch (the buttons replace it); MENU > HELP still shows a touch version of it.
+- **Learning it:** a one-time tip the first time touch controls are on, and a **Playing by touch** page in
+  the Guide.
 
-Keyboard and mouse keep working at the same time. **SWAP SIDES** (same settings tab) puts the
-joystick on the right and the buttons on the left. The controls fade when you haven't touched them
+Keyboard and mouse keep working at the same time. **SETTINGS > TOUCH** (saved with the game):
+**TOUCH CONTROLS** (auto / on / off), **SWAP SIDES** (the joystick on the right and the buttons on the
+left), **CONTROL SIZE** (small / medium / large: `touch.sizes`), **VIBRATION** (a light buzz on a catch,
+a chest upgrade, a tank unlock and a badge, `touch.vibrate`; on by default; it says NOT ON THIS DEVICE
+where the browser can't vibrate, iPhones included) and **TOUCH TEST**: a screen that shows every control,
+a numbered ring under each finger, what each finger is doing, the joystick's values, the buttons held,
+the screen and button sizes, the safe area and a BUZZ button, for checking the controls on a real phone. The controls fade when you haven't touched them
 for a few seconds. Sizes, positions, fading and the joystick's feel are in `AQ.TUNING.touch`. To try
 them on a computer, set `AQ.TUNING.debug.forceTouch: true`: the controls show and the mouse acts as a
 finger (drag in the joystick area, click the buttons).
+
+**Slow phones:** **LOW EFFECTS** (SETTINGS > OPTIONS, off by default) makes night and cave lighting
+lighter (3 light rings instead of 8, no coloured glow), drops the marine snow and light shafts, halves
+the sparkles and puffs (at most 250 particles), and redraws the aquarium's whole-building view every 3rd
+frame (`AQ.TUNING.lowEffects`). Measured in Chromium with the CPU slowed down 6x (about a slow phone),
+844x390 at 2x: the sea runs at 34-50 fps (36-52 with LOW EFFECTS), a meteor shower while listening at
+23 (34), the building at 40, its whole view 16 (32), a busy tank 35 (40), the log 27-29; at 4x most
+scenes run at 50-60 and the whole view at 26. At full speed every scene takes 1-5 ms a frame.
+(Two changes made it faster for everyone with nothing visible changing: the touch controls' layer is only
+redrawn when something on it changes, and the water backdrop is drawn in 32 px columns, the size of its
+colour cells. The building also skips tanks that are off screen.)
+
+**Trying it on a phone:** run a local server on the computer (`python3 -m http.server 8123` in this
+folder), find the computer's address on the local network (e.g. 192.168.1.20) and open
+`http://192.168.1.20:8123/` on the phone, on the same Wi-Fi. (Over plain http on a network address the
+browser won't allow the clipboard, the one-file backup or asking to keep the save; COPY SAVE CODE then
+shows the code in a box to copy by hand. Everything else works.) In a desktop browser: the developer
+tools' device mode (Chrome: F12, then the phone icon) imitates a phone and its touches, landscape.
 
 In the aquarium: **Q/E** switch tanks, **F** feeds, **T** (or TANKS) shows every tank at a glance.
 In a bigger (expanded) tank: **A/D** or **Left/Right** scroll it sideways (Q/E still switch tanks;
@@ -781,7 +811,8 @@ src/ambience.js       the looping place sounds + their crossfading director
 src/music.js          generative music engine + director (pieces in data/music.js)
 src/sounddirector.js  per-frame sound hooks: steps, splashes, beam, chimes, creature voices
 src/soundtest.js      the SETTINGS panel (SOUND / OPTIONS / TOUCH tabs) and the SOUND TEST screen
-src/touch.js          touch controls: pointers, joystick, on-screen buttons, MENU panel, rotate screen
+src/touch.js          touch controls: pointers, joystick, on-screen buttons, MENU panel, rotate screen, vibration
+src/touchtest.js      the TOUCH TEST screen (SETTINGS > TOUCH): every finger, button and the joystick, live
 data/tutorial.js      tutorial structure: tips, guided dive steps, Guide pages (their text is in data/lang/)
 src/langdata.js       gives the data files their text (names, hints, field notes...) from data/lang/
 data/music.js         music pieces, scales, motif, creature voice map, audio file mapping

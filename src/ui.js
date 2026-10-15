@@ -745,7 +745,7 @@ AQ.PauseUI = (function () {
     if (m.pressed[0] && P.hover) {
       AQ.Audio.play('menu_select');
       if (P.hover.id === 'resume') game.state = 'play';
-      if (P.hover.id === 'help') { AQ.HUD.helpT = 12; game.state = 'play'; }
+      if (P.hover.id === 'help') { AQ.HUD.showHelp = AQ.HUD.helpAsked = true; AQ.HUD.helpT = 12; game.state = 'play'; }
       if (P.hover.id === 'guide') AQ.Guide.open(game, 'pause');
       if (P.hover.id === 'saves') AQ.SaveFile.openHub(game, 'pause');
       if (P.hover.id === 'redo' && AQ.Redo) AQ.Redo.ask(game, 'pause');   // asks first, then works from anywhere

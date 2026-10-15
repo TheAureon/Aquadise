@@ -26,10 +26,15 @@ AQ.SoundUI = (function () {
       { id: 'reminders', kind: 'btn', label: AQ.t('settings.backupReminders'), value: AQ.t(AQ.SaveFile && AQ.SaveFile.remindersOn() ? 'settings.on' : 'settings.off'), on: !!AQ.SaveFile && AQ.SaveFile.remindersOn() },
       { id: 'autograd', kind: 'btn', label: AQ.t('settings.autoGraduate'), value: AQ.t(set().autoGraduate ? 'settings.on' : 'settings.off'), on: !!set().autoGraduate },
       { id: 'flashing', kind: 'btn', label: AQ.t('settings.flashing'), value: AQ.t(AQ.U.calm() ? 'settings.reduced' : 'settings.normal'), on: AQ.U.calm() },
+      { id: 'lowfx', kind: 'btn', label: AQ.t('settings.lowEffects'), value: AQ.t(AQ.U.lowFx() ? 'settings.on' : 'settings.off'), on: AQ.U.lowFx() },   // for slow phones
       { id: 'language', kind: 'btn', label: AQ.t('settings.language'), value: AQ.Lang.name(AQ.Lang.code), off: AQ.Lang.available().length < 2 }];
     return [
       { id: 'touchmode', kind: 'btn', label: AQ.t('settings.touchControls'), value: AQ.t(`settings.touch.${touchMode()}`) },
-      { id: 'swap', kind: 'btn', label: AQ.t('settings.sides'), value: AQ.t(set().swapSides ? 'settings.swapped' : 'settings.normal'), on: !!set().swapSides }].concat(S.extraTouchRows ? S.extraTouchRows() : []);
+      { id: 'swap', kind: 'btn', label: AQ.t('settings.sides'), value: AQ.t(set().swapSides ? 'settings.swapped' : 'settings.normal'), on: !!set().swapSides },
+      { id: 'csize', kind: 'btn', label: AQ.t('settings.controlSize'), value: AQ.t(`settings.size.${AQ.Touch ? AQ.Touch.sizeName() : 'medium'}`) },
+      // (iPhones and some browsers can't vibrate: the row says so and does nothing)
+      { id: 'vibe', kind: 'btn', label: AQ.t('settings.vibration'), value: AQ.t(!AQ.Touch || !AQ.Touch.canVibrate() ? 'settings.vibration.none' : AQ.Touch.vibrateOn() ? 'settings.on' : 'settings.off'), on: !!AQ.Touch && AQ.Touch.canVibrate() && AQ.Touch.vibrateOn(), off: !AQ.Touch || !AQ.Touch.canVibrate() },
+      { id: 'touchtest', kind: 'wide', value: AQ.t('settings.touchTest') }];
   }
   const order = () => ['tabs'].concat(rows().map((r) => r.id), ['back']);
   S.open = function () { S.sel = 0; };
@@ -62,6 +67,7 @@ AQ.SoundUI = (function () {
     else if (id === 'mute') { A.toggleMute(); A.play('menu_select'); }
     else if (id === 'hints') { AQ.Tips.setHints(!AQ.Tips.hintsOn()); dirty(); }
     else if (id === 'flashing') { set().reduceFlashing = !AQ.U.calm(); dirty(); }
+    else if (id === 'lowfx') { set().lowEffects = !AQ.U.lowFx(); dirty(); }
     else if (id === 'nudges' && AQ.Nudges) { set().nudges = !AQ.Nudges.playerOn(); if (!set().nudges) AQ.Nudges.cur = null; dirty(); }   // friendly nudges on / off (saved)
     else if (id === 'reminders') { set().backupReminders = !(AQ.SaveFile && AQ.SaveFile.remindersOn()); dirty(); }   // backup reminders on / off
     else if (id === 'autograd') { set().autoGraduate = !set().autoGraduate; dirty(); if (set().autoGraduate && AQ.Breeding) AQ.Breeding.autoGraduate(); }   // grown babies go home by themselves
@@ -72,6 +78,9 @@ AQ.SoundUI = (function () {
     else if (id === 'resettips') { AQ.Tips.reset(); S.resetDone = 2; dirty(); }
     else if (id === 'touchmode') { const m = ['auto', 'on', 'off'], i = m.indexOf(touchMode()); set().touchControls = m[(i + 1) % 3]; if (AQ.Touch) AQ.Touch.refresh(); dirty(); }
     else if (id === 'swap') { set().swapSides = !set().swapSides; dirty(); }
+    else if (id === 'csize') { const m = Object.keys(AQ.TUNING.touch.sizes), i = m.indexOf(AQ.Touch.sizeName()); set().controlSize = m[(i + 1) % m.length]; dirty(); }   // small / medium / large
+    else if (id === 'vibe') { if (AQ.Touch.canVibrate()) { set().vibration = !AQ.Touch.vibrateOn(); dirty(); if (set().vibration) AQ.Touch.buzz('catch'); } }
+    else if (id === 'touchtest' && AQ.TouchTest) { A.play('menu_select'); AQ.TouchTest.open(game, game.state === 'title' ? 'title' : 'pause'); }
     else if (S.activateExtra && S.activateExtra(id, game, dirty)) { /* handled by a later addition */ }
     else if (id === 'test') { A.play('menu_select'); onTest(); }
     else if (id === 'back') { A.play('menu_select'); AQ.Save && AQ.Save.save(game); onBack(); }

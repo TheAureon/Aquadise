@@ -125,7 +125,7 @@ AQ.Aquarium = (function () {
     for (let i = 0; i < 5; i++) AQ.FX.sparkle(camPx() + 88 + i * 8, 6, '#fff3b0', 4);   // over the stars in the top bar
     A.tray = 'decor'; A.trayScroll = 0; A.trayPos = 0;
     AQ.Audio.play('unlock');
-    if (AQ.Tips) AQ.Tips.event('unlock');
+    if (AQ.Tips) AQ.Tips.event('unlock'); if (AQ.Touch) AQ.Touch.buzz('unlock');   // a light buzz (touch, VIBRATION on)
     AQ.Audio.play('fanfare', { delay: 0.6 });
     if (AQ.Music) AQ.Music.stinger('reward');
   }

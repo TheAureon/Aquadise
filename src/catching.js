@@ -181,7 +181,7 @@ AQ.Catching = (function () {
     AQ.FX.text(c.x, c.y - 8, AQ.t(pried ? 'catch.pried' : 'catch.gotIt'), '#ffe36b');
     AQ.HUD.toast(AQ.t(isNew ? 'catch.caughtNew' : 'catch.caught', { name: c.def.name }), isNew ? '#ffe36b' : '#ffffff', 3);
     AQ.Audio.play('catch', { rare: !!c.def.rare });
-    if (AQ.Tips) AQ.Tips.event('catch');
+    if (AQ.Tips) AQ.Tips.event('catch'); if (AQ.Touch) AQ.Touch.buzz('catch');   // a light buzz (touch, VIBRATION on)
     if (AQ.Dive) AQ.Dive.event('catch');
   }
 
