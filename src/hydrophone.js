@@ -90,6 +90,7 @@ AQ.Hydro = (function () {
     const want = can && AQ.Keys.down('listen');
     if (want !== H.listening) {
       H.listening = want;
+      if (want && AQ.Badges && AQ.Quests && AQ.Quests.on()) AQ.Badges.add('listens', 1, true);   // (a counter only the station requests read: not counted while they're off)
       AQ.Audio.play(want ? 'listen_on' : 'listen_off');
       if (want && AQ.Tips) AQ.Tips.event('listen');
     }

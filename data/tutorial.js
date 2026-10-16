@@ -45,6 +45,7 @@ AQ.data.tutorial = {
     { id: 'photo', icon: 'ui:6', lines: 5 },
     { id: 'saving', icon: 'ui:4', lines: 6 },
     { id: 'touch', icon: 'ui.touch:1', lines: 6 },
+    { id: 'requests', icon: 'ui.radio', needs: 'Quests', lines: 5 },
     { id: 'settings', icon: 'ui:5', lines: 6 }
   ],
   tips: [
@@ -72,6 +73,7 @@ AQ.data.tutorial = {
     { id: 'tankTab', on: ['tankTab'], where: 'tank', icon: 'ui:3' },
     { id: 'badge', on: ['badge'], where: 'any', needs: 'Badges', known: ['badge'], icon: 'ui:2' },
     { id: 'hydro', on: ['hydro'], where: 'play', needs: 'Hydro', known: ['hydro'], icon: 'ui.touch:12' },
+    { id: 'request', on: ['request'], where: 'play', needs: 'Quests', icon: 'ui.radio' },
     { id: 'touch', on: ['touch'], where: 'any', needs: 'Touch', icon: 'ui.touch:1' },
     { id: 'backups', on: ['backups'], where: 'any', needs: 'SaveFile', known: ['backedUp'], icon: 'ui:4' },
     { id: 'heard', on: ['heard'], where: 'play', needs: 'Hydro', known: ['hydro'], icon: 'ui.touch:12' }

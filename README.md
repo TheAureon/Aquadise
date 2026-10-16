@@ -692,6 +692,54 @@ Proud Parent, Rainbow Collector, Treasure Hunter, Bottle Collector).
   come back within a few seconds, as they would for a player), and **0** shows / hides an overlay with
   every counter and check.
 
+## Station requests
+
+The station's directory console (a little friendly voice called **STATION**: the name is `quest.station`
+in `data/lang/en.js`) sends short, gentle requests by radio, one at a time, wherever you are: "Catch
+your first creature", "The Kelp tank would love a Ribbonmane". **There are no rewards:** nothing is
+given (no panes, items, decorations, badges, unlocks or upgrades), and finishing or ignoring a request
+changes nothing about the game. No timers, no failure, no expiry, nothing missable.
+
+- **The requests** are `data/quests.js`: 40 of them in 7 chapters (FIRST DIVE, HOME, PAIRS, NIGHT AND SKY,
+  TINKERING, LISTENING, COLLECTING), in a gentle order. Each is one entry: id, chapter, icon (a badge
+  icon), a condition and its target, and optional prerequisites (`after` another request, `needs` a
+  feature, `requires` a condition such as having the hydrophone, so nothing is asked before it's
+  possible). The words are `quest.<id>` (the tracker line), `quest.<id>.intro` (the radio message),
+  `quest.<id>.thanks` and an optional `quest.<id>.progress` count label.
+- **Conditions are the badges' own:** a counter, a check worked out from the save, or a moment
+  (`AQ.Badges.event`), read from the badge system, so nothing is counted twice. Five checks were added
+  there for both: `badge` (a badge already earned), `pairsInTanks`, `biomesComplete`,
+  `predatorTanksComplete` and `tanksWith` (`quests.fillMin` creatures). Two counters are kept only while
+  requests are on: `listens` (holding LISTEN) and `starsFound` (getting within `starfall.foundRadius` of a
+  landed star). Every request is possible for anyone without luck: no rare variants, no Comet Ray, no
+  meteor showers, no specific chest reward.
+- **When it starts:** after the first catch (or once the guided dive is over or skipped), at a calm
+  moment (playing, nothing else up, not mid-catch), the game asks once: "STATION REQUESTS? ... Want
+  them?" with YES and NO THANKS, looking the same. NO THANKS turns them off and never asks again. Older
+  saves get the same question, and every request their progress already shows is marked done quietly,
+  so they start at the first unfinished one. A new game keeps the answer.
+- **The tracker** (left, under the HUD's upgrade rows; it steps below a tip box, and folds to its icon
+  while a building prompt is over it): the radio, the request in a line or two, a count like 2/3 and the
+  request's icon. A click or tap folds it to just the radio icon and back. Its **...** button: SKIP
+  THIS ONE (to the back of the line, no penalty) and TURN OFF REQUESTS (asks once). A new request
+  arrives `quests.arriveDelay` seconds (20) after one is finished, with the radio message for
+  `introSeconds`, a soft sound and a blinking radio light; a thank-you line shows when one is done.
+  It's only on screen while playing (sea, hill, building), never during the guided dive, a scene
+  change or a menu; completion is noticed anywhere (the thank-you waits until you're back).
+- **The OFF switch:** SETTINGS > OPTIONS > REQUESTS (title screen and pause menu), or TURN OFF REQUESTS
+  in the tracker's menu. Off means nothing about requests is drawn, played, announced or counted.
+  Progress stays in the save; turning them back on resumes where it was, marking done (quietly)
+  anything finished meanwhile. `AQ.TUNING.quests.enabled: false` turns the whole feature off for
+  everyone (no question, no tracker, no setting).
+- **Saved** in `AQ.State.quests` (`asked`, `on`, `done` with dates, `cur`, `skips`, `collapsed`), so it
+  travels in backups and save codes like everything else.
+- The Guide has a **Station requests** page, and a one-time tip comes with the first request.
+- Tuning: `AQ.TUNING.quests` (`askDelay`, `firstDelay`, `arriveDelay`, `skipDelay`, `introSeconds`,
+  `thanksSeconds`, `blinkSeconds`, `trackerY`, `trackerW`, `messageW`, `fillMin`, ...).
+- **Testing:** set `AQ.TUNING.debug.quests: true`. Then **3** completes the current request, **4** skips it,
+  **5** resets every request (on, nothing done; the first arrives a second later) and **6** shows an overlay
+  with the current request's condition, its counter or check value, `also`, and what comes next.
+
 ## Sound and music
 
 Everything you hear is generated in code: soft effects, a quiet ambience bed for each place, and
@@ -781,6 +829,8 @@ src/logbutton.js      the HUD counter as the collection-log button (hover, press
 src/panes.js          glass panes: the building material for the tanks (count, add, spend, the counter)
 src/achievements.js   badges: events, counters, checks from the save, awarding, older saves catching up
 data/achievements.js  the badges, one entry each (checked by tools/check-badges.js)
+src/quests.js         station requests: the tracker, the question, checking, skipping, the off switch
+data/quests.js        the station requests, one entry each (conditions shared with the badges)
 src/hydrophone.js     the HYDROPHONE upgrade: hearing hidden callers, ripples, edge arrows, LISTEN
 src/pairs.js          ONE PAIR EACH: which creatures a tank shows (a pair of every species) and the moves
 src/release.js        releasing creatures: which ones need a second look, RELEASE EXTRAS' choice, removing them

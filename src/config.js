@@ -221,6 +221,11 @@ AQ.TUNING = {
     badgeAllKey: 'Digit8',    //   8 = award every badge (all tiers)
     badgeResetKey: 'Digit9',  //   9 = reset every badge (the counters stay)
     badgeOverlayKey: 'Digit0',//   0 = show / hide an overlay with every badge counter and check
+    quests: false,            // TESTING ONLY: true adds four keys for the station requests (any screen):
+    questCompleteKey: 'Digit3', //   3 = complete the current request
+    questSkipKey: 'Digit4',   //   4 = skip it (to the back of the line)
+    questResetKey: 'Digit5',  //   5 = reset every request (on, nothing done, the first one arrives in a second)
+    questOverlayKey: 'Digit6',//   6 = show / hide an overlay with the current request's condition and counters
     forceTouch: false         // TESTING ONLY: true shows the touch controls and makes the mouse act as a finger
   },                          //   (drag in the stick zone = joystick, click the on-screen buttons), to try them on a PC
   // Text that doesn't fit (long translations): it is squeezed sideways down to this much of its width,
@@ -257,6 +262,23 @@ AQ.TUNING = {
     swipePx: 40,              // the Guide: a sideways swipe this long (screen px) turns the page
     sizes: { small: 0.8, medium: 1, large: 1.25 },   // CONTROL SIZE setting: multiplies the buttons and the joystick
     vibrate: { catch: 25, unlock: [20, 60, 30] }    // VIBRATION setting: buzz patterns in ms (navigator.vibrate) for a catch / an unlock
+  },
+  // STATION REQUESTS (src/quests.js, data/quests.js): small friendly goals by radio. No rewards, no timers.
+  quests: {
+    enabled: true,            // false = the whole feature is off for everyone (no question, no tracker, no setting)
+    askDelay: 4,              // seconds of calm play before the one-time "Want them?" question
+    firstDelay: 3,            // seconds before the first request (after YES, turning them on, or loading a game)
+    arriveDelay: 20,          // seconds between finishing a request and the next one arriving
+    skipDelay: 4,             // seconds after SKIP THIS ONE before the next one arrives
+    recheckSeconds: 5,        // nothing ready yet (everything left needs something first): look again this often
+    checkSeconds: 0.5,        // how often the current request is checked (a counter changing checks at once)
+    introSeconds: 7,          // how long a new request's radio message shows before it shrinks to the tracker
+    thanksSeconds: 5,         // how long the thank-you line shows
+    blinkSeconds: 3,          // the radio icon blinks this long when a request arrives
+    trackerY: 58,             // where the tracker sits (game px from the top, left edge; it moves below a tip box)
+    trackerW: 130,            // the tracker's width (game px)
+    messageW: 150,            // the radio message / thank-you width
+    fillMin: 5                // "fill 3 tanks": a tank counts with at least this many creatures
   },
   // LOW EFFECTS (SETTINGS > OPTIONS, for slow phones): lighter lighting (3 light rings instead of 8, no
   // coloured glow), no marine snow or light shafts, fewer particles, and the aquarium's whole-building view
@@ -447,6 +469,7 @@ AQ.TUNING = {
   // only in the sea, on spots reachable at upgrade level 0 (the message-bottle scan), never on you.
   // Night length: with the default clock (6-minute days) night lasts about 2.25 real minutes.
   starfall: {
+    foundRadius: 70,          // get this close (px) to a landed star and it counts as found (for the station requests)
     starChance: 0.4,          // chance an ordinary night has a falling star
     guaranteeEvery: 3,        // ...but never more than this many nights in a row without one
     showerChance: 0.18,       // chance a night is a meteor shower (about one night in 5-6)

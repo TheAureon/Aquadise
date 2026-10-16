@@ -62,6 +62,7 @@ AQ.Tips = (function () {
   function context(game) {
     if (AQ.Transition && AQ.Transition.active) return null;
     if (AQ.Dive && AQ.Dive.blocksTips()) return null;           // the "guided dive?" question is up
+    if (AQ.Quests && (AQ.Quests.asking || AQ.Quests.confirm)) return null;   // the station requests' question is up
     if (game.state === 'play') {
       const K = AQ.Catching;
       if (game.scene === 'world' && K && (K.swing || K.pryTarget || K.hold > 0)) return null;   // mid-netting

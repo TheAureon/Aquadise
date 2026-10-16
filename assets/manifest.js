@@ -573,6 +573,28 @@ AQ.manifest = {
     7
    ]
   },
+  "ui.radio": {
+   "file": "sprites/ui/radio.png",
+   "fw": 12,
+   "fh": 12,
+   "anchor": [
+    6,
+    6
+   ],
+   "anims": {
+    "idle": {
+     "row": 0,
+     "frames": 2,
+     "fps": 2
+    }
+   },
+   "vis": [
+    0,
+    0,
+    11,
+    11
+   ]
+  },
   "misc.bottle": {
    "file": "sprites/scene/bottle.png",
    "fw": 12,

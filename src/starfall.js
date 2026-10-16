@@ -198,6 +198,8 @@ AQ.Starfall = (function () {
       L.left -= dt;
       const cap = U.clamp(L.left / c.fadeSeconds, 0, 1), list = creaturesOf(L);
       list.forEach((cr) => { cr.cap = cap; });
+      // reached it: counted once per star (a counter only the station requests read: not while they're off)
+      if (!L.found && game.scene === 'world' && game.state === 'play' && Math.hypot(game.player.x - L.x, game.player.y - L.y) < c.foundRadius) { L.found = true; if (AQ.Badges && AQ.Quests && AQ.Quests.on()) AQ.Badges.add('starsFound', 1, true); }
       if (L.left <= 0 || wantCount(L) <= 0) {
         list.forEach((cr) => { cr.fadedOut = true; AQ.Creatures.remove(cr); });
         s.landings.splice(i, 1);

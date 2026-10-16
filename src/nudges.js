@@ -36,7 +36,7 @@ AQ.Nudges = (function () {
     return true;
   }
   // somewhere quiet to show one: no tip, no toast on screen
-  const quiet = () => !(AQ.Tips && AQ.Tips.showing()) && !(AQ.HUD.toasts && AQ.HUD.toasts.length);
+  const quiet = () => !(AQ.Tips && AQ.Tips.showing()) && !(AQ.HUD.toasts && AQ.HUD.toasts.length) && !(AQ.Quests && (AQ.Quests.asking || AQ.Quests.confirm));
 
   // ---------------------------------------------------------------- what the game tells us
   N.swing = function () { if (active(AQ.Game)) N.swings.push(N.t); };

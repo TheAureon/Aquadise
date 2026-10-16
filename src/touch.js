@@ -100,6 +100,7 @@ AQ.Touch = (function () {
     const out = [];
     if (AQ.Tips && AQ.Tips.rect) out.push(T.toScreen(AQ.Tips.rect));
     if (AQ.Dive && AQ.Dive.panelRect && game.scene === 'world') out.push(T.toScreen(AQ.Dive.panelRect));
+    if (AQ.Quests && game.state === 'play') for (const r of AQ.Quests.rects()) out.push(T.toScreen(r));   // the station requests' tracker, menu, question
     return out;
   }
   // which controls show right now
@@ -217,7 +218,7 @@ AQ.Touch = (function () {
     if (st === 'guide') return AQ.Guide.ui;
     if (st === 'log') return AQ.LogUI.ui;
     if (st === 'aquarium') return A.photo.on ? A.photo.ui : A.ui;
-    if (st === 'play') return (AQ.Dive ? AQ.Dive.ui : []).concat(AQ.Nudges ? AQ.Nudges.ui : []);
+    if (st === 'play') return (AQ.Dive ? AQ.Dive.ui : []).concat(AQ.Nudges ? AQ.Nudges.ui : [], AQ.Quests ? AQ.Quests.ui : []);
     return [];
   }
   function snap(game, x, y) {

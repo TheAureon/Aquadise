@@ -117,6 +117,7 @@ AQ.Game = (function () {
       if (AQ.Tips) AQ.Tips.update(dt, G);           // one-time tips (first, so an Esc / click that closes a tip is used up)
       if (AQ.Dive) AQ.Dive.update(dt, G);           // the optional guided dive (its buttons' clicks never swing the net)
       if (AQ.Nudges) AQ.Nudges.update(dt, G);       // friendly nudges for a player who seems stuck (src/nudges.js)
+      if (AQ.Quests) AQ.Quests.update(dt, G);       // station requests: the tracker, its menu, the one-time question
       if (AQ.TUNING.debug.tutorialReset && I.wasPressed(AQ.TUNING.debug.tutorialResetKey) && AQ.Dive) { AQ.Tips.reset(); AQ.Dive.start(G); AQ.HUD.toast(AQ.t('debug.tutorialReset'), '#cfe8ff'); }
       if (!frozen) {
         if (AQ.TUNING.debug.timeSkip && I.wasPressed(AQ.TUNING.debug.timeSkipKey)) { AQ.Clock.set(AQ.Clock.hour() + AQ.TUNING.clock.skipHours); AQ.HUD.toast(AQ.t('debug.timeSkip', { time: AQ.HUD.clockText() }), '#cfe8ff'); }
@@ -157,6 +158,7 @@ AQ.Game = (function () {
     if (AQ.Hydro && G.player) AQ.Hydro.update(dt, G);   // the hydrophone: ripples, LISTEN (ends by itself off the sea / in menus)
     if (AQ.Badges && G.player) AQ.Badges.update(dt, G);   // badges: events come in from the game; checks every few seconds
     if (AQ.SaveFile && G.player) AQ.SaveFile.tick(dt, G);   // play time, keeping the save, the gentle backup reminder
+    if (AQ.Quests && G.player) AQ.Quests.tick(dt, G);       // station requests: checked wherever you are
     if (AQ.SoundDirector) AQ.SoundDirector.update(dt, G);
     AQ.Transition.update(dt);
     if (AQ.Breeding && G.state !== 'loading') AQ.Breeding.update(dt);   // tanks live on wherever you are
@@ -223,11 +225,13 @@ AQ.Game = (function () {
     if (G.state === 'play' && AQ.Tips) AQ.Tips.draw(ctx, G);
     if (G.state === 'play' && AQ.Dive) AQ.Dive.draw(ctx, G);
     if (G.state === 'play' && AQ.Nudges) AQ.Nudges.draw(ctx, G);
+    if (AQ.Quests) AQ.Quests.draw(ctx, G);                             // the station requests' tracker (left, under the HUD)
     if (AQ.Badges) AQ.Badges.drawToast(ctx, G);                         // a badge's toast (it waits while anything is in the way)
     if (G.state === 'map') AQ.MapUI.draw(ctx, G);
     if (G.state === 'log') AQ.LogUI.draw(ctx, G);
     if (G.state === 'pause') AQ.PauseUI.draw(ctx, G);
     if (AQ.Badges) AQ.Badges.drawOverlay(ctx);   // (testing only: every badge counter)
+    if (AQ.Quests) AQ.Quests.drawOverlay(ctx);   // (testing only: the current request)
     if (AQ.Touch) AQ.Touch.drawGame(ctx);             // the touch MENU panel
   }
 

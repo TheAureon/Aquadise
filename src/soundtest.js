@@ -22,6 +22,7 @@ AQ.SoundUI = (function () {
     if (S.tab === 'options') return [
       { id: 'hints', kind: 'btn', label: AQ.t('settings.tips'), value: AQ.t(!AQ.Tips || AQ.Tips.hintsOn() ? 'settings.hintsOn' : 'settings.hintsOff') },
       { id: 'resettips', kind: 'btn', label: AQ.t('settings.seeAgain'), value: AQ.t(S.resetDone > 0 ? 'settings.tipsReset' : 'settings.resetTips') },
+      ...(AQ.Quests && AQ.Quests.enabled() ? [{ id: 'requests', kind: 'btn', label: AQ.t('settings.requests'), value: AQ.t(AQ.Quests.on() ? 'settings.on' : 'settings.off'), on: AQ.Quests.on() }] : []),   // station requests on / off
       { id: 'nudges', kind: 'btn', label: AQ.t('settings.nudges'), value: AQ.t(AQ.Nudges && AQ.Nudges.playerOn() ? 'settings.on' : 'settings.off'), on: !!AQ.Nudges && AQ.Nudges.playerOn(), off: !AQ.Nudges },
       { id: 'reminders', kind: 'btn', label: AQ.t('settings.backupReminders'), value: AQ.t(AQ.SaveFile && AQ.SaveFile.remindersOn() ? 'settings.on' : 'settings.off'), on: !!AQ.SaveFile && AQ.SaveFile.remindersOn() },
       { id: 'autograd', kind: 'btn', label: AQ.t('settings.autoGraduate'), value: AQ.t(set().autoGraduate ? 'settings.on' : 'settings.off'), on: !!set().autoGraduate },
@@ -49,7 +50,7 @@ AQ.SoundUI = (function () {
         ui.push({ id: r.id + '+', row: r.id, x: 224, y, w: 10, h: 9, label: '+' });
         ui.push({ id: r.id + 'bar', row: r.id, x: 159, y, w: 62, h: 9, bar: r.bar });
       } else if (r.kind === 'wide') ui.push({ id: r.id, row: r.id, x: 110, y, w: 100, h: 11, label: r.value });
-      else ui.push({ id: r.id, row: r.id, x: 146, y, w: 106, h: 10, label: r.value, warn: r.warn, on2: r.on, off: r.off });
+      else ui.push({ id: r.id, row: r.id, x: 146, y, w: 106, h: Math.min(10, step - 1), label: r.value, warn: r.warn, on2: r.on, off: r.off });
       if (r.label != null) ui.push({ id: 'label:' + r.id, row: r.id, label: r.label, y, text: true });   // (a wide button has no label)
     });
     ui.push({ id: 'back', row: 'back', x: 110, y: BOX.y + BOX.h - 22, w: 100, h: 11, label: AQ.t('ui.back') });
@@ -69,6 +70,7 @@ AQ.SoundUI = (function () {
     else if (id === 'flashing') { set().reduceFlashing = !AQ.U.calm(); dirty(); }
     else if (id === 'lowfx') { set().lowEffects = !AQ.U.lowFx(); dirty(); }
     else if (id === 'nudges' && AQ.Nudges) { set().nudges = !AQ.Nudges.playerOn(); if (!set().nudges) AQ.Nudges.cur = null; dirty(); }   // friendly nudges on / off (saved)
+    else if (id === 'requests' && AQ.Quests) { AQ.Quests.setOn(!AQ.Quests.on()); dirty(); }   // station requests on / off (saved; resumes where it was)
     else if (id === 'reminders') { set().backupReminders = !(AQ.SaveFile && AQ.SaveFile.remindersOn()); dirty(); }   // backup reminders on / off
     else if (id === 'autograd') { set().autoGraduate = !set().autoGraduate; dirty(); if (set().autoGraduate && AQ.Breeding) AQ.Breeding.autoGraduate(); }   // grown babies go home by themselves
     else if (id === 'language') {                 // the next language that exists (only the ones with a file)

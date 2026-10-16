@@ -149,6 +149,13 @@ const SCREENS = [
   ['GUIDE', null],                                       // every guide page (expanded below)
   ['touch-controls', () => { const G = AQ.Game; AQ.State.settings.touchControls = 'on'; AQ.Touch.refresh(); G.state = 'play'; AQ.Scenes.restore(G, 'world', 300, 80); }],
   ['touch-menu', () => { AQ.Touch.menuOpen = true; }],
+  ['quest-ask', () => { const G = AQ.Game; AQ.Title.panel = null; G.state = 'play'; AQ.Scenes.restore(G, 'world', 300, 80); AQ.Quests.asking = true; }],
+  ['quest-intro', () => { const Q = AQ.Quests; Q.setOn(true); AQ.State.quests.cur = 'species10'; Q.intro = 5; }],
+  ['quest-track', () => { AQ.Quests.intro = 0; }],
+  ['quest-menu', () => { AQ.Quests.menu = true; }],
+  ['quest-confirm', () => { AQ.Quests.menu = false; AQ.Quests.confirm = true; }],
+  ['quest-thanks', () => { const Q = AQ.Quests; Q.confirm = false; Q.thanks.push({ id: 'four_stars', t: 0 }); }],
+  ['quest-icon', () => { const Q = AQ.Quests; Q.thanks.length = 0; AQ.State.quests.collapsed = true; }],
   ['touch-test', () => { AQ.TouchTest.open(AQ.Game, 'title'); }],
   ['save-hub', () => { AQ.SaveFile.openHub(AQ.Game, 'title'); }],
   ['save-remind', () => { AQ.SaveFile.showReminder(AQ.Game); }],

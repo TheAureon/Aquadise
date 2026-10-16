@@ -54,8 +54,8 @@ AQ.Scenes = (function () {
   // Shared little "press E" prompt over the player's head.
   // (touch: the INTERACT button shows while a prompt is up, labelled with its text: S.promptAt)
   S.prompt = function (ctx, x, y, text) {
-    S.promptAt = { t: AQ.Render.t, text };
     const F = AQ.Font, label = AQ.Touch && AQ.Touch.active() ? text : AQ.t('ui.keyPrompt', { key: S.keyName(), text }), w = F.width(label) + 6;
+    S.promptAt = { t: AQ.Render.t, text, rect: { x: Math.round(x - w / 2), y: Math.round(y - 4), w, h: 11 } };   // (where it is: the requests tracker steps out of its way)
     const t = (AQ.Render.t * 2) % 2 < 1 ? 0 : 1;
     ctx.fillStyle = 'rgba(6,18,34,0.82)'; ctx.fillRect(Math.round(x - w / 2), Math.round(y - 3 - t), w, 10);
     ctx.fillStyle = '#9feff0'; ctx.fillRect(Math.round(x - w / 2), Math.round(y - 3 - t), w, 1);

@@ -87,6 +87,9 @@ AQ.Save = (function () {
     // badges: a save from before badges existed earns everything its progress shows, silently
     if (st.badges && typeof st.badges === 'object' && st.badges.earned) AQ.State.badges = st.badges;
     if (AQ.Badges) AQ.Badges.loaded(!(st.badges && st.badges.earned));
+    // station requests: older saves start unasked (the question comes at a calm moment)
+    AQ.State.quests = st.quests && typeof st.quests === 'object' && st.quests.done ? st.quests : null;
+    if (AQ.Quests) AQ.Quests.loaded();
     if (AQ.Panes) AQ.Panes.debugTopUp();       // TESTING ONLY flag: 100 glass panes
     if (AQ.Hydro) AQ.Hydro.debugTopUp();       // TESTING ONLY flag: hydrophone at max
     // where you were: scene + spot (older saves have no scene -> the sea world). Validated against
@@ -161,6 +164,7 @@ AQ.Save = (function () {
     AQ.State.panes = 0;
     AQ.State.backups = {};                     // a new game hasn't been backed up yet
     if (AQ.Badges) AQ.Badges.newGame();        // a new game's badges start from nothing
+    if (AQ.Quests) AQ.Quests.newGame();        // ...and its requests (the yes / no answer carries over)
     if (AQ.Panes) AQ.Panes.debugTopUp();
     if (AQ.Hydro) AQ.Hydro.debugTopUp();
     game.upgrades = AQ.State.upgrades;

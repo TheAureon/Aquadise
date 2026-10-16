@@ -67,6 +67,16 @@ AQ.Badges = (function () {
     decorInTanks: { value: () => sum(Object.values(AQ.State.tanks || {}), (t) => (t.decor || []).length) },
     fedAny: { value: () => (Object.values(AQ.State.tanks || {}).some((t) => t.lastFed) ? 1 : 0) },
     nights: { value: () => ((AQ.State.starfall || {}).night || 0) },
+    // (these five are read by the station requests, data/quests.js: one set of checks for both)
+    badge: { value: (c) => (B.earned(c.badge) ? 1 : 0) },                     // a badge already earned (its moment happened)
+    pairsInTanks: { value: () => sum(Object.values(AQ.State.tanks || {}), (t) => {   // species with a ♂ and a ♀ in the same tank
+      const cr = t.creatures || [], ids = new Set(cr.filter((e) => e.sex === 'm').map((e) => e.id));
+      return new Set(cr.filter((e) => e.sex === 'f' && ids.has(e.id)).map((e) => e.id)).size;
+    }) },
+    biomesComplete: { value: () => AQ.World.biomes.filter((bm) => { const sp = defs().filter((d) => d.biome === bm.id); return sp.length && sp.every((d) => has(d.id)); }).length,
+      total: () => AQ.World.biomes.length },
+    predatorTanksComplete: { value: () => (AQ.data.predatorTanks || []).filter((t) => t.members.length && t.members.every(has)).length, total: () => (AQ.data.predatorTanks || []).length },
+    tanksWith: { value: () => (AQ.Tanks ? AQ.Tanks.list() : []).filter((t) => !t.nursery && ((AQ.State.tanks || {})[t.id] || { creatures: [] }).creatures.length >= AQ.TUNING.quests.fillMin).length },
     // the final goal: every species, both sexes of every species that has them, every rare variant
     aquadise: {
       value: () => CHECKS.discovered.value({}) + CHECKS.bothSexes.value() + CHECKS.variants.value(),
@@ -220,6 +230,7 @@ AQ.Badges = (function () {
 
   // ---------------------------------------------------------------- events, counters
   B.event = function (name, data = {}) {
+    if (AQ.Quests) AQ.Quests.event(name, data);                       // the station requests hear the same moments
     if (name === 'spook') { if (S().counters.gentleStreak) S().counters.gentleStreak = 0; return; }   // Gentle Hands: a catch streak with nothing startled
     if (name === 'catch') B.add('gentleStreak', 1, true);
     for (const b of list()) {
@@ -234,6 +245,7 @@ AQ.Badges = (function () {
   B.add = function (name, n = 1, quiet) {
     S().counters[name] = (S().counters[name] || 0) + n;
     AQ.Save && AQ.Save.dirty();
+    if (AQ.Quests) AQ.Quests.poke();                                   // (a request may read this counter)
     if (!quiet) for (const b of list()) if (b.cond.counter === name) evaluate(b, false);
   };
   B.addTo = function (name, key) {
@@ -241,6 +253,7 @@ AQ.Badges = (function () {
     if (set[key]) return;
     set[key] = 1;
     AQ.Save && AQ.Save.dirty();
+    if (AQ.Quests) AQ.Quests.poke();
     for (const b of list()) if (b.cond.counter === name) evaluate(b, false);
   };
 

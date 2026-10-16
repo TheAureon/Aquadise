@@ -1430,6 +1430,17 @@
     p.outline(0.25);
   };
   // glass panes (8 x 8, 2 frames): a small stack of two pale-blue panes with a white edge; frame 1 adds a glint
+  // the station's little radio (station requests): a teal box with a speaker grille, a stubby antenna
+  // and a light that's lit in frame 1 (it blinks when a request arrives)
+  S.uiradio = function (p, o) {
+    const body = hex('#2e7d96'), dark = hex('#1a4a5e'), edge = hex('#6ef0ef'), grille = hex('#bff6ff'), lamp = o.frame === 1 ? hex('#ffd25a') : hex('#5a6a52');
+    p.rect(1, 4, 10, 7, body); p.rect(1, 4, 10, 1, edge); p.rect(1, 10, 10, 1, dark);   // the box, lit along the top
+    for (let y = 6; y <= 8; y += 2) p.rect(2, y, 4, 1, grille);                          // speaker grille
+    p.rect(8, 6, 2, 2, lamp);                                                             // the light
+    p.rect(8, 1, 1, 3, edge); p.set(9, 0, edge);                                          // antenna
+    if (o.frame === 1) { p.set(10, 1, hex('#ffe9a8')); p.set(11, 0, hex('#ffe9a8')); }  // a little "signal" spark
+    p.outline(0.3);
+  };
   S.uipane = function (p, o) {
     const back = hex('#6fa8c8'), glass = hex('#bfe8f6'), edge = hex('#f4fdff'), deep = hex('#8cc6de');
     p.rect(2, 0, 6, 6, back);                                               // the pane behind
