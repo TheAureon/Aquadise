@@ -759,8 +759,28 @@ untouched, so it stays crisp.
 - **Bloom:** bright things (lamps, glows, stars, the beam, white highlights) get a soft glow
   (`graphics.bloom`; MEDIUM and HIGH).
 - **Vignette** (all levels) and a very faint **film grain** (MEDIUM / HIGH; never with REDUCE FLASHING).
-- **Levels** (`graphics.levels`): HIGH = bloom at half size blurred twice, screen up to 2x pixel density;
-  MEDIUM = bloom at quarter size, up to 1.5x; LOW = grading, vignette and simple fog only, 1x.
+- **Real light** (MEDIUM / HIGH, `graphics.lights`): night, caves and the deep are darkened in the shader,
+  and every light in the game's light list (up to 24 on HIGH, 12 on MEDIUM) cuts a smooth hole. The LAMP
+  shines as a soft warm cone ahead of the diver with a little light all round; coloured lights tint what
+  they touch. Glowing creatures read a `glow: { color, radius, strength, pulse }` entry in
+  `data/creatures.js`, so their glow can be edited per species; it gets stronger the darker it is.
+- **Water** (MEDIUM / HIGH, `graphics.water`): slow god rays from the surface (warm by day, faint blue by
+  moonlight), caustics dancing on rock and sand near open water, plankton and specks drifting at a few
+  depths (near ones sharp, far ones soft and dim; in the dark you only see them near light), a soft
+  reflection band under the surface and a glint path under the sun or moon. HIGH also sways the water
+  rows just under the surface by whole pixels (refraction; sprites never move).
+- **Sky** (MEDIUM / HIGH, `graphics.sky`): soft drifting clouds with light edges (dim at night), a glow
+  around the sun and moon, a warm sunset sun on the hill, and a soft volumetric glow around the UFO beam
+  (gentle by day, full at night).
+- **Levels** (`graphics.levels`): HIGH = everything (three ray bands, two caustic layers, three plankton
+  layers, refraction, finer clouds, 24 lights), bloom at half size blurred twice, effects worked out at 3x
+  the game's size, screen up to 2x pixel density; MEDIUM = a lighter version (two ray bands, one caustic
+  layer, two plankton layers, no refraction, 12 lights), bloom at quarter size, effects at 2x, up to 1.5x
+  density; LOW = colour grading, vignette and cheap fog only (lights stay the old stepped 2D ones), 1x.
+  The effects run at a fixed multiple of 320 x 180 (`fxScale`) and are then scaled up sharply, so their
+  cost doesn't grow with a big window.
+- **REDUCE FLASHING:** every moving effect runs at half speed (`graphics.calmSpeed`), no grain, no light
+  flicker, no star twinkle, and the surface glint becomes a steady soft path instead of sparkles.
 - **First run** picks a level: phones and tablets start at MEDIUM, weak machines (`graphics.detect`) at
   LOW, a software renderer (no real graphics chip) at CLASSIC. A **governor** steps down one level if the
   frame rate stays under `governor.minFps` for `governor.seconds` ("Switched to lighter graphics. You can
@@ -772,7 +792,7 @@ untouched, so it stays crisp.
   read, so the effects work there too (tested in Chromium).
 - **Photos** taken in a tank include the effects (the frame and caption stay crisp).
 - **Testing:** `AQ.TUNING.debug.gfx: true` adds **-** (next quality level), **=** (pick the next effect:
-  grade, fog, bloom, vignette, grain), **\\** (switch the picked effect off / on) and **`** (a frame-time
+  grade, fog, bloom, vignette, grain, light, water, sky), **\\** (switch the picked effect off / on) and **`** (a frame-time
   overlay: fps, ms per frame, level, effects off, canvas size, graphics chip).
 
 ## Sound and music

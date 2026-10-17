@@ -295,12 +295,12 @@ AQ.Creatures = (function () {
     const cam = AQ.Camera, l = cam.left() - 60, t = cam.top() - 60;
     for (const c of C.list) {
       if (c.decoy && c.x > l && c.x < l + cam.w + 120 && c.y > t && c.y < t + cam.h + 120) L.push({ x: c.decoy.x, y: c.decoy.y, r: c.p.glow || 26, color: c.p.decoyColor || '#d8ff8a', power: c.decoy.a * Math.max(0.5, c.alpha) });
-      const lt = c.def.light;
+      const lt = c.def.glow;                     // (data/creatures.js: { color, radius, strength, pulse })
       if (!lt || c.harvested || c.x < l || c.x > l + cam.w + 120 || c.y < t || c.y > t + cam.h + 120) continue;
       if (lt.pulse && !c.glow) continue;
       if (c.closed) continue;                    // a night bloom closed for the day
       const yy = c.def.is_plant ? c.y - 5 : c.y;
-      L.push({ x: c.x + (c.def.art && c.def.art.lure ? c.facing * c.r : 0), y: yy, r: lt.r, color: lt.color, power: Math.max(0.4, c.alpha) });
+      L.push({ x: c.x + (c.def.art && c.def.art.lure ? c.facing * c.r : 0), y: yy, r: lt.radius, color: lt.color, power: Math.max(0.4, c.alpha) * (lt.strength == null ? 1 : lt.strength), glow: true });
     }
   };
 

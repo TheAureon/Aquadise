@@ -260,7 +260,7 @@ AQ.Game = (function () {
     if (G.state === 'title') L.push({ x: AQ.Camera.x, y: AQ.Camera.y, r: 90 });
     else {
       const extra = AQ.TUNING.upgrades.lanternRadius[G.upgrades.lantern || 0] || 0;   // the LANTERN upgrade
-      L.push({ x: p.x + p.facing * 6, y: p.y, r: 58 + extra }); L.push({ x: p.x, y: p.y, r: 26 + extra * 0.5 });
+      L.push({ x: p.x + p.facing * 6, y: p.y, r: 58 + extra, cone: p.facing }); L.push({ x: p.x, y: p.y, r: 26 + extra * 0.5 });   // (cone: the shader layer draws the lamp as a soft cone ahead)
     }
     for (const l of AQ.Terrain.lights) L.push(l);
     for (const f of AQ.Terrain.fireflies) L.push({ x: f.x, y: f.y, r: 9, color: '#ffe36b', power: 0.5 });

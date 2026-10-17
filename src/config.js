@@ -293,9 +293,15 @@ AQ.TUNING = {
     logFailures: true,        // a quiet note in the console when the shader layer can't run (and CLASSIC takes over)
     background: [0.024, 0.078, 0.165],   // behind anything transparent (the page's own dark blue)
     levels: {                 // what each level does
-      high:   { bloom: true, bloomDiv: 2, bloomPasses: 2, grain: true, maxDpr: 2 },     // bloom at half size, blurred twice; screen up to 2x pixel density
-      medium: { bloom: true, bloomDiv: 4, bloomPasses: 1, grain: true, maxDpr: 1.5 },   // bloom at quarter size, blurred once
-      low:    { bloom: false, grain: false, maxDpr: 1 }                                  // colour grading, vignette and cheap fog only
+      // bloom: at 1/bloomDiv size, blurred bloomPasses times; light: the dark + real lights in the shader (else
+      // the old stepped 2D lights); water: god rays, caustics, plankton, the surface glint; sky: clouds, the
+      // sun's glow, the beam's glow. (Which details each level draws is in src/gfx/shaders.js: HIGH has more
+      // rays, two caustic layers, three plankton layers, refraction and finer clouds.) fxScale: the effects
+      // are worked out at the world's size x this (then scaled up sharply), so their cost doesn't grow with
+      // the window; none = one pass straight to the screen.
+      high:   { bloom: true, bloomDiv: 2, bloomPasses: 2, grain: true, maxDpr: 2, fxScale: 3, light: true, water: true, sky: true },
+      medium: { bloom: true, bloomDiv: 4, bloomPasses: 1, grain: true, maxDpr: 1.5, fxScale: 2, light: true, water: true, sky: true },
+      low:    { bloom: false, grain: false, maxDpr: 1, light: false, water: false, sky: false }   // colour grading, vignette and cheap fog only
     },
     // colour grading by place and time of day: [gain red, green, blue, saturation, contrast, brightness,
     // shadow tint strength, shadow tint red, green, blue]. 1 = unchanged (0 for the last four). The clock
@@ -323,9 +329,34 @@ AQ.TUNING = {
       contrastLoss: 0.30,     // how much flatter the image gets at full strength
       soften: 1.6             // how far (pixels) the softening reaches at full strength (MEDIUM / HIGH)
     },
+    calmSpeed: 0.5,           // REDUCE FLASHING: water, light and clouds move at this fraction of their speed
+    lights: {                 // real lights (MEDIUM / HIGH): the lamp, glowing creatures, chests, bottles, stars...
+      lampColor: [1.0, 0.94, 0.8],   // the lamp's warm colour...
+      lampTint: 0.22,         // ...and how much it tints what it lights
+      glow: 0.08, glowDark: 0.45,   // a coloured light's own glow (bioluminescence, lanterns): always, plus this much more in full dark
+      flicker: 0.06           // flickering lights (vents, torches) vary their size this much (never with REDUCE FLASHING)
+    },
+    water: {                  // the sea (MEDIUM / HIGH)
+      rays: 0.13,             // god rays from the surface by day...
+      raysNight: 0.05,        // ...and by moonlight
+      sunRay: [1.0, 0.96, 0.84], moonRay: [0.55, 0.7, 1.0],   // their colours
+      caustics: 0.45,         // the dancing light on rock and sand (by day; fades with depth)
+      refraction: 1.0,        // HIGH: how many pixels water rows sway just under the surface
+      plankton: 0.3,          // drifting specks
+      glint: 0.45,            // the glint path on the water under the sun / moon
+      reflection: 0.08        // the sky's soft reflection just under the surface line
+    },
+    sky: {                    // the sky (MEDIUM / HIGH)
+      clouds: 0.5, cloudsNight: 0.16,   // soft clouds by day / by night
+      sunGlow: { radius: 26, strength: 0.28, color: [1.0, 0.86, 0.6] },   // the sun's glow bleeding into the sky (the hill)
+      moonGlow: { radius: 18, strength: 0.12, color: [0.7, 0.8, 1.0] },
+      sunsetSun: [238, 118],  // where the painted sunset's sun is (texture px), for its glow at dawn / dusk
+      beam: 0.2,              // the UFO beam's volumetric glow (at night)...
+      beamDay: 0.3            // ...and this share of it by day
+    },
     vignette: 0.22,           // darker corners (0 = none)
     grain: { amount: 0.018, fps: 24 },   // film grain: strength, and how often its pattern changes (off on LOW and with REDUCE FLASHING)
-    bloom: { threshold: 0.955, knee: 0.04, strength: 0.42 },  // glow of bright things: how bright to start (0-1, the brightest colour channel), a soft start, how strong
+    bloom: { threshold: 0.955, knee: 0.04, strength: 0.42, dayScale: 0.4 },   // glow of bright things: how bright to start (0-1, the brightest colour channel), a soft start, how strong, and its share by day (sea, hill)
     detect: { weakCores: 2, weakMemoryGB: 2 },   // first run: this few CPU cores or GB of memory starts at LOW (phones / tablets start at MEDIUM)
     governor: {               // drops one level (never raises) if the frame rate stays low; never over the player's own choice
       enabled: true,

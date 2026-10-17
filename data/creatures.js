@@ -33,7 +33,8 @@
 //   color, accent, art                   placeholder-art hints only (ignored once real art exists)
 //   spawn                                { n, at: floor|water|surface|wall|ceiling|pool|ice_top|reef, area:[x0,x1], y:[y0,y1] }
 //                                        + optional extra: [{ n, at, area, y }, ...] for more places it also lives
-//   light                                { r, color } emits light in dark biomes
+//   glow                                 { color, radius, strength, pulse? } it glows: real coloured light at night and in
+//                                        the deep (radius in px; strength 1 = normal; pulse = only while it's pulsing)
 //   tank                                 tank idle locomotion: swim | crawl | still (default from category)
 //   voice                                optional: its own little sound id (src/sfx.js); otherwise one per category
 //                                        (AQ.data.creatureVoices in data/music.js)
@@ -129,7 +130,7 @@ AQ.data.creatures = [
   { id: 'lanternjaw', likes: ['light', 'rock'], biome: 'trench', category: 'fish', catch_behavior: 'wary', predator: true,
     params: { reaction: 'flee', alertR: 38, carelessNoise: 0.25, fleeSpeed: 70, speed: 10 },
     sprite_size: 'medium', color: '#3a2f4a', accent: '#5a4a6a', art: { shape: 'fish', lure: true, glow: '#9ff7ff' },
-    light: { r: 22, color: '#9ff7ff' },
+    glow: { color: '#9ff7ff', radius: 22, strength: 1 },
     spawn: { n: 3, at: 'water', y: [900, 1200], extra: [{ n: 1, at: 'water', area: [3440, 3860], y: [1200, 1280] }] } },
   { id: 'vent_shell', likes: ['rock', 'vent'], biome: 'trench', category: 'crustacean', catch_behavior: 'clinger',
     params: { pry: true },
@@ -138,7 +139,7 @@ AQ.data.creatures = [
   { id: 'abyss_drifter', likes: ['light'], biome: 'trench', category: 'cephalopod', catch_behavior: 'camouflage',
     params: { alpha: 0.05, pulse: true, pulseEvery: [3, 5], moveEvery: [8, 12] },
     sprite_size: 'medium', color: '#5a6fd5', accent: '#a6f0ff', art: { shape: 'jelly' },
-    light: { r: 26, color: '#7fdcff', pulse: true },
+    glow: { color: '#7fdcff', radius: 26, strength: 1, pulse: true },
     spawn: { n: 3, at: 'water', y: [850, 1180], extra: [{ n: 2, at: 'water', area: [3440, 3860], y: [1190, 1275] }] } },
   { id: 'trenchmaw', likes: ['hideout', 'arch'], biome: 'trench', category: 'cephalopod', catch_behavior: 'ambush', rare: 0.45,
     hostile: true, knockback: 'strong', requires_upgraded_net: true, predator: true,
@@ -146,7 +147,7 @@ AQ.data.creatures = [
     sprite_size: 'huge', color: '#4a1f3a', accent: '#d94a6a', art: { shape: 'squid' },
     spawn: { n: 1, at: 'water', y: [1080, 1200] } },
   { id: 'glow_tuft', tags: ['light'], biome: 'trench', category: 'plant', is_plant: true, catch_behavior: 'plant',
-    sprite_size: 'small', color: '#2f5f6a', accent: '#7ff7e0', art: { shape: 'tuft' }, light: { r: 34, color: '#7ff7e0' },
+    sprite_size: 'small', color: '#2f5f6a', accent: '#7ff7e0', art: { shape: 'tuft' }, glow: { color: '#7ff7e0', radius: 34, strength: 1 },
     spawn: { n: 10, at: 'floor', y: [900, 1240], extra: [{ n: 6, at: 'floor', area: [3440, 3860], y: [1220, 1300] }] } },
 
   // ------------------------------------------------------------------ Flooded Cave System
@@ -167,7 +168,7 @@ AQ.data.creatures = [
     sprite_size: 'large', color: '#7a8a96', accent: '#b9c4cc', art: { shape: 'crab', spindly: true, wide: 1.1 },
     spawn: { n: 2, at: 'floor' } },
   { id: 'mineral_bloom', tags: ['crystal', 'light'], biome: 'cave', category: 'plant', is_plant: true, catch_behavior: 'plant',
-    sprite_size: 'small', color: '#9f7fe8', accent: '#6fd6e8', art: { shape: 'crystals' }, light: { r: 18, color: '#c9a2ff' },
+    sprite_size: 'small', color: '#9f7fe8', accent: '#6fd6e8', art: { shape: 'crystals' }, glow: { color: '#c9a2ff', radius: 18, strength: 1 },
     spawn: { n: 6, at: 'floor' } },
 
   // ------------------------------------------------------------------ Open Ocean
@@ -343,11 +344,11 @@ AQ.data.creatures = [
   // ---- Day & night update: nine new creatures (night-only, depth-gated, and the new behaviours)
   { id: 'auroravein_squid', voice: 'glow_chime', likes: ['ice', 'light'], biome: 'ice', category: 'cephalopod', catch_behavior: 'drift', active: 'night',
     params: { speed: 6, alpha: 0.95 },
-    sprite_size: 'medium', color: '#cfe6dc', accent: '#c9a8ff', art: { shape: 'squid', veins: true }, light: { r: 30, color: '#b8ffd8' },
+    sprite_size: 'medium', color: '#cfe6dc', accent: '#c9a8ff', art: { shape: 'squid', veins: true }, glow: { color: '#b8ffd8', radius: 30, strength: 1 },
     spawn: { n: 2, at: 'water', y: [150, 360] } },
   { id: 'moonshell_crab', likes: ['shell', 'rock'], biome: 'tide_pools', category: 'crustacean', catch_behavior: 'camouflage', active: 'night',
     params: { freezeOnApproach: true, alpha: 0.25, visibleAlpha: 0.95, crawl: true, moveEvery: [3, 5] },
-    sprite_size: 'small', color: '#dfe4f2', accent: '#a8c4ff', art: { shape: 'crab' }, light: { r: 12, color: '#dfe8ff' },
+    sprite_size: 'small', color: '#dfe4f2', accent: '#a8c4ff', art: { shape: 'crab' }, glow: { color: '#dfe8ff', radius: 12, strength: 1 },
     spawn: { n: 2, at: 'ground', area: [40, 700] } },
   { id: 'ribbonmane', likes: ['kelp', 'plant'], biome: 'kelp', category: 'fish', catch_behavior: 'mirror',
     params: { range: 72, calmTime: 0.9, approach: 26, wanderR: 50 },
@@ -355,7 +356,7 @@ AQ.data.creatures = [
     spawn: { n: 2, at: 'water', y: [170, 360] } },
   { id: 'candlepolyp', voice: 'glow_chime', tags: ['coral', 'light'], biome: 'coral', category: 'plant', is_plant: true, catch_behavior: 'plant', bloom: 'night',
     params: {},
-    sprite_size: 'medium', color: '#6a4a6a', accent: '#ffd98a', art: { shape: 'candlepolyp' }, light: { r: 22, color: '#ffd98a' },
+    sprite_size: 'medium', color: '#6a4a6a', accent: '#ffd98a', art: { shape: 'candlepolyp' }, glow: { color: '#ffd98a', radius: 22, strength: 1 },
     spawn: { n: 5, at: 'floor' } },
   { id: 'skyleap_flyfish', likes: ['bubbles', 'arch'], biome: 'open_ocean', category: 'fish', catch_behavior: 'midair',
     params: { leapEvery: [2.5, 4.5], leap: 125, speed: 24, depth: 14, wanderR: 100 },
@@ -375,7 +376,7 @@ AQ.data.creatures = [
     spawn: { n: 2, at: 'floor' } },
   { id: 'firefly_frog', voice: 'glow_chime', likes: ['roots', 'plant'], biome: 'mangrove', category: 'amphibian', catch_behavior: 'lure', active: 'night',
     params: { decoyDist: 11, decoyColor: '#f0ff8a', alpha: 0.55, glow: 28 },
-    sprite_size: 'small', color: '#4a6a3a', accent: '#e8ff7a', art: { shape: 'frog', glow: true }, light: { r: 12, color: '#e8ff8a' },
+    sprite_size: 'small', color: '#4a6a3a', accent: '#e8ff7a', art: { shape: 'frog', glow: true }, glow: { color: '#e8ff8a', radius: 12, strength: 1 },
     spawn: { n: 2, at: 'floor' } },
 
   // ------------------------------------------------------------------ Hidden callers (the hydrophone update)
@@ -411,15 +412,15 @@ AQ.data.creatures = [
   // event: 'star' = any falling star, 'shower' = only during meteor showers. Their tank is Starfall.
   // bottle: the sea biome their message bottle lies in (they have no biome of their own in the sea).
   { id: 'starfall_minnow', likes: ['stardust', 'light'], biome: 'starfall', category: 'fish', catch_behavior: 'dart',
-    event: 'star', bottle: 'open_ocean', light: { r: 20, color: '#cfe4ff' },
+    event: 'star', bottle: 'open_ocean', glow: { color: '#cfe4ff', radius: 20, strength: 1 },
     params: { alertR: 44, runTime: [0.7, 1.1], pauseTime: [1.4, 2.2], runSpeed: 60, erratic: true },
     sprite_size: 'tiny', color: '#d8ecff', accent: '#fff3a8', art: { shape: 'fish', starry: true } },
   { id: 'aerolite_crab', likes: ['meteorite', 'hideout'], biome: 'starfall', category: 'crustacean', catch_behavior: 'wary',
-    event: 'star', bottle: 'tide_pools', light: { r: 16, color: '#ffd8a8' },
+    event: 'star', bottle: 'tide_pools', glow: { color: '#ffd8a8', radius: 16, strength: 1 },
     params: { reaction: 'hide', pry: true, alertR: 46, speed: 6, wanderR: 22 },
     sprite_size: 'small', color: '#6e6a74', accent: '#ffb86a', art: { shape: 'crab', rocky: true } },
   { id: 'comet_ray', likes: ['stardust', 'arch'], biome: 'starfall', category: 'fish', catch_behavior: 'curious',
-    event: 'shower', bottle: 'coral', light: { r: 30, color: '#b8d8ff' },
+    event: 'shower', bottle: 'coral', glow: { color: '#b8d8ff', radius: 30, strength: 1 },
     params: { approachR: 130, keepDist: 26 },
     sprite_size: 'widelarge', color: '#3a4a8a', accent: '#bfe8ff', art: { shape: 'ray' } },
 ];

@@ -94,7 +94,8 @@ AQ.Render = (function () {
     const W = AQ.World;
   // light shafts near the surface
     const seaY = W.sea - top, low = U.lowFx();
-    if (seaY > -260 && seaY < cam.h && !low) {                         // (LOW EFFECTS: no light shafts)
+    const shaderWater = !!(AQ.Gfx && AQ.Gfx.water());                 // (GRAPHICS MEDIUM / HIGH: the shader's god rays and plankton instead)
+    if (seaY > -260 && seaY < cam.h && !low && !shaderWater) {        // (LOW EFFECTS: no light shafts)
       ctx.save();
       ctx.globalAlpha = 0.045;
       ctx.fillStyle = '#e8fbff';
@@ -113,7 +114,7 @@ AQ.Render = (function () {
       for (let i = 0; i < 40; i++) {
         const x = ((i * 97 + 13 - left * 0.05) % 320 + 320) % 320, y = (i * 53) % Math.max(1, Math.min(seaY - 4, 120));
         if (y >= seaY - 4) continue;
-        ctx.globalAlpha = night * (0.45 + 0.4 * Math.sin(R.t * (1 + (i % 3)) + i));
+        ctx.globalAlpha = night * (U.calm() ? 0.65 : 0.45 + 0.4 * Math.sin(R.t * (1 + (i % 3)) + i));   // (REDUCE FLASHING: no twinkle)
         ctx.fillStyle = i % 5 ? '#e8f0ff' : '#fff6d0';
         ctx.fillRect(Math.round(x), Math.round(y), 1, 1);
       }
@@ -121,7 +122,7 @@ AQ.Render = (function () {
     }
     // drifting marine snow (parallax; LOW EFFECTS: none)
     ctx.fillStyle = 'rgba(220,240,255,0.22)';
-    if (!low) for (const s of R.snow) {
+    if (!low && !shaderWater) for (const s of R.snow) {
       const x = ((s.x - left * s.s) % 400 + 400) % 400 - 40;
       const y = ((s.y - top * s.s + R.t * s.v) % 220 + 220) % 220 - 20;
       if (top + y > W.sea) ctx.fillRect(Math.round(x), Math.round(y), 1, 1);
@@ -170,6 +171,8 @@ AQ.Render = (function () {
   const RINGS_LOW = [[1, 0.28], [0.7, 0.4], [0.4, 0.62]];
   R.lighting = function (cam, lights, target) {
     R.darkness += (target - R.darkness) * 0.04;
+    // GRAPHICS MEDIUM / HIGH: the shader layer draws the dark and the lights itself (smooth, coloured)
+    if (AQ.Gfx && AQ.Gfx.takeLighting(cam, lights, R.darkness)) return;
     if (R.darkness < 0.02) return;
     const l = R.lctx, left = cam.left(), top = cam.top();
     l.globalCompositeOperation = 'source-over';

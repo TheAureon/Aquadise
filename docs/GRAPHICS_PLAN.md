@@ -129,3 +129,26 @@ In CLASSIC all three do nothing: `#game` is still what you see, so nothing looks
   its box exactly, so mouse, touch and the log button map as before.
 - **file://** tested in Chromium: works (embedded sprites). If a browser still refuses to let WebGL read
   the canvas, `texImage2D` throws a SecurityError; the game catches it and stays CLASSIC for the session.
+- **Stage 2 (done):** light, water and sky in the composite shader (MEDIUM / HIGH). Darkness + the light
+  list move into the shader (`Gfx.takeLighting`; LOW / CLASSIC keep the 2D overlay); the lamp is a cone;
+  creature `glow` data; god rays, caustics (only near open water: a "water-coloured" mask), plankton at
+  depths, surface reflection + glint path, refraction (HIGH); clouds (only on pixels matching the sky
+  gradient), sun / moon glow, the sunset sun, the beam's glow. The old 2D light shafts and marine snow are
+  skipped when the shader draws water.
+  **Performance:** the first version ran the whole effect shader per screen pixel; on a software renderer
+  at 1280 x 720 that was 3-7 fps on MEDIUM / HIGH. Now MEDIUM / HIGH render the world with effects into a
+  framebuffer at 2x / 3x of 320 x 180 (`levels.*.fxScale`), and a tiny second pass (`Shaders.final`)
+  scales it up sharply and adds vignette, grain and the interface. Measured (Chromium + SwiftShader, a
+  software renderer, 1280 x 720; real graphics chips are many times faster and weren't available to test):
+
+  | scene | CLASSIC | LOW | MEDIUM | HIGH |
+  |---|---|---|---|---|
+  | sea day | 60 | 31 | 16 | 8 |
+  | sea night | 60 | 35 | 19 | 9 |
+  | deep | 60 | 32 | 16 | 8 |
+  | hill | 60 | 36 | 21 | 11 |
+  | station | 60 | 37 | 21 | 12 |
+  | tank | 60 | 37 | 23 | 11 |
+
+  JavaScript cost of the layer: 0.3-1.2 ms a frame. The first-run pick already sends software renderers to
+  CLASSIC, and the governor steps down if a real machine can't keep up.

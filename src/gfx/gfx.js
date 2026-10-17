@@ -22,7 +22,7 @@ AQ.Gfx = (function () {
     off: {}, overlay: false, fxSel: 0, fps: 60, ms: 0 };
   const LEVELS = ['high', 'medium', 'low', 'classic'];
   X.LEVELS = LEVELS;
-  X.EFFECTS = ['grade', 'fog', 'bloom', 'vignette', 'grain'];      // (each can be switched off for testing)
+  X.EFFECTS = ['grade', 'fog', 'bloom', 'vignette', 'grain', 'light', 'water', 'sky'];   // (each can be switched off for testing)
   const cfg = () => AQ.TUNING.graphics;
   const set = () => (AQ.State && AQ.State.settings) || {};
   const calm = () => !!(AQ.U && AQ.U.calm());
@@ -96,7 +96,12 @@ AQ.Gfx = (function () {
       X.renderer = String(dbg ? gl.getParameter(dbg.UNMASKED_RENDERER_WEBGL) : gl.getParameter(gl.RENDERER));
       X.software = /swiftshader|llvmpipe|software|softpipe|basic render/i.test(X.renderer);
       const r = { progs: {} };
-      for (const lv of ['high', 'medium', 'low']) { r.progs[lv] = AQ.GL.program(gl, AQ.Shaders.vertex, AQ.Shaders.composite(lv), 'composite-' + lv); if (!r.progs[lv]) return fail(AQ.GL.lastError); }
+      for (const lv of ['high', 'medium', 'low']) {
+        const pass = cfg().levels[lv].fxScale ? 'scene' : 'all';
+        r.progs[lv] = AQ.GL.program(gl, AQ.Shaders.vertex, AQ.Shaders.composite(lv, pass), 'composite-' + lv); if (!r.progs[lv]) return fail(AQ.GL.lastError);
+      }
+      r.final = AQ.GL.program(gl, AQ.Shaders.vertex, AQ.Shaders.final, 'final'); if (!r.final) return fail(AQ.GL.lastError);
+      r.fx = null;
       r.bright = AQ.GL.program(gl, AQ.Shaders.vertex, AQ.Shaders.bright, 'bright'); if (!r.bright) return fail(AQ.GL.lastError);
       r.blur = AQ.GL.program(gl, AQ.Shaders.vertex, AQ.Shaders.blur, 'blur'); if (!r.blur) return fail(AQ.GL.lastError);
       r.quad = AQ.GL.quad(gl);
@@ -137,6 +142,7 @@ AQ.Gfx = (function () {
   X.beginFrame = function (game) {
     X.frame++; X.worldMarked = false;
     timing();
+    if (X.dt) X.t += X.dt / 1000 * (calm() ? cfg().calmSpeed : 1);  // the effects' own clock (slower with REDUCE FLASHING)
     if (X.active()) { const c = AQ.Render.ctx; c.setTransform(1, 0, 0, 1, 0, 0); c.clearRect(0, 0, X.canvas.width, X.canvas.height); }   // (the world texture starts clean)
   };
   function upload(tex) {
@@ -156,12 +162,14 @@ AQ.Gfx = (function () {
     if (!X.active() || !gl) return;
     try { upload(R.ui); } catch (e) { fail('upload: ' + (e && e.name)); X.toClassic(); return; }
     X.sync(false);
-    draw(game, R.world, AQ.TUNING.view.w, AQ.TUNING.view.h, R.ui, null, X.view.width, X.view.height, X.mode);
+    try { draw(game, R.world, AQ.TUNING.view.w, AQ.TUNING.view.h, R.ui, null, X.view.width, X.view.height, X.mode); }
+    catch (e) { fail('draw: ' + (e && e.message)); X.toClassic(); return; }
     governor(game);
   };
 
   // ---------------------------------------------------------------- the passes
   const U = new Float32Array(4);                                    // (reused: nothing allocated per frame)
+  const LIGHTS = new Float32Array(24 * 4), LCOL = new Float32Array(24 * 4);
   function bind(prog) { gl.useProgram(prog.p); gl.bindBuffer(gl.ARRAY_BUFFER, R.quad); gl.enableVertexAttribArray(0); gl.vertexAttribPointer(0, 2, gl.FLOAT, false, 0, 0); }
   function tex(unit, t, loc) { gl.activeTexture(gl.TEXTURE0 + unit); gl.bindTexture(gl.TEXTURE_2D, t); if (loc) gl.uniform1i(loc, unit); }
   function target(t, w, h) { gl.bindFramebuffer(gl.FRAMEBUFFER, t ? t.fb : null); gl.viewport(0, 0, w, h); }
@@ -182,20 +190,51 @@ AQ.Gfx = (function () {
       }
       bloomTex = A.tex;
     }
+    // MEDIUM / HIGH: the effects run at a whole number of times the world's size (not the screen's), then
+    // a cheap second pass upscales sharply; the cost no longer grows with the window
+    let fx = null;
+    if (lv.fxScale) {
+      const k = Math.max(1, Math.min(lv.fxScale, Math.ceil(Math.max(ow / tw, oh / th) - 0.01)));
+      const fw = tw * k, fh = th * k;
+      if (!R.fx || R.fx.w !== fw || R.fx.h !== fh) { AQ.GL.free(gl, R.fx); R.fx = AQ.GL.target(gl, fw, fh); if (!R.fx) throw new Error(AQ.GL.lastError); }
+      fx = R.fx;
+    }
     const prog = R.progs[level], u = prog.u;
     bind(prog);
-    gl.bindFramebuffer(gl.FRAMEBUFFER, fb); gl.viewport(0, 0, ow, oh);
+    if (fx) target(fx, fx.w, fx.h); else { gl.bindFramebuffer(gl.FRAMEBUFFER, fb); gl.viewport(0, 0, ow, oh); }
     tex(0, worldTex, u.uWorld); tex(1, uiTex || R.blank, u.uUI); tex(2, bloomTex, u.uBloom);
-    gl.uniform2f(u.uTex, tw, th); gl.uniform2f(u.uUITex, AQ.TUNING.view.w, AQ.TUNING.view.h); gl.uniform2f(u.uOut, ow, oh);
+    gl.uniform2f(u.uTex, tw, th); if (u.uUITex) gl.uniform2f(u.uUITex, AQ.TUNING.view.w, AQ.TUNING.view.h); gl.uniform2f(u.uOut, fx ? fx.w : ow, fx ? fx.h : oh);
     gl.uniform3f(u.uBg, c.background[0], c.background[1], c.background[2]);
     gl.uniform4fv(u.uGradeA, P.gradeA); gl.uniform4fv(u.uGradeB, P.gradeB); gl.uniform3fv(u.uShadow, P.shadow);
     gl.uniform4fv(u.uFog, P.fog); gl.uniform4fv(u.uFogB, P.fogB); gl.uniform4fv(u.uFx, P.fx);
+    if (u.uCam) {                                                    // (Stage 2 inputs: MEDIUM / HIGH only)
+      gl.uniform4fv(u.uCam, P.cam); gl.uniform4fv(u.uScene, P.scene); gl.uniform4fv(u.uDark, P.dark);
+      const n = packLights(level);
+      gl.uniform4fv(u.uL, LIGHTS.subarray(0, AQ.Shaders.maxLights[level] * 4)); gl.uniform4fv(u.uLC, LCOL.subarray(0, AQ.Shaders.maxLights[level] * 4)); gl.uniform1f(u.uLN, n);
+      gl.uniform4fv(u.uLampCol, P.lamp); if (u.uGlow) gl.uniform2f(u.uGlow, cfg().lights.glow, cfg().lights.glowDark); gl.uniform4fv(u.uWater, P.water); gl.uniform3fv(u.uRayCol, P.rayCol);
+      gl.uniform4fv(u.uSurf, P.surf); gl.uniform3fv(u.uSurfCol, P.surfCol);
+      gl.uniform4fv(u.uSky, P.sky); gl.uniform3fv(u.uSkyTop, P.skyTop); gl.uniform3fv(u.uSkyBot, P.skyBot);
+      gl.uniform4fv(u.uSun, P.sun); gl.uniform3fv(u.uSunCol, P.sunCol); gl.uniform4fv(u.uBeam, P.beam);
+    }
     if (u.uUIOn) gl.uniform1f(u.uUIOn, uiTex ? 1 : 0);
+    gl.drawArrays(gl.TRIANGLES, 0, 3);
+    if (!fx) return;
+    const f = R.final, fu = f.u;
+    bind(f);
+    gl.bindFramebuffer(gl.FRAMEBUFFER, fb); gl.viewport(0, 0, ow, oh);
+    tex(0, fx.tex, fu.uSrc); tex(1, uiTex || R.blank, fu.uUI);
+    gl.uniform2f(fu.uSrcSize, fx.w, fx.h); gl.uniform2f(fu.uUITex, AQ.TUNING.view.w, AQ.TUNING.view.h); gl.uniform2f(fu.uOut, ow, oh);
+    gl.uniform4fv(fu.uFx, P.fx); gl.uniform1f(fu.uUIOn, uiTex ? 1 : 0);
     gl.drawArrays(gl.TRIANGLES, 0, 3);
   }
 
   // ---------------------------------------------------------------- what the shader is told (no allocation)
-  const P = { gradeA: new Float32Array(4), gradeB: new Float32Array(4), shadow: new Float32Array(3), fog: new Float32Array(4), fogB: new Float32Array(4), fx: new Float32Array(4) };
+  const P = { gradeA: new Float32Array(4), gradeB: new Float32Array(4), shadow: new Float32Array(3), fog: new Float32Array(4), fogB: new Float32Array(4), fx: new Float32Array(4),
+    cam: new Float32Array(4), scene: new Float32Array(4), dark: new Float32Array(4), lamp: new Float32Array(4), water: new Float32Array(4), rayCol: new Float32Array(3),
+    surf: new Float32Array(4), surfCol: new Float32Array(3), sky: new Float32Array(4), skyTop: new Float32Array(3), skyBot: new Float32Array(3),
+    sun: new Float32Array(4), sunCol: new Float32Array(3), beam: new Float32Array(4) };
+  const BEAM = new Float32Array(3);
+  X._P = P;                                                        // (for the tests: what the shader was told)
   const mixInto = (out, a, k) => { for (let i = 0; i < out.length; i++) out[i] += a[i] * k; };
   const tmpG = new Float32Array(10);
   // grading presets ([gain r, g, b, saturation, contrast, brightness, split, shadow r, g, b]) for a scene
@@ -240,9 +279,112 @@ AQ.Gfx = (function () {
     const lv = c.levels[level];
     P.fx[0] = X.off.vignette ? 0 : c.vignette;
     P.fx[1] = X.off.grain || !lv.grain || calm() ? 0 : c.grain.amount;
-    P.fx[2] = X.off.bloom ? 0 : c.bloom.strength;
+    const dayK = (key === 'sea' || key === 'hill') && AQ.Clock ? AQ.Clock.daylight() : 0;   // (by day, bright things glow less: the glow is for the dark)
+    P.fx[2] = X.off.bloom ? 0 : c.bloom.strength * (1 - dayK * (1 - c.bloom.dayScale));
     P.fx[3] = Math.floor(performance.now() / 1000 * c.grain.fps) % 1000;   // (the grain's pattern changes c.grain.fps times a second)
+    stage2(game, key, level);
     return P;
+  }
+
+  // ---------------------------------------------------------------- Stage 2: light, water, sky
+  const lv = () => (X.active() ? cfg().levels[X.mode] : null);
+  const onSea = () => { const k = sceneKey(AQ.Game); return k === 'sea' || k === 'title'; };
+  // does the shader do the sea's water effects now? (then the 2D light shafts and marine snow step aside)
+  X.water = () => { const L = lv(); return !!(L && L.water && !X.off.water && onSea()); };
+  // the sea's darkness and lights: on MEDIUM / HIGH the shader draws them (R.lighting hands them over and
+  // draws nothing); LOW / CLASSIC: the old stepped 2D overlay, as before
+  const LT = { list: null, cam: null, dark: 0, night: 0, frame: -1 };
+  X._LT = LT;
+  X.takeLighting = function (cam, lights, darkness) {
+    const L = lv();
+    if (!L || !L.light || X.off.light || X.photoScene) return false;
+    LT.list = lights; LT.cam = cam; LT.dark = darkness; LT.frame = X.frame;
+    LT.night = AQ.Clock && !(AQ.Game && AQ.Game.state === 'title') ? 1 - AQ.Clock.daylight() : 0;
+    return true;
+  };
+  const colCache = new Map();
+  function rgb(css) {
+    if (!css) return null;
+    let v = colCache.get(css);
+    if (!v) {                                                        // '#rrggbb' or 'rgb(r,g,b)' (cached: parsed once)
+      const m = /^rgba?\((\d+),\s*(\d+),\s*(\d+)/.exec(css), h = m ? [+m[1], +m[2], +m[3]] : AQ.U.hex(css);
+      v = [h[0] / 255, h[1] / 255, h[2] / 255]; colCache.set(css, v);
+    }
+    return v;
+  }
+  // the lights on screen, packed (the player's lamp first; then the nearest), as texture px
+  function packLights(level) {
+    if (LT.frame !== X.frame || !LT.list) return 0;
+    const max = AQ.Shaders.maxLights[level], cam = LT.cam, l = cam.left(), tp = cam.top(), c = cfg().lights, calmNow = calm(), t = X.t;
+    let n = 0;
+    for (const L of LT.list) {
+      if (n >= max) break;
+      const x = L.x - l, y = L.y - tp, r = L.r;
+      if (x < -r || y < -r || x > AQ.TUNING.view.w + r || y > AQ.TUNING.view.h + r) continue;
+      const fl = L.flicker && !calmNow ? 1 + Math.sin(t * 3 + L.x) * c.flicker : 1;
+      const i = n * 4;
+      LIGHTS[i] = x; LIGHTS[i + 1] = y; LIGHTS[i + 2] = r * fl; LIGHTS[i + 3] = L.power == null ? 1 : L.power;
+      const col = rgb(L.color);
+      LCOL[i] = col ? col[0] : 0; LCOL[i + 1] = col ? col[1] : 0; LCOL[i + 2] = col ? col[2] : 0;
+      LCOL[i + 3] = L.cone ? L.cone : 0;
+      n++;
+    }
+    return n;
+  }
+  X.t = 0;
+  // the clock's sun / moon across the sky (the same path the hill draws them on), texture px
+  function skyBody(out) {
+    const C = AQ.Clock, k = AQ.TUNING.clock, h = C.hour();
+    const sunUp = (h - k.dawnHour) / (k.duskHour + k.duskHours - k.dawnHour);
+    const moonUp = (((h - (k.duskHour + k.duskHours)) % 24) + 24) % 24 / (24 - (k.duskHour + k.duskHours - k.dawnHour));
+    const u = sunUp >= 0 && sunUp <= 1 ? sunUp : moonUp, sun = sunUp >= 0 && sunUp <= 1;
+    out.x = 20 + u * 280; out.y = 140 - Math.sin(u * Math.PI) * 110; out.sun = sun;
+    return out;
+  }
+  const BODY = { x: 0, y: 0, sun: true };
+  function stage2(game, key, level) {
+    const c = cfg(), L = c.levels[level], C = AQ.Clock;
+    P.cam.fill(0); P.scene.fill(0); P.dark.fill(0); P.water.fill(0); P.surf.fill(0); P.sky.fill(0); P.sun.fill(0); P.beam.fill(0);
+    P.surf[0] = -1;
+    if (!L.light && !L.water && !L.sky) return;
+    const cam = AQ.Camera, day = C && key !== 'title' ? C.daylight() : 1, tw = C && key !== 'title' ? C.twilight() : 0, isSea = key === 'sea' || key === 'title';
+    P.cam[0] = cam.left(); P.cam[1] = cam.top(); P.cam[2] = X.t; P.cam[3] = calm() ? 1 : 0;
+    P.scene[0] = isSea && !X.photoScene ? 1 : key === 'hill' && !X.photoScene ? 2 : 0; P.scene[1] = day; P.scene[2] = tw; P.scene[3] = AQ.World ? AQ.World.sea : 0;
+    // the dark + lights (the sea)
+    if (isSea && LT.frame === X.frame) {
+      const nb = LT.night;
+      P.dark[0] = (3 + nb * 3) / 255; P.dark[1] = (6 + nb * 8) / 255; P.dark[2] = (18 + nb * 22) / 255; P.dark[3] = LT.dark < 0.02 ? 0 : LT.dark;
+    }
+    P.lamp[0] = c.lights.lampColor[0]; P.lamp[1] = c.lights.lampColor[1]; P.lamp[2] = c.lights.lampColor[2]; P.lamp[3] = c.lights.lampTint;
+    if (C) skyBody(BODY);
+    // the water (the sea)
+    if (isSea && L.water && !X.off.water && !X.photoScene) {
+      const W = c.water, sunK = BODY.sun ? day : 0;
+      P.water[0] = W.rays * day + W.raysNight * (1 - day); P.water[1] = W.caustics * day; P.water[2] = W.refraction; P.water[3] = W.plankton;
+      const rc = day > 0.5 ? W.sunRay : W.moonRay; P.rayCol[0] = rc[0]; P.rayCol[1] = rc[1]; P.rayCol[2] = rc[2];
+      const surf = (AQ.World.sea - cam.top()) / AQ.TUNING.view.h;
+      P.surf[0] = surf > 0 && surf < 1 ? surf : -1; P.surf[1] = W.glint * (BODY.sun ? 1 : 0.5); P.surf[2] = BODY.x; P.surf[3] = W.reflection;
+      const g = BODY.sun ? c.sky.sunGlow.color : c.sky.moonGlow.color; P.surfCol[0] = g[0]; P.surfCol[1] = g[1]; P.surfCol[2] = g[2];
+      void sunK;
+    }
+    // the sky: the sea's (above the surface) or the hill's
+    if (L.sky && !X.off.sky && !X.photoScene && (isSea || key === 'hill')) {
+      const sky = AQ.Render.skyCols(), S = c.sky;
+      P.skyTop[0] = sky[0][0] / 255; P.skyTop[1] = sky[0][1] / 255; P.skyTop[2] = sky[0][2] / 255;
+      P.skyBot[0] = sky[1][0] / 255; P.skyBot[1] = sky[1][1] / 255; P.skyBot[2] = sky[1][2] / 255;
+      if (isSea) { const W = AQ.World; P.sky[0] = cam.top() / W.sea; P.sky[1] = 1 / W.sea; P.sky[3] = Math.max(0, W.sea - cam.top()); }
+      else { P.sky[0] = 0; P.sky[1] = 1 / 150; P.sky[3] = 152; }
+      P.sky[2] = (S.clouds * day + S.cloudsNight * (1 - day)) * (1 - tw * 0.6);
+      if (key === 'hill') {
+        const glow = BODY.sun ? S.sunGlow : S.moonGlow, fade = Math.max(0, 1 - tw / 0.7);
+        P.sun[0] = BODY.x; P.sun[1] = BODY.y; P.sun[2] = glow.radius; P.sun[3] = glow.strength * fade;
+        P.sunCol[0] = glow.color[0]; P.sunCol[1] = glow.color[1]; P.sunCol[2] = glow.color[2];
+        if (tw > 0.05) { P.sun[0] = BODY.sun || tw > 0.3 ? S.sunsetSun[0] : P.sun[0]; P.sun[1] = S.sunsetSun[1]; P.sun[2] = S.sunGlow.radius * 1.4; P.sun[3] = Math.max(P.sun[3], S.sunGlow.strength * tw); const sc = S.sunGlow.color; P.sunCol[0] = sc[0]; P.sunCol[1] = sc[1] * 0.9; P.sunCol[2] = sc[2] * 0.8; }
+        if (AQ.Hill && AQ.Hill.beamOnScreen(BEAM)) { P.beam[0] = BEAM[0]; P.beam[1] = BEAM[1]; P.beam[2] = BEAM[2]; P.beam[3] = S.beam * (S.beamDay + (1 - S.beamDay) * (1 - day)); }   // (gentle by day, full at night)
+        // the hill's own little sea at the bottom: the same glint path
+        if (L.water && !X.off.water) { P.surf[0] = 152 / AQ.TUNING.view.h; P.surf[1] = c.water.glint * (BODY.sun ? 0.8 : 0.4); P.surf[2] = BODY.x; P.surf[3] = 0; const g = BODY.sun ? S.sunGlow.color : S.moonGlow.color; P.surfCol[0] = g[0]; P.surfCol[1] = g[1]; P.surfCol[2] = g[2]; }
+      }
+    }
   }
 
   // ---------------------------------------------------------------- photos / exports with the full look

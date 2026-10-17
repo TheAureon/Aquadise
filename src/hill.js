@@ -114,7 +114,7 @@ AQ.Hill = (function () {
     for (let y = 0; y < 150; y += 2) { ctx.fillStyle = U.css(U.mix(sky[0], sky[1], y / 150)); ctx.fillRect(0, y, 320, 2); }
     if (d < 0.95) {                                            // stars
       for (let i = 0; i < 46; i++) {
-        ctx.globalAlpha = (1 - d) * (0.45 + 0.4 * Math.sin(t * (1 + (i % 3)) + i));
+        ctx.globalAlpha = (1 - d) * (U.calm() ? 0.65 : 0.45 + 0.4 * Math.sin(t * (1 + (i % 3)) + i));   // (REDUCE FLASHING: no twinkle)
         ctx.fillStyle = i % 5 ? '#e8f0ff' : '#fff6d0'; ctx.fillRect((i * 97 + 13) % 320, (i * 53) % 120, 1, 1);
       }
       ctx.globalAlpha = 1;
@@ -139,6 +139,13 @@ AQ.Hill = (function () {
     if (AQ.Gulls) AQ.Gulls.draw(ctx, AQ.Game, sky);   // distant seagulls
   }
 
+  // the beam on screen (texture px), for the shader layer's soft volumetric glow (src/gfx/)
+  H.beamOnScreen = function (out) {
+    if (!G) return false;
+    const cam = AQ.Camera, uy = G.ufoY + Math.sin(AQ.Render.t * 1.2) * 2;
+    out[0] = G.beamX - cam.left(); out[1] = uy + 6 - cam.top(); out[2] = G.top + 2 - cam.top();
+    return true;
+  };
   H.drawBeam = function (ctx, x, y0, y1, alpha) {
     const s = AQ.Assets.sprites['misc.beam'], B = AQ.TUNING.beam;
     if (!s) return;
