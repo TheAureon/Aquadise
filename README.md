@@ -740,6 +740,41 @@ changes nothing about the game. No timers, no failure, no expiry, nothing missab
   **5** resets every request (on, nothing done; the first arrives a second later) and **6** shows an overlay
   with the current request's condition, its counter or check value, `also`, and what comes next.
 
+## Graphics
+
+SETTINGS > OPTIONS > **GRAPHICS**: HIGH, MEDIUM, LOW or **CLASSIC** (the original look, no WebGL at all).
+The game still draws its 320 x 180 pixel art exactly as before; above CLASSIC a WebGL shader layer
+(`src/gfx/`, plan and pipeline in `docs/GRAPHICS_PLAN.md`) adds effects to the **world** only. The
+interface (HUD, tips, toasts, menus, buttons, the requests tracker, the touch controls) is drawn on top,
+untouched, so it stays crisp.
+
+- **Sharp upscale:** pixels stay square at any window size, including the in-between sizes phones use
+  ("sharp bilinear": flat inside each pixel, a one-screen-pixel seam between them), so no shimmer.
+- **Colour grading** by place and time of day: a warm dawn, a bright clear noon, golden-orange dusk and
+  deep indigo night, blended smoothly by the day / night clock (`graphics.grade`); the building, tanks and
+  title have their own fixed moods. It replaces the old flat dawn / dusk tint.
+- **Depth fog** in the sea: the deeper the camera, the more the picture leans to deep blue-teal, flattens
+  and softens away from the middle of the screen (never on the diver); the dark stays dark
+  (`graphics.fog`).
+- **Bloom:** bright things (lamps, glows, stars, the beam, white highlights) get a soft glow
+  (`graphics.bloom`; MEDIUM and HIGH).
+- **Vignette** (all levels) and a very faint **film grain** (MEDIUM / HIGH; never with REDUCE FLASHING).
+- **Levels** (`graphics.levels`): HIGH = bloom at half size blurred twice, screen up to 2x pixel density;
+  MEDIUM = bloom at quarter size, up to 1.5x; LOW = grading, vignette and simple fog only, 1x.
+- **First run** picks a level: phones and tablets start at MEDIUM, weak machines (`graphics.detect`) at
+  LOW, a software renderer (no real graphics chip) at CLASSIC. A **governor** steps down one level if the
+  frame rate stays under `governor.minFps` for `governor.seconds` ("Switched to lighter graphics. You can
+  change this in SETTINGS."), never up, and never over the player's own choice. Saved in
+  `AQ.State.settings.graphics` (`level`, `manual`); older saves get the first-run pick.
+- **Safety:** no WebGL, a shader that won't compile, a lost graphics context or a canvas WebGL may not
+  read: CLASSIC, quietly (one note in the console). A restored context comes back to the chosen level.
+  Opened from a local file (`file://`), the game uses its built-in copy of the sprites, which WebGL may
+  read, so the effects work there too (tested in Chromium).
+- **Photos** taken in a tank include the effects (the frame and caption stay crisp).
+- **Testing:** `AQ.TUNING.debug.gfx: true` adds **-** (next quality level), **=** (pick the next effect:
+  grade, fog, bloom, vignette, grain), **\\** (switch the picked effect off / on) and **`** (a frame-time
+  overlay: fps, ms per frame, level, effects off, canvas size, graphics chip).
+
 ## Sound and music
 
 Everything you hear is generated in code: soft effects, a quiet ambience bed for each place, and
@@ -862,6 +897,9 @@ src/music.js          generative music engine + director (pieces in data/music.j
 src/sounddirector.js  per-frame sound hooks: steps, splashes, beam, chimes, creature voices
 src/soundtest.js      the SETTINGS panel (SOUND / OPTIONS / TOUCH tabs) and the SOUND TEST screen
 src/touch.js          touch controls: pointers, joystick, on-screen buttons, MENU panel, rotate screen, vibration
+src/gfx/gfx.js        GRAPHICS: presenting the frame (CLASSIC or the shader layer), levels, governor, photos
+src/gfx/gl.js         WebGL helpers (context, shaders, textures, framebuffers)
+src/gfx/shaders.js    the shaders (GLSL strings): sharp upscale, grading, fog, bloom, vignette, grain
 src/touchtest.js      the TOUCH TEST screen (SETTINGS > TOUCH): every finger, button and the joystick, live
 data/tutorial.js      tutorial structure: tips, guided dive steps, Guide pages (their text is in data/lang/)
 src/langdata.js       gives the data files their text (names, hints, field notes...) from data/lang/

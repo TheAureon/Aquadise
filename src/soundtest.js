@@ -8,7 +8,7 @@ AQ.SoundUI = (function () {
   // The SETTINGS panel (title screen + pause menu), in tabs: SOUND, OPTIONS, TOUCH. Everything is saved
   // with the game (AQ.State.settings / the audio settings).
   const S = { sel: 0, ui: [], tab: 'sound' };
-  const BOX = { x: 52, y: 22, w: 216, h: 154 };
+  const BOX = { x: 52, y: 12, w: 216, h: 164 };
   const TABS = ['sound', 'options', 'touch'];                      // labels: settings.tab.<id>
   const set = () => (AQ.State.settings = AQ.State.settings || {});
   const touchMode = () => set().touchControls || 'auto';
@@ -26,6 +26,7 @@ AQ.SoundUI = (function () {
       { id: 'nudges', kind: 'btn', label: AQ.t('settings.nudges'), value: AQ.t(AQ.Nudges && AQ.Nudges.playerOn() ? 'settings.on' : 'settings.off'), on: !!AQ.Nudges && AQ.Nudges.playerOn(), off: !AQ.Nudges },
       { id: 'reminders', kind: 'btn', label: AQ.t('settings.backupReminders'), value: AQ.t(AQ.SaveFile && AQ.SaveFile.remindersOn() ? 'settings.on' : 'settings.off'), on: !!AQ.SaveFile && AQ.SaveFile.remindersOn() },
       { id: 'autograd', kind: 'btn', label: AQ.t('settings.autoGraduate'), value: AQ.t(set().autoGraduate ? 'settings.on' : 'settings.off'), on: !!set().autoGraduate },
+      { id: 'graphics', kind: 'btn', label: AQ.t('settings.graphics'), value: AQ.t(AQ.Gfx && AQ.Gfx.supported === false ? 'settings.gfx.unavailable' : `settings.gfx.${AQ.Gfx ? AQ.Gfx.level() : 'classic'}`), off: !AQ.Gfx || AQ.Gfx.supported === false || !AQ.TUNING.graphics.enabled },   // HIGH / MEDIUM / LOW / CLASSIC
       { id: 'flashing', kind: 'btn', label: AQ.t('settings.flashing'), value: AQ.t(AQ.U.calm() ? 'settings.reduced' : 'settings.normal'), on: AQ.U.calm() },
       { id: 'lowfx', kind: 'btn', label: AQ.t('settings.lowEffects'), value: AQ.t(AQ.U.lowFx() ? 'settings.on' : 'settings.off'), on: AQ.U.lowFx() },   // for slow phones
       { id: 'language', kind: 'btn', label: AQ.t('settings.language'), value: AQ.Lang.name(AQ.Lang.code), off: AQ.Lang.available().length < 2 }];
@@ -68,6 +69,7 @@ AQ.SoundUI = (function () {
     else if (id === 'mute') { A.toggleMute(); A.play('menu_select'); }
     else if (id === 'hints') { AQ.Tips.setHints(!AQ.Tips.hintsOn()); dirty(); }
     else if (id === 'flashing') { set().reduceFlashing = !AQ.U.calm(); dirty(); }
+    else if (id === 'graphics' && AQ.Gfx && AQ.Gfx.supported !== false && AQ.TUNING.graphics.enabled) { const L = AQ.Gfx.LEVELS, i = L.indexOf(AQ.Gfx.level()); AQ.Gfx.choose(L[(i + 1) % L.length], true); dirty(); }   // your choice: always kept
     else if (id === 'lowfx') { set().lowEffects = !AQ.U.lowFx(); dirty(); }
     else if (id === 'nudges' && AQ.Nudges) { set().nudges = !AQ.Nudges.playerOn(); if (!set().nudges) AQ.Nudges.cur = null; dirty(); }   // friendly nudges on / off (saved)
     else if (id === 'requests' && AQ.Quests) { AQ.Quests.setOn(!AQ.Quests.on()); dirty(); }   // station requests on / off (saved; resumes where it was)

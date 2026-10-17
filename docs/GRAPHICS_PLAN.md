@@ -71,7 +71,7 @@ into PNGs + `assets/manifest.js`; `tools/embed-sprites.js` packs them as base64 
 
 In CLASSIC all three do nothing: `#game` is still what you see, so nothing looks different.
 
-## 3. The plan for the shader layer (Stages 1-3)
+## 3. The shader layer (Stage 1 built the pipeline; Stages 2-3 add to it)
 
 ```
  game draws world  ──► markWorld(): upload #game as the WORLD texture, then clear #game
@@ -119,3 +119,13 @@ In CLASSIC all three do nothing: `#game` is still what you see, so nothing looks
 | **Performance** | Two texture uploads of 320 x 180 per frame (cheap), effects cost scales with quality (resolution cap, light count, bloom taps). A frame-time overlay (debug flag) and per-scene measurements each stage. |
 | **REDUCE FLASHING** | Every animated term multiplies its speed / amplitude by a calm factor from config; flicker and grain off. |
 | **Readability** | Interface is never on the world texture; effects that dim (fog, vignette) are capped in config. |
+
+## 5. Status
+
+- **Stage 1 (done):** `src/gfx/gl.js` (helpers), `src/gfx/shaders.js` (sharp upscale, grading, depth fog,
+  bloom chain, vignette, grain, the interface on top), `src/gfx/gfx.js` (levels, first-run pick,
+  governor, context loss / restore, `processImage` for photos, testing keys + frame-time overlay). The
+  world / interface split works as planned: `#game` stays in the page with `opacity: 0`, `#view` copies
+  its box exactly, so mouse, touch and the log button map as before.
+- **file://** tested in Chromium: works (embedded sprites). If a browser still refuses to let WebGL read
+  the canvas, `texImage2D` throws a SecurityError; the game catches it and stays CLASSIC for the session.

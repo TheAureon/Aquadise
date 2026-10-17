@@ -144,6 +144,7 @@ AQ.Render = (function () {
   // warm glow over the sky and the sunlit water at dawn and dusk (fades out with depth)
   R.twilightTint = function (cam) {
     if (!AQ.Clock || (AQ.Game && AQ.Game.state === 'title')) return;
+    if (AQ.Gfx && AQ.Gfx.active() && !AQ.Gfx.off.grade) return;      // (the shader layer's dawn / dusk grading takes over)
     const tw = AQ.Clock.twilight();
     if (tw < 0.02) return;
     const y1 = AQ.World.sea + 160 - cam.top();

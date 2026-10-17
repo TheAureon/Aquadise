@@ -226,6 +226,11 @@ AQ.TUNING = {
     questSkipKey: 'Digit4',   //   4 = skip it (to the back of the line)
     questResetKey: 'Digit5',  //   5 = reset every request (on, nothing done, the first one arrives in a second)
     questOverlayKey: 'Digit6',//   6 = show / hide an overlay with the current request's condition and counters
+    gfx: false,               // TESTING ONLY: true adds four keys for the graphics (any screen):
+    gfxQualityKey: 'Minus',   //   - = the next quality level (HIGH, MEDIUM, LOW, CLASSIC; counts as your choice)
+    gfxEffectKey: 'Equal',    //   = = pick the next effect (grade, fog, bloom, vignette, grain)
+    gfxToggleKey: 'Backslash',//   \ = switch the picked effect off / on
+    gfxOverlayKey: 'Backquote',//  ` = show / hide the frame-time overlay
     forceTouch: false         // TESTING ONLY: true shows the touch controls and makes the mouse act as a finger
   },                          //   (drag in the stick zone = joystick, click the on-screen buttons), to try them on a PC
   // Text that doesn't fit (long translations): it is squeezed sideways down to this much of its width,
@@ -279,6 +284,55 @@ AQ.TUNING = {
     trackerW: 130,            // the tracker's width (game px)
     messageW: 150,            // the radio message / thank-you width
     fillMin: 5                // "fill 3 tanks": a tank counts with at least this many creatures
+  },
+  // GRAPHICS (SETTINGS > OPTIONS: HIGH / MEDIUM / LOW / CLASSIC; src/gfx/, docs/GRAPHICS_PLAN.md). The game
+  // still draws 320 x 180 pixel art; above CLASSIC a WebGL pass adds the effects below to the world (never
+  // to the interface) and scales it up sharply. CLASSIC = the old look, no WebGL.
+  graphics: {
+    enabled: true,            // false = CLASSIC for everyone (no WebGL at all)
+    logFailures: true,        // a quiet note in the console when the shader layer can't run (and CLASSIC takes over)
+    background: [0.024, 0.078, 0.165],   // behind anything transparent (the page's own dark blue)
+    levels: {                 // what each level does
+      high:   { bloom: true, bloomDiv: 2, bloomPasses: 2, grain: true, maxDpr: 2 },     // bloom at half size, blurred twice; screen up to 2x pixel density
+      medium: { bloom: true, bloomDiv: 4, bloomPasses: 1, grain: true, maxDpr: 1.5 },   // bloom at quarter size, blurred once
+      low:    { bloom: false, grain: false, maxDpr: 1 }                                  // colour grading, vignette and cheap fog only
+    },
+    // colour grading by place and time of day: [gain red, green, blue, saturation, contrast, brightness,
+    // shadow tint strength, shadow tint red, green, blue]. 1 = unchanged (0 for the last four). The clock
+    // blends dawn (morning twilight), noon, dusk (evening twilight) and night smoothly.
+    gradeStrength: 1,         // 0 = no grading at all, 1 = as below
+    grade: {
+      sea:  { dawn:  [1.06, 0.99, 0.95, 1.06, 1.03, 0.00, 0.10, 0.10, 0.02, 0.12],
+              noon:  [1.02, 1.02, 1.00, 1.08, 1.05, 0.01, 0.06, 0.00, 0.03, 0.08],
+              dusk:  [1.12, 0.96, 0.86, 1.10, 1.04, 0.00, 0.12, 0.14, 0.02, 0.10],
+              night: [0.86, 0.93, 1.12, 0.90, 1.06, -0.01, 0.12, 0.00, 0.03, 0.16] },
+      hill: { dawn:  [1.08, 0.99, 0.93, 1.08, 1.04, 0.01, 0.10, 0.12, 0.02, 0.10],
+              noon:  [1.03, 1.02, 0.99, 1.08, 1.05, 0.01, 0.05, 0.02, 0.02, 0.06],
+              dusk:  [1.10, 0.97, 0.88, 1.08, 1.04, 0.00, 0.12, 0.14, 0.02, 0.10],
+              night: [0.84, 0.92, 1.14, 0.88, 1.06, -0.01, 0.14, 0.02, 0.02, 0.18] },
+      station: { fixed: [0.99, 1.00, 1.05, 1.08, 1.06, 0.00, 0.10, 0.04, 0.00, 0.14] },   // cool space, warm lamps keep their colour
+      tank:    { fixed: [1.00, 1.01, 1.02, 1.07, 1.05, 0.00, 0.05, 0.00, 0.02, 0.08] },
+      title:   { fixed: [1.04, 1.00, 0.97, 1.06, 1.04, 0.00, 0.06, 0.06, 0.02, 0.08] }
+    },
+    fog: {                    // depth fog in the sea: the deeper the camera, the bluer, flatter and softer
+      color: [0.02, 0.12, 0.17],   // deep blue-teal
+      startDepth: 120,        // px below the surface where it begins...
+      fullDepth: 1100,        // ...and how many px further it's at full strength
+      max: 0.62,              // its strongest (0-1)
+      desaturate: 0.35,       // how much colour it takes out at full strength
+      contrastLoss: 0.30,     // how much flatter the image gets at full strength
+      soften: 1.6             // how far (pixels) the softening reaches at full strength (MEDIUM / HIGH)
+    },
+    vignette: 0.22,           // darker corners (0 = none)
+    grain: { amount: 0.018, fps: 24 },   // film grain: strength, and how often its pattern changes (off on LOW and with REDUCE FLASHING)
+    bloom: { threshold: 0.955, knee: 0.04, strength: 0.42 },  // glow of bright things: how bright to start (0-1, the brightest colour channel), a soft start, how strong
+    detect: { weakCores: 2, weakMemoryGB: 2 },   // first run: this few CPU cores or GB of memory starts at LOW (phones / tablets start at MEDIUM)
+    governor: {               // drops one level (never raises) if the frame rate stays low; never over the player's own choice
+      enabled: true,
+      minFps: 40,             // below this...
+      seconds: 5,             // ...for this long (in a row, roughly) steps down one level
+      settleSeconds: 8        // then waits this long before judging again
+    }
   },
   // LOW EFFECTS (SETTINGS > OPTIONS, for slow phones): lighter lighting (3 light rings instead of 8, no
   // coloured glow), no marine snow or light shafts, fewer particles, and the aquarium's whole-building view

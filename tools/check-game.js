@@ -170,9 +170,11 @@ async function run(lang, pw, port, dump, shotsDir) {
   const browser = await pw.chromium.launch();
   const page = await (await browser.newContext({ viewport: { width: 1280, height: 720 } })).newPage();
   const problems = [];
-  let where = 'loading';
+  let where = 'loading', driverNotes = 0;
   page.on('pageerror', (e) => problems.push(`[${where}] page error: ${e.message}`));
-  page.on('console', (m) => { if (m.type() === 'error' || m.type() === 'warning') problems.push(`[${where}] console ${m.type()}: ${m.text()}`); });
+  // (the browser's own WebGL driver notes, e.g. headless Chromium's software renderer, aren't the game's: counted, not problems)
+  const driver = /GL Driver Message|swiftshader|GroupMarkerNotSet|GPU stall/i;
+  page.on('console', (m) => { if (m.type() === 'error' || m.type() === 'warning') { if (driver.test(m.text())) driverNotes++; else problems.push(`[${where}] console ${m.type()}: ${m.text()}`); } });
   // the same random numbers every run, so two runs draw the same things
   await page.addInitScript(() => { let s = 12345; Math.random = () => { s |= 0; s = (s + 0x6D2B79F5) | 0; let t = Math.imul(s ^ (s >>> 15), 1 | s); t = (t + Math.imul(t ^ (t >>> 7), 61 | t)) ^ t; return ((t ^ (t >>> 14)) >>> 0) / 4294967296; }; });
   const url = `http://127.0.0.1:${port}/index.html`;
@@ -216,7 +218,7 @@ async function run(lang, pw, port, dump, shotsDir) {
   const missingGlyphs = await page.evaluate(() => [...(AQ.Font.unknown || [])]);
   if (missingGlyphs.length) problems.push(`characters with no glyph in the font (drawn as boxes): ${missingGlyphs.map((c) => JSON.stringify(c)).join(' ')}`);
   await browser.close();
-  console.log(`\n[${lang}] visited ${screens.length} screens, ${problems.length ? problems.length + ' problem(s):' : 'no console errors.'}`);
+  console.log(`\n[${lang}] visited ${screens.length} screens, ${problems.length ? problems.length + ' problem(s):' : 'no console errors.'}${driverNotes ? ` (${driverNotes} WebGL driver note(s) from the browser itself, not the game, set aside)` : ''}`);
   problems.forEach((p) => console.log('  ' + p));
   return { problems: problems.length, text: out };
 }

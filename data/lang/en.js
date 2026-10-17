@@ -73,6 +73,15 @@ AQ.langFiles.en = {
   'settings.on': 'ON',
   'settings.off': 'OFF',
   'settings.flashing': 'FLASHING',
+  'settings.graphics': 'GRAPHICS',   // the shader look's quality
+  'settings.gfx.high': 'HIGH',
+  'settings.gfx.medium': 'MEDIUM',
+  'settings.gfx.low': 'LOW',
+  'settings.gfx.classic': 'CLASSIC',   // the original look, no effects
+  'settings.gfx.unavailable': 'CLASSIC (ONLY)',   // this browser can't run the effects
+  'gfx.switched': 'Switched to lighter graphics. You can change this in SETTINGS.',
+  'debug.gfxLevel': 'GRAPHICS: {level}',
+  'debug.gfxEffect': 'EFFECT {effect}: {state}',
   'settings.lowEffects': 'LOW EFFECTS',   // lighter lighting and fewer particles, for slow phones
   'settings.reduced': 'REDUCED',
   'settings.normal': 'NORMAL',
@@ -671,6 +680,7 @@ AQ.langFiles.en = {
   'guide.settings.4': 'REDUCE FLASHING softens the camera flash, falling stars and blinking lights.',
   'guide.settings.5': 'REDO TUTORIAL (pause menu, title screen or this book) runs the guided dive again.',
   'guide.settings.6': 'It takes you to the Tide Pools and back. Progress saves by itself.',
+  'guide.settings.7': 'GRAPHICS (OPTIONS): HIGH, MEDIUM, LOW or CLASSIC, the original look. The game picks one for your device.',
   'guide.book': 'FIELD GUIDE',
   'guide.pageOf': 'PAGE {n} OF {total}',
   'guide.footer': 'LEFT / RIGHT: TURN    ESC / {k:guide}: CLOSE',

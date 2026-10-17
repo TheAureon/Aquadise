@@ -45,6 +45,7 @@ AQ.Game = (function () {
     if (save) AQ.Save.apply(save, G);
     else { if (AQ.Panes) AQ.Panes.debugTopUp(); if (AQ.Hydro) AQ.Hydro.debugTopUp(); if (AQ.Badges) AQ.Badges.newGame(); }   // TESTING ONLY flags (a loaded save does this in Save.apply)
     AQ.Lang.refresh();                          // the saved LANGUAGE, else the browser's (if we have it), else English
+    if (AQ.Gfx) AQ.Gfx.setup();                 // the saved GRAPHICS level (a first run picks one for this device)
     // a brand-new game has tutorial progress from the start, so its saves are never mistaken for an older save
     if (!AQ.State.tutorial) AQ.State.tutorial = { seen: {} };
     G.upgrades = AQ.State.upgrades;
@@ -76,6 +77,7 @@ AQ.Game = (function () {
     const fill = Math.min(aw / vw, ah / vh);
     const s = AQ.Touch && AQ.Touch.active() ? Math.max(0.5, fill) : Math.max(1, Math.floor(fill));
     canvas.style.width = Math.floor(vw * s) + 'px'; canvas.style.height = Math.floor(vh * s) + 'px';
+    if (AQ.Gfx) AQ.Gfx.sync(true);              // the shader layer's canvas follows (same box)
     document.documentElement.style.setProperty('--px', s + 'px');
   }
   G.fit = fit;
@@ -105,6 +107,7 @@ AQ.Game = (function () {
     G.time += dt;
     AQ.Render.t = G.time;
     if (AQ.Touch) AQ.Touch.update(dt, G);
+    if (AQ.Gfx) AQ.Gfx.update(G);               // (testing keys for the graphics, when debug.gfx is on)
     // REDO TUTORIAL's question (from any screen) has the input to itself while it's up
     if (AQ.Redo && AQ.Redo.dialog && !AQ.Transition.active) { AQ.Redo.update(G); AQ.Transition.update(dt); I.endFrame(); return; }
 
@@ -172,7 +175,7 @@ AQ.Game = (function () {
     if (AQ.Gfx) AQ.Gfx.markWorld();             // (if a screen didn't mark it: everything so far is the world)
     if (AQ.Redo) AQ.Redo.draw(AQ.Render.ctx);  // REDO TUTORIAL's question, over whatever screen asked
     AQ.Transition.draw(AQ.Render.ctx);
-    if (AQ.Gfx) AQ.Gfx.present(G);             // show the frame (CLASSIC: #game as it is)
+    if (AQ.Gfx) { AQ.Gfx.drawOverlay(AQ.Render.ctx); AQ.Gfx.present(G); }   // show the frame (CLASSIC: #game as it is); (testing: frame times)
     if (AQ.Touch) AQ.Touch.drawOverlay(G);     // the on-screen touch controls (their own canvas, screen px)
   }
   function drawScene() {

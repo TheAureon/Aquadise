@@ -1468,10 +1468,15 @@ AQ.Aquarium = (function () {
   const isoDate = () => { const d = new Date(), z = (n) => String(n).padStart(2, '0'); return `${d.getFullYear()}-${z(d.getMonth() + 1)}-${z(d.getDate())}`; };
   // The picture: the tank (rim included), framed in the chosen style, scaled up crisply.
   function composePhoto(b, tank) {
-    const P = A.photo, src = document.createElement('canvas');
+    const P = A.photo;
+    let src = document.createElement('canvas');
     src.width = TANK.w + TANK.x * 2; src.height = 180;              // the whole tank, however wide (not just the part on screen)
     const sg = src.getContext('2d'); sg.imageSmoothingEnabled = false;
     drawScene(sg, b, tank, P.icons);
+    // the shader look (GRAPHICS above CLASSIC): the tank gets the same effects as on screen; the frame and
+    // caption below stay crisp. (null: CLASSIC, or it couldn't: the plain tank, as before)
+    const fx = AQ.Gfx && AQ.Gfx.processImage(src, src.width, src.height, 'tank');
+    if (fx) src = fx;
     const cx = TANK.x - 3, cy = TANK.y - 3, cw = TANK.w + 6, ch = TANK.h + 6;
     const name = (b.short || b.name), stars = A.vibe ? A.vibe.stars : 0, date = dateText();
     const pad = P.frame === 0 ? [0, 0, 0] : P.frame === 1 ? [5, 5, 5] : [10, 10, 30];   // side, top, bottom
