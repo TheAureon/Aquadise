@@ -1265,10 +1265,12 @@ AQ.Aquarium = (function () {
 
   // ---------------------------------------------------------------- drawing
   A.draw = function (g, game) {
-    if (A.view === 'overview') { drawOverview(g); return; }
+    const mark = () => { if (AQ.Gfx) AQ.Gfx.markWorld(); };            // the tank is the world; its interface goes on top
+    if (A.view === 'overview') { mark(); drawOverview(g); return; }    // (every tank at a glance: a menu, all interface)
     const b = AQ.Tanks.get(A.biome), tank = AQ.Collection.tank(A.biome);
-    if (A.photo.on) { drawView(g, b, tank, A.photo.icons); drawPhotoUI(g, b, tank); return; }
+    if (A.photo.on) { drawView(g, b, tank, A.photo.icons); mark(); drawPhotoUI(g, b, tank); return; }
     drawView(g, b, tank, true);
+    mark();
     A.drawRest(g, b, tank);
   };
   // the visible part of the tank: everything in tank coordinates, shifted by the scroll

@@ -22,6 +22,7 @@ AQ.Game = (function () {
     AQ.Input.attach(canvas);
     AQ.Audio.attach();                          // sound starts on the first click / key press / touch
     AQ.Render.init(canvas);
+    if (AQ.Gfx) AQ.Gfx.init(canvas);            // presenting each finished frame (src/gfx/)
     if (AQ.Touch) AQ.Touch.attach(canvas);      // touch controls (src/touch.js)
     fit(); window.addEventListener('resize', fit);
     if (window.visualViewport) window.visualViewport.addEventListener('resize', fit);
@@ -166,18 +167,22 @@ AQ.Game = (function () {
   }
 
   function draw() {
+    if (AQ.Gfx) AQ.Gfx.beginFrame(G);
     drawScene();
+    if (AQ.Gfx) AQ.Gfx.markWorld();             // (if a screen didn't mark it: everything so far is the world)
     if (AQ.Redo) AQ.Redo.draw(AQ.Render.ctx);  // REDO TUTORIAL's question, over whatever screen asked
     AQ.Transition.draw(AQ.Render.ctx);
+    if (AQ.Gfx) AQ.Gfx.present(G);             // show the frame (CLASSIC: #game as it is)
     if (AQ.Touch) AQ.Touch.drawOverlay(G);     // the on-screen touch controls (their own canvas, screen px)
   }
   function drawScene() {
     const ctx = AQ.Render.ctx, cam = AQ.Camera;
-    if (G.state === 'soundtest') { AQ.SoundTest.draw(ctx); return; }
-    if (G.state === 'touchtest') { AQ.TouchTest.draw(ctx); return; }
+    const mark = () => { if (AQ.Gfx) AQ.Gfx.markWorld(); };            // the world is done; interface from here on
+    if (G.state === 'soundtest') { mark(); AQ.SoundTest.draw(ctx); return; }
+    if (G.state === 'touchtest') { mark(); AQ.TouchTest.draw(ctx); return; }
     if (G.state === 'aquarium' || (G.state === 'log' && AQ.LogUI.from === 'aquarium')) {
-      AQ.Aquarium.draw(ctx, G);
-      if (G.state === 'log') AQ.LogUI.draw(ctx, G);
+      AQ.Aquarium.draw(ctx, G);                  // (marks the world itself, between the tank and its interface)
+      if (G.state === 'log') { mark(); AQ.LogUI.draw(ctx, G); }
       else { if (AQ.Tips) AQ.Tips.draw(ctx, G); if (AQ.Badges) AQ.Badges.drawToast(ctx, G); }
       return;
     }
@@ -185,6 +190,7 @@ AQ.Game = (function () {
     if (!title && G.scene !== 'world') {
       // side scenes draw themselves; overlays go on top as usual
       AQ.Scenes.cur(G).draw(ctx, G);
+      mark();
       drawOverlays(ctx);
       return;
     }
@@ -216,6 +222,7 @@ AQ.Game = (function () {
     if (!title && AQ.Hydro) AQ.Hydro.draw(ctx, G);                         // hydrophone ripples, LISTEN dim + edge arrows
     AQ.Render.heavyHaze(G.player.heavy || 0);
     AQ.Terrain.drawGlow(ctx, cam);
+    mark();
     if (title) { if (G.state === 'log') AQ.LogUI.draw(ctx, G); else if (G.state === 'guide') AQ.Guide.draw(ctx); else AQ.Title.draw(ctx, G); return; }
     drawOverlays(ctx);
   }
