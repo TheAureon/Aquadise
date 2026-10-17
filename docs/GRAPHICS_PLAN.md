@@ -152,3 +152,38 @@ In CLASSIC all three do nothing: `#game` is still what you see, so nothing looks
 
   JavaScript cost of the layer: 0.3-1.2 ms a frame. The first-run pick already sends software renderers to
   CLASSIC, and the governor steps down if a real machine can't keep up.
+- **Stage 3 (done):** tanks, the station and special scenes (MEDIUM / HIGH, `levels.*.scenes`).
+  - **Scene kinds:** each level compiles one composite program per kind of scene (`world`: sea, hill,
+    title; `station`; `tank`: the tank screen and photos), so each carries only the code it needs.
+    `uScene.x`: 1 sea, 2 hill, 3 station, 4 tank.
+  - **The light map:** lights are no longer looped per screen pixel. `Shaders.lights` draws them once per
+    world pixel into two small textures (tint + how lit; glow + the station's soft contact shadows) and
+    the composite samples them smoothly. This also frees the composite's uniform room: the light count
+    is set by the graphics chip's room (`MAX_FRAGMENT_UNIFORM_VECTORS`), so phones with little room get
+    fewer lights instead of no effects.
+  - **Tanks:** `Aquarium.gfxInfo` gives the glass on screen, water line, sand, style, mood and lights
+    (glowing decor, glowing creatures). The 2D shafts and sand ripples step aside (`Gfx.tankWater`).
+  - **Station:** `Station.gfxInfo` gives the rooms (dim inside), floors / ceilings and what stands on them
+    (soft shadows), on-screen portholes (space shows through), the planets (rim light from a distant
+    sun) and the building's lights (robot, pad, console, tank windows, ceiling lamps, trophy wall,
+    portholes). Its words (tank names, the nursery's count, "empty", the trophy count, prompts, the view
+    hint) now draw after the world (`St.drawUI`, `H.drawUI` for the hill's prompt), so effects never
+    touch them; in CLASSIC the order on screen is unchanged.
+  - **Streaks:** `ShootingStars.gfxStreaks`, `Starfall.gfxStreaks` hand the shader up to 4 streaks; a
+    landing adds a light that swells and fades (`Starfall.lights`).
+  - **Transitions:** two effect framebuffers; when the screen changes (`viewKey`), the old one's last frame
+    cross-fades into the new one in the final pass (not under a fade to black). The fade to black is
+    smooth while the shader layer is on.
+  - **Measured** (same setup as Stage 2: Chromium + SwiftShader, a software renderer, 1280 x 720; fps):
+
+    | scene | CLASSIC | LOW | MEDIUM | HIGH |
+    |---|---|---|---|---|
+    | sea day | 60 | 34 | 18 | 10 |
+    | sea night | 60 | 33 | 21 | 11 |
+    | deep | 60 | 34 | 18 | 10 |
+    | hill | 60 | 35 | 22 | 11 |
+    | station | 60 | 31 | 14 | 7 |
+    | tank | 60 | 37 | 22 | 15 |
+
+    The light map made the sea faster than after Stage 2 even with the new work. JavaScript cost of the
+    layer: 0.3-1.2 ms a frame. Real graphics chips weren't available to measure.

@@ -54,10 +54,10 @@ AQ.Hill = (function () {
       P.update(dt, W, input);
       // back down to Tide Pools off the right edge
       if (P.x >= G.w - 10 && input.axis().x > 0 && !AQ.Transition.active) AQ.Scenes.go(game, 'world', 'fromHill');
-      if (inBeam(P) && input.wasPressed(...AQ.TUNING.interactKeys)) { H.mode = 'lift'; P.vx = P.vy = 0; if (AQ.Badges) AQ.Badges.event('ufo'); }
+      if (inBeam(P) && input.wasPressed(...AQ.TUNING.interactKeys)) { H.mode = 'lift'; H.liftT = 0; P.vx = P.vy = 0; if (AQ.Badges) AQ.Badges.event('ufo'); }
     } else if (H.mode === 'lift') {
       // the beam carries you up into the UFO
-      P.t += dt; P.anim = 'jump';
+      P.t += dt; P.anim = 'jump'; H.liftT += dt;
       P.x += (G.beamX - P.x) * Math.min(1, dt * 4);
       P.y -= B.liftSpeed * dt * Math.min(1, 0.3 + H.t);
       if (R.chance(dt * 14)) AQ.FX.sparkle(P.x + R.range(-6, 6), P.y + R.range(-6, 10), '#bff6ff', 2);
@@ -182,8 +182,18 @@ AQ.Hill = (function () {
     AQ.Assets.draw(ctx, 'misc.ufo', 'idle', G.beamX, uy, AQ.U.calm() ? { frame: 0 } : { t });      // its chase lights hold still with REDUCE FLASHING
     AQ.FX.draw(ctx);
     ctx.restore();
-    const P = game.player;
-    if (H.mode === 'walk' && inBeam(P) && !AQ.Transition.active) AQ.Scenes.prompt(ctx, P.x - left, P.y - top - 22, AQ.t('hill.beamUp'));
+  };
+  // interface on top (after the world: never touched by the shader layer's effects)
+  H.drawUI = function (ctx, game) {
+    const P = game.player, cam = AQ.Camera;
+    if (H.mode === 'walk' && inBeam(P) && !AQ.Transition.active) AQ.Scenes.prompt(ctx, P.x - cam.left(), P.y - cam.top() - 22, AQ.t('hill.beamUp'));
+  };
+  // the beam-up for the shader layer: the diver's place on screen and how far up they are (0 - 1)
+  H.liftInfo = function (out) {
+    if (!G || H.mode !== 'lift' || !AQ.Game) return 0;
+    const P = AQ.Game.player, cam = AQ.Camera, k = AQ.U.clamp((G.top - P.y) / Math.max(1, G.top - G.ufoY - 18), 0, 1);
+    out[0] = P.x - cam.left(); out[1] = P.y - cam.top();
+    return Math.min(1, (H.liftT || 0) * 2.5) * (0.5 + 0.5 * k);                 // (eases in, brightest at the top)
   };
 
   AQ.Scenes.register('hill', H);

@@ -22,7 +22,7 @@ AQ.Gfx = (function () {
     off: {}, overlay: false, fxSel: 0, fps: 60, ms: 0 };
   const LEVELS = ['high', 'medium', 'low', 'classic'];
   X.LEVELS = LEVELS;
-  X.EFFECTS = ['grade', 'fog', 'bloom', 'vignette', 'grain', 'light', 'water', 'sky'];   // (each can be switched off for testing)
+  X.EFFECTS = ['grade', 'fog', 'bloom', 'vignette', 'grain', 'light', 'water', 'sky', 'glass', 'space', 'streaks', 'fade'];   // (each can be switched off for testing)
   const cfg = () => AQ.TUNING.graphics;
   const set = () => (AQ.State && AQ.State.settings) || {};
   const calm = () => !!(AQ.U && AQ.U.calm());
@@ -95,13 +95,27 @@ AQ.Gfx = (function () {
       const dbg = gl.getExtension('WEBGL_debug_renderer_info');
       X.renderer = String(dbg ? gl.getParameter(dbg.UNMASKED_RENDERER_WEBGL) : gl.getParameter(gl.RENDERER));
       X.software = /swiftshader|llvmpipe|software|softpipe|basic render/i.test(X.renderer);
-      const r = { progs: {} };
+      const r = { progs: {}, maxl: {} };
+      // lights take two uniform vectors each: a graphics chip with little room for uniforms (some phones)
+      // gets fewer lights rather than no effects
+      const room = gl.getParameter(gl.MAX_FRAGMENT_UNIFORM_VECTORS) || 64;
+      r.lightProgs = {};
       for (const lv of ['high', 'medium', 'low']) {
-        const pass = cfg().levels[lv].fxScale ? 'scene' : 'all';
-        r.progs[lv] = AQ.GL.program(gl, AQ.Shaders.vertex, AQ.Shaders.composite(lv, pass), 'composite-' + lv); if (!r.progs[lv]) return fail(AQ.GL.lastError);
+        const L = cfg().levels[lv], pass = L.fxScale ? 'scene' : 'all';
+        r.progs[lv] = {};                                            // one per kind of scene (LOW: the one 'world' program for all)
+        for (const kind of L.scenes ? AQ.Shaders.kinds : ['world']) {
+          const pr = AQ.GL.program(gl, AQ.Shaders.vertex, AQ.Shaders.composite(lv, pass, kind), `composite-${lv}-${kind}`);
+          if (!pr) return fail(AQ.GL.lastError);
+          r.progs[lv][kind] = pr;
+        }
+        if (!L.light) continue;
+        r.maxl[lv] = Math.max(1, Math.min(AQ.Shaders.maxLights[lv], Math.floor((room - 8) / 2)));
+        // [tint + how lit, glow, glow + the station's soft shadows]
+        r.lightProgs[lv] = [[0, false], [1, false], [1, true]].map(([o, ao]) => AQ.GL.program(gl, AQ.Shaders.vertex, AQ.Shaders.lights(Math.max(1, r.maxl[lv] - (ao ? AQ.Shaders.counts.ao / 2 + 1 : 0)), o, ao), `lights-${lv}-${o}${ao ? '-ao' : ''}`));
+        if (r.lightProgs[lv].some((p) => !p)) return fail(AQ.GL.lastError);
       }
       r.final = AQ.GL.program(gl, AQ.Shaders.vertex, AQ.Shaders.final, 'final'); if (!r.final) return fail(AQ.GL.lastError);
-      r.fx = null;
+      r.fxs = [null, null]; r.cur = 0; r.fxPhoto = null; r.lightA = null; r.lightB = null;            // (two, so the last frame of a screen can cross-fade into the next)
       r.bright = AQ.GL.program(gl, AQ.Shaders.vertex, AQ.Shaders.bright, 'bright'); if (!r.bright) return fail(AQ.GL.lastError);
       r.blur = AQ.GL.program(gl, AQ.Shaders.vertex, AQ.Shaders.blur, 'blur'); if (!r.blur) return fail(AQ.GL.lastError);
       r.quad = AQ.GL.quad(gl);
@@ -162,6 +176,7 @@ AQ.Gfx = (function () {
     if (!X.active() || !gl) return;
     try { upload(R.ui); } catch (e) { fail('upload: ' + (e && e.name)); X.toClassic(); return; }
     X.sync(false);
+    crossfade(game);
     try { draw(game, R.world, AQ.TUNING.view.w, AQ.TUNING.view.h, R.ui, null, X.view.width, X.view.height, X.mode); }
     catch (e) { fail('draw: ' + (e && e.message)); X.toClassic(); return; }
     governor(game);
@@ -173,6 +188,45 @@ AQ.Gfx = (function () {
   function bind(prog) { gl.useProgram(prog.p); gl.bindBuffer(gl.ARRAY_BUFFER, R.quad); gl.enableVertexAttribArray(0); gl.vertexAttribPointer(0, 2, gl.FLOAT, false, 0, 0); }
   function tex(unit, t, loc) { gl.activeTexture(gl.TEXTURE0 + unit); gl.bindTexture(gl.TEXTURE_2D, t); if (loc) gl.uniform1i(loc, unit); }
   function target(t, w, h) { gl.bindFramebuffer(gl.FRAMEBUFFER, t ? t.fb : null); gl.viewport(0, 0, w, h); }
+  function v4(loc, a) { if (loc) gl.uniform4fv(loc, a); }
+  function v3(loc, a) { if (loc) gl.uniform3fv(loc, a); }
+  // a framebuffer of w x h (kept while the size is the same)
+  function sized(t, w, h) {
+    if (t && t.w === w && t.h === h) return t;
+    AQ.GL.free(gl, t); t = AQ.GL.target(gl, w, h);
+    if (!t) throw new Error(AQ.GL.lastError);
+    return t;
+  }
+  // the effects' framebuffer: slot 0 / 1 for the screen (they take turns only for a cross-fade), -1 for photos
+  function fxTarget(slot, w, h) {
+    let t = slot < 0 ? R.fxPhoto : R.fxs[slot];
+    if (!t || t.w !== w || t.h !== h) {
+      AQ.GL.free(gl, t); t = AQ.GL.target(gl, w, h);
+      if (!t) throw new Error(AQ.GL.lastError);
+      if (slot < 0) R.fxPhoto = t; else R.fxs[slot] = t;
+    }
+    return t;
+  }
+  // soft cross-fades between screens (MEDIUM / HIGH): when the screen changes (the tank, the station, the
+  // title...), the last frame of the old one is kept and fades into the new one. Not under a fade to black.
+  const XF = { key: '', from: null, t: 0, k: 0 };
+  function viewKey(game) {
+    const k = X.photoScene || sceneKey(game), A = AQ.Aquarium;
+    return k === 'tank' && A ? k + ':' + A.biome + ':' + A.view : k + ':' + (game ? game.scene : '');
+  }
+  function crossfade(game) {
+    const key = viewKey(game), c = cfg().transitions, lv = cfg().levels[X.mode];
+    if (key !== XF.key) {
+      const T = AQ.Transition, ok = XF.key && lv && lv.scenes && !X.off.fade && !(T && T.active) && R.fxs[R.cur] && c.crossfade > 0;
+      XF.key = key;
+      if (ok) { XF.from = R.cur; R.cur = 1 - R.cur; XF.t = 0; }
+    }
+    if (XF.from == null) { XF.k = 0; return; }
+    XF.t += (X.dt || 16) / 1000;
+    const k = 1 - XF.t / c.crossfade;
+    if (k <= 0 || (lv && !lv.scenes)) { XF.from = null; XF.k = 0; return; }
+    XF.k = k * k * (3 - 2 * k);                                    // (eased)
+  }
   // world texture (+ interface) -> the screen (fb null) or a framebuffer
   function draw(game, worldTex, tw, th, uiTex, fb, ow, oh, level) {
     const c = cfg(), lv = c.levels[level], P = params(game, level);
@@ -195,11 +249,26 @@ AQ.Gfx = (function () {
     let fx = null;
     if (lv.fxScale) {
       const k = Math.max(1, Math.min(lv.fxScale, Math.ceil(Math.max(ow / tw, oh / th) - 0.01)));
-      const fw = tw * k, fh = th * k;
-      if (!R.fx || R.fx.w !== fw || R.fx.h !== fh) { AQ.GL.free(gl, R.fx); R.fx = AQ.GL.target(gl, fw, fh); if (!R.fx) throw new Error(AQ.GL.lastError); }
-      fx = R.fx;
+      fx = fxTarget(fb ? -1 : R.cur, tw * k, th * k);
     }
-    const prog = R.progs[level], u = prog.u;
+    // the light map (MEDIUM / HIGH): every light once per world pixel, sampled smoothly by the composite
+    const n = lv.light ? packLights(level) : 0;
+    let lit = false;
+    if (lv.light && (P.dark[3] > 0 || n > 0) && R.lightProgs[level]) {
+      lit = true;
+      R.lightA = sized(R.lightA, tw, th); R.lightB = sized(R.lightB, tw, th);
+      const ml = R.maxl[level];
+      for (let o = 0; o < 2; o++) {
+        const ao = o === 1 && P.scene[0] === 3, lp = R.lightProgs[level][ao ? 2 : o], lu = lp.u, t = o ? R.lightB : R.lightA;
+        const m = ao ? Math.max(1, ml - (AQ.Shaders.counts.ao / 2 + 1)) : ml;         // (the shadows' inputs take a little of the lights' room)
+        bind(lp); target(t, tw, th);
+        gl.uniform2f(lu.uTex, tw, th); gl.uniform1f(lu.uLN, Math.min(n, m)); gl.uniform4fv(lu.uLampCol, P.lamp);
+        gl.uniform4fv(lu.uL, LIGHTS.subarray(0, m * 4)); gl.uniform4fv(lu.uLC, LCOL.subarray(0, m * 4));
+        if (ao) { gl.uniform4fv(lu.uFloors, P.floors); gl.uniform4fv(lu.uCeils, P.ceils); gl.uniform4fv(lu.uAO, P.ao); }
+        gl.drawArrays(gl.TRIANGLES, 0, 3);
+      }
+    }
+    const progs = R.progs[level], prog = (P.scene[0] === 3 && progs.station) || (P.scene[0] === 4 && progs.tank) || progs.world, u = prog.u;
     bind(prog);
     if (fx) target(fx, fx.w, fx.h); else { gl.bindFramebuffer(gl.FRAMEBUFFER, fb); gl.viewport(0, 0, ow, oh); }
     tex(0, worldTex, u.uWorld); tex(1, uiTex || R.blank, u.uUI); tex(2, bloomTex, u.uBloom);
@@ -209,12 +278,16 @@ AQ.Gfx = (function () {
     gl.uniform4fv(u.uFog, P.fog); gl.uniform4fv(u.uFogB, P.fogB); gl.uniform4fv(u.uFx, P.fx);
     if (u.uCam) {                                                    // (Stage 2 inputs: MEDIUM / HIGH only)
       gl.uniform4fv(u.uCam, P.cam); gl.uniform4fv(u.uScene, P.scene); gl.uniform4fv(u.uDark, P.dark);
-      const n = packLights(level);
-      gl.uniform4fv(u.uL, LIGHTS.subarray(0, AQ.Shaders.maxLights[level] * 4)); gl.uniform4fv(u.uLC, LCOL.subarray(0, AQ.Shaders.maxLights[level] * 4)); gl.uniform1f(u.uLN, n);
-      gl.uniform4fv(u.uLampCol, P.lamp); if (u.uGlow) gl.uniform2f(u.uGlow, cfg().lights.glow, cfg().lights.glowDark); gl.uniform4fv(u.uWater, P.water); gl.uniform3fv(u.uRayCol, P.rayCol);
+      gl.uniform1f(u.uLN, lit ? Math.max(n, 1) : 0);
+      tex(3, lit ? R.lightA.tex : R.blank, u.uLightA); tex(4, lit ? R.lightB.tex : R.blank, u.uLightB);
+      if (u.uGlow) gl.uniform2f(u.uGlow, cfg().lights.glow, cfg().lights.glowDark); gl.uniform4fv(u.uWater, P.water); gl.uniform3fv(u.uRayCol, P.rayCol);
       gl.uniform4fv(u.uSurf, P.surf); gl.uniform3fv(u.uSurfCol, P.surfCol);
       gl.uniform4fv(u.uSky, P.sky); gl.uniform3fv(u.uSkyTop, P.skyTop); gl.uniform3fv(u.uSkyBot, P.skyBot);
       gl.uniform4fv(u.uSun, P.sun); gl.uniform3fv(u.uSunCol, P.sunCol); gl.uniform4fv(u.uBeam, P.beam);
+      // Stage 3 (each only if the compiled shader uses it)
+      v4(u.uRoomA, P.roomA); v4(u.uRoomB, P.roomB); v4(u.uTint, P.tint); v4(u.uGlass, P.glass);
+      v3(u.uHole, P.holes); v4(u.uSpace, P.space); v3(u.uNebA, P.nebA); v3(u.uNebB, P.nebB); v4(u.uPlanet, P.planets);
+      v4(u.uSA, P.sa); v4(u.uSB, P.sb); if (u.uSN) gl.uniform1f(u.uSN, P.sn[0]); v3(u.uStreakCol, P.streakCol); v4(u.uLift, P.lift);
     }
     if (u.uUIOn) gl.uniform1f(u.uUIOn, uiTex ? 1 : 0);
     gl.drawArrays(gl.TRIANGLES, 0, 3);
@@ -223,6 +296,8 @@ AQ.Gfx = (function () {
     bind(f);
     gl.bindFramebuffer(gl.FRAMEBUFFER, fb); gl.viewport(0, 0, ow, oh);
     tex(0, fx.tex, fu.uSrc); tex(1, uiTex || R.blank, fu.uUI);
+    const prev = !fb && XF.from != null ? R.fxs[XF.from] : null, xf = prev && prev.w === fx.w && prev.h === fx.h ? XF.k : 0;
+    tex(2, xf > 0 ? prev.tex : R.blank, fu.uPrev); gl.uniform1f(fu.uXf, xf);
     gl.uniform2f(fu.uSrcSize, fx.w, fx.h); gl.uniform2f(fu.uUITex, AQ.TUNING.view.w, AQ.TUNING.view.h); gl.uniform2f(fu.uOut, ow, oh);
     gl.uniform4fv(fu.uFx, P.fx); gl.uniform1f(fu.uUIOn, uiTex ? 1 : 0);
     gl.drawArrays(gl.TRIANGLES, 0, 3);
@@ -232,7 +307,11 @@ AQ.Gfx = (function () {
   const P = { gradeA: new Float32Array(4), gradeB: new Float32Array(4), shadow: new Float32Array(3), fog: new Float32Array(4), fogB: new Float32Array(4), fx: new Float32Array(4),
     cam: new Float32Array(4), scene: new Float32Array(4), dark: new Float32Array(4), lamp: new Float32Array(4), water: new Float32Array(4), rayCol: new Float32Array(3),
     surf: new Float32Array(4), surfCol: new Float32Array(3), sky: new Float32Array(4), skyTop: new Float32Array(3), skyBot: new Float32Array(3),
-    sun: new Float32Array(4), sunCol: new Float32Array(3), beam: new Float32Array(4) };
+    sun: new Float32Array(4), sunCol: new Float32Array(3), beam: new Float32Array(4),
+    roomA: new Float32Array(4), roomB: new Float32Array(4), tint: new Float32Array(4), glass: new Float32Array(4), floors: new Float32Array(4), ceils: new Float32Array(4),
+    ao: new Float32Array(AQ.Shaders.counts.ao * 4), holes: new Float32Array(AQ.Shaders.counts.holes * 3), space: new Float32Array(4), nebA: new Float32Array(3), nebB: new Float32Array(3),
+    planets: new Float32Array(8), sa: new Float32Array(AQ.Shaders.counts.streaks * 4), sb: new Float32Array(AQ.Shaders.counts.streaks * 4), sn: new Float32Array(1),
+    streakCol: new Float32Array(3), lift: new Float32Array(4) };
   const BEAM = new Float32Array(3);
   X._P = P;                                                        // (for the tests: what the shader was told)
   const mixInto = (out, a, k) => { for (let i = 0; i < out.length; i++) out[i] += a[i] * k; };
@@ -256,8 +335,14 @@ AQ.Gfx = (function () {
     return game.scene === 'hill' ? 'hill' : game.scene === 'station' ? 'station' : 'sea';
   }
   X.sceneKey = sceneKey;
+  // the tank screen's mood: the Nursery warm and soft, predator tanks darker (graphics.grade / .moods)
+  X.mood = function (game) {
+    const key = X.photoScene || sceneKey(game), A = AQ.Aquarium;
+    if (key !== 'tank' || !A || !AQ.Tanks) return key;
+    return AQ.Tanks.isNursery(A.biome) ? 'nursery' : AQ.Tanks.isPredatorTank(A.biome) ? 'predator' : 'tank';
+  };
   function params(game, level) {
-    const c = cfg(), key = X.photoScene || sceneKey(game), g = grade(game, key);
+    const c = cfg(), key = X.photoScene || sceneKey(game), mood = X.mood(game), g = grade(game, c.grade[mood] ? mood : key), M = c.moods[mood] || {};
     if (X.off.grade) { P.gradeA.set([1, 1, 1, 1]); P.gradeB.set([1, 0, 0, 0]); P.shadow.fill(0); }
     else {
       const k = c.gradeStrength;
@@ -277,12 +362,13 @@ AQ.Gfx = (function () {
     P.fog[0] = F.color[0]; P.fog[1] = F.color[1]; P.fog[2] = F.color[2]; P.fog[3] = amt;
     P.fogB[0] = surf; P.fogB[1] = F.desaturate; P.fogB[2] = F.contrastLoss; P.fogB[3] = level === 'low' ? 0 : F.soften;
     const lv = c.levels[level];
-    P.fx[0] = X.off.vignette ? 0 : c.vignette;
+    P.fx[0] = X.off.vignette ? 0 : M.vignette != null ? M.vignette : c.vignette;
     P.fx[1] = X.off.grain || !lv.grain || calm() ? 0 : c.grain.amount;
-    const dayK = (key === 'sea' || key === 'hill') && AQ.Clock ? AQ.Clock.daylight() : 0;   // (by day, bright things glow less: the glow is for the dark)
-    P.fx[2] = X.off.bloom ? 0 : c.bloom.strength * (1 - dayK * (1 - c.bloom.dayScale));
+    const dayK = key === 'tank' ? 1 : (key === 'sea' || key === 'hill') && AQ.Clock ? AQ.Clock.daylight() : 0;   // (tanks are lit rooms: like day)   // (by day, bright things glow less: the glow is for the dark)
+    P.fx[2] = X.off.bloom ? 0 : c.bloom.strength * (1 - dayK * (1 - c.bloom.dayScale)) * (M.bloom || 1);
     P.fx[3] = Math.floor(performance.now() / 1000 * c.grain.fps) % 1000;   // (the grain's pattern changes c.grain.fps times a second)
     stage2(game, key, level);
+    stage3(game, key, level, M);
     return P;
   }
 
@@ -293,12 +379,12 @@ AQ.Gfx = (function () {
   X.water = () => { const L = lv(); return !!(L && L.water && !X.off.water && onSea()); };
   // the sea's darkness and lights: on MEDIUM / HIGH the shader draws them (R.lighting hands them over and
   // draws nothing); LOW / CLASSIC: the old stepped 2D overlay, as before
-  const LT = { list: null, cam: null, dark: 0, night: 0, frame: -1 };
+  const LT = { list: null, ox: 0, oy: 0, z: 1, dark: 0, night: 0, frame: -1, col: null };
   X._LT = LT;
   X.takeLighting = function (cam, lights, darkness) {
     const L = lv();
     if (!L || !L.light || X.off.light || X.photoScene) return false;
-    LT.list = lights; LT.cam = cam; LT.dark = darkness; LT.frame = X.frame;
+    LT.list = lights; LT.ox = cam.left(); LT.oy = cam.top(); LT.z = 1; LT.dark = darkness; LT.frame = X.frame; LT.col = null;
     LT.night = AQ.Clock && !(AQ.Game && AQ.Game.state === 'title') ? 1 - AQ.Clock.daylight() : 0;
     return true;
   };
@@ -315,11 +401,11 @@ AQ.Gfx = (function () {
   // the lights on screen, packed (the player's lamp first; then the nearest), as texture px
   function packLights(level) {
     if (LT.frame !== X.frame || !LT.list) return 0;
-    const max = AQ.Shaders.maxLights[level], cam = LT.cam, l = cam.left(), tp = cam.top(), c = cfg().lights, calmNow = calm(), t = X.t;
+    const max = R.maxl[level], l = LT.ox, tp = LT.oy, z = LT.z, c = cfg().lights, calmNow = calm(), t = X.t;
     let n = 0;
     for (const L of LT.list) {
       if (n >= max) break;
-      const x = L.x - l, y = L.y - tp, r = L.r;
+      const x = (L.x - l) * z, y = (L.y - tp) * z, r = L.r * z;
       if (x < -r || y < -r || x > AQ.TUNING.view.w + r || y > AQ.TUNING.view.h + r) continue;
       const fl = L.flicker && !calmNow ? 1 + Math.sin(t * 3 + L.x) * c.flicker : 1;
       const i = n * 4;
@@ -384,6 +470,79 @@ AQ.Gfx = (function () {
         // the hill's own little sea at the bottom: the same glint path
         if (L.water && !X.off.water) { P.surf[0] = 152 / AQ.TUNING.view.h; P.surf[1] = c.water.glint * (BODY.sun ? 0.8 : 0.4); P.surf[2] = BODY.x; P.surf[3] = 0; const g = BODY.sun ? S.sunGlow.color : S.moonGlow.color; P.surfCol[0] = g[0]; P.surfCol[1] = g[1]; P.surfCol[2] = g[2]; }
       }
+    }
+  }
+
+  // ---------------------------------------------------------------- Stage 3: tanks, the station, streaks, the beam-up
+  // does the shader draw the tank's rays and caustics now? (then the tank's 2D shafts and ripples step aside)
+  X.tankWater = () => { const L = lv(); return !!(L && L.water && L.scenes && !X.off.water); };
+  function streak(hx, hy, ux, uy, len, k) {
+    const n = P.sn[0], S = cfg().streaks;
+    if (n >= AQ.Shaders.counts.streaks || hx < -60 || hx > 380 || hy < -60 || hy > 240) return;
+    const i = n * 4;
+    P.sa[i] = hx; P.sa[i + 1] = hy; P.sa[i + 2] = ux; P.sa[i + 3] = uy;
+    P.sb[i] = Math.max(4, len); P.sb[i + 1] = k * S.strength; P.sb[i + 2] = S.width; P.sb[i + 3] = 0;
+    P.sn[0] = n + 1;
+  }
+  const LIFT = new Float32Array(2), clamp = (v, a, b) => Math.max(a, Math.min(b, v));
+  function stage3(game, key, level, M) {
+    const c = cfg(), L = c.levels[level];
+    P.roomA.fill(0); P.roomB.fill(0); P.tint.fill(0); P.glass.fill(0); P.floors.fill(-9999); P.ceils.fill(-9999);
+    P.ao.fill(0); P.holes.fill(0); P.space.fill(0); P.planets.fill(0); P.sn[0] = 0; P.lift.fill(0);
+    if (!L.scenes || !game) return;
+    // the title: a slow, warm sunset sea (warm rays and a soft glow from above)
+    if (key === 'title' && !X.photoScene) {
+      if (M.rays && L.water && !X.off.water) { P.water[0] = M.rays; P.rayCol.set(M.rayColor); }
+      if (M.glow && L.sky && !X.off.sky) { P.sun[0] = M.glow.x; P.sun[1] = M.glow.y; P.sun[2] = M.glow.radius; P.sun[3] = M.glow.strength; P.sunCol.set(M.glow.color); }
+    }
+    // shooting stars, falling stars and meteors: soft glowing trails
+    const st = key === 'station' && !X.photoScene && AQ.Station && AQ.Station.gfxInfo ? AQ.Station.gfxInfo(game) : null;
+    if (L.sky && !X.off.streaks && !X.photoScene && (key === 'sea' || key === 'hill' || key === 'station')) {
+      P.streakCol.set(c.streaks.color);
+      if (AQ.ShootingStars && AQ.ShootingStars.gfxStreaks) AQ.ShootingStars.gfxStreaks(game, streak, st ? { ox: st.ox, oy: st.oy, z: st.z } : null);
+      if (AQ.Starfall && AQ.Starfall.gfxStreaks) AQ.Starfall.gfxStreaks(game, streak);
+    }
+    // the beam-up: the diver glows as the beam lifts them, and the beam brightens
+    if (key === 'hill' && !X.photoScene && AQ.Hill && AQ.Hill.liftInfo) {
+      const k = AQ.Hill.liftInfo(LIFT);
+      if (k > 0) { P.lift[0] = LIFT[0]; P.lift[1] = LIFT[1]; P.lift[2] = k * c.lift * (calm() ? 0.7 : 1); P.beam[3] += k * 0.25; }
+    }
+    // the station: rooms dim between warm lights, space outside, soft shadows on the floors
+    if (st) {
+      const S = c.station;
+      P.scene[0] = 3;
+      for (let i = 0; i < 4; i++) { P.roomA[i] = st.rooms[i]; P.roomB[i] = st.rooms[4 + i]; P.floors[i] = st.floors[i]; P.ceils[i] = st.ceils[i]; }
+      for (let i = 0; i < Math.min(st.ao.length, P.ao.length); i++) P.ao[i] = st.ao[i];
+      for (let i = 0; i < Math.min(st.holes.length, P.holes.length); i++) P.holes[i] = st.holes[i];
+      if (!X.off.space && L.sky) {
+        P.space[0] = S.nebula; P.space[1] = S.stars; P.space[2] = st.ox; P.space[3] = st.oy;
+        P.nebA.set(S.nebulaA); P.nebB.set(S.nebulaB);
+        for (let i = 0; i < 8; i++) P.planets[i] = st.planets[i] * (i % 4 === 3 ? S.planetRim : 1);
+        P.sun[0] = S.sun.x; P.sun[1] = S.sun.y; P.sun[2] = S.sun.radius; P.sun[3] = S.sun.strength; P.sunCol.set(S.sun.color);
+      }
+      if (L.light && !X.off.light) {
+        LT.list = st.lights; LT.ox = st.ox; LT.oy = st.oy; LT.z = st.z; LT.frame = X.frame;
+        P.dark[0] = S.darkColor[0]; P.dark[1] = S.darkColor[1]; P.dark[2] = S.darkColor[2]; P.dark[3] = S.dark;
+      }
+    }
+    // the tank screen (and photos): glass, the water's own tint, rays and caustics, glowing creatures
+    const I = key === 'tank' && AQ.Aquarium && AQ.Aquarium.gfxInfo ? AQ.Aquarium.gfxInfo(!!X.photoScene) : null;
+    if (I) {
+      const T = c.tanks, sty = I.style;
+      P.scene[0] = 4; P.scene[1] = 1; P.scene[3] = I.waterTop;          // (rays are measured from the water line)
+      P.cam[0] = I.cam; P.cam[1] = 0;
+      for (let i = 0; i < 4; i++) P.roomA[i] = I.glass[i];
+      P.roomB[0] = I.waterTop; P.roomB[1] = I.sandTop;
+      if (L.water && !X.off.water) {
+        P.water[0] = T.rays * clamp(sty.shafts / 0.08, 0, 1.5); P.water[1] = T.caustics * clamp(sty.caustics / 0.25, 0, 1.4); P.water[2] = 0; P.water[3] = T.plankton * (sty.dark ? 0.6 : 1);
+        const lc = rgb(sty.lamp) || [1, 1, 1]; P.rayCol[0] = 0.5 + lc[0] * 0.5; P.rayCol[1] = 0.5 + lc[1] * 0.5; P.rayCol[2] = 0.5 + lc[2] * 0.5;
+      }
+      if (!X.off.glass) {
+        const tc = rgb(sty.deep || I.b.water || '#3497bd'); P.tint[0] = tc[0]; P.tint[1] = tc[1]; P.tint[2] = tc[2]; P.tint[3] = T.tint;
+        const w = I.glass[2] - I.glass[0], u = (X.t / T.sweepSeconds) % 1.6;   // (then a pause off the glass before the next pass)
+        P.glass[0] = T.glassEdge; P.glass[1] = T.glassReflect; P.glass[2] = I.cam + I.glass[0] - 120 + u * (w + 240); P.glass[3] = T.sweep * (calm() ? T.sweepCalm : 1);
+      }
+      if (L.light && !X.off.light && I.lights.length) { LT.list = I.lights; LT.ox = I.cam; LT.oy = 0; LT.z = 1; LT.frame = X.frame; }
     }
   }
 

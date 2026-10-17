@@ -192,8 +192,10 @@ AQ.Game = (function () {
     const title = G.state === 'title' || (G.state === 'log' && AQ.LogUI.from === 'title') || (G.state === 'guide' && AQ.Guide.from === 'title');
     if (!title && G.scene !== 'world') {
       // side scenes draw themselves; overlays go on top as usual
-      AQ.Scenes.cur(G).draw(ctx, G);
+      const sc = AQ.Scenes.cur(G);
+      sc.draw(ctx, G);
       mark();
+      if (sc.drawUI) sc.drawUI(ctx, G);                                 // (its prompts and labels: interface)
       drawOverlays(ctx);
       return;
     }

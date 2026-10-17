@@ -1293,18 +1293,22 @@ AQ.Aquarium = (function () {
     const st = styleOf(b.id);
     g.fillStyle = '#0b1a2c'; g.fillRect(0, 0, TANK.w + TANK.x * 2, 180);
     g.drawImage(backdrop(b), TANK.x, TANK.y);
-    // light shafts from the lid, gently swaying (a bigger tank has more lamps)
-    g.save();
-    for (let i = 0, n = Math.round(6 * TANK.w / VW); i < n; i++) {
-      const x = 22 + i * 52 + Math.sin(A.t * 0.35 + i * 1.7) * 8, w = 8 + (i % 3) * 5;
-      g.globalAlpha = Math.max(0, st.shafts * (1 + 0.5 * Math.sin(A.t * 0.8 + i)));
-      g.fillStyle = '#ffffff';
-      g.beginPath(); g.moveTo(x, TANK.waterTop); g.lineTo(x + w, TANK.waterTop); g.lineTo(x + w + 26, TANK.sandTop + 6); g.lineTo(x + 18, TANK.sandTop + 6); g.fill();
+    // light shafts from the lid, gently swaying (a bigger tank has more lamps); the shader layer draws its
+    // own (softer) rays and caustics on MEDIUM / HIGH, so these step aside there
+    const shaderWater = !!(AQ.Gfx && AQ.Gfx.tankWater());
+    if (!shaderWater) {
+      g.save();
+      for (let i = 0, n = Math.round(6 * TANK.w / VW); i < n; i++) {
+        const x = 22 + i * 52 + Math.sin(A.t * 0.35 + i * 1.7) * 8, w = 8 + (i % 3) * 5;
+        g.globalAlpha = Math.max(0, st.shafts * (1 + 0.5 * Math.sin(A.t * 0.8 + i)));
+        g.fillStyle = '#ffffff';
+        g.beginPath(); g.moveTo(x, TANK.waterTop); g.lineTo(x + w, TANK.waterTop); g.lineTo(x + w + 26, TANK.sandTop + 6); g.lineTo(x + 18, TANK.sandTop + 6); g.fill();
+      }
+      g.restore();
     }
-    g.restore();
     // caustics: shifting light ripples on the sand
     g.fillStyle = `rgba(255,255,240,${st.caustics})`;
-    if (st.caustics > 0) for (let x = TANK.x; x < TANK.x + TANK.w; x += 1) if (inRange(x)) for (let k = 0; k < 9; k++) {
+    if (st.caustics > 0 && !shaderWater) for (let x = TANK.x; x < TANK.x + TANK.w; x += 1) if (inRange(x)) for (let k = 0; k < 9; k++) {
       const y = TANK.sandTop + 1 + k * 2 + (x & 1);
       if (Math.sin(x * 0.31 + A.t * 1.6 + k * 0.9) + Math.sin(x * 0.13 - A.t * 1.1 + k * 1.7) > 1.45) g.fillRect(x, y, 1, 1);
     }
@@ -1699,7 +1703,26 @@ AQ.Aquarium = (function () {
   const CARD = { w: 60, h: 37, gap: 2, x0: 6, y0: 15, cols: 5 };
   A.openOverview = () => openOverview();
   A.leaveQuietly = () => putBack();              // (REDO TUTORIAL is taking you out of the tank screen)
-  A.backdropOf = (b) => backdrop(b);              // (as wide as that tank is: AQ.Tanks.width)
+  A.backdropOf = (b) => backdrop(b);
+  // for the shader layer (src/gfx/; MEDIUM / HIGH): the glass on screen (texture px), the water line and
+  // sand, the tank's look and mood, and its lights (glowing decor and creatures). photo: the whole tank,
+  // unscrolled (composePhoto). Nothing is allocated once it has run a frame.
+  const GX = { glass: [0, 0, 0, 0], cam: 0, waterTop: 0, sandTop: 0, style: null, b: null, mood: 'tank', lights: [] };
+  const gpool = []; let gpn = 0;
+  A.gfxInfo = function (photo) {
+    const b = AQ.Tanks.get(A.biome);
+    if (!b || A.view === 'overview') return null;
+    const cam = photo ? 0 : camPx();
+    GX.cam = cam; GX.b = b; GX.style = styleOf(b.id);
+    GX.glass[0] = TANK.x - cam; GX.glass[1] = TANK.y; GX.glass[2] = TANK.x + TANK.w - cam; GX.glass[3] = TANK.y + TANK.h;
+    GX.waterTop = TANK.waterTop; GX.sandTop = TANK.sandTop;
+    GX.mood = AQ.Tanks.isNursery(b.id) ? 'nursery' : AQ.Tanks.isPredatorTank(b.id) ? 'predator' : 'tank';
+    GX.lights.length = 0; gpn = 0;
+    const add = (x, y, r, color, power) => { const o = gpool[gpn] || (gpool[gpn] = {}); gpn++; o.x = x; o.y = y; o.r = r; o.color = color; o.power = power; o.cone = 0; o.flicker = false; GX.lights.push(o); };
+    if (GX.style.dark > 0) glowSources(AQ.Collection.tank(A.biome)).forEach((g) => add(g.x, g.y, g.r, g.col, 0.6));
+    for (const f of A.fish) { const gl = f.def && f.def.glow; if (gl && !(gl.pulse && GX.style.dark <= 0)) add(f.x, f.y, gl.radius * 0.8, gl.color, (gl.strength == null ? 1 : gl.strength) * (0.4 + GX.style.dark)); }
+    return GX;
+  };              // (as wide as that tank is: AQ.Tanks.width)
   A.styleOf = styleOf;
   function overviewSlots() {
     const st = AQ.data.station, floors = st.floors.length;

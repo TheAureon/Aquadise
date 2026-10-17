@@ -115,6 +115,7 @@ AQ.Starfall = (function () {
       AQ.Audio.play('star_land', { vol: c.chimeVolume * (d < c.nearChime ? 1 : 0.45) });
       const by = L.kind === 'float' ? W.sea : L.y - 2;
       if (AQ.U.calm()) SF.glows.push({ x: L.x, y: by, t: 0 });          // REDUCE FLASHING: a gentle glow, no burst
+      else if (AQ.Gfx && AQ.Gfx.active()) SF.glows.push({ x: L.x, y: by, t: 0, light: true });   // (the shader layer: a soft light swells on the water too)
       else {
         for (let i = 0; i < 14; i++) AQ.FX.sparkle(L.x + R.range(-10, 10), by - R.range(0, 12), i % 3 ? '#fff6dc' : '#bfe0ff', 6);
         AQ.FX.puff(L.x, by, L.kind === 'float' ? 'rgba(220,240,255,0.8)' : 'rgba(230,220,200,0.7)', 10);
@@ -234,6 +235,7 @@ AQ.Starfall = (function () {
     }
     // REDUCE FLASHING landings: a soft glow that swells and fades
     for (const gw of SF.glows) {
+      if (gw.light) continue;                                         // (only a light: the shader layer draws it)
       const k = gw.t / AQ.TUNING.calm.landGlowSeconds, a = Math.sin(k * Math.PI) * AQ.TUNING.calm.landGlowAlpha, r = 10 + 26 * k;
       const rg = ctx.createRadialGradient(gw.x - l, gw.y - t, 0, gw.x - l, gw.y - t, r);
       rg.addColorStop(0, `rgba(216,228,255,${a.toFixed(3)})`); rg.addColorStop(1, 'rgba(216,228,255,0)');
@@ -256,6 +258,20 @@ AQ.Starfall = (function () {
   // light for the lighting pass, so a landing glows in the dark sea
   SF.lights = function (Ls) {
     for (const L of st().landings) if (L.landed && wantCount(L) > 0) Ls.push({ x: L.x, y: (L.kind === 'float' ? AQ.World.sea : L.y) - 6, r: 34, color: '#d8e4ff', power: 0.55 * U.clamp(L.left / cfg().fadeSeconds, 0, 1) });
+    // the shader layer: a landing's light swells and fades (no flash), and a falling star lights its way down
+    if (!(AQ.Gfx && AQ.Gfx.active())) return;
+    const G = AQ.TUNING.graphics.streaks;
+    for (const gw of SF.glows) Ls.push({ x: gw.x, y: gw.y - 4, r: G.landRadius, color: '#d8e4ff', power: G.landPower * Math.sin(U.clamp(gw.t / AQ.TUNING.calm.landGlowSeconds, 0, 1) * Math.PI) });
+    for (const f of SF.falls) { const k = Math.min(1, f.t / f.dur), e = k * (0.6 + 0.4 * k); Ls.push({ x: f.x0 + (f.x1 - f.x0) * e, y: f.y0 + (f.y1 - f.y0) * e, r: 30, color: '#fff6dc', power: 0.5 * Math.min(1, k / 0.15) }); }
+  };
+  // falling streaks for the shader layer's soft glow (see AQ.ShootingStars.gfxStreaks)
+  SF.gfxStreaks = function (game, fn) {
+    if (game.scene !== 'world') return;
+    const cam = AQ.Camera, l = cam.left(), t = cam.top(), calmK = AQ.U.calm() ? AQ.TUNING.calm.streakAlpha : 1;
+    for (const f of SF.falls) {
+      const k = Math.min(1, f.t / f.dur), e = k * (0.6 + 0.4 * k), dx = f.x1 - f.x0, dy = f.y1 - f.y0, d = Math.hypot(dx, dy) || 1;
+      fn(f.x0 + dx * e - l, f.y0 + dy * e - t, dx / d, dy / d, 40, calmK * Math.min(1, k / 0.15));
+    }
   };
   // map (M): a sparkling star at each waiting landing
   SF.drawMap = function (g, ox, oy, S, time) {

@@ -40,7 +40,9 @@ AQ.Transition = (function () {
   // Drawn last, over everything. Alpha is stepped (8 levels) for a retro palette-fade feel.
   T.draw = function (ctx) {
     if (T.alpha <= 0) return;
-    const a = AQ.U.calm() ? T.alpha : Math.ceil(T.alpha * 8) / 8;     // REDUCE FLASHING: a smooth fade, no steps
+    // REDUCE FLASHING, or the shader layer on (graphics.transitions.smoothFade): a smooth, eased fade, no steps
+    const smooth = AQ.U.calm() || (AQ.Gfx && AQ.Gfx.active() && AQ.TUNING.graphics.transitions.smoothFade);
+    const a = smooth ? T.alpha * T.alpha * (3 - 2 * T.alpha) : Math.ceil(T.alpha * 8) / 8;
     ctx.fillStyle = `rgba(0,0,0,${a})`;
     ctx.fillRect(0, 0, AQ.TUNING.view.w, AQ.TUNING.view.h);
   };

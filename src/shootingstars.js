@@ -115,5 +115,18 @@ AQ.ShootingStars = (function () {
   };
   // the building: drawn into the space backdrop, so it only shows through the portholes and round the hull
   S.drawSpace = function (ctx, left, top) { for (const s of S.space) streak(ctx, s, -left, -top, 1); };
+  // for the shader layer's soft glow (src/gfx/): each streak's head on screen, its direction, trail length
+  // and brightness, eased in and out over its life (dimmer with REDUCE FLASHING): fn(hx, hy, ux, uy, len, k).
+  // map: how the station's building maps to the screen ({ ox, oy, z }), for the streaks outside its portholes
+  function each(s, x, y, z, fn) {
+    const k = Math.sin(Math.min(1, s.t / s.life) * Math.PI) * (AQ.U.calm() ? AQ.TUNING.calm.streakAlpha : 1);
+    if (k <= 0.01) return;
+    const sp = Math.hypot(s.vx, s.vy) || 1;
+    fn(x, y, s.vx / sp, s.vy / sp, s.trail * z, k);
+  }
+  S.gfxStreaks = function (game, fn, map) {
+    if (game.scene === 'station') { if (map) for (const s of S.space) each(s, (s.x - map.ox) * map.z, (s.y - map.oy) * map.z, map.z, fn); }
+    else if (skyBottom(game) > 4) for (const s of S.list) each(s, s.x, s.y, 1, fn);
+  };
   return S;
 })();

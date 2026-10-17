@@ -6,6 +6,28 @@ var AQ = (typeof AQ !== 'undefined') ? AQ : {};
 
 AQ.Shaders = (function () {
   const S = {};
+  // every light's share of a pixel (the light map, S.lights)
+  const LOOP = `    for (int i = 0; i < MAXL; i++) {
+      if (float(i) >= uLN) break;
+      vec4 L = uL[i]; vec4 LC = uLC[i];
+      vec2 d = tp - L.xy;
+      float dist = length(d), r = max(L.z, 1.0);
+      if (dist > r * 1.2) continue;
+      float f = pow(1.0 - smoothstep(0.15, 1.0, dist / r), 1.3) * L.w;
+      float kind = LC.a;                                              // 0 point, +-1 the lamp, 2 a ceiling lamp, 3 a soft area light
+      if (kind == 2.0) f *= mix(0.3, 1.0, smoothstep(-0.1, 0.5, d.y / max(dist, 0.001)));   // a pool of light below it
+      else if (abs(kind) == 1.0) {                                    // the lamp: a soft cone ahead, a little all round
+        float ahead = smoothstep(-0.2, 0.6, d.x * kind / max(dist, 0.001));
+        f *= mix(0.45, 1.0, ahead);
+        tint += uLampCol.rgb * f * uLampCol.a;
+      }
+      lit = 1.0 - (1.0 - lit) * (1.0 - clamp(f * 0.88, 0.0, 1.0));
+      if (LC.r + LC.g + LC.b > 0.0) {
+        if (kind < 2.0) glow += LC.rgb * exp(-(dist * dist) / (r * r * 0.2)) * L.w;   // its own coloured glow
+        tint += LC.rgb * f * 0.35;                                    // what it touches takes its colour
+      }
+    }
+`;
   // highp where the GPU has it in fragment shaders (most do; some old phones only have mediump)
   const PREC = '#ifdef GL_FRAGMENT_PRECISION_HIGH\nprecision highp float;\n#else\nprecision mediump float;\n#endif\n';
 
@@ -65,10 +87,16 @@ void main() {
   // pass 'scene' (MEDIUM / HIGH): the world with every effect into a framebuffer a whole number of times the
   // world's size (graphics.levels.*.fxScale), so the heavy work doesn't grow with the screen; S.final then
   // upscales it sharply and adds the vignette, grain and interface. LOW does it all in one cheap pass.
-  S.composite = (level, pass) => PREC + `
+  S.counts = { streaks: 4, holes: 4, ao: 8 };
+  // kind: which scenes this program draws ('world': the sea, hill and title; 'station'; 'tank': the tank
+  // screen and photos), so each carries only the code it needs
+  S.kinds = ['world', 'station', 'tank'];
+  S.composite = (level, pass, kind) => PREC + `
 #define Q_${level.toUpperCase()} 1
+#define K_${(kind || 'world').toUpperCase()} 1
 ${pass === 'scene' ? '#define PASS_SCENE 1' : ''}
-#define MAXL ${S.maxLights[level]}
+#define NS ${S.counts.streaks}
+#define NHOLE ${S.counts.holes}
 varying vec2 vUv;
 uniform sampler2D uWorld;
 uniform sampler2D uUI;
@@ -88,10 +116,9 @@ uniform float uUIOn;
 uniform vec4 uCam;           // camera left, top (world px), time (s, already slowed for REDUCE FLASHING), calm (0 / 1)
 uniform vec4 uScene;         // kind (0 other, 1 sea, 2 hill), daylight, twilight, sea level (world y)
 uniform vec4 uDark;          // darkness colour rgb, amount (0 = none: the 2D layer did it, or it's light)
-uniform vec4 uL[MAXL];       // lights: x, y (texture px), radius, power
-uniform vec4 uLC[MAXL];      // their colour rgb (0 = plain white light), kind (0 point, +-1 a cone facing right / left)
-uniform float uLN;           // how many lights
-uniform vec4 uLampCol;       // the lamp's colour, its tint strength
+uniform float uLN;           // how many lights (S.lights drew them into the light map)
+uniform sampler2D uLightA;   // the light map: tint rgb (x 0.5), how lit (0-1)
+uniform sampler2D uLightB;   // ...and the coloured lights' own glow rgb (x 0.5)
 uniform vec2 uGlow;          // coloured lights' own glow: always, extra in the dark
 uniform vec4 uWater;         // god rays, caustics, refraction, plankton (strengths, 0 = off)
 uniform vec3 uRayCol;        // the light in the water (warm sun, blue moon)
@@ -103,6 +130,21 @@ uniform vec3 uSkyBot;
 uniform vec4 uSun;           // sun / moon x, y (texture px), glow radius, strength
 uniform vec3 uSunCol;
 uniform vec4 uBeam;          // the UFO beam: x, top y, bottom y (texture px), strength
+// ---- Stage 3: tanks, the station, streaks, the beam-up (MEDIUM / HIGH; kind 3 station, 4 tank screen)
+uniform vec4 uRoomA;         // station: the hull's inside (x0, y0, x1, y1, texture px); tank: the glass
+uniform vec4 uRoomB;         // station: the trophy wing's inside; tank: water top, sand top (texture y)
+uniform vec4 uTint;          // tank: its water's colour rgb, how much
+uniform vec4 uGlass;         // tank glass: bright edges, reflections, the slow highlight's position (tank px), its strength
+uniform vec3 uHole[NHOLE];   // station: portholes on screen: x, y, radius
+uniform vec4 uSpace;         // station: nebula, stars, parallax x, y
+uniform vec3 uNebA;
+uniform vec3 uNebB;
+uniform vec4 uPlanet[2];     // station: planets: x, y, radius, rim light
+uniform vec4 uSA[NS];        // streaks (shooting / falling stars): head x, y, direction x, y
+uniform vec4 uSB[NS];        // their trail length, strength, width, (unused)
+uniform float uSN;
+uniform vec3 uStreakCol;
+uniform vec4 uLift;          // the beam-up: the diver's x, y, glow (0 = not lifting)
 ` + SHARP + `
 float hash(vec2 p) { return fract(sin(dot(p, vec2(12.9898, 78.233))) * 43758.5453); }
 float vnoise(vec2 p) {
@@ -112,6 +154,17 @@ float vnoise(vec2 p) {
 // "water-coloured": blue-leaning pixels (the sea's own colour), so effects meant for open water skip rock and sprites
 float waterMask(vec3 c) { return smoothstep(0.06, 0.2, c.b - c.r); }
 #if defined(Q_MEDIUM) || defined(Q_HIGH)
+float inRect(vec2 p, vec4 r) { return step(r.x, p.x) * step(p.x, r.z) * step(r.y, p.y) * step(p.y, r.w); }
+// space: soft stars in cells; the bright ones get a little lens glow; tw = twinkle (0 with REDUCE FLASHING)
+float starLayer(vec2 p, float cell, float t, float tw) {
+  vec2 id = floor(p / cell), f = fract(p / cell);
+  float h = hash(id + cell);
+  if (h < 0.82) return 0.0;
+  vec2 c = vec2(hash(id + 1.7), hash(id + 9.3)) * 0.8 + 0.1;
+  float d = length((f - c) * cell), b = (h - 0.82) / 0.18;
+  float s = smoothstep(1.2, 0.0, d) * (0.35 + 0.65 * b) + exp(-d / 2.4) * b * b * 0.3;
+  return s * (1.0 - tw * 0.25 * (0.5 + 0.5 * sin(t * (0.5 + h) + h * 40.0)));
+}
 float rays(vec2 wp, float t) {
   float x = wp.x + (wp.y - uScene.w) * 0.35;
   float a = sin(x * 0.045 + t * 0.21) * 0.5 + 0.5, b = sin(x * 0.083 - t * 0.15 + 1.7) * 0.5 + 0.5;
@@ -161,7 +214,7 @@ void main() {
   float imgY = 1.0 - uv.y;
   vec2 tp = vec2(uv.x, imgY) * uTex;                                  // this pixel in texture px (y down)
   float t = uCam.z;
-#ifdef Q_HIGH
+#if defined(Q_HIGH) && defined(K_WORLD)
   // ---- refraction: just under the surface line, water rows sway by whole pixels (sprites never move)
   if (uWater.z > 0.0 && uSurf.x >= 0.0) {
     float below = imgY - uSurf.x;
@@ -180,6 +233,7 @@ void main() {
   float under = uFogB.x < 0.0 ? 1.0 : smoothstep(uFogB.x - 0.004, uFogB.x + 0.02, imgY);
   float fog = uFog.a * under * (0.72 + 0.28 * imgY);
 #if defined(Q_MEDIUM) || defined(Q_HIGH)
+  #ifdef K_WORLD
   // softening "in the distance": away from the middle of the screen (where the diver is), never on it
   float far = smoothstep(0.18, 0.62, length((uv - 0.5) * vec2(1.6, 1.0)));
   if (fog * far > 0.01) {
@@ -193,47 +247,79 @@ void main() {
   #endif
     c = mix(c, s, clamp(fog * far * 0.8, 0.0, 0.55));
   }
+  #endif
   vec2 wp = uCam.xy + tp;                                             // this pixel in world px
   float sea = uScene.x == 1.0 ? 1.0 : 0.0;
-  float uw = sea * (uSurf.x < 0.0 ? 1.0 : smoothstep(uSurf.x, uSurf.x + 0.01, imgY));   // under the water
+  float lumB = dot(base, vec3(0.299, 0.587, 0.114));
+  float tankG = 0.0, tankW = 0.0;                                     // the tank screen: inside the glass / in its water
+#ifdef K_TANK
+  tankG = inRect(tp, uRoomA); tankW = tankG * step(uRoomB.x, tp.y);
+#endif
+  float uw = sea * (uSurf.x < 0.0 ? 1.0 : smoothstep(uSurf.x, uSurf.x + 0.01, imgY)) + tankW;   // under the water
+  // ---- a tank's water takes its own colour (a little)
+#ifdef K_TANK
+  if (tankW > 0.0) c = mix(c, min(uTint.rgb * lumB / max(dot(uTint.rgb, vec3(0.299, 0.587, 0.114)), 0.05), 1.0), uTint.a);   // (its hue, the same brightness)
+#endif
   // ---- underwater light, before the dark: god rays on open water, caustics dancing on rock and sand
   if (uw > 0.0) {
     float depth = max(0.0, wp.y - uScene.w);
     float fade = exp(-depth / 260.0);
-    if (uWater.x > 0.0) c += uRayCol * rays(wp, t) * uWater.x * fade * (0.35 + 0.65 * wm) * uw;
+    float open = max(wm, tankW);                                      // (all of a tank's water counts as open water)
+    if (uWater.x > 0.0) c += uRayCol * rays(wp, t) * uWater.x * fade * (0.35 + 0.65 * open) * uw * (1.0 - 0.75 * lumB * tankW);   // (pale tanks: gentler, never white)
+#ifdef K_TANK
+    if (uWater.y > 0.0) {
+      float sand = smoothstep(uRoomB.y - 3.0, uRoomB.y + 2.0, tp.y);  // on the sand (and what rests on it), not the open water
+      if (sand > 0.0) c += c * uRayCol * caustics(wp, t) * uWater.y * sand * tankW;
+    }
+#else
     if (uWater.y > 0.0 && wm < 0.9) {
       // only on surfaces that touch the water (a few pixels from it), not inside solid ground
       vec2 o = 3.0 / uTex;
       float near = max(waterMask(texture2D(uWorld, uv + vec2(o.x, -o.y)).rgb), waterMask(texture2D(uWorld, uv - vec2(o.x, -o.y)).rgb));
       c += c * uRayCol * caustics(wp, t) * uWater.y * exp(-depth / 420.0) * (1.0 - wm) * near * uw;
     }
+#endif
   }
-  // ---- darkness and real lights (night, caves, the deep): smooth, coloured, at screen resolution
+  // ---- the station: space outside (nebula, soft stars, planets lit at the rim by a distant sun) and soft
+  // shadows inside where things meet the floor; its dimness only inside the building
+  float darkMask = 1.0, sunMask = 1.0;
+#ifdef K_STATION
+  {
+    float inRoom = max(inRect(tp, uRoomA), inRect(tp, uRoomB)), hole = 0.0;
+    for (int i = 0; i < NHOLE; i++) { vec3 h = uHole[i]; if (h.z > 0.0) hole = max(hole, 1.0 - step(h.z, length(tp - h.xy))); }
+    float outside = max(1.0 - inRoom, hole);
+    darkMask = inRoom * (1.0 - hole); sunMask = outside;
+    float space = outside * (1.0 - smoothstep(0.07, 0.16, lumB));    // (only the dark of space, never the hull)
+    if (space > 0.0) {
+      vec2 sp = tp + uSpace.zw * 0.08;
+      float n = fbm(sp * 0.011 + vec2(t * 0.003, 0.0)), m = vnoise(sp * 0.007 + 11.0);
+      vec3 neb = mix(uNebA, uNebB, m) * smoothstep(0.4, 0.92, n) * uSpace.x;
+      float tw = 1.0 - uCam.w;
+      float st = starLayer(tp + uSpace.zw * 0.05, 9.0, t, tw) * 0.55 + starLayer(tp + uSpace.zw * 0.12, 15.0, t + 3.0, tw);
+      c += (neb + vec3(0.86, 0.9, 1.0) * st * uSpace.y) * space;
+    }
+    for (int i = 0; i < 2; i++) {
+      vec4 p = uPlanet[i];
+      if (p.w <= 0.0) continue;
+      vec2 d = tp - p.xy; float r = length(d);
+      if (r > p.z + 9.0) continue;
+      float facing = max(0.0, dot(d / max(r, 0.001), normalize(uSun.xy - p.xy)));
+      float rim = smoothstep(p.z - 3.0, p.z - 0.5, r) * (1.0 - smoothstep(p.z - 0.5, p.z + 0.6, r));
+      float atm = r > p.z ? exp(-(r - p.z) / 2.5) : 0.0;
+      c += uSunCol * (rim * 0.55 + atm * 0.3) * facing * p.w * outside;
+    }
+    if (darkMask > 0.0 && uLN > 0.0) c *= 1.0 - texture2D(uLightB, uv).a * darkMask;   // (the soft shadows, in the light map)
+  }
+#endif
+  // ---- darkness and real lights (night, caves, the deep): smooth and coloured, from the light map
   float litK = 1.0;                                                   // how lit this pixel is (1 = no darkness here)
   if (uDark.a > 0.0 || uLN > 0.0) {
-    float lit = 0.0;
-    vec3 glow = vec3(0.0), tint = vec3(0.0);
-    for (int i = 0; i < MAXL; i++) {
-      if (float(i) >= uLN) break;
-      vec4 L = uL[i]; vec4 LC = uLC[i];
-      vec2 d = tp - L.xy;
-      float dist = length(d), r = max(L.z, 1.0);
-      if (dist > r * 1.2) continue;
-      float f = pow(1.0 - smoothstep(0.15, 1.0, dist / r), 1.3) * L.w;
-      if (LC.a != 0.0) {                                              // the lamp: a soft cone ahead, a little all round
-        float ahead = smoothstep(-0.2, 0.6, d.x * LC.a / max(dist, 0.001));
-        f *= mix(0.45, 1.0, ahead);
-        tint += uLampCol.rgb * f * uLampCol.a;
-      }
-      lit = 1.0 - (1.0 - lit) * (1.0 - clamp(f * 0.88, 0.0, 1.0));
-      if (LC.r + LC.g + LC.b > 0.0) {
-        float core = exp(-(dist * dist) / (r * r * 0.2));
-        glow += LC.rgb * core * L.w;                                  // its own coloured glow
-        tint += LC.rgb * f * 0.35;                                    // what it touches takes its colour
-      }
-    }
-    c = mix(c, uDark.rgb, uDark.a * (1.0 - lit));
-    litK = max(1.0 - uDark.a, lit);
+    vec4 la = texture2D(uLightA, uv);                                 // (worked out once per world pixel: S.lights)
+    float lit = la.a;
+    vec3 tint = la.rgb * 2.0, glow = texture2D(uLightB, uv).rgb * 2.0;
+    float da = uDark.a * darkMask;
+    c = mix(c, uDark.rgb, da * (1.0 - lit));
+    litK = max(1.0 - da, lit);
     c += c * tint + glow * (uGlow.x + uGlow.y * uDark.a);   // (coloured glow: stronger the darker it is)
   }
   // ---- plankton and floating specks (underwater): sharp near ones, soft far ones
@@ -243,8 +329,9 @@ void main() {
   #ifdef Q_HIGH
     k += specks(sp, uCam.xy, t, 2.0);
   #endif
-    c += vec3(0.75, 0.9, 1.0) * k * uWater.w * uw * wm * (0.4 + 0.6 * uScene.y) * mix(0.15, 1.0, litK);   // (open water only; in the dark you see them near light)
+    c += vec3(0.75, 0.9, 1.0) * k * uWater.w * uw * max(wm, tankW) * (0.4 + 0.6 * uScene.y) * mix(0.15, 1.0, litK);   // (open water only; in the dark you see them near light)
   }
+#ifdef K_WORLD
   // ---- the surface: a soft reflection band and a gentle glint path under the sun / moon
   if (uSurf.x >= 0.0 && uSurf.y > 0.0) {
     float below = imgY - uSurf.x;
@@ -271,16 +358,48 @@ void main() {
       c = mix(c, ccol, cl * uSky.z * isSky);
     }
   }
+#endif
   if (uSun.w > 0.0) {
     float d = length(tp - uSun.xy);
-    c += uSunCol * uSun.w * exp(-d / uSun.z);
+    c += uSunCol * uSun.w * exp(-d / uSun.z) * sunMask;
   }
+#ifdef K_WORLD
   // ---- the UFO beam: a soft volumetric glow around it
   if (uBeam.w > 0.0 && tp.y > uBeam.y - 6.0 && tp.y < uBeam.z + 4.0) {
     float dx = abs(tp.x - uBeam.x);
     float along = smoothstep(uBeam.y - 6.0, uBeam.y + 12.0, tp.y) * (1.0 - smoothstep(uBeam.z - 2.0, uBeam.z + 4.0, tp.y));
     c += vec3(0.78, 0.74, 1.0) * exp(-dx / 9.0) * uBeam.w * along;
   }
+  // ---- the beam-up: the diver glows as the beam lifts them
+  if (uLift.z > 0.0) {
+    float d = length(tp - uLift.xy);
+    c += vec3(0.82, 0.78, 1.0) * uLift.z * (0.4 * exp(-d / 10.0) + 0.14 * exp(-d / 40.0));
+  }
+#endif
+  // ---- shooting / falling stars: a soft glowing trail and a halo round the head (eased in and out, no flash)
+#if defined(K_WORLD) || defined(K_STATION)
+  for (int i = 0; i < NS; i++) {
+    if (float(i) >= uSN) break;
+    vec4 A = uSA[i], B = uSB[i];
+    vec2 d = tp - A.xy;
+    float behind = -dot(d, A.zw);
+    if (behind < -12.0 || behind > B.x + 12.0) continue;
+    float across = abs(d.x * A.w - d.y * A.z);
+    float trail = exp(-across / B.z) * (1.0 - clamp(behind / B.x, 0.0, 1.0)) * step(0.0, behind);
+    c += uStreakCol * (trail * 0.3 + exp(-length(d) / (B.z * 2.5)) * 0.45) * B.y;
+  }
+#endif
+  // ---- tank glass: brighter edges, faint fixed reflections, a highlight sweeping very slowly across
+#ifdef K_TANK
+  if (tankG > 0.0) {
+    float ex = min(tp.x - uRoomA.x, uRoomA.z - tp.x), ey = min(tp.y - uRoomA.y, uRoomA.w - tp.y);
+    float rim = exp(-max(min(ex, ey), 0.0) / 2.2);
+    float dg = wp.x + tp.y * 0.55;                                    // (diagonal, fixed to the glass as it scrolls)
+    float refl = pow(0.5 + 0.5 * sin(dg * 0.031), 14.0) + 0.5 * pow(0.5 + 0.5 * sin(dg * 0.067 + 1.3), 22.0);
+    c += vec3(0.8, 0.93, 1.0) * (rim * uGlass.x + refl * uGlass.y);
+    c += vec3(1.0, 0.98, 0.94) * exp(-pow((dg - uGlass.z) / 16.0, 2.0)) * uGlass.w;
+  }
+#endif
 #endif
   // ---- colour grading: gain, saturation, contrast, brightness, a split tone in the shadows
   c *= uGradeA.rgb;
@@ -310,6 +429,45 @@ void main() {
   gl_FragColor = vec4(c, 1.0);
 #endif
 }`;
+  // ---------------------------------------------------------------- the light map (MEDIUM / HIGH)
+  // Every light, worked out once per world pixel (the world texture's size) instead of per screen pixel;
+  // lights are soft, so the composite's smooth (bilinear) sampling keeps them smooth. out 0: tint rgb x 0.5
+  // and how lit (alpha); out 1: the coloured lights' own glow x 0.5. maxl: fewer lights when the graphics
+  // chip has little room for uniforms (src/gfx/gfx.js works it out).
+  // ao (out 1, the station): its alpha holds the soft contact shadows where things meet the floors
+  S.lights = (maxl, out, ao) => PREC + `
+#define MAXL ${maxl}
+#define NAO ${S.counts.ao}
+${ao ? '#define AO 1' : ''}
+varying vec2 vUv;
+uniform vec2 uTex;
+uniform vec4 uL[MAXL];       // lights: x, y (texture px), radius, power
+uniform vec4 uLC[MAXL];      // their colour rgb (0 = plain white light), kind (0 point, +-1 the lamp facing right / left, 2 a ceiling lamp, 3 a soft area light)
+uniform float uLN;           // how many lights
+uniform vec4 uLampCol;       // the lamp's colour, its tint strength
+#ifdef AO
+uniform vec4 uFloors;        // floor lines (texture y; far away = none)
+uniform vec4 uCeils;         // ceilings
+uniform vec4 uAO[NAO];       // things standing on a floor: centre x, floor y, half width, strength
+// a soft shadow band just above a line (a floor) or just below one (a ceiling, with negated values)
+float band(float y, float edge, float h) { float d = edge - y; return d > 0.0 && d < h ? (1.0 - d / h) * (1.0 - d / h) : 0.0; }
+#endif
+void main() {
+  vec2 tp = vec2(vUv.x, 1.0 - vUv.y) * uTex;
+  float lit = 0.0, ao = 0.0;
+  vec3 glow = vec3(0.0), tint = vec3(0.0);
+` + LOOP + `#ifdef AO
+  ao = (band(tp.y, uFloors.x, 7.0) + band(tp.y, uFloors.y, 7.0) + band(tp.y, uFloors.z, 7.0) + band(tp.y, uFloors.w, 7.0)) * 0.2
+     + (band(-tp.y, -uCeils.x, 6.0) + band(-tp.y, -uCeils.y, 6.0) + band(-tp.y, -uCeils.z, 6.0) + band(-tp.y, -uCeils.w, 6.0)) * 0.16;
+  for (int i = 0; i < NAO; i++) {
+    vec4 o = uAO[i];
+    if (o.w <= 0.0) continue;
+    float dy = o.y - tp.y, dx = abs(tp.x - o.x);
+    if (dy > 0.0 && dy < 5.0) ao += o.w * (1.0 - dy / 5.0) * (1.0 - smoothstep(o.z - 3.0, o.z + 5.0, dx));
+  }
+#endif
+  gl_FragColor = ${out ? 'vec4(glow * 0.5, clamp(ao, 0.0, 0.5))' : 'vec4(tint * 0.5, lit)'};
+}`;
   // the second pass for MEDIUM / HIGH: the finished world (S.composite 'scene') -> the screen, sharp, plus
   // the vignette, film grain (very faint; off with REDUCE FLASHING) and the interface on top
   S.final = PREC + `
@@ -321,10 +479,13 @@ uniform vec2 uUITex;
 uniform vec2 uOut;
 uniform vec4 uFx;            // vignette, grain, (bloom), grain seed
 uniform float uUIOn;
+uniform sampler2D uPrev;     // the last frame of the scene we just left, for a soft cross-fade
+uniform float uXf;           // how much of it still shows (0 = none)
 ` + SHARP + `
 float hash(vec2 p) { return fract(sin(dot(p, vec2(12.9898, 78.233))) * 43758.5453); }
 void main() {
   vec3 c = sharp(uSrc, vUv, uSrcSize, uOut).rgb;
+  if (uXf > 0.0) c = mix(c, sharp(uPrev, vUv, uSrcSize, uOut).rgb, uXf);
   vec2 q = vUv - 0.5;
   c *= 1.0 - uFx.x * smoothstep(0.32, 0.85, dot(q, q) * 2.2);
   if (uFx.y > 0.0) c += (hash(floor(vUv * uOut) + uFx.w) - 0.5) * uFx.y;

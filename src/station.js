@@ -255,25 +255,34 @@ AQ.Station = (function () {
       ctx.fillStyle = 'rgba(40,30,20,0.5)'; ctx.fillRect(ex - 1, ey - 2, 4, 3);
       ctx.fillStyle = '#fff0dc'; ctx.fillRect(ex, ey - 2, 2, 2); ctx.fillRect(ex, ey - 3, 1, 1);
     });
-    if (!tank.creatures.length && !(tank.eggs || []).length) F().draw(ctx, AQ.t('station.empty'), tk.x, iy + ih / 2 - 2, 'rgba(230,250,255,0.55)', { align: 'center', shadow: false });
+    if (!deferText) tankText(ctx, tk, 1);
     ctx.fillStyle = 'rgba(220,245,255,0.12)'; ctx.fillRect(ix + 2, iy + 1, 6, ih - 2);       // glass sheen
     if (frame) AQ.Assets.draw(ctx, 'misc.tank_frame', 'idle', tk.x, tk.y, {});
     // name above, star pips on the plate
-    if (!noLabels) F().draw(ctx, AQ.Tanks.labelFor(b, 90), tk.x, y0 - 7, '#e8fbff', { align: 'center', shadow: 'rgba(4,12,24,0.8)', max: 90 });
+    if (!deferText) tankText(ctx, tk, 2);
     if (!tk.v || t - tk.vT > 1) { tk.v = AQ.Vibe.evaluate(b.id); tk.vT = t; }   // refreshed once a second
     const v = tk.v;
     if (v.nursery) {                                // no stars: how full it is (and a warning mark when it's full: breeding pauses)
-      F().draw(ctx, `♥ ${AQ.Nursery.occupancy()}/${AQ.Nursery.capacity()}`, tk.x, tk.y - 6, AQ.Nursery.full() ? '#ffcf8a' : '#ffd8e8', { align: 'center', shadow: false });
+      if (!deferText) tankText(ctx, tk, 3);
       if (AQ.Nursery.full()) AQ.Nursery.drawWarning(ctx, ix + iw - 10, iy + 2, t);
       return;
     }
     for (let i = 0; i < 5; i++) { ctx.fillStyle = v.stars >= i + 1 ? '#ffd25a' : v.stars >= i + 0.5 ? '#c8a050' : '#3a4a5a'; ctx.fillRect(tk.x - 10 + i * 4, tk.y - 4, 3, 2); }
   }
+  // a tank's words (part: 1 "empty", 2 its name, 3 the nursery's count; 0 all). With the shader layer on
+  // they're drawn after the world (St.drawUI), so light, glow and grading never touch them.
+  function tankText(ctx, tk, part) {
+    const b = tk.b, tank = AQ.Collection.tank(b.id), y0 = tk.y - 44, iy = y0 + 4, ih = 32;
+    if ((!part || part === 1) && !tank.creatures.length && !(tank.eggs || []).length) F().draw(ctx, AQ.t('station.empty'), tk.x, iy + ih / 2 - 2, 'rgba(230,250,255,0.55)', { align: 'center', shadow: false });
+    if ((!part || part === 2) && !noLabels) F().draw(ctx, AQ.Tanks.labelFor(b, 90), tk.x, y0 - 7, '#e8fbff', { align: 'center', shadow: 'rgba(4,12,24,0.8)', max: 90 });
+    if ((!part || part === 3) && AQ.Tanks.isNursery(b.id)) F().draw(ctx, `♥ ${AQ.Nursery.occupancy()}/${AQ.Nursery.capacity()}`, tk.x, tk.y - 6, AQ.Nursery.full() ? '#ffcf8a' : '#ffd8e8', { align: 'center', shadow: false });
+  }
 
   // ---------------------------------------------------------------- optional zoomed-out view
   // V toggles between following the player and a view of the whole building (every tank at once).
   // You keep full control of the robot either way. Default + key: AQ.TUNING.station; the choice is saved.
-  let zoomAmt = -1, full = null, noLabels = false, fullN = 0;
+  let zoomAmt = -1, full = null, noLabels = false, fullN = 0, deferText = false;
+  const VIEW = { sx: 0, sy: 0, z: 1, zoomed: false };                    // how the building maps to the screen this frame
   St.zoomedOut = () => {
     const s = AQ.State.settings;
     return s && s.stationZoomOut != null ? s.stationZoomOut : AQ.TUNING.station.zoomedOutByDefault;
@@ -293,10 +302,12 @@ AQ.Station = (function () {
     const cfg = AQ.TUNING.station, want = St.zoomedOut() ? 1 : 0;
     if (zoomAmt < 0) zoomAmt = want;                                     // first frame: no animation
     const P = game.player, cam = AQ.Camera;
+    VIEW.zoomed = zoomAmt > 0;
     if (zoomAmt <= 0) {
+      VIEW.sx = cam.left(); VIEW.sy = cam.top(); VIEW.z = 1;
+      deferText = !!(AQ.Gfx && AQ.Gfx.active());
       renderScene(ctx, game, cam.left(), cam.top(), 320, 180);
-      drawPrompt(ctx, P, cam.left(), cam.top(), 1);
-      drawTrophyTip(ctx, cam.left(), cam.top());
+      deferText = false;
     } else {
       // render the whole building once, then show a (scaled) window of it
       if (!full) { full = document.createElement('canvas'); full.width = L.width; full.height = L.height; }
@@ -320,6 +331,22 @@ AQ.Station = (function () {
       ctx.imageSmoothingEnabled = true; ctx.imageSmoothingQuality = low ? 'low' : 'high';   // soft downscale instead of dropped pixels
       ctx.drawImage(full, sx, sy, sw, sh, 0, 0, 320, 180);
       ctx.restore();
+      VIEW.sx = sx; VIEW.sy = sy; VIEW.z = z;
+    }
+  };
+  // interface on top of the building (after the world: the shader layer's effects never touch it)
+  St.drawUI = function (ctx, game) {
+    const P = game.player, sx = VIEW.sx, sy = VIEW.sy, z = VIEW.z;
+    if (!VIEW.zoomed) {
+      if (AQ.Gfx && AQ.Gfx.active()) {                                   // (the tanks' words and the wall's count, held back from the world)
+        ctx.save(); ctx.translate(-sx, -sy);
+        tanks.forEach((tk) => { if (tk.b && tk.x + 66 >= sx && tk.x - 66 <= sx + 320 && tk.y + 12 >= sy && tk.y - 62 <= sy + 180) tankText(ctx, tk, 0); });
+        wallCount(ctx);
+        ctx.restore();
+      }
+      drawPrompt(ctx, P, sx, sy, 1);
+      drawTrophyTip(ctx, sx, sy);
+    } else {
       if (zoomAmt > 0.5) {
         ctx.globalAlpha = U.clamp((zoomAmt - 0.5) * 3, 0, 1);
         // room for each label = distance to the nearest neighbouring slot on the same floor
@@ -394,7 +421,12 @@ AQ.Station = (function () {
       }
     }
     for (const [id, p] of popping) { const n = p + 1 / 60; if (n > 0.5) popping.delete(id); else popping.set(id, n); }
-    // the count, top right of the wall
+    if (!deferText) wallCount(ctx);
+  }
+  // the count, top right of the wall
+  function wallCount(ctx) {
+    const B = AQ.Badges, tw = L.trophyWall;
+    if (!B || !tw) return;
     const n = B.count();
     F().draw(ctx, `${n.earned}/${n.total}`, tw.x1, tw.top - 11, '#ffe9a8', { align: 'right', shadow: false });
   }
@@ -457,6 +489,61 @@ AQ.Station = (function () {
     AQ.FX.draw(ctx);
     ctx.restore();
   }
+
+  // ---------------------------------------------------------------- for the shader layer (src/gfx/; MEDIUM / HIGH)
+  // Where things are on screen this frame (texture px): the rooms (dimmed inside, space outside), floors and
+  // ceilings (soft contact shadows), portholes (space shows through), the planets (rim light), what stands
+  // on the floors, and the building's lights: the robot, the pad, the console, each tank's window, warm
+  // ceiling lamps, the trophy wall, the portholes. Nothing is allocated once it has run a frame.
+  const GI = { rooms: [0, 0, 0, 0, 0, 0, 0, 0], floors: [0, 0, 0, 0], ceils: [0, 0, 0, 0], holes: [], ao: [], planets: [0, 0, 0, 0, 0, 0, 0, 0], lights: [] };
+  const pool = []; let pn = 0;
+  function light(x, y, r, color, power, cone) {
+    const o = pool[pn] || (pool[pn] = {});
+    pn++; o.x = x; o.y = y; o.r = r; o.color = color; o.power = power; o.cone = cone; o.flicker = false;
+    GI.lights.push(o);
+  }
+  St.gfxInfo = function (game) {
+    if (!L || !canvas) return null;
+    const h = L.hull, T = h.thick, sx = VIEW.sx, sy = VIEW.sy, z = VIEW.z, zoomed = VIEW.zoomed;
+    const X = (x) => (x - sx) * z, Y = (y) => (y - sy) * z, far = -9999;
+    const r = GI.rooms, wg = L.wing;
+    r[0] = X(h.x + T); r[1] = Y(h.y + T); r[2] = X(h.x + h.w - T); r[3] = Y(L.floors[0]);
+    if (wg) { r[4] = X(h.x + h.w - T); r[5] = Y(wg.top + T); r[6] = X(wg.x + wg.w - T); r[7] = Y(L.floors[0]); } else r[4] = r[5] = r[6] = r[7] = far;
+    for (let i = 0; i < 4; i++) {
+      const fy = L.floors[i];
+      GI.floors[i] = fy == null ? far : Y(fy);
+      GI.ceils[i] = fy == null ? far : Y(i === L.floors.length - 1 ? h.y + T : L.floors[i + 1] + L.floorThick);
+    }
+    // portholes (only following the robot: zoomed out they're specks)
+    GI.holes.length = 0;
+    if (!zoomed) for (const [wx, fl] of L.windows) { const x = X(wx), y = Y(L.floors[fl] - 50); if (x > -12 && x < 332 && y > -12 && y < 192) GI.holes.push(x, y, 11); }
+    // the planets (drawSpace: parallax in the normal view, fixed on the whole-building picture)
+    const pl = GI.planets, ps = zoomed ? 1 : 0;
+    const pr = AQ.Assets.sprites['bg.planet_ringed'], psm = AQ.Assets.sprites['bg.planet_small'];
+    if (pr) { const px = 290 + 28, py = 70 + 16; pl[0] = ps ? X(px) : px - sx * 0.3; pl[1] = ps ? Y(py) : py - sy * 0.3; pl[2] = 10.2 * z; pl[3] = 1; } else pl[3] = 0;
+    if (psm) { const px = 70 + 10, py = 150 + 10; pl[4] = ps ? X(px) : px - sx * 0.25; pl[5] = ps ? Y(py) : py - sy * 0.25; pl[6] = 9 * z; pl[7] = 1; } else pl[7] = 0;
+    // things standing on the floors
+    GI.ao.length = 0;
+    const ao = (x, fy, half, k) => { const xx = X(x); if (xx > -40 && xx < 360) GI.ao.push(xx, Y(fy), half * z, k); };
+    ao(L.console.x, L.floors[0], 9, 0.4); ao(L.pad.x, L.floors[0], 11, 0.25);
+    tanks.forEach((tk) => ao(tk.x, tk.y, 31, tk.b ? 0.35 : 0.25));
+    L.plants.forEach(([px, fl]) => ao(px, L.floors[fl], 6, 0.4));
+    // the lights (most important first: the shader takes as many as the quality level allows)
+    GI.lights.length = 0; pn = 0;
+    const P = game.player, inner0 = h.x + T, inner1 = h.x + h.w - T;
+    light(P.x, P.y, 36, null, 0.5, 0);
+    light(L.pad.x, L.floors[0] - 8, 34, '#9feff0', Math.min(1, (St.beamK || 0.18) * 1.6), 0);
+    light(L.console.x, L.floors[0] - 12, 26, '#ffe08a', 0.55, 0);
+    tanks.forEach((tk) => { if (tk.b) { const st = AQ.Aquarium.styleOf(tk.b.id); light(tk.x, tk.y - 24, 46, st.windowGlow || st.lamp, 0.8, 3); } });
+    L.floors.forEach((fy, i) => {
+      const ceil = i === L.floors.length - 1 ? h.y + T : L.floors[i + 1] + L.floorThick;
+      for (let x = inner0 + 40; x < inner1 - 20; x += 96) light(x, ceil + 3, 84, '#ffd890', 1, 2);
+    });
+    if (wg) { light(wg.x + wg.w / 2 - 4, wg.top + T + 3, 84, '#ffd890', 1, 2); const tw = L.trophyWall; light((tw.x0 + tw.x1) / 2, tw.top + 14, 60, '#ffe2a0', 0.6, 3); }
+    if (!zoomed) for (const [wx, fl] of L.windows) light(wx, L.floors[fl] - 50, 22, '#a8c0ff', 0.4, 3);
+    GI.ox = sx; GI.oy = sy; GI.z = z;
+    return GI;
+  };
 
   AQ.Scenes.register('station', St);
   return St;

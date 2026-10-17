@@ -298,10 +298,11 @@ AQ.TUNING = {
       // sun's glow, the beam's glow. (Which details each level draws is in src/gfx/shaders.js: HIGH has more
       // rays, two caustic layers, three plankton layers, refraction and finer clouds.) fxScale: the effects
       // are worked out at the world's size x this (then scaled up sharply), so their cost doesn't grow with
-      // the window; none = one pass straight to the screen.
-      high:   { bloom: true, bloomDiv: 2, bloomPasses: 2, grain: true, maxDpr: 2, fxScale: 3, light: true, water: true, sky: true },
-      medium: { bloom: true, bloomDiv: 4, bloomPasses: 1, grain: true, maxDpr: 1.5, fxScale: 2, light: true, water: true, sky: true },
-      low:    { bloom: false, grain: false, maxDpr: 1, light: false, water: false, sky: false }   // colour grading, vignette and cheap fog only
+      // the window; none = one pass straight to the screen. scenes: tank glass, the station's space and
+      // rooms, star streaks, the beam-up glow and soft cross-fades.
+      high:   { bloom: true, bloomDiv: 2, bloomPasses: 2, grain: true, maxDpr: 2, fxScale: 3, light: true, water: true, sky: true, scenes: true },
+      medium: { bloom: true, bloomDiv: 4, bloomPasses: 1, grain: true, maxDpr: 1.5, fxScale: 2, light: true, water: true, sky: true, scenes: true },
+      low:    { bloom: false, grain: false, maxDpr: 1, light: false, water: false, sky: false, scenes: false }   // colour grading, vignette and cheap fog only
     },
     // colour grading by place and time of day: [gain red, green, blue, saturation, contrast, brightness,
     // shadow tint strength, shadow tint red, green, blue]. 1 = unchanged (0 for the last four). The clock
@@ -318,7 +319,9 @@ AQ.TUNING = {
               night: [0.84, 0.92, 1.14, 0.88, 1.06, -0.01, 0.14, 0.02, 0.02, 0.18] },
       station: { fixed: [0.99, 1.00, 1.05, 1.08, 1.06, 0.00, 0.10, 0.04, 0.00, 0.14] },   // cool space, warm lamps keep their colour
       tank:    { fixed: [1.00, 1.01, 1.02, 1.07, 1.05, 0.00, 0.05, 0.00, 0.02, 0.08] },
-      title:   { fixed: [1.04, 1.00, 0.97, 1.06, 1.04, 0.00, 0.06, 0.06, 0.02, 0.08] }
+      nursery: { fixed: [1.04, 0.99, 0.95, 1.00, 1.00, -0.01, 0.10, 0.10, 0.04, 0.10] },    // the Nursery: warm and soft
+      predator: { fixed: [0.95, 0.98, 1.05, 0.94, 1.13, -0.03, 0.14, 0.00, 0.03, 0.12] },  // predator tanks: darker, more dramatic
+      title:   { fixed: [1.14, 0.94, 0.90, 1.04, 1.04, 0.00, 0.14, 0.14, 0.02, 0.16] }     // the title: a slow sunset sea
     },
     fog: {                    // depth fog in the sea: the deeper the camera, the bluer, flatter and softer
       color: [0.02, 0.12, 0.17],   // deep blue-teal
@@ -353,6 +356,42 @@ AQ.TUNING = {
       sunsetSun: [238, 118],  // where the painted sunset's sun is (texture px), for its glow at dawn / dusk
       beam: 0.2,              // the UFO beam's volumetric glow (at night)...
       beamDay: 0.3            // ...and this share of it by day
+    },
+    moods: {                  // per-scene changes on top of the grade (MEDIUM / HIGH; the vignette also on LOW)
+      nursery:  { vignette: 0.16, bloom: 0.3 },   // (its pale water would glow white)
+      predator: { vignette: 0.4, bloom: 0.85 },
+      title:    { rays: 0.26, rayColor: [1.0, 0.72, 0.48], glow: { x: 240, y: -30, radius: 120, strength: 0.34, color: [1.0, 0.62, 0.38] } }   // warm sunset light from above
+    },
+    tanks: {                  // the tank screen and photos (MEDIUM / HIGH)
+      rays: 0.12,             // soft rays from the lid (scaled by each tank's own "shafts", data/aquarium.js)...
+      caustics: 0.4,          // ...and caustics on the sand (scaled by its "caustics")
+      plankton: 0.22,         // drifting specks in the water
+      tint: 0.1,              // how much the water leans to the tank's own colour (its "deep" colour)
+      glassEdge: 0.07,        // the glass's brighter edges
+      glassReflect: 0.035,    // faint fixed reflections on the glass
+      sweep: 0.05,            // a soft highlight sweeping very slowly across the glass...
+      sweepSeconds: 14,       // ...once every this many seconds (slower with REDUCE FLASHING)
+      sweepCalm: 0.5          // REDUCE FLASHING: its strength x this
+    },
+    station: {                // the station (MEDIUM / HIGH)
+      dark: 0.24,             // how dim the rooms are between lights (the warm lamps, tank windows and portholes light them)
+      darkColor: [0.03, 0.035, 0.07],
+      nebula: 0.14,           // the soft nebula glow in space...
+      nebulaA: [0.42, 0.25, 0.75], nebulaB: [0.15, 0.45, 0.8],   // ...its two colours
+      stars: 0.5,             // soft stars at two depths (parallax), the bright ones with a little lens glow
+      sun: { x: -30, y: -40, radius: 90, strength: 0.18, color: [1.0, 0.86, 0.66] },   // a distant sun off the top-left: lights the planets' rims
+      planetRim: 1.0          // how bright the planets' sun-side rim is
+    },
+    streaks: {                // shooting stars, falling stars and meteors (MEDIUM / HIGH): a soft glowing trail
+      color: [1.0, 0.95, 0.85],
+      strength: 0.5,
+      width: 1.6,             // how wide the trail's glow is (px)
+      landRadius: 70, landPower: 0.8   // a falling star's landing: a soft light that swells and fades on the water (no flash)
+    },
+    lift: 0.7,                // the UFO beam-up: how brightly the diver glows as the beam lifts them
+    transitions: {
+      crossfade: 0.4,         // seconds: changing screens (tank, station, title) fades softly from one to the next (MEDIUM / HIGH)
+      smoothFade: true        // the fade to black is smooth instead of stepped while the shader layer is on
     },
     vignette: 0.22,           // darker corners (0 = none)
     grain: { amount: 0.018, fps: 24 },   // film grain: strength, and how often its pattern changes (off on LOW and with REDUCE FLASHING)

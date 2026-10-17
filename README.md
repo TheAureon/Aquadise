@@ -772,15 +772,34 @@ untouched, so it stays crisp.
 - **Sky** (MEDIUM / HIGH, `graphics.sky`): soft drifting clouds with light edges (dim at night), a glow
   around the sun and moon, a warm sunset sun on the hill, and a soft volumetric glow around the UFO beam
   (gentle by day, full at night).
+- **Tanks** (MEDIUM / HIGH, `graphics.tanks`): real-feeling glass (slightly brighter edges, faint fixed
+  reflections, a soft highlight sweeping very slowly across), soft rays from the lid and caustics on the
+  sand instead of the old flat shafts, drifting specks, and the water leaning a little to the tank's own
+  colour. Glowing creatures and decor light up dark tanks. Photos get the same look.
+- **Moods** (`graphics.grade` + `graphics.moods`): the Nursery is warm and soft, predator tanks darker and
+  more dramatic, and the title screen is a slow, warm sunset sea.
+- **The station** (MEDIUM / HIGH, `graphics.station`): the rooms are softly dim between warm pools of
+  lamp light, tank windows glow in their water's colour, and soft shadows sit where things meet the
+  floor. Outside: a soft nebula, stars at two depths (the bright ones with a little lens glow), and a
+  distant sun lighting the planets' rims. The tank names, the trophy wall's count and every prompt are
+  drawn on top, untouched by the effects.
+- **Streaks** (`graphics.streaks`): shooting stars, falling stars and meteors get a soft glowing trail and
+  head; a landing swells into a soft light on the water and fades (no flash).
+- **Beam-up and transitions:** the diver glows as the UFO beam lifts them (`graphics.lift`); changing
+  screens (a tank, the station, the title) cross-fades softly (`graphics.transitions.crossfade`), and the
+  fade to black is smooth instead of stepped.
 - **Levels** (`graphics.levels`): HIGH = everything (three ray bands, two caustic layers, three plankton
   layers, refraction, finer clouds, 24 lights), bloom at half size blurred twice, effects worked out at 3x
   the game's size, screen up to 2x pixel density; MEDIUM = a lighter version (two ray bands, one caustic
   layer, two plankton layers, no refraction, 12 lights), bloom at quarter size, effects at 2x, up to 1.5x
   density; LOW = colour grading, vignette and cheap fog only (lights stay the old stepped 2D ones), 1x.
   The effects run at a fixed multiple of 320 x 180 (`fxScale`) and are then scaled up sharply, so their
-  cost doesn't grow with a big window.
+  cost doesn't grow with a big window; the lights (and the station's soft shadows) are worked out once
+  per game pixel in a small light map. Tanks, the station, streaks, the beam-up glow and cross-fades are
+  MEDIUM / HIGH (`scenes`); LOW keeps the old tank and station look.
 - **REDUCE FLASHING:** every moving effect runs at half speed (`graphics.calmSpeed`), no grain, no light
-  flicker, no star twinkle, and the surface glint becomes a steady soft path instead of sparkles.
+  flicker, no star twinkle (sky and space), the surface glint becomes a steady soft path instead of
+  sparkles, the tank glass's highlight is fainter, streaks are dimmer and the beam-up glow gentler.
 - **First run** picks a level: phones and tablets start at MEDIUM, weak machines (`graphics.detect`) at
   LOW, a software renderer (no real graphics chip) at CLASSIC. A **governor** steps down one level if the
   frame rate stays under `governor.minFps` for `governor.seconds` ("Switched to lighter graphics. You can
@@ -792,7 +811,7 @@ untouched, so it stays crisp.
   read, so the effects work there too (tested in Chromium).
 - **Photos** taken in a tank include the effects (the frame and caption stay crisp).
 - **Testing:** `AQ.TUNING.debug.gfx: true` adds **-** (next quality level), **=** (pick the next effect:
-  grade, fog, bloom, vignette, grain, light, water, sky), **\\** (switch the picked effect off / on) and **`** (a frame-time
+  grade, fog, bloom, vignette, grain, light, water, sky, glass, space, streaks, fade), **\\** (switch the picked effect off / on) and **`** (a frame-time
   overlay: fps, ms per frame, level, effects off, canvas size, graphics chip).
 
 ## Sound and music
