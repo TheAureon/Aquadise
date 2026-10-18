@@ -22,7 +22,7 @@ AQ.Gfx = (function () {
     off: {}, overlay: false, fxSel: 0, fps: 60, ms: 0 };
   const LEVELS = ['high', 'medium', 'low', 'classic'];
   X.LEVELS = LEVELS;
-  X.EFFECTS = ['grade', 'fog', 'bloom', 'vignette', 'grain', 'light', 'water', 'sky', 'glass', 'space', 'streaks', 'fade'];   // (each can be switched off for testing)
+  X.EFFECTS = Object.keys(AQ.GfxEffects);                          // (src/gfx/effects.js; each can be switched off for testing)
   const cfg = () => AQ.TUNING.graphics;
   const set = () => (AQ.State && AQ.State.settings) || {};
   const calm = () => !!(AQ.U && AQ.U.calm());
@@ -63,6 +63,7 @@ AQ.Gfx = (function () {
     if (lv === 'classic' || !cfg().enabled || X.lost) { X.toClassic(); return; }
     if (!X.ensure()) { X.toClassic(); return; }
     X.mode = lv;
+    G.settle = Math.max(G.settle, cfg().governor.warmupSeconds); G.slow = 0;   // (a new level gets a moment before it's judged)
     X.sync(true);
     if (X.view) X.view.style.display = 'block';
     if (X.canvas) X.canvas.style.opacity = '0';                    // (stays in the page: input and touch read its box)
@@ -503,9 +504,9 @@ AQ.Gfx = (function () {
       if (AQ.Starfall && AQ.Starfall.gfxStreaks) AQ.Starfall.gfxStreaks(game, streak);
     }
     // the beam-up: the diver glows as the beam lifts them, and the beam brightens
-    if (key === 'hill' && !X.photoScene && AQ.Hill && AQ.Hill.liftInfo) {
+    if (key === 'hill' && !X.photoScene && !X.off.lift && AQ.Hill && AQ.Hill.liftInfo) {
       const k = AQ.Hill.liftInfo(LIFT);
-      if (k > 0) { P.lift[0] = LIFT[0]; P.lift[1] = LIFT[1]; P.lift[2] = k * c.lift * (calm() ? 0.7 : 1); P.beam[3] += k * 0.25; }
+      if (k > 0) { P.lift[0] = LIFT[0]; P.lift[1] = LIFT[1]; P.lift[2] = k * c.lift * (calm() ? c.liftCalm : 1); P.beam[3] += k * 0.25; }
     }
     // the station: rooms dim between warm lights, space outside, soft shadows on the floors
     if (st) {
@@ -573,8 +574,12 @@ AQ.Gfx = (function () {
 
   // ---------------------------------------------------------------- frame time + the safety governor
   // Steps down one level when the frame rate stays under graphics.governor.minFps for .seconds (never up,
-  // never over the player's own choice; a short pause after each step lets the new level settle).
-  const G = { slow: 0, settle: 0 };
+  // never over the player's own choice; a short pause after each step lets the new level settle). If a
+  // step didn't make the game faster (by .minGain), the slowness isn't the effects' (a 30 Hz screen, a busy
+  // machine): it stops stepping for the session instead of sliding all the way down. Each step is logged
+  // in X.govLog. A level change (any) and the first moments after loading are given .warmupSeconds.
+  const G = { slow: 0, settle: 0, before: 0, judging: false, stuck: false };
+  X.govLog = [];
   function timing() {
     const now = performance.now(), dt = now - lastT; lastT = now;
     if (dt <= 0 || dt > 250 || document.hidden) return;              // (a hidden tab or a hiccup isn't the game being slow)
@@ -583,17 +588,25 @@ AQ.Gfx = (function () {
   }
   function governor(game) {
     const g = cfg().governor, s = X.saved();
-    if (!g.enabled || !s || s.manual || !X.dt || !game || game.state === 'loading') return;
+    if (!g.enabled || !s || s.manual || G.stuck || !X.dt || !game || game.state === 'loading') return;
     const dt = X.dt / 1000;
     if (G.settle > 0) { G.settle -= dt; G.slow = 0; return; }
+    if (G.judging) {                                               // the last step: did it help?
+      G.judging = false;
+      if (X.fps < G.before * (1 + g.minGain)) { G.stuck = true; X.govLog.push({ level: s.level, fps: Math.round(X.fps), stopped: true }); return; }
+    }
     G.slow = X.fps < g.minFps ? G.slow + dt : Math.max(0, G.slow - dt * 2);
     if (G.slow < g.seconds) return;
-    G.slow = 0; G.settle = g.settleSeconds;
-    const i = LEVELS.indexOf(s.level);
-    if (i < 0 || i >= LEVELS.length - 1) return;
-    X.choose(LEVELS[i + 1], false);
+    const i = LEVELS.indexOf(s.level), lowest = LEVELS.indexOf(g.lowest);
+    if (i < 0 || i >= (lowest < 0 ? LEVELS.length - 1 : lowest)) { G.stuck = true; return; }
+    G.slow = 0; G.before = X.fps; G.judging = true;
+    X.govLog.push({ from: s.level, to: LEVELS[i + 1], fps: Math.round(X.fps) });
+    X.choose(LEVELS[i + 1], false);                               // (apply() gives the new level its settle time)
+    G.settle = Math.max(G.settle, g.settleSeconds);
     if (AQ.HUD) AQ.HUD.toast(AQ.t('gfx.switched'), '#cfe8ff', 6);
   }
+  X._governor = governor;                                         // (for tools/check-graphics.js)
+  X._gov = G;
 
   // ---------------------------------------------------------------- testing (AQ.TUNING.debug.gfx)
   X.update = (game) => debugKeys(game);                           // (from the game's update, while key presses are fresh)

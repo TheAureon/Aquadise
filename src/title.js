@@ -132,6 +132,12 @@ AQ.Title = (function () {
     g.fillStyle = '#0b2a45'; each((x, y) => g.fillRect(x, y + 1, px + 2, px + 2));        // outline
     each((x, y, ry) => { g.fillStyle = RAMP[ry]; g.fillRect(x + 1, y + 1, px, px); });    // gradient fill
     g.fillStyle = 'rgba(255,255,255,0.9)'; each((x, y, ry) => { if (ry === 0) g.fillRect(x + 1, y + 1, px, 1); });
+    // light from the top-left: edges facing left catch light, edges facing down sit in a cool shade
+    const on = new Set(); each((x, y) => on.add(x + ',' + y));
+    each((x, y, ry) => {
+      if (!on.has((x - px) + ',' + y)) { g.fillStyle = 'rgba(255,255,255,0.45)'; g.fillRect(x + 1, y + 1, 1, px); }
+      if (!on.has(x + ',' + (y + px)) && ry > 0) { g.fillStyle = 'rgba(30,110,150,0.55)'; g.fillRect(x + 1, y + px, px, 1); }
+    });
     mg.fillStyle = '#ffffff'; each((x, y) => mg.fillRect(x + 1, y + 1, px, px));          // shimmer mask
     return { c, mask };
   }

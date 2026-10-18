@@ -10,6 +10,8 @@
 //   node tools/check-game.js --keys             also check the language keys (every t() key used in
 //                                               the code exists in data/lang/en.js, and which keys
 //                                               in en.js are never used); add --lang none to skip the browser
+//   node tools/check-game.js --gfx high         draw every screen at one GRAPHICS level (high, medium, low or
+//                                               classic; by default the level the test browser picks itself)
 //
 // Needs Playwright with its Chromium (a test tool only; the game itself has no dependencies):
 //   npm install --no-save playwright && npx playwright install chromium
@@ -166,8 +168,8 @@ const SCREENS = [
   ['save-panel', () => { AQ.Touch.menuOpen = false; AQ.State.settings.touchControls = 'off'; AQ.Touch.refresh(); AQ.Title.open(AQ.Game); AQ.SaveFile.openRecover(); }]
 ];
 
-async function run(lang, pw, port, dump, shotsDir) {
-  const browser = await pw.chromium.launch();
+async function run(lang, pw, port, dump, shotsDir, gfx) {
+  const browser = await pw.chromium.launch(gfx ? { args: ['--enable-unsafe-swiftshader'] } : {});
   const page = await (await browser.newContext({ viewport: { width: 1280, height: 720 } })).newPage();
   const problems = [];
   let where = 'loading', driverNotes = 0;
@@ -193,6 +195,10 @@ async function run(lang, pw, port, dump, shotsDir) {
     window.__all = window.__all || new Set();          // everything drawn, including text painted once into cached pictures
     F.draw = function (ctx, str) { if (window.__rec) window.__rec.add(String(str)); window.__all.add(String(str)); return orig.apply(this, arguments); };
   }, lang);
+  if (gfx) {                                                          // --gfx: that GRAPHICS level, chosen (so the governor leaves it alone)
+    const got = await page.evaluate((lv) => { AQ.Gfx.choose(lv, true); return AQ.Gfx.mode + (AQ.Gfx.failed ? ' (' + AQ.Gfx.failed + ')' : ''); }, gfx);
+    if (!got.startsWith(gfx)) problems.push(`[graphics] asked for ${gfx}, drawing ${got}`);
+  }
   const screens = [];
   for (const [name, fn] of SCREENS) {
     if (name === 'TANKS') { (await page.evaluate(() => AQ.Tanks.list().map((t) => t.id))).forEach((id) => screens.push(['tank-' + id, `() => { const A = AQ.Aquarium; A.open(AQ.Game, 'station', '${id}'); A.tray = 'decor'; A.card = null; }`])); continue; }
@@ -217,8 +223,9 @@ async function run(lang, pw, port, dump, shotsDir) {
   out['(all text drawn)'] = await page.evaluate(() => [...(window.__all || [])].sort());
   const missingGlyphs = await page.evaluate(() => [...(AQ.Font.unknown || [])]);
   if (missingGlyphs.length) problems.push(`characters with no glyph in the font (drawn as boxes): ${missingGlyphs.map((c) => JSON.stringify(c)).join(' ')}`);
+  if (gfx) { const end = await page.evaluate(() => AQ.Gfx.mode); if (end !== gfx) problems.push(`[graphics] ended up drawing ${end} instead of ${gfx}`); }
   await browser.close();
-  console.log(`\n[${lang}] visited ${screens.length} screens, ${problems.length ? problems.length + ' problem(s):' : 'no console errors.'}${driverNotes ? ` (${driverNotes} WebGL driver note(s) from the browser itself, not the game, set aside)` : ''}`);
+  console.log(`\n[${lang}${gfx ? ', graphics ' + gfx : ''}] visited ${screens.length} screens, ${problems.length ? problems.length + ' problem(s):' : 'no console errors.'}${driverNotes ? ` (${driverNotes} WebGL driver note(s) from the browser itself, not the game, set aside)` : ''}`);
   problems.forEach((p) => console.log('  ' + p));
   return { problems: problems.length, text: out };
 }
@@ -232,7 +239,7 @@ async function run(lang, pw, port, dump, shotsDir) {
   const langs = want && want !== true ? [want] : ['en', 'pseudo'];
   const dump = opt('--dump'), shots = opt('--shots'), all = {};
   for (const lang of langs) {
-    const r = await run(lang, pw, port, dump, shots && shots !== true ? shots : null);
+    const g = opt('--gfx'), r = await run(lang, pw, port, dump, shots && shots !== true ? shots : null, g && g !== true ? g : null);
     failures += r.problems;
     Object.entries(r.text).forEach(([k, v]) => { all[langs.length > 1 ? `${lang}:${k}` : k] = v; });
   }

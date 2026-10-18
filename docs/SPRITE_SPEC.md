@@ -251,3 +251,23 @@ art only supplies textures and props.
 it when `index.html` is opened straight from disk (file://), so tank photos can be saved there
 (browsers block saving canvases drawn from file:// images). `tools/gen-placeholders.js` refreshes it
 automatically; after replacing PNGs by hand, run `node tools/embed-sprites.js`.
+
+## Your own art and the lighting (graphics)
+Every lighting effect in the shader layer (src/gfx/, GRAPHICS above CLASSIC) works from the colour sprites
+alone: no normal maps or extra layers are needed, so swapping in your own PNGs never breaks the light,
+glow, fog or bloom. What glows is set in data, not in the art: a creature's `glow` entry in
+data/creatures.js (`{ color, radius, strength, pulse }`), a decoration's `glow` colour in
+data/decorations.js. Bright pixels (near white) also pick up the soft bloom on MEDIUM / HIGH.
+
+The placeholder generator draws its shading (light from the top-left, a dark outline, a highlight pixel)
+into the PNGs themselves; it never runs on your files (only `--force` redraws existing PNGs, and never
+an entry marked `"custom": true`). The originals from before that art pass are in
+`art-backup/sprites-before-graphics4/` (see docs/ART_CHANGES.md).
+
+**Optional glow map (for later; nothing needs it today).** If a sprite should have parts that shine
+by themselves (a lure, lit windows, glowing spots), the place for it is a second sheet next to the
+sprite, same size and same frame layout, named `<name>_glow.png` (e.g. `sprites/creatures/lanternjaw_glow.png`):
+black (or transparent) = no glow, colour = glows in that colour. Add `"glow": "sprites/creatures/lanternjaw_glow.png"`
+to that sprite's entry in assets/manifest.js (with `"custom": true`). The game doesn't read glow maps yet;
+the shader layer has the slot for it (a third texture next to the world, like its light map), so they can
+be added later without changing any sprite.

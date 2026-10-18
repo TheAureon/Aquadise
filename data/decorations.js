@@ -59,7 +59,7 @@ AQ.data.decorations = [
 
   // ---- Open Ocean
   { id: 'buoy', kind: 'float', hang: 10, sprite_size: 'small', color: '#e8503a', accent: '#f4f0e6', art: { shape: 'buoy' }, tags: ['metal', 'light'], glow: '#fff1a8', biomes: ['open_ocean'] },
-  { id: 'message_bottle', kind: 'floor', sprite_size: 'small', color: '#5fbf8f', art: { shape: 'bottle' }, tags: ['treasure'], biomes: ['open_ocean'], unlock: { biome: 'open_ocean', tier: 1 } },
+  { id: 'message_bottle', kind: 'floor', sprite_size: 'small', color: '#5fbf8f', art: { shape: 'bottlelying' }, tags: ['treasure'], biomes: ['open_ocean'], unlock: { biome: 'open_ocean', tier: 1 } },
   { id: 'glass_floats', kind: 'float', hang: 8, sprite_size: 'small', color: '#5fd0e0', accent: '#8fe0a0', art: { shape: 'glassfloat' }, tags: ['bubbles', 'light'], glow: '#bff6ff', biomes: ['open_ocean'], unlock: { biome: 'open_ocean', tier: 2 } },
   { id: 'ships_wheel', kind: 'floor', sprite_size: 'medium', color: '#8a5b33', accent: '#f2c14e', art: { shape: 'wheel' }, tags: ['wood', 'metal', 'arch'], biomes: ['open_ocean', 'ruins'], unlock: { biome: 'open_ocean', tier: 3 } },
 

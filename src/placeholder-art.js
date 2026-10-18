@@ -66,7 +66,26 @@
       if (f !== 1) { this.d[i] = Math.min(255, src[i] * f); this.d[i + 1] = Math.min(255, src[i + 1] * f); this.d[i + 2] = Math.min(255, src[i + 2] * f); }
     }
   };
+  // The art pass's shared light (Graphics stage 4): light comes from the top-left, so edges facing left
+  // catch a little light, edges facing right fall into shade, and the bottom-right corner gets a faint
+  // cool rim (bounce light). Runs once per sprite, just before its outline (so the outline stays dark).
+  Pix.prototype.light = function (amt = 0.12) {
+    if (this.lit) return;
+    this.lit = true;
+    const src = new Uint8ClampedArray(this.d), W = this.bw, H = this.bh;
+    const A = (x, y) => (x < 0 || y < 0 || x >= W || y >= H) ? 0 : src[(y * W + x) * 4 + 3];
+    for (let y = 0; y < H; y++) for (let x = 0; x < W; x++) {
+      const i = (y * W + x) * 4;
+      if (src[i + 3] < 100) continue;
+      const left = !A(x - 1, y), right = !A(x + 1, y), below = !A(x, y + 1);
+      let f = 1;
+      if (left && !right) f = 1 + amt; else if (right && !left) f = 1 - amt * 0.8;
+      if (f !== 1) for (let k = 0; k < 3; k++) this.d[i + k] = Math.min(255, src[i + k] * f);
+      if (right && below) { this.d[i] = this.d[i] * 0.8 + 150 * 0.2; this.d[i + 1] = this.d[i + 1] * 0.8 + 190 * 0.2; this.d[i + 2] = this.d[i + 2] * 0.8 + 235 * 0.2; }
+    }
+  };
   Pix.prototype.outline = function (f = 0.35) {
+    if (!this.noLight) this.light();
     const src = new Uint8ClampedArray(this.d), W = this.bw, H = this.bh;
     const at = (x, y) => (x < 0 || y < 0 || x >= W || y >= H) ? -1 : (y * W + x) * 4;
     for (let y = 0; y < H; y++) for (let x = 0; x < W; x++) {
@@ -98,6 +117,13 @@
   const WHITE = [255, 255, 255, 255], BLACK = [20, 18, 30, 255];
   PH.hex = hex;
 
+  // a specular highlight: one bright pixel (two on big sprites) on the top-left of a rounded body
+  function shine(p, x, y, c, big) {
+    if (!p.a(Math.round(x), Math.round(y))) return;
+    const h = mix(c, WHITE, 0.6);
+    p.set(x, y, h);
+    if (big && p.a(Math.round(x) + 1, Math.round(y))) p.set(x + 1, y, mix(c, WHITE, 0.35));
+  }
   function eye(p, x, y, big) {
     if (big) { p.set(x, y, WHITE); p.set(x + 1, y, BLACK); p.set(x + 1, y - 1, WHITE); }
     else p.set(x, y, BLACK);
@@ -140,6 +166,14 @@
     }
     if (o.blackEye) { const ex = Math.round(cx + len * 0.27), ey = Math.round(cy - h * 0.12); p.rect(ex, ey, W >= 20 ? 2 : 1, W >= 20 ? 2 : 1, BLACK); }
     else if (!o.eyeless) eye(p, Math.round(cx + len * 0.27), Math.round(cy - h * 0.12), W >= 20);
+    // art pass: a gill line, a small side fin that sways, and a shine on the back
+    if (W >= 14 && !o.shark && !o.dolphin) {
+      const gx = Math.round(cx + len * 0.14);
+      for (let y = Math.round(cy - h * 0.2); y <= Math.round(cy + h * 0.15); y++) if (p.a(gx, y)) p.set(gx, y, mul(o.c, 0.72));
+      const sway = [0, 1, 1, 0][o.frame % 4] * (o.moving ? 1 : 0.6);
+      p.line(gx - 1, Math.round(cy + h * 0.12), gx - 3, Math.round(cy + h * 0.12 + 1 + sway), mul(o.a, 0.85));
+    }
+    shine(p, Math.round(cx - len * 0.08), Math.round(cy - h * 0.32), o.c, W >= 20);
     p.outline();
     if (o.lure) {
       const lx = cx + len * 0.32, ly = cy - h / 2;
@@ -181,6 +215,9 @@
     p.shade();
     p.line(cx - 2, cy - ry, cx - 2, cy - ry - 2, o.c); p.line(cx + 2, cy - ry, cx + 2, cy - ry - 2, o.c);
     p.set(cx - 2, cy - ry - 3, BLACK); p.set(cx + 2, cy - ry - 3, BLACK);
+    // art pass: the claws pinch (a notch opens and closes), and a shine on the shell
+    if (o.frame % 2 === 0) { p.set(Math.round(cx + rx + 1 + claw * 0.5), Math.round(cy - H * 0.18), [0, 0, 0, 0]); p.set(Math.round(cx - rx - 1 - W * 0.045), Math.round(cy - H * 0.18), [0, 0, 0, 0]); }
+    if (!o.bell && !o.rocky) shine(p, Math.round(cx - rx * 0.55), Math.round(cy - ry * 0.7), mul(o.c, 0.85), W >= 20);
     if (o.rocky) {                      // a pitted space-rock shell with faint glowing cracks (Aerolite Crab)
       p.ellipse(cx, cy - ry * 0.55, rx * 0.95, ry * 1.25, mix(o.c, WHITE, 0.08));
       [[-0.45, -0.5], [0.3, -0.75], [0.05, -0.15], [0.55, -0.25]].forEach(([u, v]) => p.set(Math.round(cx + u * rx), Math.round(cy + v * ry * 1.4), mul(o.c, 0.62)));
@@ -262,7 +299,9 @@
     p.shade();
     for (let a = 0; a < 10; a += 0.2) { const r = W * 0.24 * (1 - a / 11); p.set(W * 0.44 + Math.cos(a) * r, H * 0.54 + Math.sin(a) * r, mul(o.a, 0.68)); }
     if (o.echo) for (const k of [0.45, 0.75]) for (let a = -2.2; a < -0.5; a += 0.12) p.set(W * 0.44 + Math.cos(a) * W * 0.27 * k, H * 0.54 + Math.sin(a) * W * 0.27 * k, mix(o.a, WHITE, 0.6));   // pale ripple rings on the shell (Echoshell Snail)
-    p.set(W * 0.86 + stretch, H * 0.54, BLACK);
+    const nod = o.moving ? 0 : [0, 0, 1, 0][o.frame % 4];          // art pass: the eye stalk nods now and then
+    p.set(W * 0.86 + stretch, H * 0.54 + nod, BLACK);
+    shine(p, Math.round(W * 0.34), Math.round(H * 0.42), o.a, W >= 16);
     p.outline();
     if (o.glass) for (let i = 0; i < p.d.length; i += 4) if (p.d[i + 3]) p.d[i + 3] = 170;
   };
@@ -273,6 +312,7 @@
     p.shade(0.3);
     for (let i = -2; i <= 2; i++) p.line(W / 2, H * 0.47, W / 2 + i * W * 0.17, H * 0.84, mul(o.c, 0.75));
     p.set(W / 2, H * 0.47, o.a);
+    shine(p, Math.round(W * 0.32), Math.round(H * 0.62), o.c, false);   // art pass
     p.outline();
   };
 
@@ -284,6 +324,7 @@
     p.ellipse(W * 0.5, H * 0.86, W * 0.4, H * 0.08, o.a);
     p.shade(0.3);
     [[0.3, 0.6], [0.6, 0.55], [0.45, 0.4]].forEach(([x, y]) => p.set(W * x, H * y, mul(o.c, 0.4)));
+    [[0.24, 0.7], [0.53, 0.66]].forEach(([x, y]) => shine(p, Math.round(W * x), Math.round(H * y), o.c, false));   // art pass
     p.outline();
   };
 
@@ -441,6 +482,7 @@
     }
     p.ellipse(cx, cy - H * 0.06, W * 0.12, H * 0.07, alpha(o.a, 230));
     p.shade(0.25);
+    shine(p, Math.round(cx - W * 0.16), Math.round(cy - H * 0.14), alpha(o.c, 235), W >= 20);   // art pass: a shine on the bell
     p.outline(0.55);
   };
 
@@ -651,6 +693,7 @@
     p.rect(17, y - 1, 4, 5, R.w); p.rect(18, y - 2, 3, 1, R.w);
     p.rect(19, y, 3, 3, R.n); p.set(20, y, R.nl);
     p.set(18, y + 1, R.c);
+    p.set(21, y + 1, mix(R.nl, WHITE, 0.55)); p.set(17, y + 3, R.g);      // art pass: a glint on the visor, the helmet's shaded back
     // arm: tucked along the body while swimming, reaching forward during a net swing
     if (o.anim !== 'net') p.rect(12, y + 4, 3, 1, R.g);   // during a swing the game draws the reaching arm
     p.outline(0.28);
@@ -699,6 +742,7 @@
     p.rect(10, t, 4, 1, R.w); p.rect(9, t + 1, 6, 4, R.w); p.rect(10, t + 5, 4, 1, R.w);
     p.rect(12, t + 1, 3, 4, R.n); p.set(13, t + 1, R.nl); p.set(12, t + 1, R.nl);
     p.set(10, t + 3, R.c);
+    p.set(14, t + 2, mix(R.nl, WHITE, 0.55)); p.set(9, t + 4, R.g); p.set(10, t + 5, R.g);   // art pass: visor glint, helmet shade
     p.outline(0.28);
   };
 
@@ -1098,7 +1142,7 @@
     p.line(cx, H * 0.72, cx, H - 1, [70, 70, 80, 255]);
     p.shade(0.25); p.outline();
   };
-  S.bottle = function (p, o) {
+  S.bottlelying = function (p, o) {          // a message bottle lying on the sand (decor)
     const W = p.w, H = p.h;
     p.ellipse(W * 0.45, H - 4, W * 0.32, 3, o.c);
     p.rect(W * 0.72, H - 5, 3, 2, o.c); p.rect(W * 0.72 + 3, H - 5, 1, 2, [150, 100, 60, 255]);
@@ -1281,6 +1325,17 @@
     for (let x = -27; x <= 27; x++) {
       const y = Math.round(cy - ry * Math.sqrt(Math.max(0, 1 - (x * x) / (rx * rx))));
       p.set(cx + x, y, lerpC(edge, top, Math.abs(x) / 30));
+    }
+    // art pass: a glass dome on top (lit from the top-left) and little chase lights along the rim
+    const dome = hex('#7fa8e8'), domeHi = hex('#d8ecff');
+    for (let y = -6; y <= 0; y++) for (let x = -9; x <= 9; x++) {
+      if ((x * x) / 81 + (y * y) / 36 > 1) continue;
+      p.set(cx + x, cy - 4 + y, lerpC(dome, hex('#3f5fae'), (x + 9) / 18 * 0.6 + (y + 6) / 6 * 0.3));
+    }
+    p.set(cx - 5, cy - 8, domeHi); p.set(cx - 4, cy - 9, domeHi); p.set(cx - 6, cy - 7, lerpC(domeHi, dome, 0.5));
+    for (let i = 0; i < 8; i++) {
+      const x = -24 + i * 48 / 7, yy = Math.round(cy + 1 + Math.sqrt(Math.max(0, 1 - (x * x) / (rx * rx))) * 0.5);
+      p.set(cx + Math.round(x), yy, (i + o.frame) % 4 === 0 ? hex('#fff3b0') : hex('#5a6fb0'));
     }
     // glowing ring underneath (slowly breathing)
     const glow = 0.85 + 0.15 * Math.sin(o.frame / 4 * Math.PI * 2);
@@ -1576,7 +1631,7 @@
     p.rect(0, 0, W, H, a);
     p.rect(0, 0, W, 1, mul(a, 1.2)); p.rect(0, H - 1, W, 1, mul(a, 0.7)); p.rect(W - 1, 0, 1, H, mul(a, 0.75)); p.rect(0, 0, 1, H, mul(a, 1.1));
     p.rect(0, 10, W, 1, mul(a, 0.8)); p.rect(0, 21, W, 1, mul(a, 0.8));
-    for (let x = 2; x < W; x += 6) { p.set(x, 2, mul(a, 0.7)); p.set(x, 13, mul(a, 0.7)); p.set(x, 24, mul(a, 0.7)); }
+    for (let x = 2; x < W; x += 6) for (const y of [2, 13, 24]) { p.set(x, y, mul(a, 0.7)); p.set(x - 1, y - 1, mul(a, 1.18)); }   // rivets, lit from the top-left (art pass)
   };
   S.laddertile = function (p, o) {
     const W = p.w, H = p.h, rail = hex('#c8a050'), rung = hex('#e6c070');

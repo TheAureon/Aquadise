@@ -187,3 +187,27 @@ In CLASSIC all three do nothing: `#game` is still what you see, so nothing looks
 
     The light map made the sea faster than after Stage 2 even with the new work. JavaScript cost of the
     layer: 0.3-1.2 ms a frame. Real graphics chips weren't available to measure.
+- **Stage 4 (done):** art pass, governor, checks.
+  - **Art pass:** `Pix.light` (src/placeholder-art.js) gives every outlined sprite one light from the
+    top-left; hand touches on the diver, fish, snails, crabs, jellies, limpets, barnacles, the UFO (a dome),
+    the hull tile and the title logo. 547 sprites redrawn, sizes / frames / anchors / hitboxes unchanged;
+    list and restore steps in docs/ART_CHANGES.md, originals in `art-backup/sprites-before-graphics4/`.
+    Lighting needs nothing beyond the colour sprites; the optional glow-map slot is described in
+    docs/SPRITE_SPEC.md.
+  - **Governor (final):** warm-up after loading / any level change, settle after a step, stops for the
+    session when a step doesn't help (`minGain`), never below `lowest`, never up, never over a chosen level;
+    steps logged in `AQ.Gfx.govLog`.
+  - **tools/check-graphics.js:** shader checks (16 programs), the effects table per level with REDUCE
+    FLASHING proof (src/gfx/effects.js), the governor simulated; `--browser` compiles every program for real.
+  - **Test matrix (all passed):** every screen (85) at HIGH, MEDIUM, LOW and CLASSIC with no console errors
+    (`check-game.js --gfx`); sea day / night, deep, hill day / dusk / night, station (following and whole
+    building, trophy wing), tank / nursery / predator / Starfall tanks, title, at each level; the tutorial
+    (guided dive) and tips; photo mode (with effects); touch on a phone (controls above the picture);
+    resizing while playing from 320 x 180 to 2560 x 1440 (the picture always exactly over the game); high-DPI
+    2x and 3x (pixels capped per level); switching levels while playing (no reload, no blank frame); losing
+    and restoring the WebGL context; the governor with artificially slowed frames (steps down one level at a
+    time, never back up, leaves a chosen level alone); saves (an old save gets the first-run pick, a chosen
+    level is saved as ids and survives a reload and a New Game); badges (`check-badges.js`), language keys.
+  - **Not verified here:** real graphics chips (every measurement is a software renderer), Safari / iOS and
+    Firefox (only Chromium is available), a real phone, a real context loss from a driver (simulated with
+    WEBGL_lose_context).

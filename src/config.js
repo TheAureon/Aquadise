@@ -389,6 +389,7 @@ AQ.TUNING = {
       landRadius: 70, landPower: 0.8   // a falling star's landing: a soft light that swells and fades on the water (no flash)
     },
     lift: 0.7,                // the UFO beam-up: how brightly the diver glows as the beam lifts them
+    liftCalm: 0.7,            // ...REDUCE FLASHING: this much of it
     transitions: {
       crossfade: 0.4,         // seconds: changing screens (tank, station, title) fades softly from one to the next (MEDIUM / HIGH)
       smoothFade: true        // the fade to black is smooth instead of stepped while the shader layer is on
@@ -401,7 +402,10 @@ AQ.TUNING = {
       enabled: true,
       minFps: 40,             // below this...
       seconds: 5,             // ...for this long (in a row, roughly) steps down one level
-      settleSeconds: 8        // then waits this long before judging again
+      settleSeconds: 8,       // then waits this long before judging again
+      warmupSeconds: 4,       // after loading or any level change, this long before it starts judging
+      minGain: 0.1,           // a step must make the game this much faster (10%), or it stops stepping for the session
+      lowest: 'classic'       // the lowest level it may step down to ('low' keeps the shader layer on)
     }
   },
   // LOW EFFECTS (SETTINGS > OPTIONS, for slow phones): lighter lighting (3 light rings instead of 8, no
