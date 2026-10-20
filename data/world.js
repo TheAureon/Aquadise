@@ -44,15 +44,22 @@ AQ.data.world = {
   // water = tint mixed into the water colour, dark = ambient darkness (0..1).
   biomes: [
     { id: 'lush_cave', rect: [5960, 700, 840, 260],
-      palette: { top: ['#6fa456', '#4f8a43', '#3d6b37'], rock: ['#5a5560', '#4a4550', '#3b3742'], accent: '#c9e07a', style: 'mossy', backwall: true, air: '#26333a' }, water: '#2fa08c', waterMix: 0.45, dark: 0.36,
+      palette: { top: ['#6fa456', '#4f8a43', '#3d6b37'], rock: ['#5a5560', '#4a4550', '#3b3742'], accent: '#c9e07a', style: 'mossy', backwall: true, air: '#2a3a38' }, water: '#2fae94', waterMix: 0.45, dark: 0.3,
       props: [
+        { type: 'skylight', at: 'ceiling', n: 2, air: true, area: [6080, 6700] },   // daylight through cracks in the roof
+        { type: 'mossdrape', at: 'ceiling', n: 22, air: true },
         { type: 'vine', at: 'ceiling', n: 26, air: true },
         { type: 'glowvine', at: 'ceiling', n: 20, air: true },
+        { type: 'glowmoss', at: 'ceiling', n: 8, air: true },
         { type: 'glowshroom', at: 'floor', n: 12, air: true },
-        { type: 'flowerbed', at: 'floor', n: 10, airOnly: true },
+        { type: 'flowerbed', at: 'floor', n: 14, airOnly: true },
         { type: 'fern', at: 'floor', n: 14, airOnly: true },
-        { type: 'lilypad', at: 'waterline', n: 16 },
+        { type: 'lilypad', at: 'waterline', n: 18, flowers: 0.6 },
         { type: 'seagrass', at: 'floor', n: 16, colors: ['#5fae6e', '#4b9058', '#7ccf86'] },
+        { type: 'seagrass', at: 'floor', n: 10, colors: ['#d77fc0', '#a96fd6', '#e8a0d8'], h: [8, 18] },   // ribbon weed in pinks and lilacs
+        { type: 'anemone', at: 'floor', n: 8, colors: ['#ff9fc8', '#c9a2ff', '#8ff0c8', '#ffd27a'] },
+        { type: 'glowmoss', at: 'floor', n: 10 },
+        { type: 'crystal', at: 'floor', n: 4, colors: ['#e87fd0', '#6fd6e8', '#b89fff'], light: '#d8b8ff' },
         { type: 'glowshroom', at: 'floor', n: 5 },
         { type: 'stalactite', at: 'ceiling', n: 6, air: true }
       ] },

@@ -409,11 +409,49 @@ AQ.Terrain = (function () {
       for (let j = 1; j <= h; j++) P.setOpen(px, gy - j, j === h ? barkL : barkD);
     }
   };
-  PROPS.lilypad = function (P, x, y, r) {
+  PROPS.lilypad = function (P, x, y, r, b, pal, s) {
     const c = C(r.pick(['#4f9a48', '#5fae52', '#468a40'])), d = U.scale(c, 0.75), w = r.int(3, 5);
     for (let i = -w; i <= w; i++) P.set(x + i, y - 1, Math.abs(i) === w ? d : c);
     P.set(x + 1, y - 1, d);                                   // the notch
-    if (r.chance(0.35)) { const f = C(r.pick(['#ffb3d1', '#ffffff', '#f2d16b'])); P.set(x - 1, y - 2, f); P.set(x, y - 3, f); P.set(x + 1, y - 2, f); P.set(x, y - 2, C('#f2d16b')); }
+    if (r.chance(s && s.flowers != null ? s.flowers : 0.35)) { const f = C(r.pick(['#ffb3d1', '#ffffff', '#f2d16b'])); P.set(x - 1, y - 2, f); P.set(x, y - 3, f); P.set(x + 1, y - 2, f); P.set(x, y - 2, C('#f2d16b')); }
+  };
+  // the lush cave: thick moss hanging from the ceiling, its fringe dotted with tiny flowers, a strand or two
+  // dangling below
+  PROPS.mossdrape = function (P, x, y, r) {
+    const cols = [C('#4f9440'), C('#5fae4c'), C('#3e7a36'), C('#78c25a')], w = r.int(5, 11);
+    for (let i = -w; i <= w; i++) {
+      const h = Math.max(1, Math.round((1 - Math.abs(i) / (w + 1)) * r.range(2, 5)));
+      for (let j = 0; j < h; j++) P.setOpen(x + i, y + j, cols[(i + j + 9) % 3]);
+      if (r.chance(0.12)) P.setOpen(x + i, y + h, C(r.pick(['#ff9fc8', '#ffe9a8', '#c9a2ff'])));   // a tiny flower in the fringe
+    }
+    for (let k = 0; k < r.int(1, 3); k++) { const sx = x + r.int(-w + 1, w - 1), L = r.int(4, 12); for (let j = 0; j < L; j++) P.setOpen(sx + Math.round(Math.sin(j * 0.4) * 0.8), y + 2 + j, j === L - 1 ? cols[3] : cols[j % 2 ? 0 : 2]); }
+  };
+  // little patches of glowing moss (cyan / lime dots), each a faint light
+  PROPS.glowmoss = function (P, x, y, r, b, pal, s, T) {
+    const c = C(r.pick(['#8ff0c8', '#c9f07a', '#9fe0ff'])), d = U.scale(c, 0.7);
+    for (let i = 0; i < r.int(5, 9); i++) { const dx = r.int(-4, 4), dy = s.at === 'ceiling' ? r.int(0, 1) : -r.int(0, 1); P.setOpen(x + dx, y + dy, r.chance(0.4) ? c : d); }
+    T.lights.push({ x, y: y + (s.at === 'ceiling' ? 2 : -2), r: 12, color: U.css(c), power: 0.45 });
+  };
+  // daylight through a crack in the ceiling: a bright sliver, and a faint warm shaft fanning down until it
+  // meets the floor or the water (painted once into the cave), with a soft light where it lands
+  PROPS.skylight = function (P, x, y, r, b, pal, s, T) {
+    const W = AQ.World, warm = C('#fff2c4'), w0 = r.int(2, 3);
+    for (let i = -w0; i <= w0; i++) { P.set(x + i, y - 1, warm); P.set(x + i, y - 2, U.scale(warm, 0.85)); }
+    let end = y;
+    for (let j = 0; j < 140; j++) {
+      const yy = y + j, w = w0 + j * 0.3, a = Math.round(52 * (1 - j / 140));
+      let hit = false;
+      for (let i = -Math.ceil(w); i <= Math.ceil(w); i++) {
+        const xx = Math.round(x + j * 0.18 + i);
+        if (W.solid(xx, yy)) { if (Math.abs(i) < w * 0.5) hit = true; continue; }
+        const edge = 1 - Math.abs(i) / (w + 1);
+        P.set(xx, yy, warm, Math.round(a * edge));
+      }
+      end = yy;
+      if (hit || (yy >= W.sea && !W.air(x, yy))) break;
+    }
+    T.lights.push({ x, y: y + 4, r: 46, color: '#fff0c4', power: 0.8, cone: 2 });
+    T.lights.push({ x: x + (end - y) * 0.18, y: end - 4, r: 34, color: '#ffe9b0', power: 0.6 });
   };
   PROPS.flowerbed = function (P, x, y, r) {
     const cols = ['#ff9fc8', '#c9a2ff', '#ffd27a', '#9ff0d0'].map(C);
