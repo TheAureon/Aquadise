@@ -16,13 +16,23 @@
 // the game asks once ("Want them?" YES / NO THANKS). Older saves get the same question, and any request
 // their progress already shows is marked done quietly (no celebration).
 //
+// THE CELEBRATION (Stage 2): a count going up pops on the tracker (a spark flies to it, a soft tick);
+// a request done gets a short celebration (the tracker pops and ticks, confetti, the "REQUEST COMPLETE!"
+// banner with its thank-you and the running "REQUESTS 12/40" bar, a rising chime, a light buzz, a soft
+// glow at the screen edges); a streak (requests close together) makes it a little bigger, up to x5; a
+// chapter done gets a bigger one. On the tank screen it's a compact note; anywhere busy (a scene change,
+// a menu, photo mode, a tip or a badge toast up) it waits, at most 2, extras merge ("3 requests done!").
+// REDUCE FLASHING: a gentle version (no burst, no glow, no blinking; a few slow dim sparkles, a soft
+// fade, quieter sounds). Requests OFF: none of it, anywhere.
+//
 // Saved in AQ.State.quests: { v, asked, on, done: { id: date }, cur, skips: { id: n }, seq, collapsed }.
 // Testing: AQ.TUNING.debug.quests (keys in config.js): complete / skip the current request, reset all,
 // and an overlay with the current request's condition and counters.
 var AQ = (typeof AQ !== 'undefined') ? AQ : {};
 
 AQ.Quests = (function () {
-  const Q = { ui: [], asking: false, wait: 0, calmT: 0, checkT: 0, intro: 0, thanks: [], blink: 0, menu: false, confirm: false, overlay: false, rect: null };
+  const Q = { ui: [], asking: false, wait: 0, calmT: 0, checkT: 0, intro: 0, blink: 0, menu: false, confirm: false, overlay: false, rect: null,
+    celebs: [], cel: null, freeT: 0, parts: [], sparks: [], bump: null, lastN: {}, streak: 0, lastDoneAt: 0, sparkleTanks: new Set() };
   const cfg = () => AQ.TUNING.quests;
   const dbg = () => AQ.TUNING.debug;
   const F = () => AQ.Font;
@@ -44,7 +54,7 @@ AQ.Quests = (function () {
     const s = st();
     s.on = !!on; s.asked = true; Q.asking = false; Q.menu = false; Q.confirm = false;
     if (on) { catchUp(); Q.wait = cfg().firstDelay; }
-    else { Q.intro = 0; Q.thanks.length = 0; Q.blink = 0; }          // (nothing about them shows while off)
+    else quiet();                                                     // (nothing about them shows while off)
     dirty();
   };
 
@@ -111,12 +121,28 @@ AQ.Quests = (function () {
     Q.intro = 0; Q.menu = false;
     Q.wait = cfg().arriveDelay;
     dirty();
-    if (quiet) return;
-    // the thank-you (shown on the tracker as soon as it can be seen; at most 2 wait, extras merge)
-    if (Q.thanks.length >= 2) { const last = Q.thanks[Q.thanks.length - 1]; last.merged = (last.merged || 1) + 1; }
-    else Q.thanks.push({ id: q.id, t: 0 });
-    if (Q.count().done >= Q.count().total) Q.allDone = true;
+    if (quiet || !Q.on()) return;                                    // (requests off: done, quietly; nothing shows)
+    // the celebration (plays as soon as there's room; at most 2 wait, extras merge into the last one)
+    const now = Date.now(), c = cfg();
+    Q.streak = now - Q.lastDoneAt <= c.streakMinutes * 60000 ? Math.min(c.streakMax, Q.streak + 1) : 1;   // (an old streak just resets)
+    Q.lastDoneAt = now;
+    const chapterDone = list().filter((x) => x.chapter === q.chapter && available(x)).every((x) => Q.done(x.id));
+    const n = Q.count(), cel = { id: q.id, chapter: chapterDone ? q.chapter : null, streak: Q.streak, done: n.done, total: n.total, t: 0 };
+    if (Q.celebs.length >= 2) { const last = Q.celebs[Q.celebs.length - 1]; last.merged = (last.merged || 1) + 1; last.done = n.done; last.streak = Q.streak; last.chapter = last.chapter || cel.chapter; }
+    else Q.celebs.push(cel);
+    // a request about a tank: its window in the station sparkles the next time it's on screen
+    if (q.tank) { const id = q.tank === true ? AQ.Aquarium && AQ.Aquarium.biome : q.tank; if (id) Q.sparkleTanks.add(id); }
   }
+  // everything request-related that's on screen or waiting goes quiet (requests turned off, a game loaded)
+  function quiet() {
+    Q.intro = 0; Q.blink = 0; Q.celebs.length = 0; Q.cel = null; Q.parts.length = 0; Q.sparks.length = 0; Q.bump = null; Q.sparkleTanks.clear();
+  }
+  Q.celebrating = () => !!Q.cel && Q.on();
+  // the station asks: does this tank's window have a sparkle waiting? (once: it's used up)
+  Q.takeSparkle = function (id) {
+    if (!Q.on() || !Q.sparkleTanks.has(id)) return false;
+    Q.sparkleTanks.delete(id); return true;
+  };
   Q.complete = complete;
   // a new request arrives (when it can be seen)
   function arrive() {
@@ -125,7 +151,9 @@ AQ.Quests = (function () {
     st().cur = q.id;
     Q.intro = cfg().introSeconds; Q.blink = cfg().blinkSeconds;
     st().collapsed = false;
-    AQ.Audio.play('tip_new');
+    sound('quest_arrive');
+    if (AQ.Station && AQ.Station.blink) AQ.Station.blink();          // (in the station the console blinks for a moment)
+    Q.lastN[q.id] = (Q.progress(q) || { n: 0 }).n;
     if (AQ.Tips) AQ.Tips.event('request');
     dirty();
     return true;
@@ -136,8 +164,15 @@ AQ.Quests = (function () {
     s.seq = (s.seq || 0) + 1; s.skips[q.id] = s.seq;                 // to the back of the line, no penalty
     s.cur = null; Q.intro = 0; Q.menu = false;
     Q.wait = cfg().skipDelay;
+    sound('quest_skip');
     dirty();
   };
+  // every request sound goes through here: REDUCE FLASHING plays them quieter and a little softer
+  function sound(id, opts) {
+    const o = Object.assign({}, opts || {});
+    if (AQ.U.calm()) { o.vol = (o.vol || 1) * cfg().calmVolume; o.lp = 2400; }
+    AQ.Audio.play(id, o);
+  }
 
   // ---------------------------------------------------------------- where it can show
   // the tracker: playing (sea, hill, station), nothing in the way
@@ -181,15 +216,104 @@ AQ.Quests = (function () {
       else if (q && Q.satisfied(q)) complete(q);
     }
     const vis = visible(game);
-    for (const th of Q.thanks.slice(0, 1)) if (vis) th.t += dt;     // (the thank-you waits until it can be seen)
-    if (Q.thanks.length && Q.thanks[0].t >= cfg().thanksSeconds) Q.thanks.shift();
+    progressTick(game, vis);
+    celebrate(dt, game);
+    moveParts(dt);
     if (vis) { Q.intro = Math.max(0, Q.intro - dt); Q.blink = Math.max(0, Q.blink - dt); }
-    // the next request: after a pause, when it can be seen (and after any thank-you)
+    // the next request: after a pause, when it can be seen (and after any celebration)
     if (!s.cur) {
       Q.wait -= dt;
-      if (Q.wait <= 0 && vis && !Q.thanks.length) { catchUp(); if (!arrive()) Q.wait = cfg().recheckSeconds; }
+      if (Q.wait <= 0 && vis && !Q.cel && !Q.celebs.length) { catchUp(); if (!arrive()) Q.wait = cfg().recheckSeconds; }
     }
   };
+
+  // ---------------------------------------------------------------- the juice
+  // a count going up (1/3 -> 2/3): the count hops, a soft tick (higher each step), and a spark flies from
+  // the diver to it. (The last step is the completion itself.)
+  function progressTick(game, vis) {
+    const q = Q.current(), p = q && Q.progress(q);
+    if (!p) return;
+    const was = Q.lastN[q.id];
+    Q.lastN[q.id] = p.n;
+    if (was == null || p.n <= was || p.n >= p.target || !vis) return;
+    Q.bump = { t: 0 };
+    sound('quest_tick', { step: p.n });
+    if (!AQ.U.calm() && game.player && Q.countAt && game.scene !== undefined) {
+      const cam = AQ.Camera;
+      Q.sparks.push({ x: game.player.x - cam.left(), y: game.player.y - cam.top(), t: 0 });
+    }
+  }
+  // where a celebration can play right now: 'full' (the sea, the hill, the station), 'note' (the tank
+  // screen: its note area), or null (wait: a scene change, a menu, photo mode, a tip or a badge toast up)
+  function roomFor(game) {
+    if (!Q.on() || !game || (AQ.Transition && AQ.Transition.active) || Q.asking || Q.confirm) return null;
+    if ((AQ.Tips && AQ.Tips.showing()) || (AQ.Badges && AQ.Badges.cur)) return null;
+    if (game.state === 'play') return visible(game) && !(AQ.Touch && AQ.Touch.menuOpen) ? 'full' : null;
+    const A = AQ.Aquarium;
+    if (game.state === 'aquarium' && A && A.view !== 'overview' && !A.photo.on && !A.dialog) return 'note';
+    return null;
+  }
+  function celebrate(dt, game) {
+    if (Q.cel) {
+      Q.cel.t += dt;
+      const c = Q.cel;
+      // the running count ticks up once the bar starts to fill (one tick per request)
+      if (c.room === 'full' && !c.calm && c.shown < c.done && c.t >= 0.62 + (c.shown - c.from) * 0.12) { c.shown++; sound('quest_tick', { step: 6 + (c.shown - c.from) }); }
+      if (c.t >= c.life) { Q.cel = null; Q.freeT = 0; }
+      return;
+    }
+    if (!Q.celebs.length) return;
+    const room = roomFor(game);
+    Q.freeT = room ? Q.freeT + dt : 0;                               // (and a short gap after a toast or a tip)
+    if (!room || Q.freeT < cfg().gapSeconds) return;
+    start(Q.celebs.shift(), room, game);
+  }
+  function start(cel, room, game) {
+    const c = cfg(), calm = AQ.U.calm(), q = Q.byId(cel.id);
+    Object.assign(cel, { room, calm, t: 0, life: calm ? c.calmSeconds : cel.chapter ? c.chapterSeconds : c.celebrateSeconds });
+    cel.from = Math.max(0, cel.done - (cel.merged || 1)); cel.shown = calm ? cel.done : cel.from;
+    Q.cel = cel;
+    if (cel.chapter) sound('quest_chapter'); else sound('quest_done', { streak: cel.streak });
+    if (AQ.Touch) AQ.Touch.buzz('quest');                            // (touch controls on, VIBRATION on)
+    if (room === 'note') {                                           // the tank screen: a compact version in its note area
+      const A = AQ.Aquarium, head = cel.chapter ? AQ.t('quest.chapterDone', { chapter: AQ.t(`quest.chapter.${cel.chapter}`) })
+        : cel.merged ? AQ.t('quest.manyDone', { n: cel.merged }) : AQ.t('quest.noteDone', { thanks: say(`quest.${q.id}.thanks`, q) });
+      A.note(head, '#7ef0c0', 4);
+      A.note(AQ.t('quest.count', { n: cel.done, total: cel.total }), '#ffe9a8', 4);
+      cel.life = Math.min(cel.life, 1);
+      return;
+    }
+    if (game.scene === 'station' && AQ.Station && AQ.Station.joy) AQ.Station.joy();   // the console does a little dance
+    burst(cel, Q.rect ? Q.rect.x + 10 : 60, Q.rect ? Q.rect.y + 8 : cfg().trackerY + 8, 1);
+  }
+  // confetti and sparkles in the game's colours (capped); REDUCE FLASHING: a few slow, dim sparkles
+  const COLS = ['#7ef0c0', '#ffe36b', '#ff9fc0', '#9fd8ff', '#c9a8ff', '#fff6dc'];
+  const R = AQ.U.R;
+  function part(o) { const c = cfg(); if (Q.parts.length >= c.maxParticles) return; Q.parts.push(Object.assign({ t: 0 }, o)); }
+  function burst(cel, x, y, k) {
+    const c = cfg();
+    if (cel.calm) { for (let i = 0; i < 5; i++) part({ x: x + R.range(-12, 30), y: y + R.range(-4, 10), vx: R.range(-3, 3), vy: R.range(-6, -2), g: 0, life: R.range(1, 1.4), kind: 's', col: '#fff6dc', dim: true }); return; }
+    const big = cel.chapter ? 2 : 1, n = Math.round((c.confetti + (cel.streak - 1) * 5) * big * k), sp = Math.round((c.sparkles + cel.streak * 2) * big * k);
+    for (let i = 0; i < n; i++) { const a = R.range(-Math.PI * 0.95, -Math.PI * 0.05), v = R.range(40, 95) * (cel.chapter ? 1.15 : 1); part({ x, y, vx: Math.cos(a) * v + 25, vy: Math.sin(a) * v, g: 120, life: R.range(0.9, 1.5), kind: 'c', col: R.pick(COLS), w: R.chance(0.5) ? 2 : 1 }); }
+    for (let i = 0; i < sp; i++) { const a = R.range(0, Math.PI * 2), v = R.range(15, 55); part({ x, y, vx: Math.cos(a) * v + 15, vy: Math.sin(a) * v, g: 0, life: R.range(0.5, 1.0), kind: 's', col: R.pick(COLS), size: cel.streak >= 3 ? 2 : 1 }); }
+  }
+  function moveParts(dt) {
+    for (let i = Q.parts.length - 1; i >= 0; i--) {
+      const p = Q.parts[i];
+      p.t += dt; p.vy += p.g * dt; p.vx *= 1 - dt * 1.5; p.x += p.vx * dt; p.y += p.vy * dt;
+      if (p.t >= p.life) Q.parts.splice(i, 1);
+    }
+    for (let i = Q.sparks.length - 1; i >= 0; i--) {
+      const s = Q.sparks[i];
+      s.t += dt;
+      if (s.t >= cfg().tickSpark) { Q.sparks.splice(i, 1); if (Q.countAt) for (let k = 0; k < 3; k++) part({ x: Q.countAt.x, y: Q.countAt.y, vx: R.range(-20, 20), vy: R.range(-20, 10), g: 0, life: 0.4, kind: 's', col: '#ffe9a8' }); }
+    }
+    if (Q.bump) { Q.bump.t += dt; if (Q.bump.t > 0.35) Q.bump = null; }
+    if (Q.cel && Q.cel.chapter && !Q.cel.calm && !Q.cel.second && Q.cel.room === 'full' && Q.cel.t > 0.5) {   // a chapter: a second burst from the banner
+      Q.cel.second = true; const c = cfg();
+      burst(Q.cel, 160 - c.bannerW / 2 + 8, c.bannerY + 4, 0.6); burst(Q.cel, 160 + c.bannerW / 2 - 8, c.bannerY + 4, 0.6);
+    }
+  }
 
   // ---------------------------------------------------------------- layout (game px)
   const X = 4, MENU_W = 96;
@@ -203,7 +327,7 @@ AQ.Quests = (function () {
   const overlaps = (a, b) => a.x < b.x + b.w && a.x + a.w > b.x && a.y < b.y + b.h && a.y + a.h > b.y;
   // what the tracker shows right now: the thank-you, the new request's radio message, or the request
   function mode() {
-    if (Q.thanks.length) return 'thanks';
+    if (Q.cel && Q.cel.room === 'full') return 'done';
     if (!Q.current()) return null;
     if (Q.intro > 0) return 'intro';
     return st().collapsed ? 'icon' : 'track';
@@ -235,19 +359,20 @@ AQ.Quests = (function () {
     const c = cfg();
     let w, lines;
     if (md === 'icon') { w = 14; lines = []; }
-    else if (md === 'thanks') {
-      const th = Q.thanks[0], q = Q.byId(th.id);
-      w = c.messageW; lines = wrapPx(th.merged ? AQ.t('quest.manyDone', { n: th.merged }).toUpperCase() : say(`quest.${q.id}.thanks`, q), w - 24).slice(0, 4);
+    else if (md === 'done') {
+      const cel = Q.cel, q = Q.byId(cel.id);
+      w = c.trackerW; lines = wrapPx(cel.merged ? AQ.t('quest.manyDone', { n: cel.merged }).toUpperCase() : say(`quest.${q.id}`, q), w - 24).slice(0, 2);
     } else if (md === 'intro') { const q = Q.current(); w = c.messageW; lines = wrapPx(say(`quest.${q.id}.intro`, q), w - 24).slice(0, 5); }
     else { const q = Q.current(); w = c.trackerW; lines = wrapPx(say(`quest.${q.id}`, q), w - 44).slice(0, 2); }
     const prog = md === 'track' ? Q.progress(Q.current()) : null;
-    const h = md === 'icon' ? 14 : Math.max(16, (md === 'track' ? 4 : 11) + lines.length * 7 + (prog ? 7 : 0) + 3);
+    const h = md === 'icon' ? 14 : Math.max(16, (md === 'track' || md === 'done' ? 4 : 11) + lines.length * 7 + (prog ? 7 : 0) + 3);
     let y = c.trackerY;
     const r = { x: X, y, w, h };
     // never under the tip box, a nudge or the guided dive's panel: below them instead
     for (const o of [AQ.Tips && AQ.Tips.rect, AQ.Nudges && AQ.Nudges.rect, AQ.Dive && AQ.Dive.panelRect]) if (o && overlaps(r, o)) r.y = Math.max(r.y, o.y + o.h + 3);
     Q.rect = r; Q.lines = lines; Q.prog = prog;
-    Q.ui.push({ id: md === 'icon' ? 'expand' : md === 'track' ? 'collapse' : md === 'intro' ? 'introok' : 'thanksok', x: r.x, y: r.y, w: r.w - (md === 'track' || md === 'intro' ? 13 : 0), h: r.h, body: true });
+    Q.countAt = md === 'icon' ? { x: r.x + 7, y: r.y + 7 } : prog ? { x: r.x + 24, y: r.y + 7 + lines.length * 7 } : null;   // (where a progress spark flies to)
+    Q.ui.push({ id: md === 'icon' ? 'expand' : md === 'track' ? 'collapse' : md === 'intro' ? 'introok' : 'doneok', x: r.x, y: r.y, w: r.w - (md === 'track' || md === 'intro' ? 13 : 0), h: r.h, body: true });
     if (md === 'track' || md === 'intro') Q.ui.push({ id: 'menu', x: r.x + r.w - 13, y: r.y, w: 13, h: 10, label: '...' });
     if (Q.menu && (md === 'track' || md === 'intro')) {
       Q.ui.push({ id: 'skip', x: r.x + r.w - MENU_W, y: r.y + r.h + 2, w: MENU_W, h: 11, label: AQ.t('quest.menu.skip') });
@@ -285,10 +410,10 @@ AQ.Quests = (function () {
     if (hit.id === 'menu') { Q.menu = !Q.menu; AQ.Audio.play('menu_move'); }
     else if (hit.id === 'skip') { AQ.Audio.play('menu_select'); Q.skip(); }
     else if (hit.id === 'off') { AQ.Audio.play('menu_select'); Q.menu = false; Q.confirm = true; }
-    else if (hit.id === 'collapse') { s.collapsed = true; Q.menu = false; AQ.Audio.play('menu_move'); dirty(); }
-    else if (hit.id === 'expand') { s.collapsed = false; AQ.Audio.play('menu_move'); dirty(); }
+    else if (hit.id === 'collapse') { s.collapsed = true; Q.menu = false; sound('quest_collapse'); dirty(); }
+    else if (hit.id === 'expand') { s.collapsed = false; sound('quest_expand'); dirty(); }
     else if (hit.id === 'introok') { Q.intro = 0; AQ.Audio.play('menu_move'); }
-    else if (hit.id === 'thanksok') { Q.thanks.shift(); AQ.Audio.play('menu_move'); }
+    else if (hit.id === 'doneok' && Q.cel) Q.cel.t = Math.max(Q.cel.t, Q.cel.life - 0.3);   // (a tap hurries it along)
   };
   const inside = (r, m) => !!r && m.x >= r.x && m.y >= r.y && m.x < r.x + r.w && m.y < r.y + r.h;
 
@@ -320,21 +445,39 @@ AQ.Quests = (function () {
     Q.layout(game);                                                   // (what's shown may have changed since the last update)
     if (Q.confirm && Q.promptRect) { prompt(g, AQ.t('quest.off.title'), [AQ.t('quest.off.1')]); return; }
     const r = Q.rect, md = Q.mode, q = Q.current();
-    if (!r || (!q && md !== 'thanks')) return;
+    const cel = Q.cel && Q.cel.room === 'full' ? Q.cel : null, calm = AQ.U.calm();
+    if (cel && !cel.calm && cfg().edgeGlow > 0) edgeGlow(g, cel);
+    if (r && (q || md === 'done')) drawTracker(g, r, md, q, cel, calm);
+    if (cel) banner(g, cel);
+    drawParts(g);
+  };
+  // the tracker (the done one pops and ticks, the count hops, a request one step from done shimmers)
+  function drawTracker(g, r, md, q, cel, calm) {
     if (md === 'icon') {
       panel(g, r, '#6ef0ef');
       radio(g, r.x + 7, r.y + 7);
       if (Q.hover && Q.hover.id === 'expand') { g.fillStyle = 'rgba(110,240,239,0.15)'; g.fillRect(r.x, r.y, r.w, r.h); }
+      if (Q.bump && !calm) { g.fillStyle = `rgba(255,233,168,${(0.4 * (1 - Q.bump.t / 0.35)).toFixed(2)})`; g.fillRect(r.x, r.y, r.w, r.h); }
       return;
     }
-    panel(g, r, md === 'thanks' ? '#7ef0c0' : '#6ef0ef');
-    if (md === 'thanks') {
-      // a little green tick (Stage 2 adds the celebration)
-      const tx = r.x + 6, ty = r.y + 6;
-      g.fillStyle = '#7ef0c0'; g.fillRect(tx, ty + 3, 2, 2); g.fillRect(tx + 2, ty + 5, 2, 2); g.fillRect(tx + 4, ty + 3, 2, 2); g.fillRect(tx + 6, ty + 1, 2, 2); g.fillRect(tx + 8, ty - 1, 2, 2);
-      F().draw(g, AQ.t('quest.thanksTitle'), r.x + 18, r.y + 3, '#7ef0c0', { shadow: false, max: r.w - 22 });
-      Q.lines.forEach((l, i) => F().draw(g, l, r.x + 18, r.y + 11 + i * 7, '#e8fbff', { shadow: false }));
+    if (md === 'done') {
+      const t = cel.t, e = cel.calm ? 0 : t < 0.4 ? Math.round(Math.sin(t / 0.4 * Math.PI) * 3) : t < 0.55 ? -1 : 0;   // a bouncy pop (overshoot), or none
+      const rr = { x: r.x - e, y: r.y - e, w: r.w + e * 2, h: r.h + e * 2 };
+      g.save(); if (cel.calm) g.globalAlpha = Math.min(1, t / 0.25);  // (REDUCE FLASHING: a soft fade-in instead)
+      panel(g, rr, '#7ef0c0');
+      // the checkmark draws itself in
+      const TICK = [[0, 2], [1, 3], [2, 4], [3, 3], [4, 2], [5, 1], [6, 0]], k = cel.calm ? TICK.length : Math.floor(Math.min(1, Math.max(0, t - 0.1) / 0.3) * TICK.length);
+      g.fillStyle = '#7ef0c0';
+      for (let i = 0; i < k; i++) g.fillRect(r.x + 3 + TICK[i][0], r.y + 4 + TICK[i][1], 2, 2);
+      Q.lines.forEach((l, i) => F().draw(g, l, r.x + 14, r.y + 4 + i * 7, '#e8fbff', { shadow: false, max: r.w - 18 }));
+      g.restore();
       return;
+    }
+    panel(g, r, '#6ef0ef');
+    // one step from done: a gentle shimmer across the bar (REDUCE FLASHING: a still, faint highlight)
+    if (md === 'track' && Q.prog && Q.prog.n === Q.prog.target - 1) {
+      if (calm) { g.fillStyle = 'rgba(255,233,168,0.10)'; g.fillRect(r.x, r.y + 1, r.w, 1); }
+      else { const sx = r.x + ((AQ.Render.t * 45) % (r.w + 30)) - 15; g.fillStyle = 'rgba(255,240,200,0.10)'; for (let k = 0; k < 6; k++) g.fillRect(Math.round(sx + k - (k > 2 ? 0 : 0)), r.y + 1, 1, r.h - 2); }
     }
     radio(g, r.x + 8, r.y + 8);
     if (md === 'intro') {
@@ -343,20 +486,82 @@ AQ.Quests = (function () {
     } else {
       if (AQ.Badges && q) AQ.Badges.drawIcon(g, { id: q.id, icon: q.icon, group: 'first' }, r.x + r.w - 20, r.y + 8, true);
       Q.lines.forEach((l, i) => F().draw(g, l, r.x + 18, r.y + 4 + i * 7, '#e8fbff', { shadow: false, max: r.w - 44 }));
-      if (Q.prog) F().draw(g, AQ.t(AQ.Lang.has(`quest.${q.id}.progress`, 'en') ? `quest.${q.id}.progress` : 'quest.progress', { n: Q.prog.n, target: Q.prog.target }), r.x + 18, r.y + 4 + Q.lines.length * 7, '#ffe9a8', { shadow: false, max: r.w - 44 });
+      if (Q.prog) {
+        const b = Q.bump ? Q.bump.t / 0.35 : 1, hop = Q.bump && !calm ? Math.round(Math.sin(Math.min(1, b * 1.4) * Math.PI) * 2) : 0;   // the count hops (REDUCE FLASHING: it just brightens)
+        F().draw(g, AQ.t(AQ.Lang.has(`quest.${q.id}.progress`, 'en') ? `quest.${q.id}.progress` : 'quest.progress', { n: Q.prog.n, target: Q.prog.target }), r.x + 18, r.y + 4 + Q.lines.length * 7 - hop, Q.bump ? '#fff6dc' : '#ffe9a8', { shadow: false, max: r.w - 44 });
+      }
     }
     // the "..." button and its little menu
     const mb = Q.ui.find((u) => u.id === 'menu');
     if (mb) { g.fillStyle = Q.menu || Q.hover === mb ? 'rgba(110,240,239,0.3)' : 'rgba(110,240,239,0.1)'; g.fillRect(mb.x, mb.y + 1, mb.w, mb.h - 1); F().draw(g, '...', mb.x + mb.w / 2, mb.y + 2, '#cfe8ff', { align: 'center', shadow: false }); }
     for (const b of Q.ui) if (b.id === 'skip' || b.id === 'off') AQ.Aquarium.button(g, b, Q.hover === b);
-  };
+  }
+  // "REQUEST COMPLETE!" (or a chapter's): slides in with a little overshoot (REDUCE FLASHING: fades in),
+  // the thank-you line, and the running count "REQUESTS 12/40" with a bar that fills; a streak shows x2...
+  // and makes the frame fancier
+  const FRAME = ['#7ef0c0', '#7ef0c0', '#9ff3ff', '#ffe36b', '#ff9fc0', '#ffd25a'];
+  function banner(g, cel) {
+    const c = cfg(), q = Q.byId(cel.id), w = c.bannerW, h = 31, t = cel.t, out = Math.max(0, cel.life - t);
+    let x = 160 - w / 2, a = Math.min(1, out / 0.3);
+    if (cel.calm) a *= Math.min(1, t / 0.25);
+    else { const u = Math.min(1, t / 0.35), back = 1 + 2.2 * Math.pow(u - 1, 3) + 1.2 * Math.pow(u - 1, 2); x = Math.round(x - (1 - back) * 200); }   // (ease out with a small overshoot)
+    const y = c.bannerY, edge = cel.chapter ? '#ffd25a' : FRAME[Math.min(5, cel.streak)];
+    g.save(); g.globalAlpha = a;
+    g.fillStyle = 'rgba(6,18,34,0.94)'; g.fillRect(x, y, w, h);
+    g.fillStyle = edge; g.fillRect(x, y, w, 1); g.fillRect(x, y + h - 1, w, 1);
+    if (cel.streak >= 3 || cel.chapter) { g.fillRect(x, y, 1, h); g.fillRect(x + w - 1, y, 1, h); }   // (fancier from x3, and for a chapter)
+    if (cel.streak >= 4 || cel.chapter) { g.fillStyle = '#fff6dc'; for (const [cx, cy] of [[x, y], [x + w - 1, y], [x, y + h - 1], [x + w - 1, y + h - 1]]) { g.fillRect(cx - 1, cy, 3, 1); g.fillRect(cx, cy - 1, 1, 3); } }
+    const title = cel.chapter ? AQ.t('quest.chapterDone', { chapter: AQ.t(`quest.chapter.${cel.chapter}`) }) : cel.merged ? AQ.t('quest.manyDone', { n: cel.merged }).toUpperCase() : AQ.t('quest.complete');
+    const sw = cel.streak >= 2 ? F().width(AQ.t('quest.streak', { n: cel.streak })) + 6 : 0;
+    F().draw(g, title, 160 + (x - (160 - w / 2)) - sw / 2, y + 3, edge, { align: 'center', shadow: false, max: w - 12 - sw });
+    if (sw) { const sx = x + w - sw - 3; g.fillStyle = edge; g.fillRect(sx, y + 2, sw, 7); F().draw(g, AQ.t('quest.streak', { n: cel.streak }), sx + sw / 2, y + 3, '#061222', { align: 'center', shadow: false }); }
+    const line = cel.merged || !q ? '' : say(`quest.${q.id}.thanks`, q);
+    if (line) F().draw(g, line, x + w / 2, y + 12, '#e8fbff', { align: 'center', shadow: false, max: w - 10 });
+    // the running count and its bar (fills from where it was to where it is now)
+    const shown = cel.shown, fill = cel.calm ? 1 : Math.min(1, Math.max(0, (t - 0.45) / 0.5));
+    const frac = (cel.from + (cel.done - cel.from) * fill) / Math.max(1, cel.total), bx = x + 6, by = y + 23, bw = w - 70;
+    F().draw(g, AQ.t('quest.count', { n: shown, total: cel.total }), x + w - 6, y + 21, '#ffe9a8', { align: 'right', shadow: false, max: 58 });
+    g.fillStyle = 'rgba(110,240,239,0.18)'; g.fillRect(bx, by, bw, 3);
+    g.fillStyle = edge; g.fillRect(bx, by, Math.round(bw * frac), 3);
+    if (!cel.calm && fill > 0 && fill < 1) { g.fillStyle = '#ffffff'; g.fillRect(bx + Math.round(bw * frac) - 1, by, 1, 3); }   // (a bright head while it fills)
+    g.restore();
+  }
+  // a thin soft glow round the screen edges, for a fraction of a second (never with REDUCE FLASHING)
+  function edgeGlow(g, cel) {
+    const k = cel.t < 0.5 ? Math.sin(cel.t / 0.5 * Math.PI) * cfg().edgeGlow * (cel.chapter ? 1.4 : 1) : 0;
+    if (k <= 0.01) return;
+    const W = 320, H = 180, d = 12;
+    for (let i = 0; i < d; i++) {
+      g.fillStyle = `rgba(159,243,255,${(k * (1 - i / d) * (1 - i / d)).toFixed(3)})`;
+      g.fillRect(i, i, W - i * 2, 1); g.fillRect(i, H - 1 - i, W - i * 2, 1); g.fillRect(i, i + 1, 1, H - i * 2 - 2); g.fillRect(W - 1 - i, i + 1, 1, H - i * 2 - 2);
+    }
+  }
+  function drawParts(g) {
+    for (const p of Q.parts) {
+      const a = Math.min(1, (p.life - p.t) / 0.3) * (p.dim ? 0.45 : 1);
+      g.globalAlpha = a; g.fillStyle = p.col;
+      const x = Math.round(p.x), y = Math.round(p.y);
+      if (p.kind === 'c') { const flip = Math.floor(p.t * 12 + p.x) % 2; g.fillRect(x, y, flip ? p.w : 1, flip ? 1 : p.w); }   // a confetti bit, tumbling
+      else { g.fillRect(x, y, 1, 1); if (!p.dim && (p.size === 2 || p.t < p.life * 0.5)) { g.fillRect(x - 1, y, 3, 1); g.fillRect(x, y - 1, 1, 3); } }   // a sparkle
+    }
+    g.globalAlpha = 1;
+    // progress sparks flying to the tracker's count (a bright head, a short trail)
+    const T = cfg().tickSpark;
+    for (const s of Q.sparks) {
+      if (!Q.countAt) continue;
+      const u = Math.min(1, s.t / T), e = u * u * (3 - 2 * u), arc = Math.sin(u * Math.PI) * 18;
+      const px = s.x + (Q.countAt.x - s.x) * e, py = s.y + (Q.countAt.y - s.y) * e - arc;
+      g.fillStyle = 'rgba(255,233,168,0.5)'; g.fillRect(Math.round(px - (Q.countAt.x - s.x) * 0.04), Math.round(py + 1), 1, 1);
+      g.fillStyle = '#fff6dc'; g.fillRect(Math.round(px), Math.round(py), 2, 2);
+    }
+  }
 
   // ---------------------------------------------------------------- loading
   // a game loads (Save.apply): an older save (no requests yet) gets the one-time question later and
   // marks done, quietly, whatever it has already done once requests are on
   Q.loaded = function () {
     const s = st();
-    Q.asking = false; Q.menu = false; Q.confirm = false; Q.intro = 0; Q.thanks.length = 0; Q.caught = false; Q.calmT = 0;
+    Q.asking = false; Q.menu = false; Q.confirm = false; Q.caught = false; Q.calmT = 0; quiet(); Q.lastN = {}; Q.streak = 0; Q.lastDoneAt = 0;
     if (Q.on()) { catchUp(); Q.wait = cfg().firstDelay; }
     if (s.cur && (!Q.byId(s.cur) || Q.done(s.cur))) s.cur = null;
   };

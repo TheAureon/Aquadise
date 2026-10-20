@@ -143,8 +143,12 @@ AQ.SoundTest = (function () {
   const T = { tab: 0, sel: 0, ui: [], from: 'title' };
   // (the hydrophone's sounds have their own tab: they're sfx with group 'hydro', and playing one also shows
   // the ripple the game draws for it, since every hydrophone sound is also seen)
-  const TABS = [['sfx', 'soundtest.effects'], ['amb', 'soundtest.ambience'], ['music', 'soundtest.music'], ['hydro', 'soundtest.hydro'], ['badges', 'soundtest.badges']];
-  const OWN_TAB = ['hydro', 'badges'];                             // sfx groups with a tab of their own
+  // (the station requests' sounds have a tab only while requests are on: when they're off, nothing about
+  // them plays anywhere)
+  const ALL_TABS = [['sfx', 'soundtest.effects'], ['amb', 'soundtest.ambience'], ['music', 'soundtest.music'], ['hydro', 'soundtest.hydro'], ['badges', 'soundtest.badges'], ['requests', 'soundtest.requests']];
+  const tabs = () => ALL_TABS.filter(([k]) => k !== 'requests' || (AQ.Quests && AQ.Quests.on()));
+  let TABS = tabs();
+  const OWN_TAB = ['hydro', 'badges', 'requests'];                 // sfx groups with a tab of their own
   const PREV = { x: 160, y: 126 };                                 // where the ripple preview plays (hydrophone tab)
   T.ripples = []; T.pulses = [];
   const COLS = 4, CW = 76, CH = 8, STEP = 9, X0 = 8, Y0 = 28;
@@ -154,6 +158,7 @@ AQ.SoundTest = (function () {
     game.state = 'soundtest';
   };
   function items() {
+    TABS = tabs(); if (T.tab >= TABS.length) T.tab = 0;
     const kind = TABS[T.tab][0];
     if (kind === 'music') return AQ.Music.catalog().map((p) => ({ id: p.id, label: p.label, stinger: p.stinger, key: 'music:' + p.id.split(':')[0] }));
     const list = OWN_TAB.indexOf(kind) >= 0 ? A.list('sfx').filter((s) => s.group === kind) : A.list(kind).filter((s) => kind !== 'sfx' || OWN_TAB.indexOf(s.group) < 0);
@@ -165,7 +170,9 @@ AQ.SoundTest = (function () {
     return list.map((s) => ({ id: kind === 'amb' ? s.bed : s.id, label: s.label, key: s.id, ripple: s.ripple }));
   }
   function layout() {
-    const ui = TABS.map(([, name], i) => ({ id: 'tab', i, x: 8 + i * 61, y: 14, w: 59, h: 10, label: AQ.t(name), on: i === T.tab }));
+    TABS = tabs();
+    const tw = Math.floor(305 / TABS.length);                      // (the tabs share the row: a 6th one makes them a little narrower)
+    const ui = TABS.map(([, name], i) => ({ id: 'tab', i, x: 8 + i * tw, y: 14, w: tw - 2, h: 10, label: AQ.t(name), on: i === T.tab }));
     ui.push({ id: 'back', x: 270, y: 2, w: 46, h: 10, label: AQ.t('ui.back') });
     items().forEach((it, i) => ui.push({ id: 'item', i, it, x: X0 + (i % COLS) * (CW + 2), y: Y0 + Math.floor(i / COLS) * STEP, w: CW, h: CH, label: it.label }));
     return ui;
@@ -173,7 +180,7 @@ AQ.SoundTest = (function () {
   const playing = (it) => (TABS[T.tab][0] === 'amb' ? AQ.Ambience.test === it.id : TABS[T.tab][0] === 'music' ? AQ.Music.test === it.id : false);
   function trigger(it) {
     const kind = TABS[T.tab][0];
-    if (kind === 'sfx') A.play(it.id, { important: true });
+    if (kind === 'sfx' || kind === 'requests') A.play(it.id, { important: true });
     else if (kind === 'hydro') { A.play(it.id, { important: true }); preview(it); }
     else if (kind === 'badges') { A.play(it.id, { important: true }); T.toastPreview = { id: it.id, t: 0 }; }   // with the toast it plays under
     else if (kind === 'amb') AQ.Ambience.test = AQ.Ambience.test === it.id ? null : it.id;

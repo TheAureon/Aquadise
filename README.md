@@ -723,9 +723,34 @@ changes nothing about the game. No timers, no failure, no expiry, nothing missab
   request's icon. A click or tap folds it to just the radio icon and back. Its **...** button: SKIP
   THIS ONE (to the back of the line, no penalty) and TURN OFF REQUESTS (asks once). A new request
   arrives `quests.arriveDelay` seconds (20) after one is finished, with the radio message for
-  `introSeconds`, a soft sound and a blinking radio light; a thank-you line shows when one is done.
+  `introSeconds`, a soft sound and a blinking radio light (in the building, the console blinks too).
   It's only on screen while playing (sea, hill, building), never during the guided dive, a scene
-  change or a menu; completion is noticed anywhere (the thank-you waits until you're back).
+  change or a menu; completion is noticed anywhere.
+- **The celebration** (all under about two seconds, never blocking anything, never over the HUD or the
+  controls):
+  - *a step:* when a count goes up (1/3 to 2/3) the count hops, a little spark flies from the diver to it
+    and a soft tick sounds, a little higher each step; one step from done, the tracker shimmers gently;
+  - *done:* the tracker pops and a checkmark draws itself in, confetti and sparkles burst out in the
+    game's colours, the **REQUEST COMPLETE!** banner slides in (where badge toasts sit) with the
+    thank-you line and the running count, **REQUESTS 12/40**, whose bar fills and ticks up; a short rising
+    chime with a sparkle on top, a light buzz on touch (VIBRATION), and a soft glow round the screen
+    edges for a moment;
+  - *streaks:* requests done within `streakMinutes` (5) of each other build a streak, x2 up to x5: more
+    sparkles, a higher chime, a fancier banner. A streak that runs out just resets, with no message;
+  - *a chapter done:* a bigger one: **CHAPTER COMPLETE: HOME**, a second burst, a short musical phrase;
+  - *in the building:* the console does a little happy dance; a request about a tank (`tank` in
+    `data/quests.js`) makes that tank's window sparkle the next time it's on screen;
+  - *elsewhere:* on the tank screen it's a compact note in its note area; during a scene change, a menu
+    or photo mode it waits and plays the moment it's free (at most 2 wait; more become "3 requests
+    done!"). It never plays at the same time as a badge toast or a tip (they wait for each other, with a
+    short gap), and nudges stay away while it plays;
+  - *REDUCE FLASHING:* no burst, no pop, no screen glow, no blinking, no hopping console: a soft fade-in,
+    a few slow dim sparkles, quieter, gentler sounds, a little shorter;
+  - *sounds* (they follow the volumes and mute): a message arriving, progress ticks, a completion for
+    each streak step, the chapter phrase, the skip whoosh, the tracker folding / opening. The Sound
+    Test has a REQUESTS tab with all of them (only while requests are on).
+  Measured on the CLASSIC canvas, a chapter + x5 celebration (the biggest) kept every frame at 60 fps
+  (worst frame gap 16.8 ms); the game's own work per frame stayed under 7 ms (median 2.4 ms).
 - **The OFF switch:** SETTINGS > OPTIONS > REQUESTS (title screen and pause menu), or TURN OFF REQUESTS
   in the tracker's menu. Off means nothing about requests is drawn, played, announced or counted.
   Progress stays in the save; turning them back on resumes where it was, marking done (quietly)
@@ -735,7 +760,10 @@ changes nothing about the game. No timers, no failure, no expiry, nothing missab
   travels in backups and save codes like everything else.
 - The Guide has a **Station requests** page, and a one-time tip comes with the first request.
 - Tuning: `AQ.TUNING.quests` (`askDelay`, `firstDelay`, `arriveDelay`, `skipDelay`, `introSeconds`,
-  `thanksSeconds`, `blinkSeconds`, `trackerY`, `trackerW`, `messageW`, `fillMin`, ...).
+  `blinkSeconds`, `trackerY`, `trackerW`, `messageW`, `fillMin`; the celebration: `celebrateSeconds`,
+  `chapterSeconds`, `calmSeconds`, `gapSeconds`, `bannerY`, `bannerW`, `confetti`, `sparkles`,
+  `maxParticles`, `edgeGlow`, `streakMinutes`, `streakMax`, `calmVolume`, `tickSpark`, `joySeconds`),
+  and the buzz pattern `touch.vibrate.quest`.
 - **Testing:** set `AQ.TUNING.debug.quests: true`. Then **3** completes the current request, **4** skips it,
   **5** resets every request (on, nothing done; the first arrives a second later) and **6** shows an overlay
   with the current request's condition, its counter or check value, `also`, and what comes next.

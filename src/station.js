@@ -221,6 +221,11 @@ AQ.Station = (function () {
       return;
     }
     const tank = AQ.Collection.tank(b.id), st = AQ.Aquarium.styleOf(b.id);
+    // a station request about this tank was done: a soft sparkle on its window, the next time it's on screen
+    if (AQ.Quests && AQ.Quests.takeSparkle(b.id)) {
+      const n = AQ.U.calm() ? 3 : 8;
+      for (let i = 0; i < n; i++) AQ.FX.sparkle(ix + U.R.range(2, iw - 2), iy + U.R.range(2, ih - 2), i % 2 ? '#fff6dc' : '#bff6ff', AQ.U.calm() ? 1 : 2);
+    }
     // a calm, warm glow around a tank's window (the Nursery), so it's easy to spot from the walkway
     if (st.windowGlow) {
       const c = AQ.U.hex(st.windowGlow), a = AQ.U.calm() ? 0.22 : 0.2 + 0.04 * Math.sin(t * 0.9);
@@ -450,6 +455,23 @@ AQ.Station = (function () {
   }
   St.wallSlots = wallSlots;
 
+  // ---------------------------------------------------------------- the station requests' reactions (src/quests.js)
+  // joy(): the console does a little happy dance (hops, wiggles, its screen blinks); blink(): its screen
+  // blinks for a moment (a new request). REDUCE FLASHING: no hopping, the screen just glows softly once.
+  let joyAt = -99, blinkAt = -99;
+  St.joy = () => { joyAt = AQ.Render.t; };
+  St.blink = () => { blinkAt = AQ.Render.t; };
+  function consoleJoy(t) {
+    const c = AQ.TUNING.quests, calm = AQ.U.calm(), j = t - joyAt, b = t - blinkAt, out = { dx: 0, hop: 0, lit: 0 };
+    if (!AQ.Quests || !AQ.Quests.on()) return out;
+    if (j >= 0 && j < c.joySeconds) {
+      if (calm) out.lit = 0.35 * Math.sin(j / c.joySeconds * Math.PI);
+      else { out.hop = Math.round(Math.abs(Math.sin(j * 9)) * 2 * (1 - j / c.joySeconds)); out.dx = Math.round(Math.sin(j * 18) * (1 - j / c.joySeconds)); out.lit = Math.floor(j * 6) % 2 ? 0.55 : 0; }
+    }
+    if (b >= 0 && b < 1.2) out.lit = Math.max(out.lit, calm ? 0.3 * Math.sin(b / 1.2 * Math.PI) : (Math.floor(b * 5) % 2 ? 0.5 : 0));
+    return out;
+  }
+
   function renderScene(ctx, game, left, top, vw, vh) {
     const t = AQ.Render.t, P = game.player;
     drawSpace(ctx, left, top, vw, vh);
@@ -476,7 +498,10 @@ AQ.Station = (function () {
     // sideways, 58 up and 10 down)
     tanks.forEach((tk) => { if (tk.x + 66 >= left && tk.x - 66 <= left + vw && tk.y + 12 >= top && tk.y - 62 <= top + vh) drawTank(ctx, tk); });
     drawTrophyWall(ctx, left, vw);
-    AQ.Assets.draw(ctx, 'misc.console', 'idle', L.console.x, L.floors[0], { t });
+    // the console: a little happy dance when a station request is done, a blink when one arrives
+    const joy = consoleJoy(t), cx = L.console.x + joy.dx, cy = L.floors[0] - joy.hop;
+    AQ.Assets.draw(ctx, 'misc.console', 'idle', cx, cy, { t });
+    if (joy.lit > 0) { ctx.save(); ctx.globalAlpha = joy.lit; ctx.fillStyle = '#bff6ff'; ctx.fillRect(cx - 7, cy - 25, 14, 8); ctx.restore(); }
     AQ.Assets.draw(ctx, 'misc.beampad', 'idle', L.pad.x, L.floors[0] + 2, AQ.U.calm() ? { frame: 0 } : { t });
     // the pad's idle shimmer, brighter while beaming
     const beaming = St.mode !== 'walk';

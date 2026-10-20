@@ -288,6 +288,39 @@ var AQ = (typeof AQ !== 'undefined') ? AQ : {};
     return run(c, o, t + 0.05, [74, 79, 83], 0.13, 0.03, 1.0) + 0.1;
   }, { minGap: 0.6, important: true });
 
+  // ---------------------------------------------------------------- station requests (src/quests.js; their own Sound Test tab)
+  // A message arrives: a soft two-note radio blip with a breath of static
+  reg('quest_arrive', 'requests', (c, o, t) => {
+    H.noise(c, o, t, { f: 2600, q: 1.5, a: 0.01, d: 0.12, v: 0.012 });
+    H.tone(c, o, t + 0.03, { type: 'sine', f: m(86), d: 0.09, v: 0.035 });
+    return H.tone(c, o, t + 0.15, { type: 'sine', f: m(91), d: 0.14, v: 0.035 }) + 0.15;
+  }, { minGap: 0.5 });
+  // A request moves on (2/3...): a soft tick, a little higher each step (opts.step)
+  reg('quest_tick', 'requests', (c, o, t, op) => H.bell(c, o, t, m(84 + Math.min(12, ((op && op.step) || 1) * 2)), 0.03, 0.35), { minGap: 0.08 });
+  // A request done: a short bright rising arpeggio with a sparkle on top; a streak (opts.streak 1-5)
+  // lifts it, and adds a note from x3 on
+  const done = (c, o, t, k) => {
+    const up = (k - 1) * 2, notes = (k >= 3 ? [72, 76, 79, 84, 88] : [72, 76, 79, 84]).map((n) => n + up);
+    const d = run(c, o, t, notes, 0.075, 0.055, 0.7);
+    for (let i = 0; i < 3 + k; i++) H.bell(c, o, t + 0.28 + i * 0.045, m(96 + up + (i % 3) * 3), 0.014, 0.3);   // the sparkle layer
+    return d + 0.1;
+  };
+  reg('quest_done', 'requests', (c, o, t, op) => done(c, o, t, Math.max(1, Math.min(5, (op && op.streak) || 1))), { minGap: 0.6, important: true });
+  for (let k = 2; k <= 5; k++) reg(`quest_done_x${k}`, 'requests', (c, o, t) => done(c, o, t, k), { minGap: 0.6, important: true });   // (the streak versions, for the Sound Test)
+  // A chapter done: a short warm phrase over a soft chord
+  reg('quest_chapter', 'requests', (c, o, t) => {
+    [m(60), m(64), m(67)].forEach((f) => H.tone(c, o, t, { f, a: 0.12, d: 1.6, v: 0.022, type: 'triangle', lp: 1800 }));
+    const ns = [72, 76, 79, 84, 79, 84, 88];
+    ns.forEach((n, i) => H.tone(c, o, t + i * 0.1, { type: 'triangle', f: m(n), d: i === ns.length - 1 ? 0.9 : 0.22, v: 0.05, lp: 2600 }));
+    for (let i = 0; i < 6; i++) H.bell(c, o, t + 0.75 + i * 0.05, m(96 + (i % 3) * 4), 0.014, 0.35);
+    return 1.8;
+  }, { minGap: 1, important: true });
+  // SKIP THIS ONE: a soft whoosh, the request sliding away
+  reg('quest_skip', 'requests', (c, o, t) => H.noise(c, o, t, { f: 2400, f2: 600, q: 0.8, a: 0.03, d: 0.22, v: 0.05 }), { minGap: 0.2 });
+  // the tracker folds to its icon / opens again
+  reg('quest_collapse', 'requests', (c, o, t) => H.tone(c, o, t, { type: 'triangle', f: 980, f2: 620, d: 0.07, v: 0.035, lp: 2400 }), { minGap: 0.1 });
+  reg('quest_expand', 'requests', (c, o, t) => H.tone(c, o, t, { type: 'triangle', f: 620, f2: 980, d: 0.07, v: 0.035, lp: 2400 }), { minGap: 0.1 });
+
   // ---------------------------------------------------------------- aquarium
   // EXPAND: soft glass panes set into place (muted taps) and a warm rising shimmer as the tank grows
   reg('build', 'aquarium', (c, o, t) => {

@@ -145,6 +145,7 @@ AQ.Badges = (function () {
     if (AQ.Transition && AQ.Transition.active) return false;
     if (AQ.Redo && AQ.Redo.dialog) return false;
     if (AQ.Touch && AQ.Touch.menuOpen) return false;
+    if (AQ.Quests && AQ.Quests.celebrating()) return false;          // (a station request's celebration: the toast waits its turn)
     const A = AQ.Aquarium;
     if (game.state === 'aquarium' && A && (A.photo.on || A.dialog)) return false;
     return true;

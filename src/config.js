@@ -266,7 +266,7 @@ AQ.TUNING = {
     dragScrollPx: 6,          // the log's lists: a finger that moves this far (screen px) scrolls the list instead
     swipePx: 40,              // the Guide: a sideways swipe this long (screen px) turns the page
     sizes: { small: 0.8, medium: 1, large: 1.25 },   // CONTROL SIZE setting: multiplies the buttons and the joystick
-    vibrate: { catch: 25, unlock: [20, 60, 30] }    // VIBRATION setting: buzz patterns in ms (navigator.vibrate) for a catch / an unlock
+    vibrate: { catch: 25, unlock: [20, 60, 30], quest: [15, 40, 15, 40, 30] }    // VIBRATION setting: buzz patterns in ms (navigator.vibrate) for a catch / an unlock / a station request done
   },
   // STATION REQUESTS (src/quests.js, data/quests.js): small friendly goals by radio. No rewards, no timers.
   quests: {
@@ -278,12 +278,27 @@ AQ.TUNING = {
     recheckSeconds: 5,        // nothing ready yet (everything left needs something first): look again this often
     checkSeconds: 0.5,        // how often the current request is checked (a counter changing checks at once)
     introSeconds: 7,          // how long a new request's radio message shows before it shrinks to the tracker
-    thanksSeconds: 5,         // how long the thank-you line shows
     blinkSeconds: 3,          // the radio icon blinks this long when a request arrives
     trackerY: 58,             // where the tracker sits (game px from the top, left edge; it moves below a tip box)
     trackerW: 130,            // the tracker's width (game px)
     messageW: 150,            // the radio message / thank-you width
-    fillMin: 5                // "fill 3 tanks": a tank counts with at least this many creatures
+    fillMin: 5,               // "fill 3 tanks": a tank counts with at least this many creatures
+    // THE CELEBRATION (a request done): short, never blocks input, never over the HUD or the controls
+    celebrateSeconds: 2.0,    // how long a request's celebration lasts...
+    chapterSeconds: 2.8,      // ...a finished chapter's...
+    calmSeconds: 1.4,         // ...and either one with REDUCE FLASHING (gentler and a little shorter)
+    gapSeconds: 0.6,          // a celebration waits this long after a badge toast or a tip has gone (they never overlap)
+    bannerY: 106,             // the "REQUEST COMPLETE!" banner (game px from the top: where badge toasts sit)
+    bannerW: 200,             // its width
+    confetti: 22,             // confetti pieces in a burst (more with a streak; a chapter doubles it)...
+    sparkles: 10,             // ...and sparkles
+    maxParticles: 80,         // never more than this many at once
+    edgeGlow: 0.16,           // the soft glow round the screen edges (0 = none; never with REDUCE FLASHING)
+    streakMinutes: 5,         // requests done within this many minutes of each other build a streak (x2...)
+    streakMax: 5,             // ...up to this; a streak that runs out just resets, quietly
+    calmVolume: 0.6,          // REDUCE FLASHING: the request sounds play this loud (and a little softer)
+    tickSpark: 0.5,           // seconds a progress spark takes to fly to the tracker
+    joySeconds: 1.6           // the station's console dances this long when a request is done (blinks when one arrives)
   },
   // GRAPHICS (SETTINGS > OPTIONS: HIGH / MEDIUM / LOW / CLASSIC; src/gfx/, docs/GRAPHICS_PLAN.md). The game
   // still draws 320 x 180 pixel art; above CLASSIC a WebGL pass adds the effects below to the world (never

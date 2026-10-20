@@ -156,8 +156,9 @@ const SCREENS = [
   ['quest-track', () => { AQ.Quests.intro = 0; }],
   ['quest-menu', () => { AQ.Quests.menu = true; }],
   ['quest-confirm', () => { AQ.Quests.menu = false; AQ.Quests.confirm = true; }],
-  ['quest-thanks', () => { const Q = AQ.Quests; Q.confirm = false; Q.thanks.push({ id: 'four_stars', t: 0 }); }],
-  ['quest-icon', () => { const Q = AQ.Quests; Q.thanks.length = 0; AQ.State.quests.collapsed = true; }],
+  ['quest-done', () => { const Q = AQ.Quests; Q.confirm = false; AQ.Badges.cur = null; if (AQ.Touch) AQ.Touch.menuOpen = false; Q.streak = 3; Q.lastDoneAt = Date.now(); Q.complete(Q.byId('four_stars')); Q.freeT = 9; }],   // the celebration (banner, streak x4)
+  ['quest-chapter', () => { const Q = AQ.Quests; Q.cel = null; const ch = AQ.data.quests.filter((q) => q.chapter === 'home'); ch.slice(0, -1).forEach((q) => Q.complete(q, true)); Q.complete(ch[ch.length - 1]); Q.freeT = 9; }],
+  ['quest-icon', () => { const Q = AQ.Quests; Q.cel = null; Q.celebs.length = 0; AQ.State.quests.cur = 'species25'; AQ.State.quests.collapsed = true; }],
   ['touch-test', () => { AQ.TouchTest.open(AQ.Game, 'title'); }],
   ['save-hub', () => { AQ.SaveFile.openHub(AQ.Game, 'title'); }],
   ['save-remind', () => { AQ.SaveFile.showReminder(AQ.Game); }],

@@ -45,7 +45,7 @@ AQ.data.tutorial = {
     { id: 'photo', icon: 'ui:6', lines: 5 },
     { id: 'saving', icon: 'ui:4', lines: 6 },
     { id: 'touch', icon: 'ui.touch:1', lines: 6 },
-    { id: 'requests', icon: 'ui.radio', needs: 'Quests', lines: 5 },
+    { id: 'requests', icon: 'ui.radio', needs: 'Quests', lines: 6 },
     { id: 'settings', icon: 'ui:5', lines: 7 }
   ],
   tips: [

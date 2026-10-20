@@ -111,6 +111,7 @@ AQ.langFiles.en = {
   'soundtest.music': 'MUSIC',
   'soundtest.hydro': 'HYDROPHONE',   // the hydrophone's sounds (each also shows its ripple)
   'soundtest.badges': 'BADGES',   // the badge chimes (each plays with its toast)
+  'soundtest.requests': 'REQUESTS',   // the station requests' sounds (the tab shows only while requests are on)
   'soundtest.ripple': 'WHAT YOU SEE IN THE GAME:',   // over the ripple preview on the HYDROPHONE tab
   'soundtest.title': 'SOUND TEST',
   'soundtest.muted': 'MUTED - PRESS {key}',
@@ -659,11 +660,12 @@ AQ.langFiles.en = {
   'guide.saving.5': 'Clearing browser data or a new device can lose the save kept in the browser. A backup can\'t be lost that way.',
   'guide.saving.6': 'A gentle reminder may ask you to back up now and then (SETTINGS > OPTIONS turns it off).',
   'guide.requests.title': 'Station requests',
-  'guide.requests.1': 'Now and then the station radios a little request: catch something, decorate a tank, stay out at night.',
-  'guide.requests.2': 'They are just for fun. Nothing is given, nothing is lost, and there is never a timer.',
+  'guide.requests.1': 'Now and then the station radios a little request, one at a time.',
+  'guide.requests.2': 'Just for fun: nothing is given or lost, and there is never a timer.',
   'guide.requests.3': 'The tracker on the left shows the current one. Click or tap it to fold it into a small icon.',
   'guide.requests.4': 'Its ... button: SKIP THIS ONE saves it for later; TURN OFF REQUESTS turns them all off.',
   'guide.requests.5': 'SETTINGS > OPTIONS > REQUESTS turns them on or off any time. Your progress is kept.',
+  'guide.requests.6': 'Each one done gets a little celebration!',
   'guide.touch.title': 'Playing by touch',
   'guide.touch.1': 'On a phone or tablet the game plays by touch. Hold it sideways.',
   'guide.touch.2': 'The joystick appears wherever your thumb lands on its side. Push it up to jump or climb.',
@@ -2165,6 +2167,17 @@ AQ.langFiles.en = {
   'sfx.badge': 'BADGE CHIME',
   'sfx.badge_big': 'BIG BADGE CHIME',
   'sfx.badge_hidden': 'SECRET BADGE CHIME',
+  'sfx.quest_arrive': 'NEW REQUEST',
+  'sfx.quest_tick': 'PROGRESS TICK',
+  'sfx.quest_done': 'REQUEST DONE',
+  'sfx.quest_done_x2': 'REQUEST DONE X2',
+  'sfx.quest_done_x3': 'REQUEST DONE X3',
+  'sfx.quest_done_x4': 'REQUEST DONE X4',
+  'sfx.quest_done_x5': 'REQUEST DONE X5',
+  'sfx.quest_chapter': 'CHAPTER DONE',
+  'sfx.quest_skip': 'SKIP REQUEST',
+  'sfx.quest_collapse': 'TRACKER FOLDS',
+  'sfx.quest_expand': 'TRACKER OPENS',
   'sfx.call_chime': 'CHIME SHRIMP',
   'sfx.call_chirrup': 'CHIRRUP FROG',
   'sfx.call_hum': 'HOLLOW PIPER',
@@ -2242,7 +2255,11 @@ AQ.langFiles.en = {
   'quest.ask.yes': 'YES',
   'quest.ask.no': 'NO THANKS',
   'quest.from': '{station}:',   // above a new request's radio message
-  'quest.thanksTitle': 'THANK YOU!',
+  'quest.complete': 'REQUEST COMPLETE!',   // the celebration banner's title
+  'quest.chapterDone': 'CHAPTER COMPLETE: {chapter}',   // ...when a request finishes its chapter ({chapter}: quest.chapter.*)
+  'quest.count': 'REQUESTS {n}/{total}',   // the running count under it (all requests in this build)
+  'quest.streak': 'x{n}',   // a streak: requests done close together
+  'quest.noteDone': 'Request complete! {thanks}',   // on the tank screen (its note area): the compact version
   'quest.manyDone': { one: '{n} request done!', other: '{n} requests done!' },
   'quest.progress': '{n}/{target}',   // a request's count on the tracker (a request can have its own: quest.<id>.progress)
   'quest.menu.skip': 'SKIP THIS ONE',

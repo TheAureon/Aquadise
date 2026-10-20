@@ -21,6 +21,8 @@
 //   target    the number to reach for counters and checks (shown as a count, "2/3", when it's above 1)
 //   after     (optional) another request that must be done first
 //   needs     (optional) a feature the build must have (an AQ module name, like the Guide's pages)
+//   tank      (optional) the request is about a tank: true = the tank you were last at, or a tank id; that
+//             tank's window in the station sparkles softly the next time it's on screen
 //   requires  (optional) a condition that must already hold before it's offered (e.g. having the hydrophone),
 //             so nothing is ever asked that the player can't do yet
 // Every request must be possible for anyone, at any time, without luck (tools/check-quests.js checks it):
@@ -41,18 +43,18 @@ AQ.data.quests = [
 
   // ------------------------------------------------------------------ 2. HOME
   { id: 'ufo', chapter: 'home', icon: 'star', cond: { event: 'ufo', also: { check: 'flag', flag: 'visitedStation', target: 1 } } },
-  { id: 'open_tank', chapter: 'home', icon: 'heart', after: 'ufo', cond: { event: 'tank', also: { check: 'badge', badge: 'window_shopping', target: 1 } } },
-  { id: 'decor', chapter: 'home', icon: 'heart', after: 'open_tank', cond: { event: 'decor', also: { check: 'decorInTanks', target: 1 } } },
-  { id: 'feed', chapter: 'home', icon: 'heart', after: 'open_tank', cond: { event: 'feed', also: { check: 'fedAny', target: 1 } } },
-  { id: 'decor_five', chapter: 'home', icon: 'heart', after: 'decor', cond: { counter: 'decorPlaced' }, target: 5 },
-  { id: 'two_stars', chapter: 'home', icon: 'star', after: 'open_tank', cond: { check: 'bestStars' }, target: 2 },
+  { id: 'open_tank', chapter: 'home', tank: true, icon: 'heart', after: 'ufo', cond: { event: 'tank', also: { check: 'badge', badge: 'window_shopping', target: 1 } } },
+  { id: 'decor', chapter: 'home', tank: true, icon: 'heart', after: 'open_tank', cond: { event: 'decor', also: { check: 'decorInTanks', target: 1 } } },
+  { id: 'feed', chapter: 'home', tank: true, icon: 'heart', after: 'open_tank', cond: { event: 'feed', also: { check: 'fedAny', target: 1 } } },
+  { id: 'decor_five', chapter: 'home', tank: true, icon: 'heart', after: 'decor', cond: { counter: 'decorPlaced' }, target: 5 },
+  { id: 'two_stars', chapter: 'home', tank: true, icon: 'star', after: 'open_tank', cond: { check: 'bestStars' }, target: 2 },
 
   // ------------------------------------------------------------------ 3. PAIRS
   { id: 'both_sexes', chapter: 'pairs', icon: 'heart', needs: 'Sex', cond: { check: 'bothSexes' }, target: 1 },
-  { id: 'pair_tank', chapter: 'pairs', icon: 'heart', needs: 'Sex', after: 'both_sexes', cond: { check: 'pairsInTanks' }, target: 1 },
-  { id: 'court', chapter: 'pairs', icon: 'heart', needs: 'Breeding', after: 'pair_tank', cond: { event: 'court', also: { check: 'bred', target: 1 } } },
-  { id: 'baby', chapter: 'pairs', icon: 'egg', needs: 'Breeding', after: 'court', cond: { counter: 'births' }, target: 1 },
-  { id: 'graduate', chapter: 'pairs', icon: 'egg', needs: 'Nursery', after: 'baby', cond: { check: 'graduates' }, target: 1 },
+  { id: 'pair_tank', chapter: 'pairs', tank: true, icon: 'heart', needs: 'Sex', after: 'both_sexes', cond: { check: 'pairsInTanks' }, target: 1 },
+  { id: 'court', chapter: 'pairs', tank: true, icon: 'heart', needs: 'Breeding', after: 'pair_tank', cond: { event: 'court', also: { check: 'bred', target: 1 } } },
+  { id: 'baby', chapter: 'pairs', tank: 'nursery', icon: 'egg', needs: 'Breeding', after: 'court', cond: { counter: 'births' }, target: 1 },
+  { id: 'graduate', chapter: 'pairs', tank: 'nursery', icon: 'egg', needs: 'Nursery', after: 'baby', cond: { check: 'graduates' }, target: 1 },
   { id: 'five_pairs', chapter: 'pairs', icon: 'heart', needs: 'Sex', after: 'both_sexes', cond: { check: 'bothSexes' }, target: 5 },
 
   // ------------------------------------------------------------------ 4. NIGHT AND SKY
@@ -65,10 +67,10 @@ AQ.data.quests = [
 
   // ------------------------------------------------------------------ 5. TINKERING
   { id: 'chests', chapter: 'tinker', icon: 'bottle', needs: 'Chests', cond: { counter: 'chests' }, target: 3 },
-  { id: 'photo', chapter: 'tinker', icon: 'camera', after: 'open_tank', cond: { event: 'photo', also: { check: 'badge', badge: 'say_cheese', target: 1 } } },
-  { id: 'four_stars', chapter: 'tinker', icon: 'star', after: 'two_stars', cond: { check: 'bestStars' }, target: 4 },
-  { id: 'one_pair', chapter: 'tinker', icon: 'heart', needs: 'Pairs', after: 'open_tank', cond: { event: 'onePair', also: { check: 'badge', badge: 'tidy_up', target: 1 } } },
-  { id: 'expand', chapter: 'tinker', icon: 'shell', needs: 'Panes', after: 'open_tank', cond: { check: 'expanded' }, target: 1 },
+  { id: 'photo', chapter: 'tinker', tank: true, icon: 'camera', after: 'open_tank', cond: { event: 'photo', also: { check: 'badge', badge: 'say_cheese', target: 1 } } },
+  { id: 'four_stars', chapter: 'tinker', tank: true, icon: 'star', after: 'two_stars', cond: { check: 'bestStars' }, target: 4 },
+  { id: 'one_pair', chapter: 'tinker', tank: true, icon: 'heart', needs: 'Pairs', after: 'open_tank', cond: { event: 'onePair', also: { check: 'badge', badge: 'tidy_up', target: 1 } } },
+  { id: 'expand', chapter: 'tinker', tank: true, icon: 'shell', needs: 'Panes', after: 'open_tank', cond: { check: 'expanded' }, target: 1 },
 
   // ------------------------------------------------------------------ 6. LISTENING
   { id: 'chime_shrimp', chapter: 'listen', icon: 'ear', needs: 'Hydro', cond: { check: 'discovered', where: { id: 'chime_shrimp' } }, target: 1 },
