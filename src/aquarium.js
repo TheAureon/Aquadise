@@ -716,6 +716,9 @@ AQ.Aquarium = (function () {
     if (s.dropT <= 0 && s.left > 0 && s.t > 0.2) {
       s.dropT = dur / L.feedPellets; s.left--;
       A.food.push({ x: s.sx + R.range(-2, 2), y: TANK.waterTop - 2, t: 0, ph: R() * 6 });
+      // the tank counts as fed as soon as food goes in: creatures that stay put (limpets) or crawl slowly
+      // across a wide tank may never reach a pellet, and feeding them should still count
+      if (s.left === L.feedPellets - 1) markFed();
     }
     if (s.t > dur + 0.5) A.shaker = null;
   }
