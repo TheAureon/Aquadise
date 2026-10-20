@@ -112,6 +112,7 @@ AQ.Nudges = (function () {
     if (N.t - N.lastCatch < c.afterCatch) return false;
     return quiet();
   }
+  N.mayShow = allowed;                                               // (for the checks: would a nudge be allowed right now?)
   // the next line of a type, from its shuffled bag (saved, so a reload doesn't start the bag over)
   function nextLine(type) {
     const n = (AQ.data.tutorial.nudges || {})[type] || 0, bags = store().bags = store().bags || {};
