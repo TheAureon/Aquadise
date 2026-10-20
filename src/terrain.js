@@ -428,7 +428,7 @@ AQ.Terrain = (function () {
     for (let j = 0; j < len; j++) P.setOpen(x + Math.sin(j * 0.3) * 1.2, y + j, cols[j % 4 === 0 ? 1 : 0]);
     const ex = x + Math.sin(len * 0.3) * 1.2, ey = y + len;
     P.setOpen(ex, ey, bulb); P.setOpen(ex - 1, ey + 1, bulb); P.setOpen(ex + 1, ey + 1, bulb); P.setOpen(ex, ey + 1, U.scale(bulb, 1.2)); P.setOpen(ex, ey + 2, bulb);
-    T.lights.push({ x: ex, y: ey + 1, r: 14, color: U.css(bulb), power: 0.6 });
+    T.lights.push({ x: ex, y: ey + 1, r: 20, color: U.css(bulb), power: 0.75 });
   };
   PROPS.plank = function (P, x, y, r) {
     const c = C('#7a5432'), d = U.scale(c, 0.7), len = r.int(8, 18), a = r.range(-0.3, 0.3);

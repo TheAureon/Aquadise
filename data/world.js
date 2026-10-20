@@ -47,7 +47,7 @@ AQ.data.world = {
       palette: { top: ['#6fa456', '#4f8a43', '#3d6b37'], rock: ['#5a5560', '#4a4550', '#3b3742'], accent: '#c9e07a', style: 'mossy', backwall: true, air: '#26333a' }, water: '#2fa08c', waterMix: 0.45, dark: 0.36,
       props: [
         { type: 'vine', at: 'ceiling', n: 26, air: true },
-        { type: 'glowvine', at: 'ceiling', n: 14, air: true },
+        { type: 'glowvine', at: 'ceiling', n: 20, air: true },
         { type: 'glowshroom', at: 'floor', n: 12, air: true },
         { type: 'flowerbed', at: 'floor', n: 10, airOnly: true },
         { type: 'fern', at: 'floor', n: 14, airOnly: true },
