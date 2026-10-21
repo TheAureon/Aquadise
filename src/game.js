@@ -134,7 +134,7 @@ AQ.Game = (function () {
         if (I.wasPressed('Tab') && AQ.Aquarium && AQ.TUNING.debug.tabOpensAquarium) { AQ.Aquarium.open(G); I.endFrame(); return; }
         if (AQ.Keys.pressed('log') && AQ.LogUI) { AQ.LogUI.open(G); I.endFrame(); return; }
         if (AQ.Keys.pressed('guide') && AQ.Guide) { AQ.Guide.open(G, 'play'); I.endFrame(); return; }
-        if (AQ.Keys.pressed('pause')) { if (G.state === 'map') G.state = 'play'; else { G.state = 'pause'; I.endFrame(); return; } }
+        if (AQ.Keys.pressed('pause')) { if (G.state === 'map') G.state = 'play'; else { G.state = 'pause'; AQ.PauseUI.sel = 0; I.endFrame(); return; } }
       }
       AQ.Scenes.cur(G).update(dt, G, frozen ? NO_INPUT : I);
       if (AQ.Gulls) AQ.Gulls.update(dt, G);         // distant seagulls in the sky (sea + hill)

@@ -300,9 +300,9 @@ AQ.langFiles.en = {
 
   // ---------------------------------------------------------------- the HUD: help line, toasts, upgrades
   'hud.net': 'NET',   // upgrade levels, top left (short)
-  'hud.speed': 'SPD',
+  'hud.speed': 'SPEED',
   'hud.lamp': 'LAMP',
-  'hud.deep': 'DEEP',
+  'hud.deep': 'DEPTH',
   'hud.ear': 'EAR',            // the HYDROPHONE upgrade's HUD row (keep it short)
   'hud.sneaking': 'SNEAKING',
   'hud.logTip': 'COLLECTION LOG ({key})',   // hovering the counter button (top right): {key} = the log key
@@ -2030,7 +2030,7 @@ AQ.langFiles.en = {
   'log.badgesCount': 'BADGES {n}/{total}',
   'log.badges.intro': 'KEEPSAKES FOR THINGS YOU HAVE DONE',
   'log.title': 'COLLECTION LOG',
-  'log.bottles': 'BOTTLES FOUND {n}/{total}',
+  'log.bottles': 'BOTTLES {n}/{total}',
   'log.done': 'DONE',
   'log.caught': 'CAUGHT',
   'log.unknown': '???',   // a species not caught yet

@@ -84,7 +84,7 @@ AQ.Vibe = (function () {
         const d = creatureDef(e.id); if (!d || !d.likes || !d.likes.length) return;
         withLikes++;
         const lp = V.likesPresent(d, decor);
-        if (lp.present.length) liked++; else wants.push({ name: d.name, like: lp.likes[0] });
+        if (lp.present.length) liked++; else if (!wants.some((w) => w.name === d.name)) wants.push({ name: d.name, like: lp.likes[0] });   // (two of a kind: said once)
       });
       parts.likes = withLikes ? liked / withLikes : 1;
     } else { parts.fed = 0; parts.calm = 0; parts.space = 0; parts.likes = 0; }

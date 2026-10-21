@@ -171,8 +171,7 @@ AQ.Badges = (function () {
     const w = Math.min(300, F.width(text) + 26), x = Math.round(160 - w / 2), h = 16;
     const a = Math.max(0, Math.min(1, q.t * 5, (q.life - q.t) * 2.5));
     g.save(); g.globalAlpha = a;
-    g.fillStyle = 'rgba(6,18,34,0.94)'; g.fillRect(x, y, w, h);
-    g.fillStyle = q.kind === 'badge_hidden' ? '#c9a8ff' : '#ffd25a'; g.fillRect(x, y, w, 1);
+    AQ.Kit.panel(g, { x, y, w: w, h: h }, { edge: q.kind === 'badge_hidden' ? '#c9a8ff' : '#ffd25a' });
     g.fillStyle = 'rgba(255,210,90,0.25)'; g.fillRect(x, y + h - 1, w, 1);
     if (q.summary) B.drawIcon(g, { id: '_', icon: 'crown', group: 'final' }, x + 10, y + 8, true);
     else B.drawIcon(g, q.b, x + 10, y + 8, true, q.tier);

@@ -1627,8 +1627,7 @@ AQ.Aquarium = (function () {
     const box = cardBox(f), W = box.w, H = box.h, x = box.x, y = box.y;
     const tank = AQ.Collection.tank(A.biome), likes = f.def.likes || [];
     const have = new Set(); tank.decor.forEach((d) => AQ.Vibe.tagsOf(d).forEach((t) => have.add(t)));
-    g.fillStyle = 'rgba(6,18,34,0.92)'; g.fillRect(x, y, W, H);
-    g.fillStyle = '#5fc6d9'; g.fillRect(x, y, W, 1);
+    AQ.Kit.panel(g, { x, y, w: W, h: H }, { edge: '#5fc6d9' });
     g.fillStyle = '#132b40'; g.fillRect(x + 3, y + 4, 26, 26);
     const e = AQ.Assets.entry(f.key);
     if (e) {
@@ -2005,8 +2004,7 @@ AQ.Aquarium = (function () {
     if (best > v.stars) lines.push([AQ.t('vibe.best', { n: best }), '#8fb6cc']);
     const w = Math.min(316, Math.max(120, ...lines.map((l) => F().width(l[0]))) + 10), h = 14 + lines.length * 7;   // (longer text squeezes)
     const x = Math.max(2, Math.min(84, 318 - w)), y = 15;
-    g.fillStyle = 'rgba(6,18,34,0.94)'; g.fillRect(x, y, w, h);
-    g.fillStyle = '#5fc6d9'; g.fillRect(x, y, w, 1);
+    AQ.Kit.panel(g, { x, y, w: w, h: h }, { edge: '#5fc6d9' });
     F().draw(g, AQ.t('vibe.title', { n: v.stars }), x + 5, y + 4, '#ffe9a8', { shadow: false, max: w - 10 });
     lines.forEach(([t, c], i) => F().draw(g, t, x + 5, y + 12 + i * 7, c, { shadow: false, max: w - 10 }));
   }
@@ -2026,8 +2024,7 @@ AQ.Aquarium = (function () {
     const T = AQ.t, lines = [[T('nursery.tip.about'), '#cfe8ff'], [T('nursery.tip.counts', { growing, grown, eggs: T('nursery.tip.eggs', { n: eggs }) }), '#ffd8e8'],
       N.full() ? [T('nursery.tip.full'), '#ffcf8a'] : [T('nursery.tip.room', { n: N.room() }), '#8ff0b0'], [T('nursery.tip.noStars'), '#8fb6cc']];
     const w = Math.min(316, Math.max(...lines.map((l) => F().width(l[0]))) + 10), h = 14 + lines.length * 7, x = Math.max(2, Math.min(84, 318 - w)), y = 15;
-    g.fillStyle = 'rgba(6,18,34,0.94)'; g.fillRect(x, y, w, h);
-    g.fillStyle = '#ffb0d0'; g.fillRect(x, y, w, 1);
+    AQ.Kit.panel(g, { x, y, w: w, h: h }, { edge: '#ffb0d0' });
     F().draw(g, AQ.t('nursery.tip.title', { n: N.occupancy(), total: N.capacity() }), x + 5, y + 4, '#ffe9a8', { shadow: false, max: w - 10 });
     lines.forEach(([tx, c], i) => F().draw(g, tx, x + 5, y + 12 + i * 7, c, { shadow: false, max: w - 10 }));
   }
@@ -2063,19 +2060,11 @@ AQ.Aquarium = (function () {
     const w = Math.min(316, Math.max(...lines.map((l) => F().width(l[0]))) + 8), h = lines.length * 7 + 5;
     const x = U.clamp(Math.round(it.x + it.w / 2 - w / 2), 2, 318 - w), y = TRAY_Y - h - 3;
     if (AQ.Tips && AQ.Tips.overlaps(x, y, w, h)) return;                   // a tutorial tip is there: step aside
-    g.fillStyle = 'rgba(6,18,34,0.94)'; g.fillRect(x, y, w, h);
-    g.fillStyle = '#5fc6d9'; g.fillRect(x, y, w, 1);
+    AQ.Kit.panel(g, { x, y, w: w, h: h }, { edge: '#5fc6d9' });
     lines.forEach(([t, c], i) => F().draw(g, t, x + 4, y + 3 + i * 7, c, { shadow: false, max: w - 8 }));
   }
 
-  function button(g, r, hover) {
-    g.fillStyle = r.warn ? (hover ? '#a8503a' : '#8a3f2e') : r.on ? (hover ? '#3a92ac' : '#2e7d96') : hover && !r.off ? '#24506b' : '#16334a';
-    g.fillRect(r.x, r.y, r.w, r.h);
-    g.fillStyle = 'rgba(160,220,240,0.35)'; g.fillRect(r.x, r.y, r.w, 1);
-    const iw = r.pane ? 9 : 0;                       // a pane icon after the label (EXPAND: 20 ▢)
-    if (r.label) F().draw(g, r.label, r.x + (r.w - iw) / 2, r.y + Math.floor((r.h - 5) / 2), r.off ? '#5f7a8c' : '#e8fbff', { align: 'center', max: r.w - 2 - iw });   // a long label squeezes to fit
-    if (iw) { g.globalAlpha = r.off ? 0.45 : 1; AQ.Assets.draw(g, 'ui.pane', 'idle', r.x + r.w - 7, r.y + 5, { frame: 0 }); g.globalAlpha = 1; }
-  }
+  const button = (g, r, hover) => AQ.Kit.button(g, r, hover);   // the shared look (src/uikit.js)
   A.button = button;
   // A row of buttons that keeps its usual layout while every label fits. If a label is too long (a
   // longer language), the buttons grow to their text and re-flow between x0 and x1 (align 'left' or

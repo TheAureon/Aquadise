@@ -82,6 +82,7 @@ AQ.HUD = (function () {
     const up = game.upgrades;
     if (up) {
       const rows = upgradeRows(up), px = pipsX(rows);
+      ctx.fillStyle = 'rgba(6,18,34,0.3)'; AQ.Kit.rounded(ctx, 1, 2, H.leftWidth() + 1, rows.length * 7 + 3);   // a soft backing: readable on a bright sky
       ctx.globalAlpha = 0.85;
       rows.forEach(([label, lvl, max, col], r) => {
         const y = 4 + r * 7;
@@ -121,6 +122,8 @@ AQ.HUD = (function () {
     if (H.helpOn() && game.state !== 'pause') {
       ctx.globalAlpha = Math.min(1, H.helpT) * 0.9;
       const tut = AQ.data.tutorial, lines = (AQ.Touch && AQ.Touch.active() && tut.touchHelpLines ? tut.touchHelpLines : tut.helpLines).map(AQ.Keys.fill);    // help.* in data/lang/en.js; key names from the bindings
+      const lw = Math.min(vw - 2, Math.max(...lines.map((l) => F.width(l))) + 8);
+      ctx.fillStyle = 'rgba(6,18,34,0.55)'; AQ.Kit.rounded(ctx, Math.round((vw - lw) / 2), vh - 17, lw, lines.length * 7 + 3);   // a soft strip behind it
       lines.forEach((l, i) => F.draw(ctx, l, vw / 2, vh - 15 + i * 7, '#d8f3ff', { align: 'center', shadow: SH, max: vw - 4 }));
       ctx.globalAlpha = 1;
     }

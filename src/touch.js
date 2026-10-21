@@ -313,7 +313,7 @@ AQ.Touch = (function () {
     else if (id === 'map') { if (game.scene === 'world') game.state = game.state === 'map' ? 'play' : 'map'; else AQ.HUD.toast(AQ.t('map.onlySea'), '#cfe8ff'); }
     else if (id === 'guide' && AQ.Guide) AQ.Guide.open(game, 'play');
     else if (id === 'help') { AQ.HUD.askHelp(); if (game.state === 'map') game.state = 'play'; }
-    else if (id === 'pause') game.state = 'pause';
+    else if (id === 'pause') { game.state = 'pause'; AQ.PauseUI.sel = 0; }
     else if (id === 'settings') { game.state = 'pause'; AQ.PauseUI.panel = 'sound'; AQ.SoundUI.open(); AQ.SoundUI.tab = 'touch'; }
     return true;
   };

@@ -384,7 +384,7 @@ AQ.LogUI = (function () {
     F().draw(g, AQ.t('log.title'), 6, 4, C.title, { shadow: false, max: 60 });   // (the tabs start at x 68)
     const bp = AQ.Bottles ? AQ.Bottles.progress() : { found: 0, total: 0 };
     const bc = AQ.Badges ? AQ.Badges.count() : null;               // (the BADGES tab: badges earned instead of bottles)
-    F().draw(g, L.tab === 'badges' && bc ? AQ.t('log.badgesCount', { n: bc.earned, total: bc.total }) : AQ.t('log.bottles', { n: bp.found, total: bp.total }), 276, 4, C.info, { align: 'right', shadow: false, max: 276 - 210 });   // (the tabs end near x 206)
+    F().draw(g, L.tab === 'badges' && bc ? AQ.t('log.badgesCount', { n: bc.earned, total: bc.total }) : AQ.t('log.bottles', { n: bp.found, total: bp.total }), 276, 4, C.info, { align: 'right', shadow: false, max: 276 - 216 });   // (the tabs end at x 210)
     for (const r of L.ui) if (r.id === 'tab' || r.id === 'close') AQ.Aquarium.button(g, r, L.hover === r);
     // the NEW dot on the BADGES tab while there are badges you haven't looked at
     const bt = L.ui.find((r) => r.id === 'tab' && r.tab === 'badges');
@@ -727,40 +727,47 @@ AQ.MapUI = (function () {
 
 AQ.PauseUI = (function () {
   const F = () => AQ.Font;
-  const P = { ui: [], confirm: 0 };
+  const P = { ui: [], confirm: 0, sel: 0 };
+  const BOX = { x: 98, y: 17, w: 124, h: 127 };
+  function act(id, game) {
+    AQ.Audio.play('menu_select');
+    if (id === 'resume') game.state = 'play';
+    if (id === 'help') { AQ.HUD.showHelp = AQ.HUD.helpAsked = true; AQ.HUD.helpT = 12; game.state = 'play'; }
+    if (id === 'guide') AQ.Guide.open(game, 'pause');
+    if (id === 'saves') AQ.SaveFile.openHub(game, 'pause');
+    if (id === 'redo' && AQ.Redo) AQ.Redo.ask(game, 'pause');   // asks first, then works from anywhere
+    if (id === 'sound') { P.panel = 'sound'; AQ.SoundUI.open(); }
+    if (id === 'home') { AQ.Save.save(game); AQ.Title.open(game); }
+  }
   P.update = function (dt, game) {
     const I = AQ.Input, m = I.mouse;
     if (P.panel === 'sound') { AQ.SoundUI.update(game, () => { P.panel = null; }, () => AQ.SoundTest.open(game, 'pause')); return; }
     if (AQ.SaveFile && AQ.SaveFile.update(game)) return;        // a save-file panel (import confirm, messages) is up
     const T = AQ.t, rows = [['resume', T('pause.resume')], ['help', T('pause.help')], ['guide', T('pause.guide')], ['redo', T('redo.btn')], ['sound', T('pause.settings')], ['saves', T('title.saves')], ['home', T('pause.home')]];
     P.ui = [];
-    rows.forEach(([id, label], i) => {
-      const y = 38 + i * 14;
-      P.ui.push({ id, x: 110, y, w: 100, h: 12, label });
-    });
+    rows.forEach(([id, label], i) => P.ui.push({ id, x: 110, y: 38 + i * 15, w: 100, h: 12, label }));
     if (I.wasPressed('Escape')) { game.state = 'play'; return; }
+    P.sel = Math.min(P.sel, P.ui.length - 1);
+    // the keyboard: up / down to pick, Enter or Space to choose
+    if (I.rawPressed('ArrowUp', 'KeyW')) { P.sel = (P.sel + P.ui.length - 1) % P.ui.length; AQ.Audio.play('menu_move'); }
+    if (I.rawPressed('ArrowDown', 'KeyS')) { P.sel = (P.sel + 1) % P.ui.length; AQ.Audio.play('menu_move'); }
     const prev = P.hover;
     P.hover = P.ui.find((r) => m.x >= r.x && m.y >= r.y && m.x < r.x + r.w && m.y < r.y + r.h);
+    if (P.hover && (m.x !== P.mx || m.y !== P.my)) P.sel = P.ui.indexOf(P.hover);   // the mouse picks too (when it moves)
+    P.mx = m.x; P.my = m.y;
     if (P.hover && P.hover !== prev && (!prev || prev.id !== P.hover.id)) AQ.Audio.play('menu_move');
-    if (m.pressed[0] && P.hover) {
-      AQ.Audio.play('menu_select');
-      if (P.hover.id === 'resume') game.state = 'play';
-      if (P.hover.id === 'help') { AQ.HUD.showHelp = AQ.HUD.helpAsked = true; AQ.HUD.helpT = 12; game.state = 'play'; }
-      if (P.hover.id === 'guide') AQ.Guide.open(game, 'pause');
-      if (P.hover.id === 'saves') AQ.SaveFile.openHub(game, 'pause');
-      if (P.hover.id === 'redo' && AQ.Redo) AQ.Redo.ask(game, 'pause');   // asks first, then works from anywhere
-      if (P.hover.id === 'sound') { P.panel = 'sound'; AQ.SoundUI.open(); }
-      if (P.hover.id === 'home') { AQ.Save.save(game); AQ.Title.open(game); }
-    }
+    if (m.pressed[0] && P.hover) act(P.hover.id, game);
+    else if (I.rawPressed('Enter', 'Space')) act(P.ui[P.sel].id, game);
   };
   P.draw = function (g) {
-    g.fillStyle = 'rgba(4,12,24,0.75)'; g.fillRect(0, 0, 320, 180);
+    g.fillStyle = 'rgba(4,12,24,0.7)'; g.fillRect(0, 0, 320, 180);
     if (P.panel === 'sound') { AQ.SoundUI.draw(g); return; }
-    F().draw(g, AQ.t('pause.title'), 160, 26, '#ffe9a8', { align: 'center' });
-    for (const r of P.ui) { AQ.Aquarium.button(g, r, P.hover === r); if (r.id === 'saves' && AQ.SaveFile) AQ.SaveFile.drawDot(g, r); }
+    AQ.Kit.panel(g, BOX, { title: AQ.t('pause.title') });
+    g.fillStyle = 'rgba(95,198,217,0.25)'; g.fillRect(BOX.x + 8, BOX.y + 14, BOX.w - 16, 1);
+    P.ui.forEach((r, i) => { AQ.Aquarium.button(g, r, i === P.sel); if (r.id === 'saves' && AQ.SaveFile) AQ.SaveFile.drawDot(g, r); });
     const warn = AQ.SaveFile && AQ.SaveFile.statusLine(), old = AQ.SaveFile && AQ.SaveFile.pauseLine();
-    F().draw(g, warn || AQ.t('pause.autosave'), 160, 162, warn ? '#ffcf8a' : '#8aa4b8', { align: 'center' });
-    if (old && !warn) F().draw(g, old, 160, 170, '#ffe9a8', { align: 'center' });   // (only once it's been a while)
+    F().draw(g, warn || AQ.t('pause.autosave'), 160, 156, warn ? '#ffcf8a' : '#8aa4b8', { align: 'center', max: 300 });
+    if (old && !warn) F().draw(g, old, 160, 165, '#ffe9a8', { align: 'center', max: 300 });   // (only once it's been a while)
     if (AQ.SaveFile) AQ.SaveFile.draw(g);
   };
   return P;

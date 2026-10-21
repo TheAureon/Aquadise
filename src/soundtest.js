@@ -20,22 +20,22 @@ AQ.SoundUI = (function () {
       { id: 'mute', kind: 'btn', label: AQ.t('settings.mute'), value: AQ.t(st.mute ? 'settings.muted' : 'settings.soundOn'), warn: st.mute },
       { id: 'test', kind: 'wide', value: AQ.t('settings.soundTest') }];
     if (S.tab === 'options') return [
-      { id: 'hints', kind: 'btn', label: AQ.t('settings.tips'), value: AQ.t(!AQ.Tips || AQ.Tips.hintsOn() ? 'settings.hintsOn' : 'settings.hintsOff') },
+      { id: 'hints', kind: 'btn', label: AQ.t('settings.tips'), value: AQ.t(!AQ.Tips || AQ.Tips.hintsOn() ? 'settings.hintsOn' : 'settings.hintsOff'), on: !AQ.Tips || AQ.Tips.hintsOn(), toggle: true },
       { id: 'resettips', kind: 'btn', label: AQ.t('settings.seeAgain'), value: AQ.t(S.resetDone > 0 ? 'settings.tipsReset' : 'settings.resetTips') },
-      ...(AQ.Quests && AQ.Quests.enabled() ? [{ id: 'requests', kind: 'btn', label: AQ.t('settings.requests'), value: AQ.t(AQ.Quests.on() ? 'settings.on' : 'settings.off'), on: AQ.Quests.on() }] : []),   // station requests on / off
-      { id: 'nudges', kind: 'btn', label: AQ.t('settings.nudges'), value: AQ.t(AQ.Nudges && AQ.Nudges.playerOn() ? 'settings.on' : 'settings.off'), on: !!AQ.Nudges && AQ.Nudges.playerOn(), off: !AQ.Nudges },
-      { id: 'reminders', kind: 'btn', label: AQ.t('settings.backupReminders'), value: AQ.t(AQ.SaveFile && AQ.SaveFile.remindersOn() ? 'settings.on' : 'settings.off'), on: !!AQ.SaveFile && AQ.SaveFile.remindersOn() },
-      { id: 'autograd', kind: 'btn', label: AQ.t('settings.autoGraduate'), value: AQ.t(set().autoGraduate ? 'settings.on' : 'settings.off'), on: !!set().autoGraduate },
-      { id: 'graphics', kind: 'btn', label: AQ.t('settings.graphics'), value: AQ.t(AQ.Gfx && AQ.Gfx.supported === false ? 'settings.gfx.unavailable' : `settings.gfx.${AQ.Gfx ? AQ.Gfx.level() : 'classic'}`), off: !AQ.Gfx || AQ.Gfx.supported === false || !AQ.TUNING.graphics.enabled },   // HIGH / MEDIUM / LOW / CLASSIC
-      { id: 'flashing', kind: 'btn', label: AQ.t('settings.flashing'), value: AQ.t(AQ.U.calm() ? 'settings.reduced' : 'settings.normal'), on: AQ.U.calm() },
-      { id: 'lowfx', kind: 'btn', label: AQ.t('settings.lowEffects'), value: AQ.t(AQ.U.lowFx() ? 'settings.on' : 'settings.off'), on: AQ.U.lowFx() },   // for slow phones
-      { id: 'language', kind: 'btn', label: AQ.t('settings.language'), value: AQ.Lang.name(AQ.Lang.code), off: AQ.Lang.available().length < 2 }];
+      ...(AQ.Quests && AQ.Quests.enabled() ? [{ id: 'requests', kind: 'btn', label: AQ.t('settings.requests'), value: AQ.t(AQ.Quests.on() ? 'settings.on' : 'settings.off'), on: AQ.Quests.on(), toggle: true }] : []),   // station requests on / off
+      { id: 'nudges', kind: 'btn', label: AQ.t('settings.nudges'), value: AQ.t(AQ.Nudges && AQ.Nudges.playerOn() ? 'settings.on' : 'settings.off'), on: !!AQ.Nudges && AQ.Nudges.playerOn(), off: !AQ.Nudges, toggle: true },
+      { id: 'reminders', kind: 'btn', label: AQ.t('settings.backupReminders'), value: AQ.t(AQ.SaveFile && AQ.SaveFile.remindersOn() ? 'settings.on' : 'settings.off'), on: !!AQ.SaveFile && AQ.SaveFile.remindersOn(), toggle: true },
+      { id: 'autograd', kind: 'btn', label: AQ.t('settings.autoGraduate'), value: AQ.t(set().autoGraduate ? 'settings.on' : 'settings.off'), on: !!set().autoGraduate, toggle: true },
+      { id: 'graphics', kind: 'btn', label: AQ.t('settings.graphics'), value: AQ.t(AQ.Gfx && AQ.Gfx.supported === false ? 'settings.gfx.unavailable' : `settings.gfx.${AQ.Gfx ? AQ.Gfx.level() : 'classic'}`), off: !AQ.Gfx || AQ.Gfx.supported === false || !AQ.TUNING.graphics.enabled, cycle: true },   // HIGH / MEDIUM / LOW / CLASSIC
+      { id: 'flashing', kind: 'btn', label: AQ.t('settings.flashing'), value: AQ.t(AQ.U.calm() ? 'settings.reduced' : 'settings.normal'), on: AQ.U.calm(), cycle: true },
+      { id: 'lowfx', kind: 'btn', label: AQ.t('settings.lowEffects'), value: AQ.t(AQ.U.lowFx() ? 'settings.on' : 'settings.off'), on: AQ.U.lowFx(), toggle: true },   // for slow phones
+      { id: 'language', kind: 'btn', label: AQ.t('settings.language'), value: AQ.Lang.name(AQ.Lang.code), off: AQ.Lang.available().length < 2, cycle: true }];
     return [
-      { id: 'touchmode', kind: 'btn', label: AQ.t('settings.touchControls'), value: AQ.t(`settings.touch.${touchMode()}`) },
-      { id: 'swap', kind: 'btn', label: AQ.t('settings.sides'), value: AQ.t(set().swapSides ? 'settings.swapped' : 'settings.normal'), on: !!set().swapSides },
-      { id: 'csize', kind: 'btn', label: AQ.t('settings.controlSize'), value: AQ.t(`settings.size.${AQ.Touch ? AQ.Touch.sizeName() : 'medium'}`) },
+      { id: 'touchmode', kind: 'btn', label: AQ.t('settings.touchControls'), value: AQ.t(`settings.touch.${touchMode()}`), cycle: true },
+      { id: 'swap', kind: 'btn', label: AQ.t('settings.sides'), value: AQ.t(set().swapSides ? 'settings.swapped' : 'settings.normal'), on: !!set().swapSides, cycle: true },
+      { id: 'csize', kind: 'btn', label: AQ.t('settings.controlSize'), value: AQ.t(`settings.size.${AQ.Touch ? AQ.Touch.sizeName() : 'medium'}`), cycle: true },
       // (iPhones and some browsers can't vibrate: the row says so and does nothing)
-      { id: 'vibe', kind: 'btn', label: AQ.t('settings.vibration'), value: AQ.t(!AQ.Touch || !AQ.Touch.canVibrate() ? 'settings.vibration.none' : AQ.Touch.vibrateOn() ? 'settings.on' : 'settings.off'), on: !!AQ.Touch && AQ.Touch.canVibrate() && AQ.Touch.vibrateOn(), off: !AQ.Touch || !AQ.Touch.canVibrate() },
+      { id: 'vibe', kind: 'btn', label: AQ.t('settings.vibration'), value: AQ.t(!AQ.Touch || !AQ.Touch.canVibrate() ? 'settings.vibration.none' : AQ.Touch.vibrateOn() ? 'settings.on' : 'settings.off'), on: !!AQ.Touch && AQ.Touch.canVibrate() && AQ.Touch.vibrateOn(), off: !AQ.Touch || !AQ.Touch.canVibrate(), toggle: AQ.Touch && AQ.Touch.canVibrate() },
       { id: 'touchtest', kind: 'wide', value: AQ.t('settings.touchTest') }];
   }
   const order = () => ['tabs'].concat(rows().map((r) => r.id), ['back']);
@@ -51,7 +51,7 @@ AQ.SoundUI = (function () {
         ui.push({ id: r.id + '+', row: r.id, x: 224, y, w: 10, h: 9, label: '+' });
         ui.push({ id: r.id + 'bar', row: r.id, x: 159, y, w: 62, h: 9, bar: r.bar });
       } else if (r.kind === 'wide') ui.push({ id: r.id, row: r.id, x: 110, y, w: 100, h: 11, label: r.value });
-      else ui.push({ id: r.id, row: r.id, x: 146, y, w: 106, h: Math.min(10, step - 1), label: r.value, warn: r.warn, on2: r.on, off: r.off });
+      else ui.push({ id: r.id, row: r.id, x: 146, y, w: 106, h: Math.min(10, step - 1), label: r.value, warn: r.warn, on2: r.on, off: r.off, toggle: r.toggle, cycle: r.cycle });
       if (r.label != null) ui.push({ id: 'label:' + r.id, row: r.id, label: r.label, y, text: true });   // (a wide button has no label)
     });
     ui.push({ id: 'back', row: 'back', x: 110, y: BOX.y + BOX.h - 22, w: 100, h: 11, label: AQ.t('ui.back') });
@@ -119,9 +119,7 @@ AQ.SoundUI = (function () {
   };
   S.draw = function (g) {
     const st = A.settings(), ord = order(), selRow = ord[S.sel];
-    g.fillStyle = 'rgba(6,20,38,0.95)'; g.fillRect(BOX.x, BOX.y, BOX.w, BOX.h);
-    g.fillStyle = 'rgba(110,240,239,0.6)'; g.fillRect(BOX.x, BOX.y, BOX.w, 1); g.fillRect(BOX.x, BOX.y + BOX.h - 1, BOX.w, 1);
-    F().draw(g, AQ.t('settings.title'), 160, BOX.y + 4, '#6ef0ef', { align: 'center', shadow: false });
+    AQ.Kit.panel(g, BOX, { edge: '#4fb8c8', title: AQ.t('settings.title'), titleColor: '#6ef0ef' });
     g.fillStyle = 'rgba(110,240,239,0.25)'; g.fillRect(BOX.x + 8, BOX.y + 28, BOX.w - 16, 1);
     for (const r of S.ui) {
       if (r.text) { F().draw(g, r.label, 66, r.y + ((rows().find((x) => x.id === r.row) || {}).kind === 'bar' ? 2 : 3), selRow === r.row ? '#ffffff' : '#9fd3ee', { shadow: false, max: (S.ui.find((u) => u.row === r.row && !u.text) || { x: 146 }).x - 70 }); continue; }
@@ -129,7 +127,14 @@ AQ.SoundUI = (function () {
         for (let i = 0; i < 10; i++) { g.fillStyle = i < Math.round(r.bar * 10) ? (st.mute ? '#5f7a8c' : '#6ef0ef') : '#16334a'; g.fillRect(r.x + i * 6 + 1, r.y + 2, 5, 5); }
         F().draw(g, AQ.t('ui.percent', { n: Math.round(r.bar * 100) }), 258, r.y + 2, '#c3dfec', { align: 'right', shadow: false });
       } else if (r.row === 'tabs') AQ.Aquarium.button(g, r, S.hover === r || (selRow === 'tabs' && r.on));   // the open tab is lit
-      else AQ.Aquarium.button(g, Object.assign({}, r, { on: (r.on || r.on2 || selRow === r.row) && !r.warn }), S.hover === r);
+      else if (r.toggle) {                          // on / off: a switch, and the word beside it
+        AQ.Kit.button(g, Object.assign({}, r, { label: '' }), S.hover === r || selRow === r.row);
+        AQ.Kit.toggle(g, r.x + 4, r.y + Math.floor((r.h - 7) / 2), r.on2, r.off);
+        F().draw(g, r.label, r.x + 18 + (r.w - 20) / 2, r.y + Math.floor((r.h - 5) / 2), r.off ? '#5f7a8c' : r.on2 ? '#e8fbff' : '#8fb0c4', { align: 'center', shadow: false, max: r.w - 22 });
+      } else {                                       // a choice that steps on with each click (< >), or an action
+        AQ.Kit.button(g, Object.assign({}, r, { on: false }), S.hover === r || selRow === r.row);   // (lit = picked; the ring shows it)
+        if (r.cycle && !r.off) AQ.Kit.cycle(g, r);
+      }
     }
     if (selRow !== 'tabs' && selRow !== 'back') { const r = S.ui.find((u) => u.text && u.row === selRow); if (r) F().draw(g, '>', 59, r.y + 3, '#6ef0ef', { shadow: false }); }
     const foot = S.tab === 'sound' ? AQ.t('settings.foot.sound', { key: AQ.Keys.name('mute') }) : S.tab === 'touch' ? AQ.t(AQ.Touch && AQ.Touch.active() ? 'settings.foot.touchOn' : 'settings.foot.touchOff') : AQ.t('settings.foot.saved');

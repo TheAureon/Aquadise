@@ -236,6 +236,15 @@ AQ.TUNING = {
   // Text that doesn't fit (long translations): it is squeezed sideways down to this much of its width,
   // then cut short with ".." (src/font.js). screenMargin: px kept free at the screen's edges.
   text: { squeezeMin: 0.55, screenMargin: 2 },
+  // The look shared by buttons, panels and switches (src/uikit.js). Colours are hex; change one here and
+  // every screen that uses the shared look follows.
+  ui: {
+    button: { fill: '#16334a', hover: '#21506b', on: '#2a7590', onHover: '#3790ab', warn: '#8a3f2e', warnHover: '#a8503a',
+      off: '#132a3b', text: '#e8fbff', textOff: '#5f7a8c', shine: 'rgba(190,235,250,0.32)', shade: 'rgba(0,8,16,0.45)', ring: '#bff4ff' },
+    panel: { fill: '#081a2c', edge: '#5fc6d9', shine: 'rgba(160,220,240,0.18)', shadow: 'rgba(0,4,10,0.5)', title: '#ffe9a8' },
+    toggle: { on: '#6ef0ef', off: '#2a4558', knob: '#f2fdff', knobOff: '#9fb8c8' },
+    pressShift: 1             // px a pressed button sinks
+  },
   // Touch controls (src/touch.js). Sizes are in screen pixels (CSS px), so they stay finger-sized on any
   // screen; fractions are of the window. The settings (TOUCH CONTROLS auto/on/off, SWAP SIDES) live in
   // the SETTINGS panel and are saved with the game.
