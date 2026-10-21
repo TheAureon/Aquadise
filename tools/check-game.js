@@ -10,6 +10,8 @@
 //   node tools/check-game.js --keys             also check the language keys (every t() key used in
 //                                               the code exists in data/lang/en.js, and which keys
 //                                               in en.js are never used); add --lang none to skip the browser
+//   node tools/check-game.js --build            check the one-file build (build/Aquadise/index.html, made by
+//                                               node tools/build.js) instead of the project's index.html
 //   node tools/check-game.js --gfx high         draw every screen at one GRAPHICS level (high, medium, low or
 //                                               classic; by default the level the test browser picks itself)
 //
@@ -180,7 +182,7 @@ async function run(lang, pw, port, dump, shotsDir, gfx) {
   page.on('console', (m) => { if (m.type() === 'error' || m.type() === 'warning') { if (driver.test(m.text())) driverNotes++; else problems.push(`[${where}] console ${m.type()}: ${m.text()}`); } });
   // the same random numbers every run, so two runs draw the same things
   await page.addInitScript(() => { let s = 12345; Math.random = () => { s |= 0; s = (s + 0x6D2B79F5) | 0; let t = Math.imul(s ^ (s >>> 15), 1 | s); t = (t + Math.imul(t ^ (t >>> 7), 61 | t)) ^ t; return ((t ^ (t >>> 14)) >>> 0) / 4294967296; }; });
-  const url = `http://127.0.0.1:${port}/index.html`;
+  const url = `http://127.0.0.1:${port}/${opt('--build') ? 'build/Aquadise/' : ''}index.html`;
   await page.goto(url);
   await page.waitForFunction(() => window.AQ && AQ.Game && AQ.Game.state === 'title', null, { timeout: 60000 });
   await page.evaluate((s) => { AQ.Save.save = () => {}; localStorage.clear(); localStorage.setItem(AQ.TUNING.save.key, JSON.stringify(s)); }, SAVE());

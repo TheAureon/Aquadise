@@ -133,6 +133,14 @@ straight from disk (file://) the sprites load from `assets/sprites-embedded.js` 
 `tools/gen-placeholders.js`, or run `node tools/embed-sprites.js` after replacing art), because
 browsers won't let a page save pictures made from file:// images.
 
+## Uploading (one file)
+
+`node tools/build.js` packs the whole game into **one file**: `build/Aquadise/index.html` holds the style
+sheet, every script, the sprites and the recordings. It also writes `build/Aquadise.zip` (that one file,
+about 800 KB). Upload the zip as an HTML5 game (itch.io and similar), or put the HTML file on any web
+host. It also works opened straight from disk. Run the build again after any change; `build/` is not
+kept in git. `node tools/check-game.js --build` checks every screen of the built file.
+
 ## How it plays
 
 - **Title screen (home):** the world drifts by behind the logo. Continue, New Game (asks to
