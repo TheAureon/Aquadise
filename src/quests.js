@@ -419,8 +419,7 @@ AQ.Quests = (function () {
 
   // ---------------------------------------------------------------- drawing
   function panel(g, r, edge) {
-    g.fillStyle = 'rgba(6,18,34,0.92)'; g.fillRect(r.x, r.y, r.w, r.h);
-    g.fillStyle = edge; g.fillRect(r.x, r.y, r.w, 1);
+    AQ.Kit.panel(g, { x: r.x, y: r.y, w: r.w, h: r.h }, { edge: edge });
     g.fillStyle = 'rgba(110,240,239,0.18)'; g.fillRect(r.x, r.y + r.h - 1, r.w, 1);
   }
   function radio(g, cx, cy) {
@@ -507,8 +506,7 @@ AQ.Quests = (function () {
     else { const u = Math.min(1, t / 0.35), back = 1 + 2.2 * Math.pow(u - 1, 3) + 1.2 * Math.pow(u - 1, 2); x = Math.round(x - (1 - back) * 200); }   // (ease out with a small overshoot)
     const y = c.bannerY, edge = cel.chapter ? '#ffd25a' : FRAME[Math.min(5, cel.streak)];
     g.save(); g.globalAlpha = a;
-    g.fillStyle = 'rgba(6,18,34,0.94)'; g.fillRect(x, y, w, h);
-    g.fillStyle = edge; g.fillRect(x, y, w, 1); g.fillRect(x, y + h - 1, w, 1);
+    AQ.Kit.panel(g, { x: x, y: y, w: w, h: h }, { edge: edge }); g.fillRect(x, y + h - 1, w, 1);
     if (cel.streak >= 3 || cel.chapter) { g.fillRect(x, y, 1, h); g.fillRect(x + w - 1, y, 1, h); }   // (fancier from x3, and for a chapter)
     if (cel.streak >= 4 || cel.chapter) { g.fillStyle = '#fff6dc'; for (const [cx, cy] of [[x, y], [x + w - 1, y], [x, y + h - 1], [x + w - 1, y + h - 1]]) { g.fillRect(cx - 1, cy, 3, 1); g.fillRect(cx, cy - 1, 1, 3); } }
     const title = cel.chapter ? AQ.t('quest.chapterDone', { chapter: AQ.t(`quest.chapter.${cel.chapter}`) }) : cel.merged ? AQ.t('quest.manyDone', { n: cel.merged }).toUpperCase() : AQ.t('quest.complete');

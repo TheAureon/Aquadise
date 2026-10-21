@@ -60,5 +60,27 @@ AQ.Kit = (function () {
     g.fillRect(rt, cy, 1, 1); g.fillRect(rt - 1, cy - 1, 1, 3);         // >
   };
 
+  // A line of help text with its key names drawn as little key caps: the template is a language string with
+  // {k:action} placeholders (as in help.1). Too wide for `max`: plain text instead, squeezed to fit.
+  K.keyLine = function (g, tpl, cx, y, o = {}) {
+    const max = o.max || 316, col = o.color || '#c8e6f4', parts = [];
+    let last = 0;
+    String(tpl).replace(/\{k:([a-zA-Z]+)\}/g, (m, a, i) => { parts.push({ t: tpl.slice(last, i) }); parts.push({ k: AQ.Keys.name(a) }); last = i + m.length; return m; });
+    parts.push({ t: tpl.slice(last) });
+    parts.forEach((p) => { if (p.t != null) p.t = p.t.replace(/ {2,}/g, ' '); p.w = p.k != null ? F().width(p.k) + 4 : F().width(p.t); });
+    const total = parts.reduce((a, p) => a + p.w + (p.k != null ? 2 : 0), 0);
+    if (total > max) { F().draw(g, AQ.Keys.fill(tpl), cx, y, col, { align: 'center', shadow: o.shadow, max }); return; }
+    let x = Math.round(cx - total / 2);
+    for (const p of parts) {
+      if (p.k != null) {
+        x += 1;
+        g.fillStyle = '#2b5470'; rounded(g, x, y - 1, p.w, 7);
+        g.fillStyle = 'rgba(190,235,250,0.35)'; g.fillRect(x + 1, y - 1, p.w - 2, 1);
+        F().draw(g, p.k, x + 2, y, '#ffffff', { shadow: false });
+        x += p.w + 1;
+      } else { if (p.t) F().draw(g, p.t, x, y, col, { shadow: o.shadow }); x += p.w; }
+    }
+  };
+
   return K;
 })();

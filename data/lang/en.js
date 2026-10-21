@@ -404,7 +404,7 @@ AQ.langFiles.en = {
 
   // ---------------------------------------------------------------- the controls help line
   'help.1': 'MOVE {k:move}  JUMP {k:jump}  SNEAK {k:sneak}  NET {k:net} (HOLD TO PRY)  MUTE {k:mute}',
-  'help.2': 'BAIT {k:bait}  INTERACT {k:interact}  LOG {k:log} / COUNTER  MAP {k:map}  GUIDE {k:guide}  LISTEN {k:listen}',   // COUNTER = the 31/83 button, top right
+  'help.2': 'BAIT {k:bait}  INTERACT {k:interact}  LOG {k:log}  MAP {k:map}  GUIDE {k:guide}  LISTEN {k:listen}',
   'help.touch.1': 'STICK: MOVE   JUMP   SNEAK (TAP ON / OFF)   EAR: LISTEN (HOLD)',
   'help.touch.2': 'TAP: NET (HOLD TO PRY)  BAIT  HAND: INTERACT  COUNTER: LOG  MENU: MAP, GUIDE',
 

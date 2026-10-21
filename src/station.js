@@ -449,8 +449,7 @@ AQ.Station = (function () {
     if (!tipSlot) return;
     const B = AQ.Badges, s = tipSlot, got = B.earned(s.b.id), text = (got ? B.name(s.b) : B.name(s.b, 1)).toUpperCase() + (got ? '' : '  ' + AQ.t('badge.notYet'));
     const w = Math.min(200, F().width(text) + 6), x = Math.round(U.clamp(s.x - left + s.w / 2 - w / 2, 2, 318 - w)), y = Math.round(s.y - top - 11);
-    ctx.fillStyle = 'rgba(6,18,34,0.92)'; ctx.fillRect(x, y, w, 9);
-    ctx.fillStyle = got ? '#ffd25a' : '#5fc6d9'; ctx.fillRect(x, y, w, 1);
+    AQ.Kit.panel(ctx, { x: x, y: y, w: w, h: 9 }, { edge: got ? '#ffd25a' : '#5fc6d9' });
     F().draw(ctx, text, x + 3, y + 2, got ? '#ffe9a8' : '#c3dfec', { shadow: false, max: w - 6 });
   }
   St.wallSlots = wallSlots;

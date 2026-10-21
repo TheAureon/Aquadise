@@ -489,8 +489,7 @@ AQ.SaveFile = (function () {
   function hubDraw(g) {
     const x = HUB.x, y = HUB.y, w = HUB.w, cx = x + w / 2;
     g.fillStyle = 'rgba(4,10,20,0.6)'; g.fillRect(0, 0, 320, 180);
-    g.fillStyle = 'rgba(6,18,34,0.97)'; g.fillRect(x, y, w, HUB.h);
-    g.fillStyle = '#6ef0ef'; g.fillRect(x, y, w, 1);
+    AQ.Kit.panel(g, { x: x, y: y, w: w, h: HUB.h }, { edge: '#6ef0ef' });
     F().draw(g, AQ.t('save.hub'), cx, y + 5, '#fff6dc', { align: 'center', shadow: false, max: w - 10 });
     // how saving stands
     const lines = hubLines(), lh = lines.length > 3 ? 7 : 8;
@@ -624,8 +623,7 @@ AQ.SaveFile = (function () {
     layout();
     const p = SF.panel, r = p.rect;
     g.fillStyle = 'rgba(4,10,20,0.6)'; g.fillRect(0, 0, 320, 180);
-    g.fillStyle = 'rgba(6,18,34,0.97)'; g.fillRect(r.x, r.y, r.w, r.h);
-    g.fillStyle = p.kind === 'recover' || p.kind === 'freshconfirm' || p.kind === 'erase' ? '#ffcf8a' : '#6ef0ef'; g.fillRect(r.x, r.y, r.w, 1);
+    AQ.Kit.panel(g, { x: r.x, y: r.y, w: r.w, h: r.h }, { edge: p.kind === 'recover' || p.kind === 'freshconfirm' || p.kind === 'erase' ? '#ffcf8a' : '#6ef0ef' });
     F().draw(g, AQ.t(p.title), 160, r.y + 5, '#fff6dc', { align: 'center', shadow: false, max: BOX_W - 10 });
     p.wrapped.forEach((l, i) => F().draw(g, l, p.left ? r.x + 7 : 160, r.y + 15 + i * r.lh, '#9fd3ee', { align: p.left ? 'left' : 'center', shadow: false }));
     for (const b of SF.ui) AQ.Aquarium.button(g, b, SF.hover === b);

@@ -320,8 +320,7 @@ AQ.Touch = (function () {
   T.drawGame = function (g) {
     if (!T.menuOpen) return;
     g.fillStyle = 'rgba(4,12,24,0.55)'; g.fillRect(0, 0, 320, 180);
-    g.fillStyle = 'rgba(6,18,34,0.96)'; g.fillRect(104, 30, 112, 100);
-    g.fillStyle = '#6ef0ef'; g.fillRect(104, 30, 112, 1);
+    AQ.Kit.panel(g, { x: 104, y: 30, w: 112, h: 16 + Math.ceil(MENU.length / 2) * 18 + 4 }, { edge: '#6ef0ef' });   // (as tall as its rows)
     AQ.Font.draw(g, AQ.t('touch.menu'), 160, 35, '#fff6dc', { align: 'center', shadow: false });
     for (const r of (T.menuUi.length ? T.menuUi : menuLayout())) AQ.Aquarium.button(g, r, T.menuHover === r);
   };

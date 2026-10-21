@@ -77,8 +77,7 @@ AQ.Redo = (function () {
     if (!R.dialog) return;
     const L = layout(), d = R.dialog;
     g.fillStyle = 'rgba(4,10,20,0.5)'; g.fillRect(0, 0, 320, 180);
-    g.fillStyle = 'rgba(6,18,34,0.96)'; g.fillRect(L.x, L.y, L.w, L.h);
-    g.fillStyle = '#7ef0c0'; g.fillRect(L.x, L.y, L.w, 1);
+    AQ.Kit.panel(g, { x: L.x, y: L.y, w: L.w, h: L.h }, { edge: '#7ef0c0' });
     F().draw(g, AQ.t('redo.title'), 160, L.y + 4, '#ffe9a8', { align: 'center', shadow: false, max: L.w - 10 });
     L.lines.forEach((l, i) => F().draw(g, l, 160, L.y + 13 + i * 7, i ? '#9fd3ee' : '#e8fbff', { align: 'center', shadow: false, max: L.w - 10 }));
     F().draw(g, AQ.t('redo.tipsQ'), L.tx, L.ty, '#cfe8ff', { shadow: false });

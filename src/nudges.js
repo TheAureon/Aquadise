@@ -168,8 +168,7 @@ AQ.Nudges = (function () {
     N.rect = { x, y, w, h };
     const a = U.clamp(Math.min(cur.t * 6, (cur.life - cur.t) * 2), 0, 1);
     g.save(); g.globalAlpha = a;
-    g.fillStyle = 'rgba(6,18,34,0.94)'; g.fillRect(x, y, w, h);
-    g.fillStyle = COLOR[cur.type]; g.fillRect(x, y, w, 1);
+    AQ.Kit.panel(g, { x: x, y: y, w: w, h: h }, { edge: COLOR[cur.type] });
     g.fillStyle = 'rgba(255,233,168,0.25)'; g.fillRect(x, y + h - 1, w, 1);
     icon(g, ICON[cur.type], x + 10, y + Math.min(h, 20) / 2 + (cur.button ? 0 : 0));
     lines.forEach((l, i) => F().draw(g, l, x + 20, y + 4 + i * 7, i === 0 ? '#fff6dc' : '#d8eef8', { shadow: false }));

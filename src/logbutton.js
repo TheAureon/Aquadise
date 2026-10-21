@@ -104,8 +104,7 @@ AQ.LogButton = (function () {
     // the tooltip (mouse only): just left of the button
     if (B.hover && !pressed) {
       const tip = AQ.t('hud.logTip', { key: AQ.Keys.name('log') }), w = F().width(tip) + 6, x = r.x - w - 3;
-      ctx.fillStyle = 'rgba(6,18,34,0.92)'; ctx.fillRect(x, r.y, w, r.h);
-      ctx.fillStyle = '#5fc6d9'; ctx.fillRect(x, r.y, w, 1);
+      AQ.Kit.panel(ctx, { x: x, y: r.y, w: w, h: r.h }, { edge: '#5fc6d9' });
       F().draw(ctx, tip, x + 3, r.y + 2, '#e8fbff', { shadow: false });
     }
   };

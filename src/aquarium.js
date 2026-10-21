@@ -826,8 +826,7 @@ AQ.Aquarium = (function () {
   function drawDialog(g) {
     const d = A.dialog, L = dialogLayout();
     g.fillStyle = 'rgba(4,10,20,0.45)'; g.fillRect(0, 0, 320, 180);
-    g.fillStyle = 'rgba(6,18,34,0.96)'; g.fillRect(L.x, L.y, L.w, L.h);
-    g.fillStyle = d.warn ? '#ffb08a' : '#5fc6d9'; g.fillRect(L.x, L.y, L.w, 1);
+    AQ.Kit.panel(g, { x: L.x, y: L.y, w: L.w, h: L.h }, { edge: d.warn ? '#ffb08a' : '#5fc6d9' });
     F().draw(g, d.title, 160, L.y + 4, d.warn ? '#ffcf8a' : '#ffe9a8', { align: 'center', shadow: false, max: L.w - 10 });
     (d.lines || []).forEach(([t, c], i) => F().draw(g, t, 160, L.y + 13 + i * 7, c || '#cfe8ff', { align: 'center', shadow: false, max: L.w - 10 }));
     L.btns.forEach((b) => button(g, b, A.dHover && A.dHover.id === b.id));
@@ -2189,8 +2188,7 @@ AQ.Aquarium = (function () {
     (A.notes || []).forEach((n, i) => {
       g.globalAlpha = U.clamp(Math.min(n.t * 4, (n.life - n.t) * 2), 0, 1);
       const cf = cardFish(), w = F().width(n.text) + 10, y = (cf ? cardBox(cf).y + cardBox(cf).h + 6 : TANK.waterTop + 16) + i * 11;   // below an open info card
-      g.fillStyle = 'rgba(6,18,34,0.85)'; g.fillRect(160 - w / 2, y - 3, w, 10);
-      g.fillStyle = n.color; g.fillRect(160 - w / 2, y - 3, w, 1);
+      AQ.Kit.panel(g, { x: 160 - w / 2, y: y - 3, w: w, h: 10 }, { edge: n.color });
       F().draw(g, n.text, 160, y, n.color, { align: 'center', shadow: false });
       g.globalAlpha = 1;
     });

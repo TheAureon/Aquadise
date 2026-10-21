@@ -121,10 +121,11 @@ AQ.HUD = (function () {
     // help (first moments only, or when H is pressed)
     if (H.helpOn() && game.state !== 'pause') {
       ctx.globalAlpha = Math.min(1, H.helpT) * 0.9;
-      const tut = AQ.data.tutorial, lines = (AQ.Touch && AQ.Touch.active() && tut.touchHelpLines ? tut.touchHelpLines : tut.helpLines).map(AQ.Keys.fill);    // help.* in data/lang/en.js; key names from the bindings
-      const lw = Math.min(vw - 2, Math.max(...lines.map((l) => F.width(l))) + 8);
-      ctx.fillStyle = 'rgba(6,18,34,0.55)'; AQ.Kit.rounded(ctx, Math.round((vw - lw) / 2), vh - 17, lw, lines.length * 7 + 3);   // a soft strip behind it
-      lines.forEach((l, i) => F.draw(ctx, l, vw / 2, vh - 15 + i * 7, '#d8f3ff', { align: 'center', shadow: SH, max: vw - 4 }));
+      // help.* in data/lang/en.js; the key names (from the bindings) drawn as key caps
+      const tut = AQ.data.tutorial, touch = AQ.Touch && AQ.Touch.active() && tut.touchHelpLines, lines = touch ? tut.touchHelpLines : tut.helpLines;
+      const lw = Math.min(vw - 2, Math.max(...lines.map((l) => F.width(AQ.Keys.fill(l)))) + 10);
+      ctx.fillStyle = 'rgba(6,18,34,0.6)'; AQ.Kit.rounded(ctx, Math.round((vw - lw) / 2), vh - 19, lw, lines.length * 8 + 3);   // a soft strip behind it
+      lines.forEach((l, i) => AQ.Kit.keyLine(ctx, l, vw / 2, vh - 16 + i * 8, { max: vw - 4, shadow: SH }));
       ctx.globalAlpha = 1;
     }
   };
