@@ -176,10 +176,12 @@ AQ.Dive = (function () {
     if (D.prompt) {
       const p = data().prompt, r = D.panelRect;
       if (!r) return;
+      AQ.Kit.enter(g, 'diveprompt'); AQ.Kit.rise(g);
       AQ.Kit.panel(g, { x: r.x, y: r.y, w: r.w, h: r.h }, { edge: '#ffe9a8' });
       F().draw(g, p.title.toUpperCase(), 160, r.y + 4, '#fff6dc', { align: 'center', shadow: false, max: r.w - 8 });
       p.lines.forEach((l, i) => F().draw(g, l.toUpperCase(), 160, r.y + 12 + i * 7, '#9fd3ee', { align: 'center', shadow: false, max: r.w - 8 }));
       for (const b of D.ui) AQ.Aquarium.button(g, Object.assign({ on: b.id === 'yes' }, b), D.hover === b);
+      AQ.Kit.leave(g);
       return;
     }
     if (!D.active() || game.state !== 'play' || game.scene !== 'world' || !D.panelRect || !D.lines) return;   // waits out of sight away from the sea

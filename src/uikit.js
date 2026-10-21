@@ -6,6 +6,8 @@
 //   AQ.Kit.panel(g, r, { edge, title, shadow })   an opaque box with rounded corners and a soft shadow
 //   AQ.Kit.toggle(g, x, y, on, dim)   a 13x7 switch (knob right + lit = on)
 //   AQ.Kit.cycle(g, r, col)           small < > marks at a button's ends: clicking steps through choices
+//   AQ.Kit.enter(g, id) ... AQ.Kit.leave(g)   a menu or dialog fades in when it opens (id: which one); after
+//                                     drawing its dimmed backdrop, AQ.Kit.rise(g) lifts the box into place
 var AQ = (typeof AQ !== 'undefined') ? AQ : {};
 
 AQ.Kit = (function () {
@@ -59,6 +61,22 @@ AQ.Kit = (function () {
     g.fillRect(l, cy, 1, 1); g.fillRect(l + 1, cy - 1, 1, 3);           // <
     g.fillRect(rt, cy, 1, 1); g.fillRect(rt - 1, cy - 1, 1, 3);         // >
   };
+
+  // Opening animation. A dialog counts as just opened when it wasn't drawn a moment ago, so nothing has to
+  // tell the kit that it opened or closed.
+  const seen = {};
+  const now = () => (typeof performance !== 'undefined' ? performance.now() : Date.now()) / 1000;
+  let cur = 1;
+  K.enter = function (g, id) {
+    const t = now(), s = seen[id];
+    if (!s || t - s.last > 0.15) seen[id] = { start: t, last: t }; else s.last = t;
+    const k = Math.min(1, (t - seen[id].start) / Math.max(0.01, cfg().appearSeconds));
+    cur = 1 - Math.pow(1 - k, 3);                                  // ease out
+    g.save(); g.globalAlpha *= cur;
+    return cur;
+  };
+  K.rise = function (g) { if (cur < 1 && !(AQ.U && AQ.U.calm())) g.translate(0, Math.round((1 - cur) * cfg().appearRise)); };
+  K.leave = function (g) { g.restore(); cur = 1; };
 
   // A line of help text with its key names drawn as little key caps: the template is a language string with
   // {k:action} placeholders (as in help.1). Too wide for `max`: plain text instead, squeezed to fit.

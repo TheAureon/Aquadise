@@ -319,10 +319,13 @@ AQ.Touch = (function () {
   };
   T.drawGame = function (g) {
     if (!T.menuOpen) return;
+    AQ.Kit.enter(g, 'touchmenu');
     g.fillStyle = 'rgba(4,12,24,0.55)'; g.fillRect(0, 0, 320, 180);
+    AQ.Kit.rise(g);
     AQ.Kit.panel(g, { x: 104, y: 30, w: 112, h: 16 + Math.ceil(MENU.length / 2) * 18 + 4 }, { edge: '#6ef0ef' });   // (as tall as its rows)
     AQ.Font.draw(g, AQ.t('touch.menu'), 160, 35, '#fff6dc', { align: 'center', shadow: false });
     for (const r of (T.menuUi.length ? T.menuUi : menuLayout())) AQ.Aquarium.button(g, r, T.menuHover === r);
+    AQ.Kit.leave(g);
   };
 
   // ---------------------------------------------------------------- drawing the controls (screen px)

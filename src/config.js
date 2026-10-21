@@ -243,7 +243,9 @@ AQ.TUNING = {
       off: '#132a3b', text: '#e8fbff', textOff: '#5f7a8c', shine: 'rgba(190,235,250,0.32)', shade: 'rgba(0,8,16,0.45)', ring: '#bff4ff' },
     panel: { fill: '#081a2c', edge: '#5fc6d9', shine: 'rgba(160,220,240,0.18)', shadow: 'rgba(0,4,10,0.5)', title: '#ffe9a8' },
     toggle: { on: '#6ef0ef', off: '#2a4558', knob: '#f2fdff', knobOff: '#9fb8c8' },
-    pressShift: 1             // px a pressed button sinks
+    pressShift: 1,            // px a pressed button sinks
+    appearSeconds: 0.18,      // a menu or dialog fades in over this long when it opens...
+    appearRise: 5             // ...rising this many px into place (REDUCE FLASHING: a fade only)
   },
   // Touch controls (src/touch.js). Sizes are in screen pixels (CSS px), so they stay finger-sized on any
   // screen; fractions are of the window. The settings (TOUCH CONTROLS auto/on/off, SWAP SIDES) live in

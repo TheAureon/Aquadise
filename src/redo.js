@@ -76,12 +76,15 @@ AQ.Redo = (function () {
   R.draw = function (g) {
     if (!R.dialog) return;
     const L = layout(), d = R.dialog;
+    AQ.Kit.enter(g, 'redo');
     g.fillStyle = 'rgba(4,10,20,0.5)'; g.fillRect(0, 0, 320, 180);
+    AQ.Kit.rise(g);
     AQ.Kit.panel(g, { x: L.x, y: L.y, w: L.w, h: L.h }, { edge: '#7ef0c0' });
     F().draw(g, AQ.t('redo.title'), 160, L.y + 4, '#ffe9a8', { align: 'center', shadow: false, max: L.w - 10 });
     L.lines.forEach((l, i) => F().draw(g, l, 160, L.y + 13 + i * 7, i ? '#9fd3ee' : '#e8fbff', { align: 'center', shadow: false, max: L.w - 10 }));
     F().draw(g, AQ.t('redo.tipsQ'), L.tx, L.ty, '#cfe8ff', { shadow: false });
     L.ui.forEach((b) => AQ.Aquarium.button(g, b, R.hover === b));
+    AQ.Kit.leave(g);
     void d;
   };
 

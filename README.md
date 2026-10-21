@@ -975,6 +975,7 @@ src/miniworld.js      small collision maps for side scenes (ladders, one-way pla
 src/hill.js           the hill scene with the UFO and its beam
 src/station.js        the aquarium building in space (tanks on the walls, directory, beam pad)
 src/ui.js             collection log, map, pause
+src/uikit.js          the shared look: buttons, panels, on/off switches, key caps, menus fading in (AQ.TUNING.ui)
 src/gulls.js          distant seagull flocks in the sky (sea + hill)
 src/shootingstars.js  night shooting-star streaks (sky, underwater glow, station portholes)
 src/keys.js           key bindings: pressed / held checks and key names for the text

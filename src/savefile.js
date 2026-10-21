@@ -488,7 +488,9 @@ AQ.SaveFile = (function () {
   }
   function hubDraw(g) {
     const x = HUB.x, y = HUB.y, w = HUB.w, cx = x + w / 2;
+    AQ.Kit.enter(g, 'savehub');
     g.fillStyle = 'rgba(4,10,20,0.6)'; g.fillRect(0, 0, 320, 180);
+    AQ.Kit.rise(g);
     AQ.Kit.panel(g, { x: x, y: y, w: w, h: HUB.h }, { edge: '#6ef0ef' });
     F().draw(g, AQ.t('save.hub'), cx, y + 5, '#fff6dc', { align: 'center', shadow: false, max: w - 10 });
     // how saving stands
@@ -511,6 +513,7 @@ AQ.SaveFile = (function () {
     const hl = wrapPx(hint.toUpperCase(), w - 24), hlh = hl.length * 8 <= room ? 8 : 7;
     hl.slice(0, Math.floor(room / hlh)).forEach((l, i) => F().draw(g, l, cx, ty + i * hlh, '#8aa4b8', { align: 'center', shadow: false }));
     g.fillStyle = '#1c3a52'; g.fillRect(x + 6, y + HUB.h - 20, w - 12, 1);
+    AQ.Kit.leave(g);
   }
 
   // ---------------------------------------------------------------- erase (asks twice, backup first offered)
@@ -622,11 +625,14 @@ AQ.SaveFile = (function () {
     if (SF.panel.kind === 'hub') { hubDraw(g); return; }
     layout();
     const p = SF.panel, r = p.rect;
+    AQ.Kit.enter(g, 'save:' + p.kind);
     g.fillStyle = 'rgba(4,10,20,0.6)'; g.fillRect(0, 0, 320, 180);
+    AQ.Kit.rise(g);
     AQ.Kit.panel(g, { x: r.x, y: r.y, w: r.w, h: r.h }, { edge: p.kind === 'recover' || p.kind === 'freshconfirm' || p.kind === 'erase' ? '#ffcf8a' : '#6ef0ef' });
     F().draw(g, AQ.t(p.title), 160, r.y + 5, '#fff6dc', { align: 'center', shadow: false, max: BOX_W - 10 });
     p.wrapped.forEach((l, i) => F().draw(g, l, p.left ? r.x + 7 : 160, r.y + 15 + i * r.lh, '#9fd3ee', { align: p.left ? 'left' : 'center', shadow: false }));
     for (const b of SF.ui) AQ.Aquarium.button(g, b, SF.hover === b);
+    AQ.Kit.leave(g);
   };
   // the small "can't save right now" line for the title / pause screens
   SF.statusLine = () => (S().failed ? AQ.t('save.cantSaveLine') : null);

@@ -119,6 +119,7 @@ AQ.SoundUI = (function () {
   };
   S.draw = function (g) {
     const st = A.settings(), ord = order(), selRow = ord[S.sel];
+    AQ.Kit.enter(g, 'settings'); AQ.Kit.rise(g);
     AQ.Kit.panel(g, BOX, { edge: '#4fb8c8', title: AQ.t('settings.title'), titleColor: '#6ef0ef' });
     g.fillStyle = 'rgba(110,240,239,0.25)'; g.fillRect(BOX.x + 8, BOX.y + 28, BOX.w - 16, 1);
     for (const r of S.ui) {
@@ -139,6 +140,7 @@ AQ.SoundUI = (function () {
     if (selRow !== 'tabs' && selRow !== 'back') { const r = S.ui.find((u) => u.text && u.row === selRow); if (r) F().draw(g, '>', 59, r.y + 3, '#6ef0ef', { shadow: false }); }
     const foot = S.tab === 'sound' ? AQ.t('settings.foot.sound', { key: AQ.Keys.name('mute') }) : S.tab === 'touch' ? AQ.t(AQ.Touch && AQ.Touch.active() ? 'settings.foot.touchOn' : 'settings.foot.touchOff') : AQ.t('settings.foot.saved');
     F().draw(g, foot, 160, BOX.y + BOX.h - 8, '#7fa4ba', { align: 'center', shadow: false, max: BOX.w - 8 });
+    AQ.Kit.leave(g);
   };
   return S;
 })();

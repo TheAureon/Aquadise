@@ -825,11 +825,14 @@ AQ.Aquarium = (function () {
   }
   function drawDialog(g) {
     const d = A.dialog, L = dialogLayout();
+    AQ.Kit.enter(g, 'tankdialog');
     g.fillStyle = 'rgba(4,10,20,0.45)'; g.fillRect(0, 0, 320, 180);
+    AQ.Kit.rise(g);
     AQ.Kit.panel(g, { x: L.x, y: L.y, w: L.w, h: L.h }, { edge: d.warn ? '#ffb08a' : '#5fc6d9' });
     F().draw(g, d.title, 160, L.y + 4, d.warn ? '#ffcf8a' : '#ffe9a8', { align: 'center', shadow: false, max: L.w - 10 });
     (d.lines || []).forEach(([t, c], i) => F().draw(g, t, 160, L.y + 13 + i * 7, c || '#cfe8ff', { align: 'center', shadow: false, max: L.w - 10 }));
     L.btns.forEach((b) => button(g, b, A.dHover && A.dHover.id === b.id));
+    AQ.Kit.leave(g);
   }
 
   // ---------------------------------------------------------------- the TANK tab: size and EXPAND

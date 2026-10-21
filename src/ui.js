@@ -762,12 +762,14 @@ AQ.PauseUI = (function () {
   P.draw = function (g) {
     g.fillStyle = 'rgba(4,12,24,0.7)'; g.fillRect(0, 0, 320, 180);
     if (P.panel === 'sound') { AQ.SoundUI.draw(g); return; }
+    AQ.Kit.enter(g, 'pause'); AQ.Kit.rise(g);
     AQ.Kit.panel(g, BOX, { title: AQ.t('pause.title') });
     g.fillStyle = 'rgba(95,198,217,0.25)'; g.fillRect(BOX.x + 8, BOX.y + 14, BOX.w - 16, 1);
     P.ui.forEach((r, i) => { AQ.Aquarium.button(g, r, i === P.sel); if (r.id === 'saves' && AQ.SaveFile) AQ.SaveFile.drawDot(g, r); });
     const warn = AQ.SaveFile && AQ.SaveFile.statusLine(), old = AQ.SaveFile && AQ.SaveFile.pauseLine();
     F().draw(g, warn || AQ.t('pause.autosave'), 160, 156, warn ? '#ffcf8a' : '#8aa4b8', { align: 'center', max: 300 });
     if (old && !warn) F().draw(g, old, 160, 165, '#ffe9a8', { align: 'center', max: 300 });   // (only once it's been a while)
+    AQ.Kit.leave(g);
     if (AQ.SaveFile) AQ.SaveFile.draw(g);
   };
   return P;
