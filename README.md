@@ -860,7 +860,7 @@ untouched, so it stays crisp.
   right edges, a faint cool rim), and the most visible ones got hand touches (the diver's visor glint, fish
   gills + swaying side fins, pinching crab claws, nodding snails, shines; a glass dome on the UFO; lit
   rivets on the station hull; a lit title logo). Sizes and hitboxes are unchanged. Every changed sprite is
-  listed in `docs/ART_CHANGES.md`; the originals are in `art-backup/sprites-before-graphics4/`. All lighting
+  listed in `docs/ART_CHANGES.md`, with how to get an original back from git history. All lighting
   works from the colour sprites alone, so your own art never breaks it; where an optional glow map would go
   is in `docs/SPRITE_SPEC.md`.
 - **Effects list:** `src/gfx/effects.js` lists every effect, the levels that draw it, and how REDUCE
@@ -1017,7 +1017,6 @@ tools/sprites.html          animated preview of every sprite
 docs/SPRITE_SPEC.md         how to make sprites that drop in cleanly
 docs/GRAPHICS_PLAN.md       the shader layer: how it works, each stage, measurements
 docs/ART_CHANGES.md         the art pass: every changed sprite, and how to put an original back
-art-backup/                 the original placeholder sprites from before the art pass
 ```
 
 ### Adding content (data only)

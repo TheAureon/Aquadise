@@ -261,8 +261,8 @@ data/decorations.js. Bright pixels (near white) also pick up the soft bloom on M
 
 The placeholder generator draws its shading (light from the top-left, a dark outline, a highlight pixel)
 into the PNGs themselves; it never runs on your files (only `--force` redraws existing PNGs, and never
-an entry marked `"custom": true`). The originals from before that art pass are in
-`art-backup/sprites-before-graphics4/` (see docs/ART_CHANGES.md).
+an entry marked `"custom": true`). The originals from before that art pass are in git history (see
+docs/ART_CHANGES.md).
 
 **Optional glow map (for later; nothing needs it today).** If a sprite should have parts that shine
 by themselves (a lure, lit windows, glowing spots), the place for it is a second sheet next to the

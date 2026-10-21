@@ -2,16 +2,16 @@
 
 Every sprite below was redrawn by `tools/gen-placeholders.js --force` after the art pass in
 `src/placeholder-art.js`. Sizes, frames, anchors and hitboxes are unchanged (the only sprite whose visible
-bounds changed is the UFO, which gained a glass dome on top). The originals are kept, at the same paths, in
-`art-backup/sprites-before-graphics4/`.
+bounds changed is the UFO, which gained a glass dome on top). The originals are in git history: commit
+`c58d83e~1` (the commit just before the art pass) has them at the same paths.
 
 ## To put an original back
 
-1. Copy it from `art-backup/sprites-before-graphics4/<path>` over `assets/sprites/<path>`.
+1. Get it from git history: `git checkout c58d83e~1 -- assets/sprites/<path>`.
 2. In `assets/manifest.js`, add `"custom": true` to its entry, so `gen-placeholders.js --force` never redraws it.
 3. Run `node tools/embed-sprites.js` (the copy the game uses when opened from a file).
 
-To put them all back: copy the whole folder over `assets/sprites/` and run `node tools/embed-sprites.js`.
+To put them all back: `git checkout c58d83e~1 -- assets/sprites` and run `node tools/embed-sprites.js`.
 (Without `--force` the generator never overwrites an existing PNG.)
 
 ## What changed

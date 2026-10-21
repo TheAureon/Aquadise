@@ -191,7 +191,7 @@ In CLASSIC all three do nothing: `#game` is still what you see, so nothing looks
   - **Art pass:** `Pix.light` (src/placeholder-art.js) gives every outlined sprite one light from the
     top-left; hand touches on the diver, fish, snails, crabs, jellies, limpets, barnacles, the UFO (a dome),
     the hull tile and the title logo. 547 sprites redrawn, sizes / frames / anchors / hitboxes unchanged;
-    list and restore steps in docs/ART_CHANGES.md, originals in `art-backup/sprites-before-graphics4/`.
+    list and restore steps in docs/ART_CHANGES.md (the originals are in git history, commit `c58d83e~1`).
     Lighting needs nothing beyond the colour sprites; the optional glow-map slot is described in
     docs/SPRITE_SPEC.md.
   - **Governor (final):** warm-up after loading / any level change, settle after a step, stops for the
