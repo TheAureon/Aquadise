@@ -122,6 +122,8 @@ const SCREENS = [
   ['sound-test-effects', () => { AQ.Title.panel = null; AQ.SoundTest.open(AQ.Game, 'title'); }],
   ['sound-test-ambience', () => { AQ.SoundTest.tab = 1; }],
   ['sound-test-music', () => { AQ.SoundTest.tab = 2; }],
+  ['sound-test-delta', () => { AQ.SoundTest.tab = 3; if (AQ.Delta.player) AQ.Delta.test('kelp'); }],   // (a song playing: its position bar)
+  ['sound-test-delta-stopped', () => { if (AQ.Delta.playing()) AQ.Delta.player.clear(); }],
   ['sea', () => { const G = AQ.Game; G.state = 'play'; AQ.Scenes.restore(G, 'world', 300, 80); AQ.HUD.showHelp = true; AQ.HUD.helpT = 10; AQ.HUD.bannerT = 0; AQ.HUD.toast('A toast for the check.', '#fff'); }],
   ['sea-deep', () => { const G = AQ.Game; AQ.Scenes.restore(G, 'world', 1400, 700); AQ.HUD.bannerT = 0; }],
   ['map', () => { AQ.Game.state = 'map'; }],

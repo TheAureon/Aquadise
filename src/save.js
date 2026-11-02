@@ -66,6 +66,9 @@ AQ.Save = (function () {
     AQ.State.unlocks = st.unlocks || {};      // older saves: nothing unlocked yet, best stars 0
     AQ.State.tankBest = st.tankBest || {};
     AQ.State.settings = st.settings || {};   // player options (e.g. the building's zoomed-out view)
+    // DELTA songs heard (older saves: none yet); kept tidy so a hand-edited save can't break the music
+    const mu = st.music && typeof st.music === 'object' ? st.music : {};
+    AQ.State.music = { heard: mu.heard && typeof mu.heard === 'object' ? mu.heard : {}, recent: Array.isArray(mu.recent) ? mu.recent.filter((x) => typeof x === 'string').slice(-8) : [] };
     AQ.State.log = st.log || {};
     S.renameSpecies(RENAMED);                 // species that were replaced: carry progress over (see RENAMED)
     // predators moved out of the biome tanks into their own tanks (4th floor): move any old ones over

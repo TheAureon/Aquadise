@@ -1,6 +1,7 @@
 // The music director. Builds the music mixer once the audio is unlocked (src/musicmix.js), and tells
 // ATARAXIA (src/ataraxia.js) where the player is and how it feels there: the place (title, hill, station,
-// aquarium, each sea biome), the depth, the time of day and a meteor-shower night. Notes are scheduled on
+// aquarium, each sea biome), the depth, the time of day and a meteor-shower night. DELTA (src/delta.js)
+// decides when a song plays; while one does, Ataraxia dips to a thin bed underneath it. Notes are scheduled on
 // the audio clock, both every frame and on a small timer, so a slow frame never leaves a gap.
 // Menus duck the music (AQ.Audio.setDuck). The two reward jingles (stingers) play over it.
 // (The old generative music is in git history: docs/MUSIC_PLAN.md.)
@@ -18,8 +19,22 @@ AQ.Music = (function () {
     AQ.MusicMix.setLayer(M.mix, 'ataraxia', AQ.TUNING.ataraxia.level, 0.05);
     AQ.MusicMix.setLayer(M.mix, 'fx', 1, 0.05);
     X().start(M.mix);
+    AQ.Delta.start(M.mix);
+    AQ.Delta.onBegin = () => M.layers(AQ.TUNING.delta.dipSeconds);
+    AQ.Delta.onEnd = () => M.layers(AQ.TUNING.delta.returnSeconds);
+    M.layers(0.05);
     // the scheduler also runs by itself, so dropped frames (or a busy phone) never leave a gap
-    M.timer = setInterval(() => { try { X().tick(); } catch (e) {} }, AQ.TUNING.music.tickMs);
+    M.timer = setInterval(() => { try { X().tick(); AQ.Delta.update(0, null); } catch (e) {} }, AQ.TUNING.music.tickMs);
+  };
+  // Ataraxia's level: off (ATARAXIA OFF), a thin bed under a song, stepped back for a reward phrase, or full
+  M.layers = function (seconds) {
+    if (!M.mix) return;
+    const on = AQ.Delta.ataraxiaOn(), song = !!AQ.Delta.playing(), sting = M.stingUntil && A.ctx.currentTime < M.stingUntil;
+    const k = !on ? 0 : (song ? AQ.TUNING.delta.bedLevel : 1) * (sting ? 0.4 : 1);
+    X().quiet = !on;                                               // off: no notes scheduled at all
+    if (M.lastK === k) return;
+    M.lastK = k;
+    AQ.MusicMix.setLayer(M.mix, 'ataraxia', AQ.TUNING.ataraxia.level * k, seconds);
   };
 
   // which place's music: the Sound Test's choice, else where the player is (same rule as always)
@@ -54,6 +69,8 @@ AQ.Music = (function () {
     if (A.settle(M, M.current, want, dt, !!M.test || !roaming)) { M.current = want; X().setPlace(want.split(':')[0], M.test ? 2 : undefined); }
     X().setMood(mood(game, M.current || want));
     X().tick();
+    AQ.Delta.update(dt, game);
+    M.layers(M.stingUntil && A.ctx.currentTime >= M.stingUntil - 0.05 ? 2.5 : 2);
     // menus: the music steps back
     const st = game.state;
     A.setDuck(st === 'log' || st === 'pause' || st === 'map' ? AQ.TUNING.audio.menuDuck : 1);
@@ -66,17 +83,16 @@ AQ.Music = (function () {
     const s = D().stingers[id];
     if (!s) return;
     if (AQ.data.audioFiles && AQ.data.audioFiles['music:' + id]) { A.playFile(AQ.data.audioFiles['music:' + id], { bus: A.musicBus }); return; }
-    const c = A.ctx, beat = 60 / s.bpm, sc = D().scales[s.scale], lvl = AQ.TUNING.ataraxia.level;
+    const c = A.ctx, beat = 60 / s.bpm, sc = D().scales[s.scale];
     const note = (st, oct = 0) => s.root + sc[((st % sc.length) + sc.length) % sc.length] + 12 * (Math.floor(st / sc.length) + oct);
-    AQ.MusicMix.setLayer(M.mix, 'ataraxia', lvl * 0.4, 0.4);
     let t = c.currentTime + 0.2;
     s.notes.forEach((st, i) => {
       AQ.Instruments.play(M.mix, 'fx', s.lead, t, note(st), 0.75 * (s.vol || 1) * 1.6, s.beats[i] * beat);
       if (i % 3 === 0) AQ.Instruments.play(M.mix, 'fx', 'harp', t, note(st, -1), 0.4 * (s.vol || 1) * 1.6, s.beats[i] * beat);
       t += s.beats[i] * beat;
     });
-    clearTimeout(M.stingT);
-    M.stingT = setTimeout(() => { if (M.mix) AQ.MusicMix.setLayer(M.mix, 'ataraxia', lvl, 2.5); }, (t - c.currentTime + 0.5) * 1000);
+    M.stingUntil = t + 0.5;                                        // Ataraxia steps back until then (M.layers)
+    M.layers(0.4);
   };
 
   // the Sound Test's list: every place's Ataraxia, by day and at night, then the jingles

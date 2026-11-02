@@ -18,6 +18,8 @@ AQ.SoundUI = (function () {
     if (S.tab === 'sound') return [
       { id: 'music', kind: 'bar', label: AQ.t('settings.music'), bar: st.music }, { id: 'sfx', kind: 'bar', label: AQ.t('settings.effects'), bar: st.sfx },
       { id: 'mute', kind: 'btn', label: AQ.t('settings.mute'), value: AQ.t(st.mute ? 'settings.muted' : 'settings.soundOn'), warn: st.mute },
+      { id: 'delta', kind: 'btn', label: AQ.t('settings.delta'), value: AQ.t(`settings.delta.${AQ.Delta.frequency()}`), cycle: true },   // how often songs play
+      { id: 'ataraxia', kind: 'btn', label: AQ.t('settings.ataraxia'), value: AQ.t(AQ.Delta.ataraxiaOn() ? 'settings.on' : 'settings.off'), on: AQ.Delta.ataraxiaOn(), toggle: true },
       { id: 'test', kind: 'wide', value: AQ.t('settings.soundTest') }];
     if (S.tab === 'options') return [
       { id: 'hints', kind: 'btn', label: AQ.t('settings.tips'), value: AQ.t(!AQ.Tips || AQ.Tips.hintsOn() ? 'settings.hintsOn' : 'settings.hintsOff'), on: !AQ.Tips || AQ.Tips.hintsOn(), toggle: true },
@@ -59,6 +61,7 @@ AQ.SoundUI = (function () {
   }
   function nudge(row, dir) {
     if (row === 'tabs') { const i = TABS.indexOf(S.tab); S.tab = TABS[(i + dir + TABS.length) % TABS.length]; A.play('menu_move'); return; }
+    if (row === 'delta') { const F = AQ.Delta.FREQS; AQ.Delta.setFrequency(F[Math.max(0, Math.min(F.length - 1, F.indexOf(AQ.Delta.frequency()) + dir))]); A.play('menu_move'); return; }   // (stops at OFF / ALWAYS)
     if (row !== 'music' && row !== 'sfx') return;
     A.setVolume(row, A.settings()[row] + dir * 0.1);
     A.play('menu_move');
@@ -67,6 +70,8 @@ AQ.SoundUI = (function () {
     const dirty = () => { A.play('menu_select'); AQ.Save && AQ.Save.dirty(); };
     if (id.startsWith('tab:')) { S.tab = id.slice(4); A.play('menu_move'); }
     else if (id === 'mute') { A.toggleMute(); A.play('menu_select'); }
+    else if (id === 'delta') { const F = AQ.Delta.FREQS; AQ.Delta.setFrequency(F[(F.indexOf(AQ.Delta.frequency()) + 1) % F.length]); A.play('menu_select'); }
+    else if (id === 'ataraxia') { AQ.Delta.setAtaraxia(!AQ.Delta.ataraxiaOn()); if (AQ.Music.layers) AQ.Music.layers(2); A.play('menu_select'); }
     else if (id === 'hints') { AQ.Tips.setHints(!AQ.Tips.hintsOn()); dirty(); }
     else if (id === 'flashing') { set().reduceFlashing = !AQ.U.calm(); dirty(); }
     else if (id === 'graphics' && AQ.Gfx && AQ.Gfx.supported !== false && AQ.TUNING.graphics.enabled) { const L = AQ.Gfx.LEVELS, i = L.indexOf(AQ.Gfx.level()); AQ.Gfx.choose(L[(i + 1) % L.length], true); dirty(); }   // your choice: always kept
@@ -152,13 +157,15 @@ AQ.SoundTest = (function () {
   // the ripple the game draws for it, since every hydrophone sound is also seen)
   // (the station requests' sounds have a tab only while requests are on: when they're off, nothing about
   // them plays anywhere)
-  const ALL_TABS = [['sfx', 'soundtest.effects'], ['amb', 'soundtest.ambience'], ['music', 'soundtest.ataraxia'], ['hydro', 'soundtest.hydro'], ['badges', 'soundtest.badges'], ['requests', 'soundtest.requests']];
+  const ALL_TABS = [['sfx', 'soundtest.effects'], ['amb', 'soundtest.ambience'], ['music', 'soundtest.ataraxia'], ['delta', 'soundtest.delta'], ['hydro', 'soundtest.hydro'], ['badges', 'soundtest.badges'], ['requests', 'soundtest.requests']];
   const tabs = () => ALL_TABS.filter(([k]) => k !== 'requests' || (AQ.Quests && AQ.Quests.on()));
   let TABS = tabs();
   const OWN_TAB = ['hydro', 'badges', 'requests'];                 // sfx groups with a tab of their own
   const PREV = { x: 160, y: 126 };                                 // where the ripple preview plays (hydrophone tab)
   T.ripples = []; T.pulses = [];
   const COLS = 4, CW = 76, CH = 8, STEP = 9, X0 = 8, Y0 = 28;
+  const cols = () => (TABS[T.tab] && TABS[T.tab][0] === 'delta' ? 2 : COLS);   // songs: two wide columns (title + length)
+  const cw = () => (cols() === 2 ? CW * 2 + 2 : CW);
 
   T.open = function (game, from) {
     T.from = from; T.prevState = game.state; T.sel = 0;
@@ -167,6 +174,7 @@ AQ.SoundTest = (function () {
   function items() {
     TABS = tabs(); if (T.tab >= TABS.length) T.tab = 0;
     const kind = TABS[T.tab][0];
+    if (kind === 'delta') return (AQ.data.songs || []).map((s) => ({ id: s.id, song: true, key: 'song:' + s.id, label: AQ.t('soundtest.songItem', { title: AQ.Delta.title(s), len: AQ.Delta.clock(AQ.Delta.length(s)) }) }));
     if (kind === 'music') return AQ.Music.catalog().map((p) => ({ id: p.id, label: p.label, stinger: p.stinger, key: 'music:' + p.id.split(':')[0] }));
     const list = OWN_TAB.indexOf(kind) >= 0 ? A.list('sfx').filter((s) => s.group === kind) : A.list(kind).filter((s) => kind !== 'sfx' || OWN_TAB.indexOf(s.group) < 0);
     if (kind === 'sfx') {
@@ -181,16 +189,19 @@ AQ.SoundTest = (function () {
     const tw = Math.floor(305 / TABS.length);                      // (the tabs share the row: a 6th one makes them a little narrower)
     const ui = TABS.map(([, name], i) => ({ id: 'tab', i, x: 8 + i * tw, y: 14, w: tw - 2, h: 10, label: AQ.t(name), on: i === T.tab }));
     ui.push({ id: 'back', x: 270, y: 2, w: 46, h: 10, label: AQ.t('ui.back') });
-    items().forEach((it, i) => ui.push({ id: 'item', i, it, x: X0 + (i % COLS) * (CW + 2), y: Y0 + Math.floor(i / COLS) * STEP, w: CW, h: CH, label: it.label }));
+    items().forEach((it, i) => ui.push({ id: 'item', i, it, x: X0 + (i % cols()) * (cw() + 2), y: Y0 + Math.floor(i / cols()) * STEP, w: cw(), h: CH, label: it.label }));
+    if (TABS[T.tab][0] === 'delta' && AQ.Delta.playing()) ui.push({ id: 'stopsong', x: 270, y: 146, w: 42, h: 10, label: AQ.t('soundtest.stop') });
     return ui;
   }
-  const playing = (it) => (TABS[T.tab][0] === 'amb' ? AQ.Ambience.test === it.id : TABS[T.tab][0] === 'music' ? AQ.Music.test === it.id : false);
+  const playing = (it) => (TABS[T.tab][0] === 'amb' ? AQ.Ambience.test === it.id : TABS[T.tab][0] === 'music' ? AQ.Music.test === it.id
+    : TABS[T.tab][0] === 'delta' ? !!AQ.Delta.playing() && AQ.Delta.playing().id === it.id : false);
   function trigger(it) {
     const kind = TABS[T.tab][0];
     if (kind === 'sfx' || kind === 'requests') A.play(it.id, { important: true });
     else if (kind === 'hydro') { A.play(it.id, { important: true }); preview(it); }
     else if (kind === 'badges') { A.play(it.id, { important: true }); T.toastPreview = { id: it.id, t: 0 }; }   // with the toast it plays under
     else if (kind === 'amb') AQ.Ambience.test = AQ.Ambience.test === it.id ? null : it.id;
+    else if (kind === 'delta') AQ.Delta.test(it.id);               // click again: it stops
     else if (it.stinger) AQ.Music.stinger(it.id);
     else AQ.Music.test = AQ.Music.test === it.id ? null : it.id;
   }
@@ -209,6 +220,7 @@ AQ.SoundTest = (function () {
   function setTab(i) { T.tab = (i + TABS.length) % TABS.length; T.sel = 0; A.play('menu_move'); }
   function close(game) {
     AQ.Music.test = null; AQ.Ambience.test = null;
+    if (AQ.Delta.isTest) AQ.Delta.stop(1.5);                         // a song started here stops when you leave
     A.play('menu_select');
     if (T.from === 'title') { AQ.Title.open(game); AQ.Title.panel = 'sound'; }
     else { game.state = 'pause'; AQ.PauseUI.panel = 'sound'; }
@@ -226,14 +238,15 @@ AQ.SoundTest = (function () {
     const mv = (d) => { T.sel = Math.max(0, Math.min(n - 1, T.sel + d)); A.play('menu_move'); };
     if (I.rawPressed('ArrowLeft', 'KeyA')) mv(-1);
     if (I.rawPressed('ArrowRight', 'KeyD')) mv(1);
-    if (I.rawPressed('ArrowUp', 'KeyW')) mv(-COLS);
-    if (I.rawPressed('ArrowDown', 'KeyS')) mv(COLS);
+    if (I.rawPressed('ArrowUp', 'KeyW')) mv(-cols());
+    if (I.rawPressed('ArrowDown', 'KeyS')) mv(cols());
     T.hover = T.ui.find((r) => m.x >= r.x && m.y >= r.y && m.x < r.x + r.w && m.y < r.y + r.h);
     if (T.hover && T.hover.id === 'item' && (m.x !== T.mx || m.y !== T.my)) T.sel = T.hover.i;
     T.mx = m.x; T.my = m.y;
     if (m.pressed[0] && T.hover) {
       if (T.hover.id === 'tab') setTab(T.hover.i);
       else if (T.hover.id === 'back') close(game);
+      else if (T.hover.id === 'stopsong') { AQ.Delta.stop(1.5); A.play('menu_select'); }
       else if (T.hover.id === 'item') trigger(T.hover.it);
     } else if (I.rawPressed('Enter', 'Space')) { const it = items()[T.sel]; if (it) trigger(it); }
   };
@@ -266,6 +279,17 @@ AQ.SoundTest = (function () {
         AQ.Hydro.ring(g, r.x, r.y, rad, a * 0.9, AQ.TUNING.hydrophone.ripple.color);
         if (r.r1 > 20 && k > 0.25) AQ.Hydro.ring(g, r.x, r.y, rad * 0.6, a * 0.5, AQ.TUNING.hydrophone.ripple.color);
       }
+    }
+    if (kind === 'delta') {                                         // the playing song: where it is, and how long it is
+      const s = AQ.Delta.playing();
+      if (s) {
+        const len = AQ.Delta.length(s), pos = AQ.Delta.position(), w = 256;
+        g.fillStyle = '#132b40'; g.fillRect(8, 150, w, 3);
+        g.fillStyle = '#6ef0ef'; g.fillRect(8, 150, Math.round(w * Math.min(1, pos / len)), 3);
+        F().draw(g, AQ.t('soundtest.info.song', { title: AQ.Delta.title(s), pos: AQ.Delta.clock(pos), len: AQ.Delta.clock(len) }), 8, 162, '#8fb6cc', { max: 304 });
+      } else F().draw(g, AQ.t('soundtest.info.songIdle'), 8, 162, '#8fb6cc', { max: 304 });
+      F().draw(g, AQ.t('soundtest.footer'), 160, 172, '#5f7f96', { align: 'center' });
+      return;
     }
     // (the font has no '_': ids show it as a space, as they always looked)
     if (cur) F().draw(g, AQ.t(`soundtest.info.${kind === 'sfx' || OWN_TAB.indexOf(kind) >= 0 ? 'sfx' : kind === 'amb' ? 'amb' : cur.stinger ? 'stinger' : 'music'}`, { id: cur.key.replace(/_/g, ' '), rec: A.hasRecording(cur.key) ? AQ.t('soundtest.recording') : '' }), 8, 162, '#8fb6cc');

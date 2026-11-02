@@ -2,6 +2,7 @@
 var AQ = (typeof AQ !== 'undefined') ? AQ : {};
 
 AQ.State = {
+  music: { heard: {}, recent: [] },   // DELTA songs heard (id -> times) and the latest few (src/delta.js)
   collection: {},   // id -> number caught / harvested
   plants: {},       // id -> plants in inventory (usable as decorations)
   tanks: {},        // tankId (biome id or predator tank id) -> { creatures: [{uid,id}], storage: [{uid,id}], decor: [{uid,type,id,x,y}] }

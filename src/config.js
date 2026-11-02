@@ -685,8 +685,8 @@ AQ.TUNING = {
   // ---- the music mixer and instruments (src/musicmix.js, src/instruments.js); see docs/MUSIC_PLAN.md
   music: {
     level: 0.75,              // everything musical, before the MUSIC slider (the limiter keeps it from clipping)
-    maxVoices: 24,            // most music notes ringing at once (the quietest old one fades to make room)
-    lowFxVoices: 14,          // ...with LOW EFFECTS on (slow phones)
+    maxVoices: 32,            // most music notes ringing at once (the quietest old one fades to make room)
+    lowFxVoices: 18,          // ...with LOW EFFECTS on (slow phones)
     scheduleAhead: 0.6,       // seconds of notes queued ahead on the audio clock (steady timing through slow frames)
     tickMs: 100,              // how often the scheduler also runs by itself (ms), besides every frame
     // the room: a generated reverb with a soft, warm tail
@@ -707,6 +707,7 @@ AQ.TUNING = {
       marimba: { level: 0.7,  verb: 0.35, echo: 0.2,  pan: 0.35 },
       pad:     { level: 0.55, verb: 0.65, echo: 0.1,  pan: 0.15 },
       sub:     { level: 0.3,  verb: 0.05, echo: 0,    pan: 0 },
+      bass:    { level: 0.4,  verb: 0.12, echo: 0.05, pan: 0.05 },
       chip:    { level: 0.35, verb: 0.55, echo: 0.5,  pan: 0.5 },
       perc:    { level: 0.45, verb: 0.3,  echo: 0.1,  pan: 0.3 }
     },
@@ -726,6 +727,23 @@ AQ.TUNING = {
                               // quieter, notes this much rarer (in between: in proportion)
     showerShimmer: 0.25,      // a meteor-shower night: share of notes that are a high glass shimmer instead
     padBright: [320, 4800]    // the pad's filter range (Hz) from darkest to brightest
+  },
+  // ---- DELTA: the composed songs (src/delta.js; the songs: data/songs.js)
+  delta: {
+    level: 1,                 // the songs' loudness (Ataraxia is quieter)
+    bedLevel: 0.3,            // while a song plays, Ataraxia dips to this share of its level (a thin bed underneath)
+    dipSeconds: 4,            // ...taking this long to step back when a song begins...
+    returnSeconds: 8,         // ...and this long to come back when it ends
+    // how often songs come (SETTINGS > SOUND > DELTA): minutes between songs, randomized by `jitter`
+    minutes: { rarely: 25, sometimes: 10, often: 4 },
+    alwaysGapSeconds: 20,     // ALWAYS: songs one after another, with this breathing gap between
+    jitter: 0.25,             // intervals vary this much either way (0.25 = 75% .. 125%)
+    defaultFrequency: 'sometimes',
+    recent: 4,                // songs heard among the last this many are picked less often (never the same twice in a row)
+    titleDelay: 2.5,          // the title screen's DELTA begins this many seconds after the title appears
+    offFade: 3,               // turning songs OFF fades a playing song out over this many seconds
+    tailSeconds: 6,           // after a song's last note, this long for it to ring out before it counts as ended
+    waitDiveSteps: 3          // during the guided dive's first this many steps no song begins (it waits)
   },
 
   save: { key: 'aquadise.save.v1', autosaveEvery: 10 },

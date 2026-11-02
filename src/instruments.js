@@ -3,7 +3,7 @@
 // when it ends (AQ.MusicMix.track). Each note uses at most about 7 nodes.
 //
 //   AQ.Instruments.play(mix, layer, inst, t, midi, vel, len, opts) -> when the note has fully died away
-//     inst: piano | bell | glass | harp | marimba | chip | sub | pad | perc (opts.kind: shaker | clave | kick)
+//     inst: piano | bell | glass | harp | marimba | chip | sub | bass | pad | perc (opts.kind: shaker | clave | kick)
 //     opts: { pan (-1..1, a fixed place instead of the group's drift), exact (no human touches) }
 //   AQ.Instruments.padEngine(mix, layer, { color, voices })   a held pad that never restarts: it glides
 //     from chord to chord (setChord), brightens or darkens (setBright), fades (setLevel), stops (stop)
@@ -61,7 +61,7 @@ AQ.Instruments = (function () {
       const rel = t + Math.max(0.2, len);
       if (rel > t + 0.45) out.gain.setTargetAtTime(0, t + 0.45, tau);
       out.gain.setTargetAtTime(0, rel, 0.22);
-      const end = Math.min(rel + 1.4, t + 0.45 + tau * 5);
+      const end = Math.min(rel + 1.0, t + 0.45 + tau * 5);       // (a released note is silent after ~4.5 time-constants)
       startAll([o1, o2], t, end); nz.start(t, Math.random()); nz.stop(t + 0.08);
       MM().track(mix, src, nodes, { out, vel: v, t, end, links });
       return end;
@@ -134,6 +134,23 @@ AQ.Instruments = (function () {
       MM().track(mix, src, nodes, { out, vel: v, t, end });
       return end;
     },
+    // a song's bass: round and plucked (a soft upright / felt-bass feel); the filter closes after the attack
+    bass(mix, L, t, m, v, len, o) {
+      const c = mix.ctx, nodes = [], src = [], f = hz(m);
+      const out = outFor(mix, L, 'bass', o, nodes);
+      const flt = lowpass(c, Math.min(1400, f * 9), 0.7, nodes); flt.connect(out);
+      flt.frequency.setTargetAtTime(Math.max(140, f * 2.5), t + 0.01, 0.18);
+      osc(c, 'sine', f, 0, nodes, src).connect(out);
+      osc(c, 'triangle', f, rnd(-3, 3), nodes, src).connect(flt);
+      const rel = t + Math.max(0.2, len * 0.95);
+      rise(out, t, 0.5 * v, 0.012);
+      out.gain.setTargetAtTime(0.3 * v, t + 0.015, 0.5);
+      out.gain.setTargetAtTime(0, rel, 0.12);
+      const end = rel + 0.9;
+      startAll(src, t, end);
+      MM().track(mix, src, nodes, { out, vel: v, t, end });
+      return end;
+    },
     // a pad chord tone (songs): two detuned layers, slow in, slow out
     pad(mix, L, t, m, v, len, o) {
       const c = mix.ctx, nodes = [], src = [], f = hz(m), d = rnd(5, 9);
@@ -144,7 +161,7 @@ AQ.Instruments = (function () {
       const rel = t + Math.max(1, len);
       rise(out, t, 0.12 * v, Math.min(1.2, len * 0.4));
       out.gain.setTargetAtTime(0, rel, 0.6);
-      const end = rel + 3.6;
+      const end = rel + 2.6;
       startAll(src, t, end);
       MM().track(mix, src, nodes, { out, vel: v, t, end });
       return end;
@@ -188,7 +205,7 @@ AQ.Instruments = (function () {
       g.gain.setValueAtTime(amps[i], t); g.gain.setTargetAtTime(0, t + attack, decays[i] * k);
       longest = Math.max(longest, decays[i] * k);
     });
-    const end = t + attack + longest * 5;
+    const end = t + attack + longest * 4;
     startAll(src, t, end);
     MM().track(mix, src, nodes, { out, vel: v, t, end, links });
     return end;

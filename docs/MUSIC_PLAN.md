@@ -1,7 +1,8 @@
 # Music plan: ATARAXIA and DELTA
 
-Status: **Stage 1 done** (the new mixer, the instruments, ATARAXIA). The old generative music is gone from
-the game (it's in git history, before this stage). Stage 2 (DELTA songs) is next.
+Status: **Stage 2 done** (DELTA: the song format, the player, ten songs, the frequency and ATARAXIA
+settings, the Sound Test's DELTA tab). Stage 1 (the mixer, the instruments, ATARAXIA) is done too. Next:
+Stage 3 (the NOW PLAYING toast, the jukebox, songs from audio files).
 
 The new music has two parts, in the game's cozy, airy piano-and-bell ambient style (C418, the quiet moments
 of Stardew Valley, a soft chiptune touch at night):
@@ -305,3 +306,23 @@ Each song has a 4–8 note motif that returns, varied, across its sections. Some
   - There's no menu or hydrophone ducking in an export.
   - Recordings (Stage 3 files) only render if they've already been decoded.
 - **Real audio files from `file://`:** browsers may block `fetch` for local files. The game already handles this for effects with `tools/embed-audio.js`, and Stage 3 uses the same approach (with a size warning).
+
+## 10. The songs (Stage 2), and what each should sound like
+
+| Song | Place, time | Key, tempo | Meant to sound like |
+|---|---|---|---|
+| DELTA | title | D major → E, 72, 4/4 | The album's theme: a calm felt-piano melody (the "A F# E D E" motif) over a warm pad, harp arpeggios in the middle, a glassy bridge, then the theme lifted a step for its last return and a soft ending on the motif. |
+| SEA GLASS MORNING | tide pools, mangrove; day | G major → A, 96, 3/4 waltz | Sunny and light: marimba melody, harp "oom-pah" on beats 2 and 3, a hushed shaker in the middle section, a lift to A for the last verse. |
+| CORAL LANTERNS | coral, ruins; day | E major (lydian), 76 | Warm and shimmering: harp melody with the raised 4th (A#) giving a floating colour, high glass counterlines, a marimba-arpeggio middle. |
+| GREEN CATHEDRAL | kelp, mangrove | D dorian, 66 | Swaying and green: piano melody with dorian's bright 6th (B over D minor), harp arpeggios, a middle section in F that quotes the motif. |
+| BLUE MILE | open ocean, ice | C lydian → D, 60 | Wide and slow: long bell notes, lots of space and rests, a deep sub instead of a plucked bass, a lift to D lydian. |
+| LANTERN BELOW | trench, vents, ruins | A minor, 54 | Dark and tender: sparse low piano phrases, glass notes, a soft "lub-dub" heartbeat in the middle, ends on A minor. |
+| DRIP GARDEN | cave, lush cave | F major → G, 63 | Playful and echoing: marimba melody, rare clave "drips", high glass answers, lifts to G. |
+| KITE WEATHER | hill; day | G major → A, 104, 3/4 waltz | Breezy: harp melody, soft piano chords on the off-beats, shaker in the middle, lifts to A. |
+| ORBIT GARDEN | station, aquarium | E major, 70 | Spacey and gentle: bell melody, soft chiptune arpeggios, harp in the middle section. |
+| MOON POOL | everywhere at night | B flat major, 64 | Sleepy and nostalgic: a soft chiptune lead, chip arpeggios, a piano middle section that quotes the motif. |
+
+Measured (offline renders at the default MUSIC volume): every song is 2:17 to 3:24, peaks about -10 to -12 dB
+(no clipping), average loudness -27 to -30 dB (within 3 dB of each other; Ataraxia sits about 3 to 8 dB
+below), a loudness shape that rises from the intro to the last section and falls into the ending, at
+most 32 notes ringing and all nodes freed by the end.

@@ -70,6 +70,13 @@ AQ.langFiles.en = {
   'settings.requests': 'REQUESTS',   // the station requests (little goals by radio) on / off
   'settings.backupReminders': 'BACKUP REMINDERS',   // a gentle reminder to back up now and then (on / off)
   'settings.autoGraduate': 'AUTO-GRADUATE',   // grown babies leave the nursery by themselves
+  'settings.delta': 'DELTA',   // how often a composed song plays (SETTINGS > SOUND)
+  'settings.delta.off': 'OFF',
+  'settings.delta.rarely': 'RARELY',
+  'settings.delta.sometimes': 'SOMETIMES',
+  'settings.delta.often': 'OFTEN',
+  'settings.delta.always': 'ALWAYS',   // one song after another
+  'settings.ataraxia': 'ATARAXIA',   // the calm background music, on / off
   'settings.on': 'ON',
   'settings.off': 'OFF',
   'settings.flashing': 'FLASHING',
@@ -109,6 +116,13 @@ AQ.langFiles.en = {
   'soundtest.effects': 'EFFECTS',
   'soundtest.ambience': 'AMBIENCE',
   'soundtest.ataraxia': 'ATARAXIA',   // the Sound Test tab with every place's calm background music (day + night)
+  'soundtest.delta': 'DELTA',   // the Sound Test tab with every composed song
+  'soundtest.songItem': '{title} {len}',   // a song in the list: its name and length
+  'soundtest.info.song': '{title}  {pos} / {len}  (CLICK AGAIN TO STOP)',   // the playing song: where it is / how long it is
+  'soundtest.info.song.touch': '{title}  {pos} / {len}  (TAP AGAIN TO STOP)',
+  'soundtest.info.songIdle': 'CLICK A SONG TO PLAY IT FROM THE START',
+  'soundtest.info.songIdle.touch': 'TAP A SONG TO PLAY IT FROM THE START',
+  'soundtest.stop': 'STOP',
   'soundtest.hydro': 'HYDROPHONE',   // the hydrophone's sounds (each also shows its ripple)
   'soundtest.badges': 'BADGES',   // the badge chimes (each plays with its toast)
   'soundtest.requests': 'REQUESTS',   // the station requests' sounds (the tab shows only while requests are on)
@@ -2118,6 +2132,18 @@ AQ.langFiles.en = {
   'music.shower': 'METEOR SHOWER',
   'music.reward': 'REWARD',
   'music.nightVersion': '{name} NIGHT',   // the night version of a piece in the sound test
+  'music.time': '{m}:{s}',   // a length or a position in a song: minutes and seconds ({s} is always two digits)
+  // the DELTA songs (data/songs.js)
+  'song.delta': 'DELTA',
+  'song.tide_pools': 'SEA GLASS MORNING',
+  'song.coral': 'CORAL LANTERNS',
+  'song.kelp': 'GREEN CATHEDRAL',
+  'song.open_ocean': 'BLUE MILE',
+  'song.deep': 'LANTERN BELOW',
+  'song.cave': 'DRIP GARDEN',
+  'song.hill': 'KITE WEATHER',
+  'song.station': 'ORBIT GARDEN',
+  'song.night': 'MOON POOL',
 
   // ---------------------------------------------------------------- sound effects (sound test)
   'sfx.swing': 'NET SWING',

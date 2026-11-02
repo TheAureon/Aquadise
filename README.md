@@ -878,14 +878,16 @@ untouched, so it stays crisp.
 ## Sound and music
 
 Everything you hear is generated in code: soft effects, a quiet ambience bed for each place, and
-the music (ATARAXIA, the calm background; DELTA, composed songs, coming next: see docs/MUSIC_PLAN.md). Sound starts on your first click or key press (browsers don't allow it
+the music: ATARAXIA, the calm background, and DELTA, composed songs that play now and then (docs/MUSIC_PLAN.md). Sound starts on your first click or key press (browsers don't allow it
 before that), and pauses while the tab is hidden.
 
-- **Settings:** title screen → SOUND, or Esc → SOUND. MUSIC and EFFECTS volume, MUTE, and the
+- **Settings:** title screen → SOUND, or Esc → SOUND. MUSIC and EFFECTS volume, MUTE, DELTA (how
+  often a song plays: OFF, RARELY, SOMETIMES, OFTEN, ALWAYS), ATARAXIA (on / off), and the
   SOUND TEST. They're saved with the game (New Game keeps them). **O** mutes or unmutes anywhere.
 - **Sound test:** SOUND → SOUND TEST lists every effect and ambience bed, and on the ATARAXIA tab
-  every place's background music (by day and at night, plus the two reward phrases). Click one to
-  hear it. Beds and music play until clicked again. Each entry shows its id.
+  every place's background music (by day and at night, plus the two reward phrases), and on the
+  DELTA tab every song with its length (while one plays: where it is, a position bar and STOP).
+  Click one to hear it. Beds and music play until clicked again. Each entry shows its id.
 - **Feel:** effects and ambience are muffled while you're underwater and open up on land (hill,
   shore, station). Places crossfade into each other, and the log, map and pause menu duck the
   music to about half.
@@ -896,6 +898,21 @@ before that), and pauses while the tab is hidden.
   place's notes over a few seconds. The deeper you swim, the darker and quieter it gets; at night it
   is softer and slower, with a faint chiptune sparkle; on a meteor-shower night a high glass shimmer
   joins in. It sits quiet enough to talk over. Tuning: `AQ.TUNING.ataraxia`.
+- **DELTA** (`src/delta.js`, the songs in `data/songs.js`): ten composed songs, one album sharing
+  DELTA's motif: DELTA (the title theme), SEA GLASS MORNING (tide pools), CORAL LANTERNS, GREEN
+  CATHEDRAL (kelp), BLUE MILE (open ocean), LANTERN BELOW (the deep), DRIP GARDEN (caves), KITE
+  WEATHER (the hill), ORBIT GARDEN (the station) and MOON POOL (night). Each is 2 to 3.5 minutes with
+  a real beginning, middle and end; several change key for their last section. A song is picked for
+  the place you're in when it begins and the time of day (MOON POOL only at night; the sunny ones only
+  by day), never the same twice in a row, and less often one you heard recently. It doesn't change
+  when you move, and Ataraxia dips to a thin bed under it, coming back when it ends. A song never
+  begins while you LISTEN with the hydrophone, in photo mode, during the guided dive's first steps,
+  or while the sound is muted: it waits. The title screen plays DELTA each time you arrive (unless
+  DELTA is OFF). Turning DELTA OFF fades a playing song out; any other change lets it finish. With
+  ATARAXIA and DELTA both off there's no music (effects and ambience still play). How often, the
+  dip, the waits: `AQ.TUNING.delta`. The songs heard are saved (they'll fill the jukebox).
+  How to write a song: the top of `data/songs.js`. A mistake (a bar with the wrong number of beats,
+  an unknown chord or note) is shown as a warning in the browser console when the music starts.
 - **The music mixer and instruments** (`src/musicmix.js`, `src/instruments.js`): all synthesized.
   A felt piano, bells, glass, harp, marimba, warm / glassy / airy pads, a sub bass, a soft chiptune
   voice and hushed percussion, with small human touches (timing, velocity, slow pitch drift). The
@@ -1007,6 +1024,7 @@ src/music.js          the music director: place, depth, time of day; the reward 
 src/musicmix.js       the music mixer: reverb, tape echo, warmth, compressor, limiter, voice cap
 src/instruments.js    the music's synthesized instruments (piano, bells, harp, pads, sub, chip...)
 src/ataraxia.js       ATARAXIA: the calm music that is always there
+src/delta.js          DELTA: the song notation, voicing, player, and when songs play
 src/sounddirector.js  per-frame sound hooks: steps, splashes, beam, chimes, creature voices
 src/soundtest.js      the SETTINGS panel (SOUND / OPTIONS / TOUCH tabs) and the SOUND TEST screen
 src/touch.js          touch controls: pointers, joystick, on-screen buttons, MENU panel, rotate screen, vibration
@@ -1017,6 +1035,7 @@ src/touchtest.js      the TOUCH TEST screen (SETTINGS > TOUCH): every finger, bu
 data/tutorial.js      tutorial structure: tips, guided dive steps, Guide pages (their text is in data/lang/)
 src/langdata.js       gives the data files their text (names, hints, field notes...) from data/lang/
 data/music.js         ATARAXIA's setting for each place, the reward phrases, creature voice map, audio files
+data/songs.js         DELTA: the ten composed songs
 assets/audio/         recorded sounds (+ embedded.js, generated by tools/embed-audio.js)
 tools/gen-placeholders.js   writes placeholder PNGs + manifest from the data files
 tools/check-game.js         headless check of every main screen (console errors, text dumps, language keys)

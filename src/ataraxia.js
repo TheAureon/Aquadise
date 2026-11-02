@@ -100,7 +100,7 @@ AQ.Ataraxia = (function make() {
       X.nextChord = t + rnd(C.chordSeconds[0], C.chordSeconds[1]) * f.slow;
     }
     if (X.nextNote <= t + ahead) {
-      if (X.nextNote >= t - 0.5) playNote(Math.max(t + 0.01, X.nextNote));   // (fell far behind: just move on)
+      if (X.nextNote >= t - 0.5 && !X.quiet) playNote(Math.max(t + 0.01, X.nextNote));   // (fell far behind: just move on)
       X.nextNote = Math.max(X.nextNote, t) + rnd(C.noteEvery[0], C.noteEvery[1]) * f.slow;
     }
     if (!X.driftT || t >= X.driftT) { X.pad.drift(); X.driftT = t + AQ.TUNING.music.humanize.padDriftSeconds * rnd(0.7, 1.3); }
