@@ -878,32 +878,41 @@ untouched, so it stays crisp.
 ## Sound and music
 
 Everything you hear is generated in code: soft effects, a quiet ambience bed for each place, and
-gentle generative music. Sound starts on your first click or key press (browsers don't allow it
+the music (ATARAXIA, the calm background; DELTA, composed songs, coming next: see docs/MUSIC_PLAN.md). Sound starts on your first click or key press (browsers don't allow it
 before that), and pauses while the tab is hidden.
 
 - **Settings:** title screen → SOUND, or Esc → SOUND. MUSIC and EFFECTS volume, MUTE, and the
   SOUND TEST. They're saved with the game (New Game keeps them). **O** mutes or unmutes anywhere.
-- **Sound test:** SOUND → SOUND TEST lists every effect, ambience bed and music piece (day and
-  night versions, plus the reward phrase). Click one to hear it. Beds and music loop until clicked
-  again. Each entry shows its id.
+- **Sound test:** SOUND → SOUND TEST lists every effect and ambience bed, and on the ATARAXIA tab
+  every place's background music (by day and at night, plus the two reward phrases). Click one to
+  hear it. Beds and music play until clicked again. Each entry shows its id.
 - **Feel:** effects and ambience are muffled while you're underwater and open up on land (hill,
   shore, station). Places crossfade into each other, and the log, map and pause menu duck the
   music to about half.
-- **Music:** ambient by default: slow, with a soft pad that never stops, long airy notes and lots
-  of echo (`musicAmbient` in config: 1 = ambient, 0 = livelier and pluckier). Each place has its own
-  key, tempo, instruments and short tune (`data/music.js`).
-  One shared motif comes back everywhere, voiced by each place's lead instrument. Phrases are
-  sparse, with long rests. At night the sea pieces play slower, quieter and darker.
+- **ATARAXIA** (`src/ataraxia.js`, places in `data/music.js`): calm music that is always there and
+  never asks for attention. A held pad glides between a place's few slow chords, a deep bass note
+  sits under it, and now and then a single bell, piano or plucked note sounds, with long silences
+  between (never a tune). It never restarts: moving to another place glides the same pad to the new
+  place's notes over a few seconds. The deeper you swim, the darker and quieter it gets; at night it
+  is softer and slower, with a faint chiptune sparkle; on a meteor-shower night a high glass shimmer
+  joins in. It sits quiet enough to talk over. Tuning: `AQ.TUNING.ataraxia`.
+- **The music mixer and instruments** (`src/musicmix.js`, `src/instruments.js`): all synthesized.
+  A felt piano, bells, glass, harp, marimba, warm / glassy / airy pads, a sub bass, a soft chiptune
+  voice and hushed percussion, with small human touches (timing, velocity, slow pitch drift). The
+  music has its own warm reverb, a soft tape echo bouncing left and right, a gentle low-pass, a glue
+  compressor and a limiter (it can't clip, and effects never pull it down); a master safety limiter
+  sits after everything. At most `music.maxVoices` notes ring at once (fewer with LOW EFFECTS);
+  every note frees its nodes when it ends. Levels, reverb, echo and each instrument's mix:
+  `AQ.TUNING.music`.
 - **Creature sounds:** rare and quiet. One nearby creature makes a little sound every so often,
   by category, or its own `voice:` in `data/creatures.js`.
 - **Recordings:** footsteps on sand and grass, and going into and climbing out of the water, use real recordings
   (single steps cut from the walking clips in `assets/audio/`; a random one plays each step).
   To swap any other sound for a file, put it in `assets/audio/`, map its id in
   `AQ.data.audioFiles` (`data/music.js`), and run `node tools/embed-audio.js` so it also plays when
-  the game is opened straight from disk. Effects use their id, beds use `amb:<place>`, and music
-  uses `music:<piece>`.
-- **Tuning** (`AQ.TUNING.audio` in `src/config.js`): `master` (overall volume), `musicAmbient`, `musicPace`
-  (tempo), `musicRest` (silence between phrases), `creatureVoiceEvery` (seconds between creature
+  the game is opened straight from disk. Effects use their id and beds use `amb:<place>`; the
+  two reward phrases can be replaced as `music:reward` and `music:shower`.
+- **Tuning** (`AQ.TUNING.audio` in `src/config.js`): `master` (overall volume), `creatureVoiceEvery` (seconds between creature
   sounds), plus the default volumes, ambience level, crossfade time, menu duck, underwater muffle
   and the mute key.
 
@@ -994,7 +1003,10 @@ assets/sprites-embedded.js   base64 copy of the sprites for file:// (tools/embed
 src/audio.js          audio engine: mixer, voice limit, underwater filter, settings, file mapping
 src/sfx.js            every sound effect recipe (registered by id)
 src/ambience.js       the looping place sounds + their crossfading director
-src/music.js          generative music engine + director (pieces in data/music.js)
+src/music.js          the music director: place, depth, time of day; the reward phrases
+src/musicmix.js       the music mixer: reverb, tape echo, warmth, compressor, limiter, voice cap
+src/instruments.js    the music's synthesized instruments (piano, bells, harp, pads, sub, chip...)
+src/ataraxia.js       ATARAXIA: the calm music that is always there
 src/sounddirector.js  per-frame sound hooks: steps, splashes, beam, chimes, creature voices
 src/soundtest.js      the SETTINGS panel (SOUND / OPTIONS / TOUCH tabs) and the SOUND TEST screen
 src/touch.js          touch controls: pointers, joystick, on-screen buttons, MENU panel, rotate screen, vibration
@@ -1004,7 +1016,7 @@ src/gfx/shaders.js    the shaders (GLSL strings): sharp upscale, grading, fog, b
 src/touchtest.js      the TOUCH TEST screen (SETTINGS > TOUCH): every finger, button and the joystick, live
 data/tutorial.js      tutorial structure: tips, guided dive steps, Guide pages (their text is in data/lang/)
 src/langdata.js       gives the data files their text (names, hints, field notes...) from data/lang/
-data/music.js         music pieces, scales, motif, creature voice map, audio file mapping
+data/music.js         ATARAXIA's setting for each place, the reward phrases, creature voice map, audio files
 assets/audio/         recorded sounds (+ embedded.js, generated by tools/embed-audio.js)
 tools/gen-placeholders.js   writes placeholder PNGs + manifest from the data files
 tools/check-game.js         headless check of every main screen (console errors, text dumps, language keys)

@@ -1,54 +1,57 @@
-// Music + sound data. Edit freely: every piece is generated live from these settings (src/music.js).
+// Music data. ATARAXIA (src/ataraxia.js), the calm music that is always there: one setting per place.
+// (The composed DELTA songs come in data/songs.js.) Edit freely; AQ.TUNING.ataraxia holds the shared tuning.
 //
-// A piece:  root (MIDI note of the key), scale, bpm, and which instruments play which part:
-//   lead    the melody voice          piano | bell | harp | marimba | guitar | chip | drone | bass
-//   pad     held chords (optional)    warm | glass
-//   bass    soft low notes (true/false)
-//   arp     arpeggios (optional)      harp | chip | marimba | guitar   (+ arpDensity 0..1)
-//   bounce  little offbeat chord plucks (Stardew-ish), true/false
-//   melody  the place's own short tune (scale steps); the shared MOTIF also comes back now and then
-//   chords  chord roots (scale steps) the phrases move through
-//   rest    [min, max] beats of quiet between phrases (silence matters); x AQ.TUNING.audio.musicRest
-//   octave  shifts the melody (12 = an octave up, -12 down)
-//   night   true -> at night this piece plays slower, quieter and darker (AQ.TUNING.audio.night*),
-//           in a minor-ish scale, with soft chiptune arpeggios
+// A place:
+//   root     MIDI note the pad's chords are built on (48 = C3; lower = deeper)
+//   chords   the few slow chords the pad glides between, as semitones above the root (4 notes each,
+//            written close together so each note only moves a little: smooth voice leading)
+//   color    the pad's sound: warm (soft saws) | glass (glassy) | airy (wide, hollow)
+//   bright   0..1 how open the pad sounds (then darkened by depth and night)
+//   level    0..1 how loud this place's pad is
+//   sub      0..1 the deep held bass note under it (0 = none)
+//   notes    the instruments of the single, occasional notes (one at a time, long silences between)
+//   high     how far above the root those notes may sit (semitones: [lowest, highest])
+//   depth    0..1 how deep the place usually is (only the Sound Test uses it; in the game it's the
+//            diver's real depth)
 var AQ = (typeof AQ !== 'undefined') ? AQ : {};
 AQ.data = AQ.data || {};
 
+// chord shapes shared by several places (semitones above the root; see `chords` above)
+const ATARAXIA_CHORDS = {
+  major: [[0, 7, 14, 16], [-3, 7, 12, 16], [-7, 7, 12, 16]],          // I add9, vi7, IV maj9 (shared A, D, F#)
+  lydian: [[0, 7, 14, 18], [2, 9, 14, 18], [0, 7, 11, 16]],          // I(#11), II, I maj7: floating
+  dorian: [[0, 7, 14, 15], [5, 9, 12, 14], [-2, 7, 10, 14]],         // i add9, IV6, VII: green, open
+  mixolydian: [[0, 7, 14, 16], [-2, 7, 10, 14]],                      // I add9, VII6: earthy
+  aeolian: [[0, 7, 14, 15], [-4, 7, 12, 15], [-7, 7, 10, 15]],       // i add9, VI maj7, iv: old, dim
+  pentatonic: [[0, 7, 14, 19], [-3, 7, 12, 14]],                      // open fifths: glassy, cold
+  deep: [[0, 7, 12, 15], [-4, 7, 12, 15]]                             // almost a drone: i, VI
+};
+
 AQ.data.music = {
-  scales: {
-    major: [0, 2, 4, 5, 7, 9, 11], majPent: [0, 2, 4, 7, 9], minPent: [0, 3, 5, 7, 10],
-    lydian: [0, 2, 4, 6, 7, 9, 11], mixolydian: [0, 2, 4, 5, 7, 9, 10], dorian: [0, 2, 3, 5, 7, 9, 10],
-    aeolian: [0, 2, 3, 5, 7, 8, 10]
-  },
-  // the darker scale each one turns into at night
-  nightScale: { major: 'dorian', majPent: 'minPent', lydian: 'dorian', mixolydian: 'dorian', dorian: 'aeolian', aeolian: 'aeolian', minPent: 'minPent' },
-
-  // The shared motif (scale steps + beats) heard in every place, voiced by that place's lead.
-  motif: { notes: [0, 2, 4, 3, 1], beats: [1, 0.5, 1.5, 1, 2] },
-
-  pieces: {
-    title:      { root: 60, scale: 'major',      bpm: 70,  lead: 'piano',   pad: 'warm',  bass: true, melody: [4, 2, 1, 2, 0, -1, 0], chords: [0, 5, 3, 4], rest: [3, 6] },
-    hill:       { root: 62, scale: 'mixolydian', bpm: 76,  lead: 'guitar',  pad: 'warm',  bass: true, bounce: true, melody: [0, 2, 4, 5, 4, 2], chords: [0, 3, 6, 0], rest: [4, 7], night: true },
-    station:    { root: 64, scale: 'lydian',     bpm: 84,  lead: 'chip',    pad: 'glass', arp: 'chip', arpDensity: 0.7, melody: [0, 4, 3, 7, 6, 4], chords: [0, 1, 0, 4], rest: [3, 6] },
-    aquarium:   { root: 65, scale: 'lydian',     bpm: 72,  lead: 'bell',    pad: 'glass', arp: 'chip', arpDensity: 0.35, melody: [4, 3, 1, 0, 1, 4], chords: [0, 1, 3, 4], rest: [4, 7] },
-    tide_pools: { root: 67, scale: 'majPent',    bpm: 100, lead: 'marimba', bass: true, bounce: true, melody: [0, 1, 2, 4, 3, 2, 0], chords: [0, 3, 1, 4], rest: [3, 6], night: true },
-    coral:      { root: 64, scale: 'major',      bpm: 80,  lead: 'harp',    pad: 'warm',  arp: 'harp', arpDensity: 0.6, melody: [2, 4, 5, 4, 2, 1], chords: [0, 3, 5, 4], rest: [3, 6], night: true },
-    ruins:      { root: 57, scale: 'aeolian',    bpm: 64,  lead: 'piano',   pad: 'warm',  bass: true, melody: [0, 2, 3, 2, 4, 0], chords: [0, 5, 3, 6], rest: [4, 8], night: true },
-    open_ocean: { root: 60, scale: 'lydian',     bpm: 60,  lead: 'bell',    pad: 'warm',  arp: 'harp', arpDensity: 0.5, bass: true, melody: [4, 7, 6, 4, 3, 4], chords: [0, 1, 5, 4], rest: [4, 8], night: true },
-    vents:      { root: 47, scale: 'aeolian', bpm: 50,  lead: 'piano',   pad: 'warm',  bass: true, melody: [0, 1, 0, -2, 0], chords: [0, 5, 0, 6], rest: [6, 10], octave: 12, night: true },
-    trench:     { root: 45, scale: 'minPent',    bpm: 44,  lead: 'drone',   pad: 'warm',  melody: [0, 2, 1, 0], chords: [0, 3], rest: [8, 12], night: true },
-    kelp:       { root: 62, scale: 'dorian',     bpm: 66,  lead: 'harp',    pad: 'warm',  arp: 'harp', arpDensity: 0.65, bass: true, melody: [0, 2, 4, 6, 4, 3], chords: [0, 3, 6, 4], rest: [3, 7], night: true },
-    mangrove:   { root: 62, scale: 'mixolydian', bpm: 84,  lead: 'guitar',  bass: true, bounce: true, melody: [4, 2, 4, 6, 4, 0], chords: [0, 6, 3, 0], rest: [4, 7], night: true },
-    ice:        { root: 69, scale: 'majPent',    bpm: 60,  lead: 'bell',    pad: 'glass', melody: [4, 3, 1, 3, 2, 0], chords: [0, 3, 2, 4], rest: [5, 9], night: true },
-    cave:       { root: 50, scale: 'aeolian',    bpm: 52,  lead: 'piano',   pad: 'warm',  melody: [4, 3, 2, 0, 1], chords: [0, 5, 3], rest: [6, 11], octave: 12, night: true },
-    lush_cave:  { root: 65, scale: 'majPent',    bpm: 62,  lead: 'harp',    pad: 'warm',  melody: [2, 3, 4, 2, 1, 0], chords: [0, 3, 1, 4], rest: [5, 9], night: true }
+  ataraxia: {
+    title:      { root: 50, chords: ATARAXIA_CHORDS.major,      color: 'warm',  bright: 0.55, level: 0.9,  sub: 0.5, notes: ['piano', 'bell'],          high: [14, 34], depth: 0.1 },
+    hill:       { root: 55, chords: ATARAXIA_CHORDS.major,      color: 'airy',  bright: 0.7,  level: 0.85, sub: 0.4, notes: ['harp', 'piano'],          high: [12, 31], depth: 0 },
+    station:    { root: 52, chords: ATARAXIA_CHORDS.lydian,     color: 'glass', bright: 0.65, level: 0.8,  sub: 0.35, notes: ['glass', 'bell', 'chip'], high: [16, 36], depth: 0 },
+    aquarium:   { root: 53, chords: ATARAXIA_CHORDS.lydian,     color: 'glass', bright: 0.55, level: 0.8,  sub: 0.3, notes: ['bell', 'harp', 'glass'],  high: [14, 34], depth: 0.2 },
+    tide_pools: { root: 55, chords: ATARAXIA_CHORDS.major,      color: 'airy',  bright: 0.8,  level: 0.9,  sub: 0.4, notes: ['harp', 'bell', 'piano'],  high: [12, 31], depth: 0.1 },
+    coral:      { root: 52, chords: ATARAXIA_CHORDS.lydian,     color: 'warm',  bright: 0.7,  level: 0.9,  sub: 0.45, notes: ['harp', 'glass', 'marimba'], high: [12, 31], depth: 0.25 },
+    ruins:      { root: 47, chords: ATARAXIA_CHORDS.aeolian,    color: 'warm',  bright: 0.45, level: 0.85, sub: 0.55, notes: ['piano', 'bell'],         high: [15, 34], depth: 0.4 },
+    open_ocean: { root: 48, chords: ATARAXIA_CHORDS.lydian,     color: 'airy',  bright: 0.6,  level: 0.85, sub: 0.6, notes: ['bell', 'glass', 'piano'], high: [16, 38], depth: 0.45 },
+    kelp:       { root: 50, chords: ATARAXIA_CHORDS.dorian,     color: 'warm',  bright: 0.6,  level: 0.9,  sub: 0.5, notes: ['harp', 'piano'],          high: [12, 31], depth: 0.35 },
+    mangrove:   { root: 50, chords: ATARAXIA_CHORDS.mixolydian, color: 'warm',  bright: 0.55, level: 0.85, sub: 0.5, notes: ['marimba', 'harp'],        high: [12, 28], depth: 0.2 },
+    ice:        { root: 57, chords: ATARAXIA_CHORDS.pentatonic, color: 'glass', bright: 0.75, level: 0.8,  sub: 0.3, notes: ['glass', 'bell'],          high: [14, 34], depth: 0.25 },
+    cave:       { root: 45, chords: ATARAXIA_CHORDS.aeolian,    color: 'warm',  bright: 0.35, level: 0.8,  sub: 0.6, notes: ['piano', 'glass'],         high: [17, 36], depth: 0.6 },
+    lush_cave:  { root: 53, chords: ATARAXIA_CHORDS.major,      color: 'warm',  bright: 0.5,  level: 0.85, sub: 0.45, notes: ['harp', 'glass'],         high: [12, 31], depth: 0.6 },
+    vents:      { root: 45, chords: ATARAXIA_CHORDS.aeolian,    color: 'warm',  bright: 0.3,  level: 0.75, sub: 0.7, notes: ['piano'],                  high: [19, 36], depth: 0.75 },
+    trench:     { root: 43, chords: ATARAXIA_CHORDS.deep,       color: 'airy',  bright: 0.25, level: 0.7,  sub: 0.7, notes: ['glass'],                  high: [21, 38], depth: 0.95 }
   },
 
-  // quiet reward moments (a new decoration unlocked): a short plucked phrase over the music
+  // scales, for the stingers below (scale steps -> semitones)
+  scales: { major: [0, 2, 4, 5, 7, 9, 11] },
+  // quiet reward moments (a new decoration unlocked, a meteor shower): a short phrase over the music
   stingers: {
     shower: { root: 79, scale: 'major', bpm: 66, lead: 'bell', vol: 0.45, notes: [7, 11, 14, 9, 12, 16, 14], beats: [1, 1, 1.5, 1, 1, 1.5, 4] },
-    reward: { root: 67, scale: 'major', bpm: 132, lead: 'guitar', notes: [0, 2, 4, 7, 9, 7, 11, 14], beats: [0.5, 0.5, 0.5, 1, 0.5, 0.5, 1, 3] }
+    reward: { root: 67, scale: 'major', bpm: 132, lead: 'harp', notes: [0, 2, 4, 7, 9, 7, 11, 14], beats: [0.5, 0.5, 0.5, 1, 0.5, 0.5, 1, 3] }
   }
 };
 
@@ -60,8 +63,8 @@ AQ.data.creatureVoices = {
 };
 
 // Swap any generated sound for a real recording: map its id to a file. Effects use their id, ambience
-// beds 'amb:<place>', music 'music:<piece>' (beds + music loop), e.g.
-//   AQ.data.audioFiles = { catch: 'audio/catch.ogg', 'amb:kelp': 'audio/kelp-bed.ogg', 'music:kelp': 'audio/kelp.ogg' };
+// beds 'amb:<place>' (they loop), the two reward phrases 'music:reward' / 'music:shower', e.g.
+//   AQ.data.audioFiles = { catch: 'audio/catch.ogg', 'amb:kelp': 'audio/kelp-bed.ogg' };
 // The SOUND TEST screen lists every id. Serve the game over http for files to play reliably.
 // A value can be one file, a list (one is picked at random each time), or
 //   { files: [...], vol: 0..1, vary: 0..0.2 }   (vol = loudness, vary = random pitch change).

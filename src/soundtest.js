@@ -152,7 +152,7 @@ AQ.SoundTest = (function () {
   // the ripple the game draws for it, since every hydrophone sound is also seen)
   // (the station requests' sounds have a tab only while requests are on: when they're off, nothing about
   // them plays anywhere)
-  const ALL_TABS = [['sfx', 'soundtest.effects'], ['amb', 'soundtest.ambience'], ['music', 'soundtest.music'], ['hydro', 'soundtest.hydro'], ['badges', 'soundtest.badges'], ['requests', 'soundtest.requests']];
+  const ALL_TABS = [['sfx', 'soundtest.effects'], ['amb', 'soundtest.ambience'], ['music', 'soundtest.ataraxia'], ['hydro', 'soundtest.hydro'], ['badges', 'soundtest.badges'], ['requests', 'soundtest.requests']];
   const tabs = () => ALL_TABS.filter(([k]) => k !== 'requests' || (AQ.Quests && AQ.Quests.on()));
   let TABS = tabs();
   const OWN_TAB = ['hydro', 'badges', 'requests'];                 // sfx groups with a tab of their own

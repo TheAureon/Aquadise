@@ -5,15 +5,15 @@
 //   AQ.Audio.music(id)        ask for a music piece      (the music director in src/music.js decides)
 //   AQ.Audio.register(id, def) add a sound: { kind: 'sfx'|'amb'|'music', label, fn | start }
 //
-// Every sound, ambience bed ('amb:<place>') and music piece ('music:<piece>') is registered by id
+// Every sound, ambience bed ('amb:<place>') and music place ('music:<place>') is registered by id
 // (src/sfx.js, src/ambience.js, src/music.js). To swap one for a real recording later, add it to
 // AQ.data.audioFiles (data/music.js): { catch: 'audio/catch.ogg' }. Mapped ids play that file instead.
 //
 // Mixer:  sfx ──┐
-//         amb ──┴─> env (underwater lowpass) ─┬──────────────> compressor ─> master ─> speakers
-//                                             └─> reverb ──────┘
-//         music ─┬─────────────────────────────────────────────┘
-//                └─> reverb + slow echo ──────┘
+//         amb ──┴─> env (underwater lowpass) ─┬──────────────> compressor ─┬─> master ─> safety limiter ─> speakers
+//                                             └─> reverb ──────┘            │
+//         music: its own mixer (src/musicmix.js: reverb, echo, limiter) ─> musicBus ─┘
+// (The music has its own room and compressor, so an effect never pulls the music down.)
 // Nothing makes a sound until the first click or key press (browsers block it before that).
 var AQ = (typeof AQ !== 'undefined') ? AQ : {};
 
@@ -63,7 +63,11 @@ AQ.Audio = (function () {
     if (!AC) return;
     try { A.ctx = new AC(); } catch (e) { return; }
     const c = A.ctx;
-    A.master = c.createGain(); A.master.connect(c.destination);
+    // the very last stage: a safety limiter, so nothing can ever clip
+    const safe = c.createDynamicsCompressor();
+    safe.threshold.value = -2; safe.ratio.value = 20; safe.knee.value = 0; safe.attack.value = 0.002; safe.release.value = 0.15;
+    safe.connect(c.destination);
+    A.master = c.createGain(); A.master.connect(safe);
     const comp = c.createDynamicsCompressor();                     // keeps everything soft, no spikes
     comp.threshold.value = -18; comp.ratio.value = 3; comp.attack.value = 0.01; comp.release.value = 0.3;
     comp.connect(A.master); A.out = comp;
@@ -71,17 +75,12 @@ AQ.Audio = (function () {
     A.env.connect(comp);
     A.sfxBus = c.createGain(); A.sfxBus.connect(A.env);
     A.ambBus = c.createGain(); A.ambBus.connect(A.env);
-    A.musicBus = c.createGain(); A.musicBus.connect(comp);
+    A.musicBus = c.createGain(); A.musicBus.connect(A.master);
     // shared reverb (generated impulse). Sends are taken after the volume controls, so the sliders
     // and the underwater filter shape the echo too.
     A.reverb = c.createConvolver(); A.reverb.buffer = impulse(2.8, 2.4);
     A.reverbOut = c.createGain(); A.reverbOut.gain.value = 0.55; A.reverb.connect(A.reverbOut); A.reverbOut.connect(comp);
     A.sfxVerb = c.createGain(); A.sfxVerb.gain.value = 0.18; A.sfxVerb.connect(A.reverb); A.env.connect(A.sfxVerb);
-    A.musicVerb = c.createGain(); A.musicVerb.gain.value = 0.35; A.musicVerb.connect(A.reverb); A.musicBus.connect(A.musicVerb);
-    // a slow, soft echo for the music
-    const dl = c.createDelay(2), fb = c.createGain(), dlp = c.createBiquadFilter(), dOut = c.createGain();
-    dl.delayTime.value = 0.62; fb.gain.value = 0.32; dlp.type = 'lowpass'; dlp.frequency.value = 1800; dOut.gain.value = 0.3;
-    A.musicBus.connect(dl); dl.connect(dlp); dlp.connect(fb); fb.connect(dl); dlp.connect(dOut); dOut.connect(comp);
     // a direct send for "echoey" one-off sounds (drips in caves)
     A.echo = c.createGain(); A.echo.gain.value = 1; A.echo.connect(A.reverb);
     A.noiseBuf = noiseBuffer(4);

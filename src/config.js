@@ -672,21 +672,60 @@ AQ.TUNING = {
     ambienceLevel: 0.5,       // place sounds (waves, drips, wind...) relative to the effects slider
     maxVoices: 14,            // most effects allowed to ring at once (extra ones are skipped)
     underwaterCutoff: 900,    // how muffled effects + ambience are underwater (Hz; lower = more muffled)
-    musicPace: 1,             // music tempo multiplier (0.8 = slower, 1.2 = quicker)
-    musicRest: 1,             // silence between music phrases multiplier (2 = twice as much quiet)
-    musicAmbient: 1,          // 1 = ambient (slow, a soft pad that never stops, long airy notes, more echo);
-                              // 0 = the livelier, plucky style; anything in between blends
-    nightPace: 0.8,           // night versions of the sea music play this much slower...
-    nightVolume: 0.7,         // ...and this much quieter
-    crossfadeSeconds: 3,      // how long music + ambience take to blend into the next place
+    crossfadeSeconds: 3,      // how long ambience takes to blend into the next place (music: AQ.TUNING.ataraxia)
     // sounds from a spot in the world (AQ.Audio.playAt: hydrophone calls)
     spatial: { range: 300, panWidth: 200, panMax: 0.85, minVol: 0.15, nearCutoff: 8000, farCutoff: 450 },
     menuDuck: 0.5,            // music level while the log, map or pause menu is open
-    lookahead: 0.3,           // seconds of music notes scheduled ahead (keeps timing steady, cheap)
     creatureVoiceEvery: 9,    // average seconds between little creature sounds (higher = rarer)
     creatureVoiceRange: 120,  // only creatures this close (px) make sounds
     stepEvery: 20,            // px walked between footsteps (about two steps a second at walking speed)
     muteKey: 'KeyO'           // quick mute / unmute, anywhere
+  },
+
+  // ---- the music mixer and instruments (src/musicmix.js, src/instruments.js); see docs/MUSIC_PLAN.md
+  music: {
+    level: 0.75,              // everything musical, before the MUSIC slider (the limiter keeps it from clipping)
+    maxVoices: 24,            // most music notes ringing at once (the quietest old one fades to make room)
+    lowFxVoices: 14,          // ...with LOW EFFECTS on (slow phones)
+    scheduleAhead: 0.6,       // seconds of notes queued ahead on the audio clock (steady timing through slow frames)
+    tickMs: 100,              // how often the scheduler also runs by itself (ms), besides every frame
+    // the room: a generated reverb with a soft, warm tail
+    reverb: { seconds: 5, lowFxSeconds: 2.5, predelay: 0.025, damping: 0.7, highCut: 6500, lowCut: 220, level: 0.7 },   // lowCut: no boom in the tail
+    // a soft tape echo, bouncing left / right, each repeat darker
+    echo: { seconds: 0.46, feedback: 0.3, tone: 2000, level: 0.35, wow: 0.0018, wowRate: 0.35, spread: 0.65 },
+    warmth: 8500,             // gentle low-pass over all the music (Hz; lower = warmer, duller)
+    lowShelf: { freq: 150, gain: -4 },   // a gentle cut of the deepest lows (dB), so the music never gets muddy
+    glue: { threshold: -22, ratio: 2, attack: 0.03, release: 0.45 },   // a soft compressor holding the mix together
+    limiter: { threshold: -4, ratio: 20, attack: 0.002, release: 0.2 },  // the last stage: music can never clip
+    // each instrument: its level, how much reverb and echo it gets, and how far its slow pan drift reaches
+    // (0 = centre; it wanders at its own slow speed)
+    inst: {
+      piano:   { level: 0.9,  verb: 0.45, echo: 0.25, pan: 0.25 },
+      bell:    { level: 0.55, verb: 0.7,  echo: 0.45, pan: 0.6 },
+      glass:   { level: 0.45, verb: 0.8,  echo: 0.4,  pan: 0.7 },
+      harp:    { level: 0.75, verb: 0.5,  echo: 0.35, pan: 0.45 },
+      marimba: { level: 0.7,  verb: 0.35, echo: 0.2,  pan: 0.35 },
+      pad:     { level: 0.55, verb: 0.65, echo: 0.1,  pan: 0.15 },
+      sub:     { level: 0.3,  verb: 0.05, echo: 0,    pan: 0 },
+      chip:    { level: 0.35, verb: 0.55, echo: 0.5,  pan: 0.5 },
+      perc:    { level: 0.45, verb: 0.3,  echo: 0.1,  pan: 0.3 }
+    },
+    // small human touches on every note
+    humanize: { timing: 0.012, velocity: 0.12, padDriftCents: 7, padDriftSeconds: 9 }
+  },
+  // ---- ATARAXIA: the calm music that is always there (src/ataraxia.js; each place: data/music.js)
+  ataraxia: {
+    level: 0.5,               // its loudness (Delta songs are louder; this stays talk-over quiet)
+    crossfadeSeconds: 6,      // a place change: the pad glides to the new place over this long (no restart)
+    chordSeconds: [16, 34],   // how long the pad stays on one chord before gliding to the next
+    noteEvery: [7, 22],       // seconds between the single, occasional notes (bell, piano, pluck)
+    noteSkip: 0.25,           // chance an occasional note is left out (more silence)
+    night: { slower: 1.5, bright: 0.55, level: 0.9, chip: 0.3 },   // at night: chords and notes this much rarer, the pad
+                              // this much darker, this much quieter, and this share of notes a soft chiptune sparkle
+    depth: { dark: 0.7, quiet: 0.35, slower: 1.4 },   // at the very bottom of the sea: pad this much darker, this much
+                              // quieter, notes this much rarer (in between: in proportion)
+    showerShimmer: 0.25,      // a meteor-shower night: share of notes that are a high glass shimmer instead
+    padBright: [320, 4800]    // the pad's filter range (Hz) from darkest to brightest
   },
 
   save: { key: 'aquadise.save.v1', autosaveEvery: 10 },

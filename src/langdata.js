@@ -10,7 +10,7 @@
 //   predator + special tanks: name, short, tiny      tank.<id>.name / .short / .tiny
 //   field notes       AQ.data.lore[id]: title, sci, lines   lore.<id>.title / .sci / .<n>
 //   tutorial          help lines, controls, dive, guide pages, tips   help.*, controls.*, dive.*, guide.*, tip.*
-//   music             piece + stinger labels          music.<id>
+//   music             place + stinger labels          music.<id>
 // Load right after the data files (index.html).
 var AQ = (typeof AQ !== 'undefined') ? AQ : {};
 
@@ -67,7 +67,7 @@ AQ.LangData = (function () {
     // (a tip can have its own wording with touch controls too: tip.<id>.touch)
     T.tips.forEach((tip) => getter(tip, 'lines', () => [AQ.Touch && AQ.Touch.active() && AQ.Lang.has(`tip.${tip.id}.touch`, 'en') ? t(`tip.${tip.id}.touch`) : t(`tip.${tip.id}`)]));
     // music labels (the sound test)
-    ['pieces', 'stingers'].forEach((grp) => Object.keys(D.music[grp]).forEach((id) => getter(D.music[grp][id], 'label', () => t(`music.${id}`))));
+    ['ataraxia', 'stingers'].forEach((grp) => Object.keys(D.music[grp]).forEach((id) => getter(D.music[grp][id], 'label', () => t(`music.${id}`))));
   };
   return LD;
 })();

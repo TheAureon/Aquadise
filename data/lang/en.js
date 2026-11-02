@@ -108,7 +108,7 @@ AQ.langFiles.en = {
   // ---------------------------------------------------------------- sound test
   'soundtest.effects': 'EFFECTS',
   'soundtest.ambience': 'AMBIENCE',
-  'soundtest.music': 'MUSIC',
+  'soundtest.ataraxia': 'ATARAXIA',   // the Sound Test tab with every place's calm background music (day + night)
   'soundtest.hydro': 'HYDROPHONE',   // the hydrophone's sounds (each also shows its ripple)
   'soundtest.badges': 'BADGES',   // the badge chimes (each plays with its toast)
   'soundtest.requests': 'REQUESTS',   // the station requests' sounds (the tab shows only while requests are on)

@@ -1,7 +1,7 @@
 # Music plan: ATARAXIA and DELTA
 
-Status: **Stage 0 (audit and plan).** No sound has changed yet; the current generative music keeps playing
-until Stage 1 replaces it.
+Status: **Stage 1 done** (the new mixer, the instruments, ATARAXIA). The old generative music is gone from
+the game (it's in git history, before this stage). Stage 2 (DELTA songs) is next.
 
 The new music has two parts, in the game's cozy, airy piano-and-bell ambient style (C418, the quiet moments
 of Stardew Valley, a soft chiptune touch at night):
