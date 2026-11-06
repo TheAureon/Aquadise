@@ -158,6 +158,8 @@ AQ.Game = (function () {
       AQ.TouchTest.update(dt, G);
     } else if (G.state === 'guide') {
       AQ.Guide.update(dt, G);
+    } else if (G.state === 'jukebox') {
+      AQ.Jukebox.update(dt, G);
     }
     if (AQ.Hydro && G.player) AQ.Hydro.update(dt, G);   // the hydrophone: ripples, LISTEN (ends by itself off the sea / in menus)
     if (AQ.Badges && G.player) AQ.Badges.update(dt, G);   // badges: events come in from the game; checks every few seconds
@@ -233,6 +235,7 @@ AQ.Game = (function () {
   }
   function drawOverlays(ctx) {
     if (G.state === 'guide') { AQ.Guide.draw(ctx); return; }              // the book covers the HUD (no text underneath)
+    if (G.state === 'jukebox') { AQ.Jukebox.draw(ctx); return; }          // the MUSIC page too
     AQ.HUD.draw(ctx, G);
     if (G.state === 'play' && AQ.Tips) AQ.Tips.draw(ctx, G);
     if (G.state === 'play' && AQ.Dive) AQ.Dive.draw(ctx, G);

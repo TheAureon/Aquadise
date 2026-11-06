@@ -107,7 +107,8 @@ AQ.TUNING = {
     toastGap: 0.6,            // ...with this gap before the next one
     summaryAt: 3,             // this many waiting at once become one "3 new badges!" toast
     trophyEmptySlots: true,   // the trophy wall shows a faint empty slot for every badge still to earn (false: earned ones only)
-    toastY: 118               // where the badge toast sits (game px from the top: under the tip box, above the HUD toasts)
+    toastY: 118,              // where the badge toast sits (game px from the top: under the tip box, above the HUD toasts)
+    songToastMaxWait: 20      // a NOW PLAYING toast that couldn't show within this many seconds of its song beginning is dropped
   },
 
   bait: { lifetime: 22, sinkSpeed: 7, lureRadius: 95 },
@@ -708,6 +709,7 @@ AQ.TUNING = {
       pad:     { level: 0.55, verb: 0.65, echo: 0.1,  pan: 0.15 },
       sub:     { level: 0.3,  verb: 0.05, echo: 0,    pan: 0 },
       bass:    { level: 0.4,  verb: 0.12, echo: 0.05, pan: 0.05 },
+      file:    { level: 1,    verb: 0.06, echo: 0,    pan: 0 },   // a song from an audio file (assets/music): already mixed
       chip:    { level: 0.35, verb: 0.55, echo: 0.5,  pan: 0.5 },
       perc:    { level: 0.45, verb: 0.3,  echo: 0.1,  pan: 0.3 }
     },
@@ -743,7 +745,11 @@ AQ.TUNING = {
     titleDelay: 2.5,          // the title screen's DELTA begins this many seconds after the title appears
     offFade: 3,               // turning songs OFF fades a playing song out over this many seconds
     tailSeconds: 6,           // after a song's last note, this long for it to ring out before it counts as ended
-    waitDiveSteps: 3          // during the guided dive's first this many steps no song begins (it waits)
+    waitDiveSteps: 3,         // during the guided dive's first this many steps no song begins (it waits)
+    fileLoudness: -24,        // a song from an audio file (assets/music) is turned up or down so its average level is
+                              // about this (dB, before the music mixer), so it sits with the built-in songs
+    fileGainRange: [0.15, 2.5],   // ...but never quieter or louder than this (times its own level)
+    pauseFade: 0.25           // the jukebox's PAUSE / STOP fade (seconds)
   },
 
   save: { key: 'aquadise.save.v1', autosaveEvery: 10 },

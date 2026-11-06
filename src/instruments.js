@@ -217,6 +217,7 @@ AQ.Instruments = (function () {
     const H = AQ.TUNING.music.humanize;
     if (!opts.exact) { t += Math.random() * H.timing; vel *= 1 + (Math.random() * 2 - 1) * H.velocity; }
     t = Math.max(t, mix.ctx.currentTime + 0.005);
+    mix.playing = layer;                                          // (the note's layer, for MusicMix.track)
     try { return fn(mix, layer, t, midi, clamp(vel, 0.02, 1.2), len || 0.5, opts); } catch (e) { return t; }
   };
   IN.list = Object.keys(R);

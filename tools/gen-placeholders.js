@@ -69,6 +69,7 @@ add('ui.radio', 'sprites/ui/radio.png', 'uiradio', [12, 12], { shape: 'uiradio',
 add('misc.bottle', 'sprites/scene/bottle.png', 'bottle', [12, 14], { shape: 'bottle', fit: false });
 add('misc.beampad', 'sprites/scene/beampad.png', 'propanim', [40, 12], { shape: 'beampad' });
 add('misc.console', 'sprites/scene/console.png', 'propanim', [20, 28], { shape: 'console' });
+add('misc.jukebox', 'sprites/scene/jukebox.png', 'propanim', [18, 26], { shape: 'jukebox' });
 add('misc.tank_frame', 'sprites/scene/tank_frame.png', 'prop', [64, 44], { shape: 'tankframe', fit: false });
 add('bg.hill_sky', 'sprites/scene/hill_sky.png', 'still', [320, 180], { shape: 'hillsky', fit: false });
 add('bg.space', 'sprites/scene/space.png', 'still', [320, 180], { shape: 'spacebg', fit: false });

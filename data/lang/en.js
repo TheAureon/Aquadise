@@ -76,6 +76,7 @@ AQ.langFiles.en = {
   'settings.delta.sometimes': 'SOMETIMES',
   'settings.delta.often': 'OFTEN',
   'settings.delta.always': 'ALWAYS',   // one song after another
+  'settings.songTitles': 'SONG TITLES',   // the small NOW PLAYING toast when a song begins (on / off)
   'settings.ataraxia': 'ATARAXIA',   // the calm background music, on / off
   'settings.on': 'ON',
   'settings.off': 'OFF',
@@ -145,6 +146,7 @@ AQ.langFiles.en = {
   'pause.help': 'SHOW CONTROLS',
   'pause.guide': 'GUIDE',
   'pause.settings': 'SETTINGS',
+  'pause.music': 'MUSIC',   // the JUKEBOX: every song you've heard, to play again
   'pause.home': 'HOME',
   'pause.title': 'PAUSED',
   'pause.autosave': 'PROGRESS SAVES AUTOMATICALLY',
@@ -687,6 +689,13 @@ AQ.langFiles.en = {
   'guide.touch.4': 'Buttons: JUMP, BAIT, SNEAK (tap on, tap off), the hand to interact and the ear to listen.',
   'guide.touch.5': 'MENU, in a top corner, has the log, map, guide, help, mute, pause and settings.',
   'guide.touch.6': 'SETTINGS > TOUCH: controls on or off, swap sides, control size, vibration and a TOUCH TEST.',
+  'guide.music.title': 'Music',
+  'guide.music.1': 'ATARAXIA: calm music that always plays, shaped by place and time of day.',
+  'guide.music.2': 'DELTA: songs that play now and then, picked for where you are.',
+  'guide.music.3': 'SETTINGS > SOUND: DELTA (how often), SONG TITLES, ATARAXIA (on or off).',
+  'guide.music.4': 'MUSIC (pause menu) or the station\'s jukebox lists the songs you have heard.',
+  'guide.music.5': 'Play them again, with SHUFFLE or REPEAT ONE. Unheard ones show as ???.',
+  'guide.music.6': 'Just for listening: nothing in the game needs it.',
   'guide.settings.title': 'Sound and settings',
   'guide.settings.1': 'Pause ({k:pause}) > SOUND: music and effects volume, mute and a SOUND TEST.',
   'guide.settings.1.touch': 'MENU > SETTINGS: music and effects volume, mute and a SOUND TEST.',
@@ -750,6 +759,7 @@ AQ.langFiles.en = {
   'station.name': 'Aquarium Station',
   'station.beamDown': 'BEAM DOWN TO THE HILL',
   'station.directory': 'TANK DIRECTORY',
+  'station.jukebox': 'JUKEBOX',   // the prompt at the jukebox (opens the MUSIC page)
   'station.tend': 'TEND THE {tank} TANK',
   'station.followRobot': '{key}: FOLLOW ROBOT',   // {key} = the whole-building view key
   'station.followRobot.touch': 'EYE BUTTON: FOLLOW ROBOT',
@@ -2132,6 +2142,25 @@ AQ.langFiles.en = {
   'music.shower': 'METEOR SHOWER',
   'music.reward': 'REWARD',
   'music.nightVersion': '{name} NIGHT',   // the night version of a piece in the sound test
+  // the JUKEBOX: the MUSIC page (pause menu, or the jukebox by the station's directory)
+  'jukebox.title': 'MUSIC',
+  'jukebox.count': '{n} OF {total} HEARD',   // songs you've heard begin somewhere / all the songs
+  'jukebox.unknown': '???  ({place})',   // a song not heard yet: where it plays
+  'jukebox.night': 'AT NIGHT',   // ...a night song
+  'jukebox.prev': '<<',
+  'jukebox.next': '>>',
+  'jukebox.play': 'PLAY',
+  'jukebox.pause': 'PAUSE',
+  'jukebox.stop': 'STOP',
+  'jukebox.shuffle': 'SHUFFLE',
+  'jukebox.repeat': 'REPEAT ONE',
+  'jukebox.now': '{title}  {pos} / {len}',
+  'jukebox.idle': 'PICK A SONG TO PLAY IT. ATARAXIA PLAYS SOFTLY UNDERNEATH.',
+  'jukebox.notYet': 'THIS ONE PLAYS NOW AND THEN AS YOU EXPLORE. HEAR IT ONCE TO PICK IT HERE.',
+  'jukebox.empty': 'NO SONGS HEARD YET. THEY PLAY NOW AND THEN AS YOU EXPLORE.',
+  'jukebox.footer': 'ENTER: PLAY   SPACE: PAUSE   LEFT/RIGHT: SKIP   ESC: CLOSE',
+  'jukebox.footer.touch': 'TAP A SONG TO PLAY IT',
+  'music.nowPlaying': 'NOW PLAYING: {title}',   // the small toast when a song begins (a note icon before it)
   'music.time': '{m}:{s}',   // a length or a position in a song: minutes and seconds ({s} is always two digits)
   // the DELTA songs (data/songs.js)
   'song.delta': 'DELTA',

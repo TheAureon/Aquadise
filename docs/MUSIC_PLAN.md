@@ -1,8 +1,8 @@
 # Music plan: ATARAXIA and DELTA
 
-Status: **Stage 2 done** (DELTA: the song format, the player, ten songs, the frequency and ATARAXIA
-settings, the Sound Test's DELTA tab). Stage 1 (the mixer, the instruments, ATARAXIA) is done too. Next:
-Stage 3 (the NOW PLAYING toast, the jukebox, songs from audio files).
+Status: **Stage 3 done** (the NOW PLAYING toast, the jukebox, songs from audio files, the Guide's MUSIC
+page). Stages 1 and 2 are done too. Next: Stage 4 (the WAV preview export, tools/check-music.js, the full
+test pass).
 
 The new music has two parts, in the game's cozy, airy piano-and-bell ambient style (C418, the quiet moments
 of Stardew Valley, a soft chiptune touch at night):

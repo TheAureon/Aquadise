@@ -19,6 +19,7 @@ AQ.SoundUI = (function () {
       { id: 'music', kind: 'bar', label: AQ.t('settings.music'), bar: st.music }, { id: 'sfx', kind: 'bar', label: AQ.t('settings.effects'), bar: st.sfx },
       { id: 'mute', kind: 'btn', label: AQ.t('settings.mute'), value: AQ.t(st.mute ? 'settings.muted' : 'settings.soundOn'), warn: st.mute },
       { id: 'delta', kind: 'btn', label: AQ.t('settings.delta'), value: AQ.t(`settings.delta.${AQ.Delta.frequency()}`), cycle: true },   // how often songs play
+      { id: 'titles', kind: 'btn', label: AQ.t('settings.songTitles'), value: AQ.t(AQ.Delta.titlesOn() ? 'settings.on' : 'settings.off'), on: AQ.Delta.titlesOn(), toggle: true },   // NOW PLAYING
       { id: 'ataraxia', kind: 'btn', label: AQ.t('settings.ataraxia'), value: AQ.t(AQ.Delta.ataraxiaOn() ? 'settings.on' : 'settings.off'), on: AQ.Delta.ataraxiaOn(), toggle: true },
       { id: 'test', kind: 'wide', value: AQ.t('settings.soundTest') }];
     if (S.tab === 'options') return [
@@ -71,6 +72,7 @@ AQ.SoundUI = (function () {
     if (id.startsWith('tab:')) { S.tab = id.slice(4); A.play('menu_move'); }
     else if (id === 'mute') { A.toggleMute(); A.play('menu_select'); }
     else if (id === 'delta') { const F = AQ.Delta.FREQS; AQ.Delta.setFrequency(F[(F.indexOf(AQ.Delta.frequency()) + 1) % F.length]); A.play('menu_select'); }
+    else if (id === 'titles') { AQ.Delta.setTitles(!AQ.Delta.titlesOn()); A.play('menu_select'); }
     else if (id === 'ataraxia') { AQ.Delta.setAtaraxia(!AQ.Delta.ataraxiaOn()); if (AQ.Music.layers) AQ.Music.layers(2); A.play('menu_select'); }
     else if (id === 'hints') { AQ.Tips.setHints(!AQ.Tips.hintsOn()); dirty(); }
     else if (id === 'flashing') { set().reduceFlashing = !AQ.U.calm(); dirty(); }
@@ -174,7 +176,7 @@ AQ.SoundTest = (function () {
   function items() {
     TABS = tabs(); if (T.tab >= TABS.length) T.tab = 0;
     const kind = TABS[T.tab][0];
-    if (kind === 'delta') return (AQ.data.songs || []).map((s) => ({ id: s.id, song: true, key: 'song:' + s.id, label: AQ.t('soundtest.songItem', { title: AQ.Delta.title(s), len: AQ.Delta.clock(AQ.Delta.length(s)) }) }));
+    if (kind === 'delta') return AQ.Delta.all().map((s) => ({ id: s.id, song: true, key: 'song:' + s.id, label: AQ.t('soundtest.songItem', { title: AQ.Delta.title(s), len: AQ.Delta.clock(AQ.Delta.length(s)) }) }));
     if (kind === 'music') return AQ.Music.catalog().map((p) => ({ id: p.id, label: p.label, stinger: p.stinger, key: 'music:' + p.id.split(':')[0] }));
     const list = OWN_TAB.indexOf(kind) >= 0 ? A.list('sfx').filter((s) => s.group === kind) : A.list(kind).filter((s) => kind !== 'sfx' || OWN_TAB.indexOf(s.group) < 0);
     if (kind === 'sfx') {

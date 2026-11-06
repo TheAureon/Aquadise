@@ -140,6 +140,10 @@ AQ.Badges = (function () {
   B.queue = []; B.cur = null; B.gap = 0;
   const chimeOf = (b, tier) => (b.hidden ? 'badge_hidden' : (tier > 1 || b.id === 'aquadise') ? 'badge_big' : 'badge');
   B.announce = function (b, tier) { B.queue.push({ b, tier, kind: chimeOf(b, tier) }); };
+  // NOW PLAYING (a DELTA song began): the same box and queue, no chime (the song is the sound); dropped if the
+  // song has already ended (or is long under way) by the time it would show
+  B.announceSong = function (song) { B.queue.push({ song, kind: 'song', at: Date.now() }); };
+  const stale = (q) => q.kind === 'song' && (!AQ.Delta || AQ.Delta.playing() !== q.song || Date.now() - q.at > AQ.TUNING.badges.songToastMaxWait * 1000);
   function free(game) {
     if (!game || (game.state !== 'play' && game.state !== 'aquarium')) return false;
     if (AQ.Transition && AQ.Transition.active) return false;
@@ -156,17 +160,33 @@ AQ.Badges = (function () {
     if (!free(game)) return;                                          // (a toast up when a menu opens waits too)
     if (B.cur) { B.cur.t += dt; if (B.cur.t >= B.cur.life) { B.cur = null; B.gap = c.toastGap; } return; }
     B.gap -= dt;
+    for (let i = B.queue.length - 1; i >= 0; i--) if (stale(B.queue[i])) B.queue.splice(i, 1);
     if (B.gap > 0 || !B.queue.length) return;
-    if (B.queue.length >= c.summaryAt) {
-      const n = B.queue.length, big = B.queue.some((q) => q.kind === 'badge_big');
+    const badges = B.queue.filter((q) => q.kind !== 'song');
+    if (badges.length >= c.summaryAt) {
+      const n = badges.length, big = badges.some((q) => q.kind === 'badge_big');
       B.cur = { summary: n, kind: big ? 'badge_big' : 'badge', t: 0, life: c.toastSeconds };
-      B.queue.length = 0;
+      for (let i = B.queue.length - 1; i >= 0; i--) if (B.queue[i].kind !== 'song') B.queue.splice(i, 1);   // (a song keeps its place)
     } else B.cur = Object.assign(B.queue.shift(), { t: 0, life: c.toastSeconds });
+    if (B.cur.kind === 'song') return;                                // (no chime, no buzz: the music is the news)
     AQ.Audio.play(B.cur.kind);
     if (AQ.Tips) AQ.Tips.event('badge'); if (AQ.Touch) AQ.Touch.buzz('unlock');   // a light buzz (touch, VIBRATION on)
   }
   // the toast box: centred, under the tip box and above the HUD toasts (y = badges.toastY)
+  // a small note (♪) for the NOW PLAYING toast, 7x7
+  const NOTE = ['...###', '...#.#', '...#.#', '...#..', '.###..', '####..', '.##...'];
+  function drawSongToast(g, q, y) {
+    const F = AQ.Font, text = AQ.t('music.nowPlaying', { title: AQ.Delta.title(q.song) });
+    const w = Math.min(300, F.width(text) + 24), x = Math.round(160 - w / 2), h = 14;
+    const a = Math.max(0, Math.min(1, q.t * 4, (q.life - q.t) * 2));
+    g.save(); g.globalAlpha = a;
+    AQ.Kit.panel(g, { x, y, w, h }, { edge: '#9feff0' });
+    g.fillStyle = '#9feff0'; NOTE.forEach((row, ry) => [...row].forEach((v, rx) => { if (v === '#') g.fillRect(x + 6 + rx, y + 3 + ry, 1, 1); }));
+    F.draw(g, text, x + 16, y + 4, '#e8fbff', { shadow: false, max: w - 20 });
+    g.restore();
+  }
   B.drawToastBox = function (g, q, y) {
+    if (q.kind === 'song') { drawSongToast(g, q, y); return; }
     const F = AQ.Font, text = q.summary ? AQ.t('badge.summary', { n: q.summary }) : AQ.t('badge.toast', { name: B.name(q.b, q.tier) });
     const w = Math.min(300, F.width(text) + 26), x = Math.round(160 - w / 2), h = 16;
     const a = Math.max(0, Math.min(1, q.t * 5, (q.life - q.t) * 2.5));

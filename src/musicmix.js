@@ -117,7 +117,7 @@ AQ.MusicMix = (function () {
   // Every note registers its sources and nodes; when the last source ends, all of them are disconnected
   // (nothing piles up). Past the voice cap, the quietest note that started longest ago fades out in 60 ms.
   MM.track = function (mix, sources, nodes, info) {
-    const note = { sources, nodes, out: info.out, vel: info.vel || 0.5, t: info.t, end: info.end, left: sources.length, links: info.links || [] };
+    const note = { sources, nodes, out: info.out, vel: info.vel || 0.5, t: info.t, end: info.end, left: sources.length, links: info.links || [], layer: info.layer || mix.playing };
     mix.nodesAlive += nodes.length; mix.started++;
     const done = () => {
       if (--note.left > 0) return;
@@ -146,6 +146,8 @@ AQ.MusicMix = (function () {
     note.sources.forEach((s) => { try { s.stop(t + seconds + 0.02); } catch (e) {} });
     note.end = t + seconds;
   };
+  // fade out every note of one layer now (pausing or stopping a song: its pads and tails go quiet too)
+  MM.releaseLayer = function (mix, layer, seconds) { mix.live.filter((n) => n.layer === layer).forEach((n) => MM.release(mix, n, seconds)); };
   MM.stats = (mix) => (mix ? { notes: mix.live.length, nodesAlive: mix.nodesAlive, started: mix.started, stolen: mix.stolen } : null);
 
   return MM;

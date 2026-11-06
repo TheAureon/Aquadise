@@ -4,8 +4,8 @@
 // inside it) and build/Aquadise.zip (that one file, ready to upload as an HTML5 game). Nothing else is
 // needed: the page works from any web host and straight from disk (file://).
 // It reads index.html, so a new <script> added there is packed automatically. Before packing it refreshes
-// the embedded sprites and recordings (tools/embed-sprites.js, tools/embed-audio.js), so they match the
-// files in assets/. The build/ folder is not kept in git.
+// the embedded sprites, recordings and your own songs (tools/embed-sprites.js, tools/embed-audio.js,
+// tools/embed-music.js), so they match the files in assets/. The build/ folder is not kept in git.
 'use strict';
 const fs = require('fs'), path = require('path'), zlib = require('zlib'), { execFileSync } = require('child_process');
 const ROOT = path.join(__dirname, '..');
@@ -15,6 +15,7 @@ const read = (f) => fs.readFileSync(path.join(ROOT, f), 'utf8');
 // 1. fresh embedded copies of the art and the recordings
 require('./embed-sprites.js')();
 execFileSync(process.execPath, [path.join(__dirname, 'embed-audio.js')], { stdio: 'ignore' });
+execFileSync(process.execPath, [path.join(__dirname, 'embed-music.js')], { stdio: 'ignore' });   // your own songs (assets/music) go inside too
 
 // 2. inline everything index.html links to
 let html = read('index.html'), scripts = 0;

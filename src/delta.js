@@ -172,23 +172,34 @@ AQ.Delta = (function () {
     song._compiled = out;
     return out;
   };
-  DL.length = (song) => DL.compile(song).seconds;
-  DL.title = (song) => AQ.t(`song.${song.id}`);
+  DL.length = (song) => (song.file ? (song.buffer ? song.buffer.duration : 0) : DL.compile(song).seconds);
+  DL.title = (song) => (song.file ? song.name : AQ.t(`song.${song.id}`));   // (a file's title is its own)
   DL.clock = (sec) => AQ.t('music.time', { m: Math.floor(sec / 60), s: String(Math.floor(sec % 60)).padStart(2, '0') });
 
   // ---------------------------------------------------------------- 3. the player
   // One song at a time on the mixer's 'delta' layer. start() -> pump() often -> done() when it has rung out.
+  // A song from an audio file (assets/music) plays its decoded buffer instead of notes. pause() / resume()
+  // (the jukebox) pick up where it stopped.
   DL.make = function (mix) {
-    const P = { mix, song: null };
-    P.start = function (song, when) {
-      const c = mix.ctx, comp = DL.compile(song);
-      P.song = song; P.comp = comp; P.idx = 0; P.t0 = Math.max(when || 0, c.currentTime + 0.15);
-      AQ.MusicMix.setLayer(mix, 'delta', cfg().level, 0.05);
-      if (mix.setEcho) mix.setEcho(Math.min(1.2, (60 / song.bpm) * (song.echo || 1.5)));   // the echo follows the song's tempo
+    const P = { mix, song: null, paused: null };
+    P.start = function (song, when, offset = 0) {
+      const c = mix.ctx, comp = song.file ? { seconds: song.buffer.duration + 0.5, events: [] } : DL.compile(song);
+      P.song = song; P.comp = comp; P.paused = null;
+      P.t0 = Math.max(when || 0, c.currentTime + 0.15) - offset;
+      P.idx = 0; while (P.idx < comp.events.length && comp.events[P.idx].t < offset - 1e-6) P.idx++;   // (from the middle: skip what's before)
+      AQ.MusicMix.setLayer(mix, 'delta', cfg().level, offset ? 0.3 : 0.05);
+      if (song.file) {                                             // a recording: its buffer, loudness-matched
+        const src = c.createBufferSource(), g = c.createGain();
+        src.buffer = song.buffer; g.gain.value = song.gain;
+        src.connect(g); g.connect(AQ.MusicMix.group(mix, 'delta', 'file'));
+        src.start(P.t0 + offset, offset);
+        src.onended = () => { try { g.disconnect(); src.disconnect(); } catch (e) {} };
+        P.src = src;
+      } else if (mix.setEcho) mix.setEcho(Math.min(1.2, (60 / song.bpm) * (song.echo || 1.5)));   // the echo follows the song's tempo
       P.pump();
     };
     P.pump = function () {
-      if (!P.song) return;
+      if (!P.song || P.paused != null) return;
       const c = mix.ctx, horizon = c.currentTime + AQ.TUNING.music.scheduleAhead, ev = P.comp.events;
       while (P.idx < ev.length && P.t0 + ev[P.idx].t < horizon) {
         const e = ev[P.idx++], at = P.t0 + e.t;
@@ -196,24 +207,65 @@ AQ.Delta = (function () {
         AQ.Instruments.play(mix, 'delta', e.inst, at, e.midi, e.vel, e.dur, e.opts || {});
       }
     };
-    P.position = () => (P.song ? Math.max(0, Math.min(P.comp.seconds, mix.ctx.currentTime - P.t0)) : 0);
-    P.done = () => !P.song || mix.ctx.currentTime >= P.t0 + P.comp.seconds;
+    P.position = () => (!P.song ? 0 : P.paused != null ? P.paused : Math.max(0, Math.min(P.comp.seconds, mix.ctx.currentTime - P.t0)));
+    P.done = () => !P.song || (P.paused == null && mix.ctx.currentTime >= P.t0 + P.comp.seconds);
+    // everything still sounding fades quickly (no note is cut off hard)
+    function hush(fade) {
+      AQ.MusicMix.releaseLayer(mix, 'delta', fade);
+      if (P.src) { const s = P.src; try { s.stop(mix.ctx.currentTime + fade + 0.05); } catch (e) {} P.src = null; }
+    }
+    P.pause = function () {
+      if (!P.song || P.paused != null) return;
+      P.paused = P.position();
+      AQ.MusicMix.setLayer(mix, 'delta', 0, cfg().pauseFade);
+      hush(cfg().pauseFade);
+    };
+    P.resume = function () { if (P.song && P.paused != null) P.start(P.song, mix.ctx.currentTime + cfg().pauseFade + 0.05, P.paused); };
     P.stop = function (fade) {                                     // fade the whole song out, then end it
       if (!P.song) return;
+      if (P.paused != null) { P.clear(); return; }
       P.idx = P.comp.events.length;
       AQ.MusicMix.setLayer(mix, 'delta', 0, fade);
+      setTimeout(() => hush(0.2), fade * 1000);
       P.t0 = mix.ctx.currentTime + fade + 0.5 - P.comp.seconds;    // it now ends when the fade is over
     };
-    P.clear = function () { P.song = null; P.comp = null; };
+    P.clear = function () { hush(0.1); P.song = null; P.comp = null; P.paused = null; };
     return P;
   };
+
+  // ---------------------------------------------------------------- songs from audio files (assets/music)
+  // assets/music/manifest.js lists them; each is fetched (or, opened from disk, read from the embedded copy
+  // made by tools/embed-music.js), decoded once, measured, and turned up or down to sit with the built-in
+  // songs. Until it has loaded (or if it can't), it simply isn't offered.
+  const fileSongs = [];
+  DL.fileSongs = fileSongs;
+  DL.loadFiles = function (ctx) {
+    const list = (AQ.data.musicFiles || []).filter((f) => f && f.file);
+    list.forEach((f, i) => {
+      const song = { id: 'file:' + f.file, file: f.file, name: f.title || f.file, places: f.places || (f.place ? [f.place] : []), time: f.night === true ? 'night' : f.night === false ? 'day' : (f.time || 'any'), loading: true };
+      fileSongs.push(song);
+      const emb = AQ.data.musicEmbedded && AQ.data.musicEmbedded[f.file];
+      const bytes = emb ? Promise.resolve(Uint8Array.from(atob(emb), (ch) => ch.charCodeAt(0)).buffer) : fetch(f.file).then((r) => { if (!r.ok) throw new Error(r.status); return r.arrayBuffer(); });
+      bytes.then((ab) => ctx.decodeAudioData(ab)).then((buf) => {
+        let sum = 0, n = 0;                                        // its average level (every 7th sample is plenty)
+        for (let ch = 0; ch < buf.numberOfChannels; ch++) { const d = buf.getChannelData(ch); for (let k = 0; k < d.length; k += 7) { sum += d[k] * d[k]; n++; } }
+        const db = 10 * Math.log10(sum / Math.max(1, n) + 1e-12), R = cfg().fileGainRange;
+        song.buffer = buf; song.level = db; song.gain = Math.max(R[0], Math.min(R[1], Math.pow(10, (cfg().fileLoudness - db) / 20)));
+        song.loading = false;
+      }).catch((e) => { song.loading = false; song.failed = true; console.warn(`[music] couldn't load ${f.file}: ${e && e.message ? e.message : e}`); });
+    });
+  };
+  const ready = (s) => !s.file || !!s.buffer;
+  // every song: the built-in ones, then the audio files that have loaded
+  DL.all = () => songs().concat(fileSongs.filter(ready));
 
   // ---------------------------------------------------------------- 4. the director
   const set = () => { const s = (AQ.State.settings = AQ.State.settings || {}); return (s.music = s.music || {}); };
   DL.frequency = () => (DL.FREQS.indexOf(set().delta) >= 0 ? set().delta : cfg().defaultFrequency);
   DL.ataraxiaOn = () => set().ataraxia !== false;
+  DL.titlesOn = () => set().titles !== false;                    // SONG TITLES: the NOW PLAYING toast
   const heard = () => (AQ.State.music = AQ.State.music || { heard: {}, recent: [] });
-  DL.byId = (id) => songs().find((s) => s.id === id);
+  DL.byId = (id) => DL.all().find((s) => s.id === id);
   DL.playing = () => (DL.player && DL.player.song ? DL.player.song : null);
   DL.position = () => (DL.player ? DL.player.position() : 0);
 
@@ -233,6 +285,7 @@ AQ.Delta = (function () {
     AQ.Save && AQ.Save.dirty();
   };
   DL.setAtaraxia = function (on) { set().ataraxia = !!on; AQ.Save && AQ.Save.dirty(); };
+  DL.setTitles = function (on) { set().titles = !!on; AQ.Save && AQ.Save.dirty(); };
 
   // which song now: one of the place's own that fits the time of day (night songs only at night, and then
   // more likely; day songs only by day), else any song that fits; never the last one again, and songs heard
@@ -240,8 +293,8 @@ AQ.Delta = (function () {
   DL.pick = function (place, night) {
     const H = heard(), last = H.recent[H.recent.length - 1];
     const fits = (s) => (s.time === 'night' ? night : s.time === 'day' ? !night : true);
-    let list = songs().filter((s) => fits(s) && (s.places || []).indexOf(place) >= 0);
-    if (!list.length) list = songs().filter((s) => fits(s) && s.id !== 'delta');
+    let list = DL.all().filter((s) => fits(s) && (s.places || []).indexOf(place) >= 0);
+    if (!list.length) list = DL.all().filter((s) => fits(s) && s.id !== 'delta');
     if (list.length > 1) list = list.filter((s) => s.id !== last);
     const recent = H.recent.slice(-cfg().recent);
     const weight = (s) => (recent.indexOf(s.id) >= 0 ? 0.25 : 1) / (1 + 0.15 * (H.heard[s.id] || 0)) * (night && s.time === 'night' ? 2 : 1);
@@ -259,10 +312,14 @@ AQ.Delta = (function () {
     if (AQ.Dive && AQ.Dive.active() && AQ.State.tutorial && AQ.State.tutorial.dive && AQ.State.tutorial.dive.step < cfg().waitDiveSteps) return true;
     return false;
   };
-  function begin(song, test) {
+  // how: 'test' (the Sound Test: not counted as heard), 'jukebox' (you chose it: no NOW PLAYING toast)
+  function begin(song, how) {
     if (!song || !DL.player) return;
+    const test = how === true || how === 'test';
+    if (DL.playing()) DL.player.clear();
     DL.player.start(song);
-    DL.isTest = !!test;
+    DL.isTest = test; DL.how = test ? 'test' : how || 'auto';
+    if (!test && how !== 'jukebox' && DL.titlesOn() && (!AQ.Tips || AQ.Tips.hintsOn()) && AQ.Badges && AQ.Badges.announceSong) AQ.Badges.announceSong(song);
     if (!test) {
       const H = heard(); H.heard[song.id] = (H.heard[song.id] || 0) + 1;
       H.recent.push(song.id); if (H.recent.length > 8) H.recent.shift();
@@ -282,6 +339,7 @@ AQ.Delta = (function () {
 
   DL.start = function (mix) {
     DL.player = DL.make(mix); DL.wait = interval(DL.frequency()); DL.titleVisit = false;
+    DL.loadFiles(mix.ctx);
     songs().forEach((s) => DL.compile(s).errors.forEach((e) => console.warn('[songs] ' + e)));   // a song with a mistake says so
   };
   // once a frame (and on the music timer, with game = null: only keeps notes flowing)
@@ -289,11 +347,14 @@ AQ.Delta = (function () {
     if (!DL.player) return;
     DL.player.pump();
     if (DL.playing() && DL.player.done()) {                        // it has rung out
-      DL.player.clear(); DL.isTest = false;
+      const how = DL.how;
+      DL.player.clear(); DL.isTest = false; DL.how = null;
       DL.wait = interval(DL.frequency());
+      if (how === 'jukebox' && AQ.Jukebox) AQ.Jukebox.ended();     // the jukebox plays on (next, shuffle, repeat)
       if (DL.onEnd) DL.onEnd();
     }
     if (!game) return;
+    if (AQ.Jukebox && AQ.Jukebox.active()) return;                 // the jukebox chooses for now
     const f = DL.frequency(), st = game.state;
     // the title screen: DELTA itself, once each time you arrive there (unless songs are OFF)
     const atTitle = st === 'title' || (st === 'log' && AQ.LogUI && AQ.LogUI.from === 'title');

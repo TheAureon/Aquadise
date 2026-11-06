@@ -31,13 +31,14 @@ AQ.data.station = {
   trophyWall: { x0: 712, x1: 838, top: 345, row: 8 },   // the shelves (one per badge group), inside the wing
   pad: { x: 572 },                          // the beam pad (ground floor)
   console: { x: 496 },                      // the tank directory (ground floor)
+  jukebox: { x: 528 },                      // the jukebox: the MUSIC page (ground floor, beside the directory)
   windows: [                                // portholes in the back wall, [x, floor] (centre)
     [172, 0], [316, 0], [636, 0],
     [130, 1], [230, 1], [330, 1], [430, 1], [530, 1], [630, 1],
     [130, 2], [230, 2], [330, 2], [430, 2], [530, 2], [630, 2],
     [130, 3], [230, 3], [330, 3], [430, 3], [530, 3], [630, 3]
   ],
-  plants: [[110, 0], [528, 0], [650, 1], [110, 2], [650, 3]],   // potted plants, [x, floor]
+  plants: [[110, 0], [612, 0], [650, 1], [110, 2], [650, 3]],   // potted plants, [x, floor]
   signs: [                                  // [id, x, floor, colour] (text: data/lang/ sign.<id>)
     ['directory', 496, 0, '#ffe08a'], ['beampad', 572, 0, '#9feff0'],
     ['station', 380, 2, '#ffd0e0'], ['predators', 380, 3, '#ffb0a0'], ['trophies', 768, 0, '#ffd25a']

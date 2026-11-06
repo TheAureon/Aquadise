@@ -128,6 +128,8 @@ const SCREENS = [
   ['sea-deep', () => { const G = AQ.Game; AQ.Scenes.restore(G, 'world', 1400, 700); AQ.HUD.bannerT = 0; }],
   ['map', () => { AQ.Game.state = 'map'; }],
   ['pause', () => { AQ.Game.state = 'pause'; AQ.PauseUI.panel = null; }],
+  ['jukebox', () => { AQ.State.music = { heard: { delta: 1, kelp: 2, night: 1 }, recent: [] }; AQ.Jukebox.open(AQ.Game); }],   // the MUSIC page (3 heard)
+  ['song-toast', () => { const G = AQ.Game; G.state = 'play'; if (AQ.Badges) { AQ.Badges.cur = { kind: 'song', song: AQ.data.songs[1], t: 1, life: 4 }; } }],   // NOW PLAYING
   ['guided-dive-prompt', () => { const G = AQ.Game; G.state = 'play'; AQ.State.tutorial.diveAsked = false; AQ.Dive.offer(); }],
   ['guided-dive', () => { AQ.Dive.start(AQ.Game); }],
   ['tip', () => { AQ.Dive.stop && AQ.Dive.stop(); AQ.Tips.setHints(true); AQ.Tips.reset(); AQ.Tips.event('noticed'); AQ.Tips.gap = 0; }],

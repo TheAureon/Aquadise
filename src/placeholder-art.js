@@ -1541,6 +1541,23 @@
     }
     p.set(W - 5, 4, o.frame % 2 ? hex('#7ef0c0') : hex('#2a6a5a'));
   };
+  // the station's jukebox (the MUSIC page): an arched cabinet, a ring of lights chasing round the arch,
+  // a window with a turning record, a speaker grille; 4 frames
+  S.jukebox = function (p, o) {
+    const W = p.w, H = p.h, cx = W / 2, body = hex('#7a4f6a'), trim = hex('#d9a64e');
+    p.rect(2, 8, W - 4, H - 8, body); p.circle(cx - 0.5, 9, W / 2 - 2, body);                  // the arched cabinet
+    p.rect(1, H - 2, W - 2, 2, mul(body, 0.7));
+    p.shade(0.2); p.outline(0.3);
+    const lights = [hex('#ff9fc0'), hex('#ffe08a'), hex('#7ef0c0'), hex('#9fd8ff')];
+    for (let i = 0; i < 9; i++) {                                                             // chase lights round the arch
+      const a = Math.PI + i / 8 * Math.PI, x = cx - 0.5 + Math.cos(a) * (W / 2 - 3), y = 9 + Math.sin(a) * (W / 2 - 3);
+      p.set(x, y, (i + o.frame) % 4 === 0 ? WHITE : lights[(i + o.frame) % 4]);
+    }
+    p.rect(4, 9, W - 8, 7, hex('#1c1a2a'));                                                    // the window...
+    p.ellipse(cx - 0.5, 12.5, 3, 1.5, hex('#2e2e3a')); p.set(cx - 0.5 + (o.frame % 2 ? 1 : -1), 12, hex('#9a8aa0'));   // ...a turning record
+    p.rect(4, 18, W - 8, 1, trim);
+    for (let y = 20; y < H - 3; y += 2) p.rect(5, y, W - 10, 1, mul(body, 0.6));               // speaker grille
+  };
   S.tankframe = function (p, o) {
     const W = p.w, H = p.h, m = hex('#5a6a7a'), hl = hex('#8fa2b4'), dk = hex('#33404c');
     p.rect(0, 0, W, 4, m); p.rect(0, 0, 4, H - 8, m); p.rect(W - 4, 0, 4, H - 8, m);

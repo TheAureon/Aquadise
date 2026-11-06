@@ -661,6 +661,28 @@ AQ.manifest = {
     27
    ]
   },
+  "misc.jukebox": {
+   "file": "sprites/scene/jukebox.png",
+   "fw": 18,
+   "fh": 26,
+   "anchor": [
+    9,
+    25
+   ],
+   "anims": {
+    "idle": {
+     "row": 0,
+     "frames": 4,
+     "fps": 6
+    }
+   },
+   "vis": [
+    1,
+    3,
+    16,
+    25
+   ]
+  },
   "misc.tank_frame": {
    "file": "sprites/scene/tank_frame.png",
    "fw": 64,

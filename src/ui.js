@@ -728,7 +728,7 @@ AQ.MapUI = (function () {
 AQ.PauseUI = (function () {
   const F = () => AQ.Font;
   const P = { ui: [], confirm: 0, sel: 0 };
-  const BOX = { x: 98, y: 17, w: 124, h: 127 };
+  const BOX = { x: 98, y: 15, w: 124, h: 133 };
   function act(id, game) {
     AQ.Audio.play('menu_select');
     if (id === 'resume') game.state = 'play';
@@ -737,15 +737,16 @@ AQ.PauseUI = (function () {
     if (id === 'saves') AQ.SaveFile.openHub(game, 'pause');
     if (id === 'redo' && AQ.Redo) AQ.Redo.ask(game, 'pause');   // asks first, then works from anywhere
     if (id === 'sound') { P.panel = 'sound'; AQ.SoundUI.open(); }
+    if (id === 'music' && AQ.Jukebox) AQ.Jukebox.open(game);       // the MUSIC page (the jukebox)
     if (id === 'home') { AQ.Save.save(game); AQ.Title.open(game); }
   }
   P.update = function (dt, game) {
     const I = AQ.Input, m = I.mouse;
     if (P.panel === 'sound') { AQ.SoundUI.update(game, () => { P.panel = null; }, () => AQ.SoundTest.open(game, 'pause')); return; }
     if (AQ.SaveFile && AQ.SaveFile.update(game)) return;        // a save-file panel (import confirm, messages) is up
-    const T = AQ.t, rows = [['resume', T('pause.resume')], ['help', T('pause.help')], ['guide', T('pause.guide')], ['redo', T('redo.btn')], ['sound', T('pause.settings')], ['saves', T('title.saves')], ['home', T('pause.home')]];
+    const T = AQ.t, rows = [['resume', T('pause.resume')], ['help', T('pause.help')], ['guide', T('pause.guide')], ['redo', T('redo.btn')], ['sound', T('pause.settings')], ['music', T('pause.music')], ['saves', T('title.saves')], ['home', T('pause.home')]];
     P.ui = [];
-    rows.forEach(([id, label], i) => P.ui.push({ id, x: 110, y: 38 + i * 15, w: 100, h: 12, label }));
+    rows.forEach(([id, label], i) => P.ui.push({ id, x: 110, y: 34 + i * 14, w: 100, h: 12, label }));
     if (I.wasPressed('Escape')) { game.state = 'play'; return; }
     P.sel = Math.min(P.sel, P.ui.length - 1);
     // the keyboard: up / down to pick, Enter or Space to choose

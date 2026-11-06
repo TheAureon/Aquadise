@@ -60,6 +60,7 @@ AQ.Station = (function () {
     if (fl < 0 || P.mode !== 'walk') return null;
     if (fl === 0 && Math.abs(P.x - L.pad.x) < 13) return { kind: 'pad', text: AQ.t('station.beamDown') };
     if (fl === 0 && Math.abs(P.x - L.console.x) < 11) return { kind: 'console', text: AQ.t('station.directory') };
+    if (fl === 0 && L.jukebox && Math.abs(P.x - L.jukebox.x) < 9) return { kind: 'jukebox', text: AQ.t('station.jukebox') };
     if (fl === 0 && L.trophyWall && P.x > L.trophyWall.x0 + 4 && P.x < L.trophyWall.x1 - 4) return { kind: 'trophy', text: AQ.t('station.trophies') };
     const t = tanks.find((k) => k.b && k.floor === fl && Math.abs(P.x - k.x) < 26);
     if (t) return { kind: 'tank', tank: t, text: AQ.t('station.tend', { tank: (t.b.short || t.b.name).toUpperCase() }) };
@@ -80,6 +81,7 @@ AQ.Station = (function () {
         else if (n.kind === 'tank') { AQ.Aquarium.open(game, 'station', n.tank.b.id); return; }
         else if (n.kind === 'console') { AQ.Aquarium.open(game, 'station', AQ.Aquarium.biome || 'tide_pools'); AQ.Aquarium.openOverview(); return; }
         else if (n.kind === 'trophy') { AQ.LogUI.openBadges(game, 'play'); return; }      // the log's BADGES tab
+        else if (n.kind === 'jukebox' && AQ.Jukebox) { AQ.Jukebox.open(game); return; }   // the MUSIC page
       }
     } else if (St.mode === 'beamin' || St.mode === 'beamout') {
       P.t += dt; P.anim = 'stand';
@@ -501,6 +503,7 @@ AQ.Station = (function () {
     const joy = consoleJoy(t), cx = L.console.x + joy.dx, cy = L.floors[0] - joy.hop;
     AQ.Assets.draw(ctx, 'misc.console', 'idle', cx, cy, { t });
     if (joy.lit > 0) { ctx.save(); ctx.globalAlpha = joy.lit; ctx.fillStyle = '#bff6ff'; ctx.fillRect(cx - 7, cy - 25, 14, 8); ctx.restore(); }
+    if (L.jukebox) AQ.Assets.draw(ctx, 'misc.jukebox', 'idle', L.jukebox.x, L.floors[0], AQ.U.calm() || !(AQ.Delta && AQ.Delta.playing()) ? { frame: 0 } : { t });   // its lights chase while a song plays
     AQ.Assets.draw(ctx, 'misc.beampad', 'idle', L.pad.x, L.floors[0] + 2, AQ.U.calm() ? { frame: 0 } : { t });
     // the pad's idle shimmer, brighter while beaming
     const beaming = St.mode !== 'walk';
@@ -549,7 +552,7 @@ AQ.Station = (function () {
     // things standing on the floors
     GI.ao.length = 0;
     const ao = (x, fy, half, k) => { const xx = X(x); if (xx > -40 && xx < 360) GI.ao.push(xx, Y(fy), half * z, k); };
-    ao(L.console.x, L.floors[0], 9, 0.4); ao(L.pad.x, L.floors[0], 11, 0.25);
+    ao(L.console.x, L.floors[0], 9, 0.4); ao(L.pad.x, L.floors[0], 11, 0.25); if (L.jukebox) ao(L.jukebox.x, L.floors[0], 8, 0.4);
     tanks.forEach((tk) => ao(tk.x, tk.y, 31, tk.b ? 0.35 : 0.25));
     L.plants.forEach(([px, fl]) => ao(px, L.floors[fl], 6, 0.4));
     // the lights (most important first: the shader takes as many as the quality level allows)
@@ -558,6 +561,7 @@ AQ.Station = (function () {
     light(P.x, P.y, 36, null, 0.5, 0);
     light(L.pad.x, L.floors[0] - 8, 34, '#9feff0', Math.min(1, (St.beamK || 0.18) * 1.6), 0);
     light(L.console.x, L.floors[0] - 12, 26, '#ffe08a', 0.55, 0);
+    if (L.jukebox) light(L.jukebox.x, L.floors[0] - 14, 20, '#ffb0d8', 0.4, 0);
     tanks.forEach((tk) => { if (tk.b) { const st = AQ.Aquarium.styleOf(tk.b.id); light(tk.x, tk.y - 24, 46, st.windowGlow || st.lamp, 0.8, 3); } });
     L.floors.forEach((fy, i) => {
       const ceil = i === L.floors.length - 1 ? h.y + T : L.floors[i + 1] + L.floorThick;
