@@ -354,6 +354,13 @@ AQ.Delta = (function () {
       if (DL.onEnd) DL.onEnd();
     }
     if (!game) return;
+    const dbg = AQ.TUNING.debug;
+    if (dbg.musicKeys && AQ.Input.wasPressed(dbg.nextSongKey)) {   // TESTING: the next song, right now
+      const s = DL.pick((AQ.Music.current || 'title').split(':')[0], AQ.Clock.isNight());
+      if (AQ.Jukebox) AQ.Jukebox.on = false;
+      begin(s);
+      if (AQ.HUD && s) AQ.HUD.toast(AQ.t('debug.nextSong', { title: DL.title(s) }), '#cfe8ff');
+    }
     if (AQ.Jukebox && AQ.Jukebox.active()) return;                 // the jukebox chooses for now
     const f = DL.frequency(), st = game.state;
     // the title screen: DELTA itself, once each time you arrive there (unless songs are OFF)

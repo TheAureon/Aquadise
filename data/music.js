@@ -30,20 +30,20 @@ const ATARAXIA_CHORDS = {
 AQ.data.music = {
   ataraxia: {
     title:      { root: 50, chords: ATARAXIA_CHORDS.major,      color: 'warm',  bright: 0.55, level: 0.9,  sub: 0.5, notes: ['piano', 'bell'],          high: [14, 34], depth: 0.1 },
-    hill:       { root: 55, chords: ATARAXIA_CHORDS.major,      color: 'airy',  bright: 0.7,  level: 0.85, sub: 0.4, notes: ['harp', 'piano'],          high: [12, 31], depth: 0 },
-    station:    { root: 52, chords: ATARAXIA_CHORDS.lydian,     color: 'glass', bright: 0.65, level: 0.8,  sub: 0.35, notes: ['glass', 'bell', 'chip'], high: [16, 36], depth: 0 },
-    aquarium:   { root: 53, chords: ATARAXIA_CHORDS.lydian,     color: 'glass', bright: 0.55, level: 0.8,  sub: 0.3, notes: ['bell', 'harp', 'glass'],  high: [14, 34], depth: 0.2 },
-    tide_pools: { root: 55, chords: ATARAXIA_CHORDS.major,      color: 'airy',  bright: 0.8,  level: 0.9,  sub: 0.4, notes: ['harp', 'bell', 'piano'],  high: [12, 31], depth: 0.1 },
+    hill:       { root: 55, chords: ATARAXIA_CHORDS.major,      color: 'airy',  bright: 0.7,  level: 0.7, sub: 0.4, notes: ['harp', 'piano'],          high: [12, 31], depth: 0 },
+    station:    { root: 52, chords: ATARAXIA_CHORDS.lydian,     color: 'glass', bright: 0.65, level: 0.55,  sub: 0.35, notes: ['glass', 'bell', 'chip'], high: [16, 36], depth: 0 },
+    aquarium:   { root: 53, chords: ATARAXIA_CHORDS.lydian,     color: 'glass', bright: 0.55, level: 0.62,  sub: 0.3, notes: ['bell', 'harp', 'glass'],  high: [14, 34], depth: 0.2 },
+    tide_pools: { root: 55, chords: ATARAXIA_CHORDS.major,      color: 'airy',  bright: 0.8,  level: 0.72,  sub: 0.4, notes: ['harp', 'bell', 'piano'],  high: [12, 31], depth: 0.1 },
     coral:      { root: 52, chords: ATARAXIA_CHORDS.lydian,     color: 'warm',  bright: 0.7,  level: 0.9,  sub: 0.45, notes: ['harp', 'glass', 'marimba'], high: [12, 31], depth: 0.25 },
-    ruins:      { root: 47, chords: ATARAXIA_CHORDS.aeolian,    color: 'warm',  bright: 0.45, level: 0.85, sub: 0.55, notes: ['piano', 'bell'],         high: [15, 34], depth: 0.4 },
-    open_ocean: { root: 48, chords: ATARAXIA_CHORDS.lydian,     color: 'airy',  bright: 0.6,  level: 0.85, sub: 0.6, notes: ['bell', 'glass', 'piano'], high: [16, 38], depth: 0.45 },
+    ruins:      { root: 47, chords: ATARAXIA_CHORDS.aeolian,    color: 'warm',  bright: 0.45, level: 0.9, sub: 0.45, notes: ['piano', 'bell'],         high: [15, 34], depth: 0.4 },
+    open_ocean: { root: 48, chords: ATARAXIA_CHORDS.lydian,     color: 'airy',  bright: 0.6,  level: 0.75, sub: 0.6, notes: ['bell', 'glass', 'piano'], high: [16, 38], depth: 0.45 },
     kelp:       { root: 50, chords: ATARAXIA_CHORDS.dorian,     color: 'warm',  bright: 0.6,  level: 0.9,  sub: 0.5, notes: ['harp', 'piano'],          high: [12, 31], depth: 0.35 },
     mangrove:   { root: 50, chords: ATARAXIA_CHORDS.mixolydian, color: 'warm',  bright: 0.55, level: 0.85, sub: 0.5, notes: ['marimba', 'harp'],        high: [12, 28], depth: 0.2 },
-    ice:        { root: 57, chords: ATARAXIA_CHORDS.pentatonic, color: 'glass', bright: 0.75, level: 0.8,  sub: 0.3, notes: ['glass', 'bell'],          high: [14, 34], depth: 0.25 },
-    cave:       { root: 45, chords: ATARAXIA_CHORDS.aeolian,    color: 'warm',  bright: 0.35, level: 0.8,  sub: 0.6, notes: ['piano', 'glass'],         high: [17, 36], depth: 0.6 },
+    ice:        { root: 57, chords: ATARAXIA_CHORDS.pentatonic, color: 'glass', bright: 0.75, level: 0.62,  sub: 0.3, notes: ['glass', 'bell'],          high: [14, 34], depth: 0.25 },
+    cave:       { root: 45, chords: ATARAXIA_CHORDS.aeolian,    color: 'warm',  bright: 0.35, level: 0.85,  sub: 0.45, notes: ['piano', 'glass'],         high: [17, 36], depth: 0.6 },
     lush_cave:  { root: 53, chords: ATARAXIA_CHORDS.major,      color: 'warm',  bright: 0.5,  level: 0.85, sub: 0.45, notes: ['harp', 'glass'],         high: [12, 31], depth: 0.6 },
-    vents:      { root: 45, chords: ATARAXIA_CHORDS.aeolian,    color: 'warm',  bright: 0.3,  level: 0.75, sub: 0.7, notes: ['piano'],                  high: [19, 36], depth: 0.75 },
-    trench:     { root: 43, chords: ATARAXIA_CHORDS.deep,       color: 'airy',  bright: 0.25, level: 0.7,  sub: 0.7, notes: ['glass'],                  high: [21, 38], depth: 0.95 }
+    vents:      { root: 45, chords: ATARAXIA_CHORDS.aeolian,    color: 'warm',  bright: 0.4,  level: 0.8, sub: 0.4, notes: ['piano'],                  high: [19, 36], depth: 0.75 },
+    trench:     { root: 43, chords: ATARAXIA_CHORDS.deep,       color: 'airy',  bright: 0.25, level: 0.75,  sub: 0.55, notes: ['glass'],                  high: [21, 38], depth: 0.95 }
   },
 
   // scales, for the stingers below (scale steps -> semitones)

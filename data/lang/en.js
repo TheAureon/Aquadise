@@ -124,6 +124,10 @@ AQ.langFiles.en = {
   'soundtest.info.songIdle': 'CLICK A SONG TO PLAY IT FROM THE START',
   'soundtest.info.songIdle.touch': 'TAP A SONG TO PLAY IT FROM THE START',
   'soundtest.stop': 'STOP',
+  'soundtest.preview': 'PREVIEW',   // TESTING: the picked song / place saved as a WAV file
+  'soundtest.exportAll': 'EXPORT ALL',   // TESTING: every one of this tab, one WAV file each
+  'soundtest.rendering': 'MAKING {name} ({n} OF {total})...',
+  'soundtest.exported': { one: 'SAVED {n} WAV FILE TO YOUR DOWNLOADS', other: 'SAVED {n} WAV FILES TO YOUR DOWNLOADS' },
   'soundtest.hydro': 'HYDROPHONE',   // the hydrophone's sounds (each also shows its ripple)
   'soundtest.badges': 'BADGES',   // the badge chimes (each plays with its toast)
   'soundtest.requests': 'REQUESTS',   // the station requests' sounds (the tab shows only while requests are on)
@@ -2289,6 +2293,7 @@ AQ.langFiles.en = {
   // ---------------------------------------------------------------- testing keys (debug only)
   'debug.tutorialReset': 'Tutorial restarted, all tips reset.',
   'debug.timeSkip': 'Time skip: {time}',
+  'debug.nextSong': 'Next song: {title}',   // TESTING: the next-song key (debug.musicKeys)
   'debug.noStarSpot': 'No free spot for a star right now.',
 
   // ---------------------------------------------------------------- the game

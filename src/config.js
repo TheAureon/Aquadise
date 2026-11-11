@@ -232,8 +232,16 @@ AQ.TUNING = {
     gfxEffectKey: 'Equal',    //   = = pick the next effect (grade, fog, bloom, vignette, grain)
     gfxToggleKey: 'Backslash',//   \ = switch the picked effect off / on
     gfxOverlayKey: 'Backquote',//  ` = show / hide the frame-time overlay
-    forceTouch: false         // TESTING ONLY: true shows the touch controls and makes the mouse act as a finger
-  },                          //   (drag in the stick zone = joystick, click the on-screen buttons), to try them on a PC
+    forceTouch: false,        // TESTING ONLY: true shows the touch controls and makes the mouse act as a finger
+                              //   (drag in the stick zone = joystick, click the on-screen buttons), to try them on a PC
+    musicPreview: false,      // TESTING ONLY: true adds PREVIEW and EXPORT ALL to the Sound Test's ATARAXIA and DELTA tabs:
+                              //   the picked song / place rendered offline with the game's own instruments and mixer and
+                              //   downloaded as a WAV (EXPORT ALL: every one of that tab, one file each)
+    musicPreviewSeconds: 90,  //   how long an ATARAXIA preview is (a song is always whole)
+    exportAllSeconds: 45,     //   ...and each place's, day and night, in ATARAXIA's EXPORT ALL
+    musicKeys: false,         // TESTING ONLY: true adds a key (any screen) that starts the next DELTA song right now
+    nextSongKey: 'Digit2'     //   2 = the next song (picked as usual for the place and time of day)
+  },
   // Text that doesn't fit (long translations): it is squeezed sideways down to this much of its width,
   // then cut short with ".." (src/font.js). screenMargin: px kept free at the screen's edges.
   text: { squeezeMin: 0.55, screenMargin: 2 },

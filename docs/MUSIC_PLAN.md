@@ -1,8 +1,8 @@
 # Music plan: ATARAXIA and DELTA
 
-Status: **Stage 3 done** (the NOW PLAYING toast, the jukebox, songs from audio files, the Guide's MUSIC
-page). Stages 1 and 2 are done too. Next: Stage 4 (the WAV preview export, tools/check-music.js, the full
-test pass).
+Status: **all four stages done.** Stage 4 added the WAV previews (Sound Test, `debug.musicPreview`),
+`tools/check-music.js` (data, offline renders and live checks) and the full test pass. See "Previews" and
+"Checking the music" at the end.
 
 The new music has two parts, in the game's cozy, airy piano-and-bell ambient style (C418, the quiet moments
 of Stardew Valley, a soft chiptune touch at night):
@@ -326,3 +326,72 @@ Measured (offline renders at the default MUSIC volume): every song is 2:17 to 3:
 (no clipping), average loudness -27 to -30 dB (within 3 dB of each other; Ataraxia sits about 3 to 8 dB
 below), a loudness shape that rises from the intro to the last section and falls into the ending, at
 most 32 notes ringing and all nodes freed by the end.
+
+## 11. Previews (WAV files to listen to anywhere)
+
+Set `musicPreview: true` in the `debug` section of `src/config.js`. The Sound Test's ATARAXIA and DELTA tabs
+then get two buttons:
+- **PREVIEW:** the picked song, whole, or the picked place for `musicPreviewSeconds` (90 s), by day or at
+  night as listed.
+- **EXPORT ALL:** every song, or every place by day and at night for `exportAllSeconds` (45 s) each.
+
+They download WAV files named like `Aquadise-DELTA-04-kelp.wav` or `Aquadise-ATARAXIA-kelp-night.wav`. The
+first time, the browser may ask whether the page may download several files.
+
+The render is made by `src/musicpreview.js` with an OfflineAudioContext, through the same instruments,
+music mixer, reverb, echo, compressor and limiter as the game. How it differs from what you hear in the game:
+- **A song plays alone.** In the game it plays over Ataraxia's thin bed (30 % of Ataraxia's level).
+- **An Ataraxia preview** uses the place's usual depth (its `depth` in `data/music.js`) and full day or full
+  night. In the game the real depth and the time of day keep moving, and on meteor-shower nights a shimmer
+  joins in.
+- **No game sounds:** no effects, ambience, menu or hydrophone ducking, and none of the master safety limiter
+  that sits after effects and music together.
+- **The human touches are random,** so two renders of the same song differ very slightly (a few ms of
+  timing, small loudness and pan differences). Ataraxia's chord changes and single notes differ more
+  between renders, as they do every time in the game.
+- **The level** is your MUSIC slider times the master volume (mute is ignored), as in the game.
+- **44.1 kHz.** The game runs at your device's rate (often 48 kHz); it sounds the same.
+
+## 12. Checking the music
+
+```
+node tools/check-music.js            the data, then every song and every place (day + night) rendered and measured
+node tools/check-music.js --quick    the data only
+node tools/check-music.js --song kelp one song
+node tools/check-music.js --wav dir   also save every render as a WAV file
+node tools/check-music.js --live     also play the game and check the music's rules in every situation
+```
+
+**The data:**
+- every song reads correctly: bars add up, chords and notes exist and are in range, no section is empty;
+- every place has an Ataraxia setting;
+- held notes that clash with their chord are listed to listen to.
+
+**The renders:**
+- length, peak (below -1 dB), average loudness (songs within 4 dB of each other, every Ataraxia place at
+  least 3 dB below the songs), silences inside a song, the spectrum (not over 60 % below 120 Hz, not over
+  10 % above 5 kHz), and every note's nodes freed by the end.
+- Measured at the default MUSIC volume:
+  - songs -26.8 to -29.9 dB average, peaks about -10 to -12 dB;
+  - Ataraxia -32.8 to -42.1 dB (the deep places quietest), about 8.5 dB below the songs in the middle.
+
+**`--live`** (27 checks):
+- the music follows all 15 places by day and at night;
+- a song carries on through a scene change, pause and the log, and menus duck it;
+- a hidden tab freezes and resumes it;
+- mute and volume 0 / max;
+- songs wait for LISTEN, photo mode, mute and the guided dive's first steps (REDO TUTORIAL);
+- a request celebration during a song;
+- each DELTA frequency over simulated time:
+  - RARELY 19-29 min;
+  - SOMETIMES 7-13 min;
+  - OFTEN 3-5 min;
+  - ALWAYS 20 s;
+  - OFF never;
+- ATARAXIA off schedules nothing, and effects still play;
+- backups, save codes and old saves;
+- a long busy session's nodes coming back down to where they started;
+- the testing key;
+- the jukebox and the DELTA setting by touch on a phone-sized screen.
+
+**Testing key:** `musicKeys: true` in `debug` makes **2** start the next song right away, picked as usual.

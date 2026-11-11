@@ -193,6 +193,12 @@ AQ.SoundTest = (function () {
     ui.push({ id: 'back', x: 270, y: 2, w: 46, h: 10, label: AQ.t('ui.back') });
     items().forEach((it, i) => ui.push({ id: 'item', i, it, x: X0 + (i % cols()) * (cw() + 2), y: Y0 + Math.floor(i / cols()) * STEP, w: cw(), h: CH, label: it.label }));
     if (TABS[T.tab][0] === 'delta' && AQ.Delta.playing()) ui.push({ id: 'stopsong', x: 270, y: 146, w: 42, h: 10, label: AQ.t('soundtest.stop') });
+    // TESTING (debug.musicPreview): the picked one, or all of this tab, rendered to WAV files
+    if (AQ.TUNING.debug.musicPreview && AQ.MusicPreview && (TABS[T.tab][0] === 'delta' || TABS[T.tab][0] === 'music')) {
+      const busy = !!AQ.MusicPreview.busy;
+      ui.push({ id: 'preview', x: 8, y: 136, w: 60, h: 10, label: AQ.t('soundtest.preview'), off: busy });
+      ui.push({ id: 'exportall', x: 72, y: 136, w: 72, h: 10, label: AQ.t('soundtest.exportAll'), off: busy });
+    }
     return ui;
   }
   const playing = (it) => (TABS[T.tab][0] === 'amb' ? AQ.Ambience.test === it.id : TABS[T.tab][0] === 'music' ? AQ.Music.test === it.id
@@ -218,6 +224,15 @@ AQ.SoundTest = (function () {
     if (r.edge) T.pulses.push({ t: 0, life: AQ.TUNING.hydrophone.edgePulse.life, k: 1 });   // the screen's edges pulse
     // (the burst's later calls play their sound with their ripple)
     for (let i = 1; i < (r.burst || 1); i++) A.play(it.id, { important: true, delay: i * r.gap, key: it.id + ':' + i });
+  }
+  // what a preview renders: the picked song or place (ATARAXIA: day or night as listed), or every one of the tab
+  function exportWavs(all) {
+    const kind = TABS[T.tab][0], MP = AQ.MusicPreview;
+    if (kind === 'delta') return MP.export((all ? AQ.Delta.all() : [AQ.Delta.all()[T.sel]]).filter(Boolean).map((s) => ({ song: s.id })));
+    const places = (it) => { const [place, mode] = it.id.split(':'); return { place, night: mode === 'night' }; };
+    const list = items().filter((it) => !it.stinger);
+    if (all) MP.export(list.map((it) => Object.assign(places(it), { seconds: AQ.TUNING.debug.exportAllSeconds })));
+    else { const it = items()[T.sel]; if (it && !it.stinger) MP.export([places(it)]); }
   }
   function setTab(i) { T.tab = (i + TABS.length) % TABS.length; T.sel = 0; A.play('menu_move'); }
   function close(game) {
@@ -249,6 +264,7 @@ AQ.SoundTest = (function () {
       if (T.hover.id === 'tab') setTab(T.hover.i);
       else if (T.hover.id === 'back') close(game);
       else if (T.hover.id === 'stopsong') { AQ.Delta.stop(1.5); A.play('menu_select'); }
+      else if ((T.hover.id === 'preview' || T.hover.id === 'exportall') && !T.hover.off) { A.play('menu_select'); exportWavs(T.hover.id === 'exportall'); }
       else if (T.hover.id === 'item') trigger(T.hover.it);
     } else if (I.rawPressed('Enter', 'Space')) { const it = items()[T.sel]; if (it) trigger(it); }
   };
@@ -282,6 +298,8 @@ AQ.SoundTest = (function () {
         if (r.r1 > 20 && k > 0.25) AQ.Hydro.ring(g, r.x, r.y, rad * 0.6, a * 0.5, AQ.TUNING.hydrophone.ripple.color);
       }
     }
+    if (AQ.MusicPreview && AQ.MusicPreview.busy) { const b = AQ.MusicPreview.busy; F().draw(g, AQ.t('soundtest.rendering', { name: b.name, n: b.n, total: b.total }), 8, 152, '#ffe9a8', { max: 304 }); }
+    else if (AQ.MusicPreview && AQ.MusicPreview.done && Date.now() - AQ.MusicPreview.done.at < 6000) F().draw(g, AQ.t('soundtest.exported', { n: AQ.MusicPreview.done.total }), 8, 152, '#8ff0b0', { max: 304 });
     if (kind === 'delta') {                                         // the playing song: where it is, and how long it is
       const s = AQ.Delta.playing();
       if (s) {
