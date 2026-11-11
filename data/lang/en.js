@@ -91,6 +91,7 @@ AQ.langFiles.en = {
   'debug.gfxLevel': 'GRAPHICS: {level}',
   'debug.gfxEffect': 'EFFECT {effect}: {state}',
   'settings.lowEffects': 'LOW EFFECTS',   // lighter lighting and fewer particles, for slow phones
+  'perf.slowHint': 'Running a bit slowly? Try LOW EFFECTS in SETTINGS > OPTIONS.',   // a toast, once, on a slow device (src/slowwatch.js)
   'settings.reduced': 'REDUCED',
   'settings.normal': 'NORMAL',
   'settings.touchControls': 'TOUCH CONTROLS',

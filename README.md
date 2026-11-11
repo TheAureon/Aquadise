@@ -98,6 +98,14 @@ frame (`AQ.TUNING.lowEffects`). Measured in Chromium with the CPU slowed down 6x
 844x390 at 2x: the sea runs at 34-50 fps (36-52 with LOW EFFECTS), a meteor shower while listening at
 23 (34), the building at 40, its whole view 16 (32), a busy tank 35 (40), the log 27-29; at 4x most
 scenes run at 50-60 and the whole view at 26. At full speed every scene takes 1-5 ms a frame.
+When the game runs slowly for a while anyway, the music quietly plays fewer notes at once and a toast
+suggests LOW EFFECTS, once per save (`src/slowwatch.js`, `AQ.TUNING.slowWatch`). LOW EFFECTS changes
+the music's note limit at once; the reverb's length only changes after a reload.
+
+**iPhone, iPad, Android and Safari:** sound starts on the first tap and comes back after a phone call,
+an alarm or switching apps; save codes from newer browsers open in older Safari too (a small built-in
+decompressor); songs from audio files are kept compressed and only decoded while they play (a decoded
+3-minute song is about 70 MB). A checklist for trying it on a real device: `docs/DEVICE_TESTING.md`.
 (Two changes made it faster for everyone with nothing visible changing: the touch controls' layer is only
 redrawn when something on it changes, and the water backdrop is drawn in 32 px columns, the size of its
 colour cells. The building also skips tanks that are off screen.)
@@ -1046,6 +1054,7 @@ src/delta.js          DELTA: the song notation, voicing, player, when songs play
 src/jukebox.js        the JUKEBOX: the MUSIC page (play any song you've heard)
 src/musicpreview.js   music previews: offline renders, measuring, WAV files (Sound Test, tools/check-music.js)
 src/sounddirector.js  per-frame sound hooks: steps, splashes, beam, chimes, creature voices
+src/slowwatch.js      the slow-device watch: lighter music and a LOW EFFECTS hint when frames are slow
 src/soundtest.js      the SETTINGS panel (SOUND / OPTIONS / TOUCH tabs) and the SOUND TEST screen
 src/touch.js          touch controls: pointers, joystick, on-screen buttons, MENU panel, rotate screen, vibration
 src/gfx/gfx.js        GRAPHICS: presenting the frame (CLASSIC or the shader layer), levels, governor, photos
@@ -1068,6 +1077,7 @@ tools/check-badges.js       checks the badge data
 tools/lang-check.js         checks a translation against English (keys, placeholders, plural forms, letters)
 tools/lang-csv.js           exports all text to a CSV for translators, and imports it back
 docs/TRANSLATING.md         how to translate the game
+docs/DEVICE_TESTING.md      a checklist for trying the game on a real iPhone, iPad and Android phone
 tools/sprites.html          animated preview of every sprite
 docs/SPRITE_SPEC.md         how to make sprites that drop in cleanly
 docs/GRAPHICS_PLAN.md       the shader layer: how it works, each stage, measurements

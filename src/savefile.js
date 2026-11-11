@@ -273,7 +273,8 @@ AQ.SaveFile = (function () {
   // ---------------------------------------------------------------- save codes
   // A save code is the save as one line of text: AQ1.<z|j>.<length>.<checksum>.<data>
   //   AQ1       the code's version (a newer one is refused kindly, like a newer backup)
-  //   z / j     the data is compressed (CompressionStream 'deflate') / not (older browsers)
+  //   z / j     the data is compressed (CompressionStream 'deflate') / not (older browsers; they can still
+  //             open 'z' codes with the small inflate below)
   //   length    how many characters the data has (so a cut-off code can be told apart from a damaged one)
   //   checksum  CRC-32 of the data (8 hex digits): any changed character is caught
   //   data      base64url (letters, digits, - and _: safe in notes, emails and chats)
@@ -284,6 +285,61 @@ AQ.SaveFile = (function () {
   const toB64 = (bytes) => { let s = ''; for (let i = 0; i < bytes.length; i += 0x8000) s += String.fromCharCode.apply(null, bytes.subarray(i, i + 0x8000)); return btoa(s).replace(/\+/g, '-').replace(/\//g, '_').replace(/=+$/, ''); };
   const fromB64 = (str) => { let s = str.replace(/-/g, '+').replace(/_/g, '/'); while (s.length % 4) s += '='; const bin = atob(s), u = new Uint8Array(bin.length); for (let i = 0; i < bin.length; i++) u[i] = bin.charCodeAt(i); return u; };
   const through = (bytes, Stream) => new Response(new Blob([bytes]).stream().pipeThrough(new Stream('deflate'))).arrayBuffer().then((b) => new Uint8Array(b));
+  // Older browsers (Safari before 16.4) can't decompress, but codes made in newer ones are compressed: this
+  // small inflate (zlib / DEFLATE, RFC 1950 + 1951) opens them anyway. Throws on damaged data.
+  function inflate(src) {
+    if (src.length < 2 || (src[0] & 0x0f) !== 8 || ((src[0] << 8) | src[1]) % 31) throw new Error('not zlib');
+    let pos = 2, bit = 0, out = new Uint8Array(Math.max(1024, src.length * 4)), n = 0;
+    const need = (k) => { if (n + k > out.length) { const o = new Uint8Array(Math.max(out.length * 2, n + k)); o.set(out); out = o; } };
+    const bits = (k) => { let v = 0; for (let i = 0; i < k; i++) { if (pos >= src.length) throw new Error('short'); v |= ((src[pos] >> bit) & 1) << i; if (++bit === 8) { bit = 0; pos++; } } return v; };
+    const table = (lens) => {                                      // canonical Huffman: counts + symbols in order
+      const count = new Uint16Array(16), sym = []; lens.forEach((l) => count[l]++); count[0] = 0;
+      for (let l = 1; l < 16; l++) lens.forEach((x, s) => { if (x === l) sym.push(s); });
+      return { count, sym };
+    };
+    const decode = (h) => { let code = 0, first = 0, idx = 0; for (let l = 1; l < 16; l++) { code |= bits(1); const c = h.count[l]; if (code - c < first) return h.sym[idx + code - first]; idx += c; first = (first + c) << 1; code <<= 1; } throw new Error('bad code'); };
+    const LB = [3, 4, 5, 6, 7, 8, 9, 10, 11, 13, 15, 17, 19, 23, 27, 31, 35, 43, 51, 59, 67, 83, 99, 115, 131, 163, 195, 227, 258], LE = [0, 0, 0, 0, 0, 0, 0, 0, 1, 1, 1, 1, 2, 2, 2, 2, 3, 3, 3, 3, 4, 4, 4, 4, 5, 5, 5, 5, 0];
+    const DB = [1, 2, 3, 4, 5, 7, 9, 13, 17, 25, 33, 49, 65, 97, 129, 193, 257, 385, 513, 769, 1025, 1537, 2049, 3073, 4097, 6145, 8193, 12289, 16385, 24577], DE = [0, 0, 0, 0, 1, 1, 2, 2, 3, 3, 4, 4, 5, 5, 6, 6, 7, 7, 8, 8, 9, 9, 10, 10, 11, 11, 12, 12, 13, 13];
+    let fixed = null, last = 0;
+    while (!last) {
+      last = bits(1); const type = bits(2);
+      if (type === 0) {                                            // stored
+        if (bit) { bit = 0; pos++; }
+        if (pos + 4 > src.length) throw new Error('short');
+        const len = src[pos] | (src[pos + 1] << 8); pos += 4;
+        if (pos + len > src.length) throw new Error('short');
+        need(len); out.set(src.subarray(pos, pos + len), n); n += len; pos += len; continue;
+      }
+      let lit, dist;
+      if (type === 1) {
+        if (!fixed) { const l = []; for (let i = 0; i < 288; i++) l.push(i < 144 ? 8 : i < 256 ? 9 : i < 280 ? 7 : 8); fixed = [table(l), table(new Array(30).fill(5))]; }
+        [lit, dist] = fixed;
+      } else if (type === 2) {
+        const hl = bits(5) + 257, hd = bits(5) + 1, hc = bits(4) + 4, ord = [16, 17, 18, 0, 8, 7, 9, 6, 10, 5, 11, 4, 12, 3, 13, 2, 14, 1, 15], cl = new Array(19).fill(0);
+        for (let i = 0; i < hc; i++) cl[ord[i]] = bits(3);
+        const ch = table(cl), lens = [];
+        while (lens.length < hl + hd) {
+          const s = decode(ch);
+          if (s < 16) lens.push(s);
+          else if (s === 16) { if (!lens.length) throw new Error('bad'); const p = lens[lens.length - 1]; for (let r = 3 + bits(2); r > 0; r--) lens.push(p); }
+          else for (let r = s === 17 ? 3 + bits(3) : 11 + bits(7); r > 0; r--) lens.push(0);
+        }
+        lit = table(lens.slice(0, hl)); dist = table(lens.slice(hl, hl + hd));
+      } else throw new Error('bad block');
+      for (;;) {
+        const s = decode(lit);
+        if (s < 256) { need(1); out[n++] = s; } else if (s === 256) break;
+        else {
+          const i = s - 257; if (i >= 29) throw new Error('bad length');
+          const len = LB[i] + bits(LE[i]), d = decode(dist); if (d >= 30) throw new Error('bad distance');
+          const back = DB[d] + bits(DE[d]); if (back > n) throw new Error('bad distance');
+          need(len); for (let k = 0; k < len; k++, n++) out[n] = out[n - back];
+        }
+      }
+    }
+    return out.subarray(0, n);
+  }
+  SF.inflate = inflate;
   SF.makeCode = function (json) {
     const raw = new TextEncoder().encode(json);
     const wrap = (type, bytes) => { const body = toB64(bytes); return `AQ${CODE_VER}.${type}.${body.length}.${crc32(body)}.${body}`; };
@@ -304,8 +360,9 @@ AQ.SaveFile = (function () {
     let bytes;
     try { bytes = fromB64(body); } catch (e) { return no('damaged'); }
     if (parts[1] === 'j') return Promise.resolve(new TextDecoder().decode(bytes));
-    if (typeof DecompressionStream !== 'function') return no('cantopen');
-    return through(bytes, DecompressionStream).then((b) => new TextDecoder().decode(b), () => no('damaged'));
+    const slow = () => { try { return Promise.resolve(new TextDecoder().decode(inflate(bytes))); } catch (e) { return no('damaged'); } };
+    if (typeof DecompressionStream !== 'function' || SF.forceInflate) return slow();      // (older Safari: the small inflate above)
+    return through(bytes, DecompressionStream).then((b) => new TextDecoder().decode(b), slow);
   };
   const roughly = (n) => (n < 1000 ? Math.max(100, Math.round(n / 100) * 100) : Math.round(n / 1000) * 1000);
   // COPY SAVE CODE: straight to the clipboard; if the browser won't allow it, the code in a box to copy by hand

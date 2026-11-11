@@ -11,6 +11,8 @@ var AQ = (typeof AQ !== 'undefined') ? AQ : {};
 AQ.MusicPreview = (function () {
   const MP = {};
   const RATE = 44100;
+  const Offline = typeof OfflineAudioContext === 'function' ? OfflineAudioContext : (typeof webkitOfflineAudioContext === 'function' ? webkitOfflineAudioContext : null);
+  MP.can = () => !!Offline && typeof Offline.prototype.suspend === 'function' && typeof Blob === 'function';        // (very old browsers: no PREVIEW buttons)
   // the level it is rendered at: the player's MUSIC slider and the master volume (mute ignored), as in the game
   function level() { const st = AQ.Audio.settings(); return (st.music != null ? st.music : AQ.TUNING.audio.musicVolume) * AQ.TUNING.audio.master; }
 
@@ -19,8 +21,10 @@ AQ.MusicPreview = (function () {
     if (what.song && !song) throw new Error('no song ' + what.song);
     const place = what.place && AQ.data.music.ataraxia[what.place];
     if (what.place && !place) throw new Error('no place ' + what.place);
+    if (song && song.file) await AQ.Delta.prepare(song);          // (a song from a file: its decoded sound)
     const secs = song ? Math.ceil(AQ.Delta.length(song) + (song.file ? 1 : 0)) : (what.seconds || AQ.TUNING.debug.musicPreviewSeconds);
-    const ctx = new OfflineAudioContext(2, Math.ceil(RATE * secs), RATE);
+    if (!MP.can()) throw new Error('offline audio is not supported here');
+    const ctx = new Offline(2, Math.ceil(RATE * secs), RATE);
     const vol = ctx.createGain(); vol.gain.value = what.level != null ? what.level : level(); vol.connect(ctx.destination);
     const mix = AQ.MusicMix.create(ctx, vol, { lowFx: AQ.U.lowFx() });
     let tick, maxNodes = 0;
@@ -36,6 +40,7 @@ AQ.MusicPreview = (function () {
     for (let t = 0.25; t < secs; t += 0.25) ctx.suspend(t).then(() => { tick(); maxNodes = Math.max(maxNodes, mix.nodesAlive); ctx.resume(); });
     const buf = await ctx.startRendering();
     buf.stats = { notes: mix.started, stolen: mix.stolen, maxNodes, nodesAtEnd: mix.nodesAlive };
+    if (song && song.file) AQ.Delta.release(song);                // (its decoded sound is let go again, unless it's playing)
     return buf;
   };
 

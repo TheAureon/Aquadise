@@ -31,7 +31,7 @@ own German pass, which I'd do at the end of each update.
 
 ## A. Reach and polish
 
-**A1. Safari, iPhone and Android readiness.**
+**A1. Safari, iPhone and Android readiness.** *(Done.)*
 - Go through the code for what those browsers do differently:
   - audio unlock on the first touch, and `webkitAudioContext` / older OfflineAudioContext;
   - CompressionStream, used by save codes, with its fallback;

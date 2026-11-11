@@ -451,6 +451,15 @@ AQ.TUNING = {
     particleShare: 0.5,       // sparkles and puffs: this share of the usual count
     wholeViewEvery: 3         // the whole-building view redraws the building every this many frames
   },
+  // The slow-device watch (src/slowwatch.js): real frame times while playing. Slow for a while: the music plays
+  // fewer notes at once (music.lowFxVoices) and a toast suggests LOW EFFECTS (once per save).
+  slowWatch: {
+    slowFrameMs: 45,          // a smoothed frame time over this (ms; about 22 frames a second) counts as slow...
+    slowSeconds: 8,           // ...for this long: the lighter music, and the hint
+    fastFrameMs: 30,          // under this (ms) counts as quick again...
+    recoverSeconds: 20,       // ...for this long: the music goes back to normal
+    hint: true                // show the LOW EFFECTS hint (once per save)
+  },
   // The guided first dive (src/dive.js; the text is dive.* in data/lang/en.js).
   dive: {
     niceSeconds: 1.1,         // the little "NICE!" after a step before the next one shows
@@ -695,7 +704,7 @@ AQ.TUNING = {
   music: {
     level: 0.75,              // everything musical, before the MUSIC slider (the limiter keeps it from clipping)
     maxVoices: 32,            // most music notes ringing at once (the quietest old one fades to make room)
-    lowFxVoices: 18,          // ...with LOW EFFECTS on (slow phones)
+    lowFxVoices: 18,          // ...with LOW EFFECTS on, or on a slow device (src/slowwatch.js); changes live
     scheduleAhead: 0.6,       // seconds of notes queued ahead on the audio clock (steady timing through slow frames)
     tickMs: 100,              // how often the scheduler also runs by itself (ms), besides every frame
     // the room: a generated reverb with a soft, warm tail

@@ -172,7 +172,7 @@ AQ.Delta = (function () {
     song._compiled = out;
     return out;
   };
-  DL.length = (song) => (song.file ? (song.buffer ? song.buffer.duration : 0) : DL.compile(song).seconds);
+  DL.length = (song) => (song.file ? song.duration || 0 : DL.compile(song).seconds);
   DL.title = (song) => (song.file ? song.name : AQ.t(`song.${song.id}`));   // (a file's title is its own)
   DL.clock = (sec) => AQ.t('music.time', { m: Math.floor(sec / 60), s: String(Math.floor(sec % 60)).padStart(2, '0') });
 
@@ -183,7 +183,7 @@ AQ.Delta = (function () {
   DL.make = function (mix) {
     const P = { mix, song: null, paused: null };
     P.start = function (song, when, offset = 0) {
-      const c = mix.ctx, comp = song.file ? { seconds: song.buffer.duration + 0.5, events: [] } : DL.compile(song);
+      const c = mix.ctx, comp = song.file ? { seconds: song.duration + 0.5, events: [] } : DL.compile(song);
       P.song = song; P.comp = comp; P.paused = null;
       P.t0 = Math.max(when || 0, c.currentTime + 0.15) - offset;
       P.idx = 0; while (P.idx < comp.events.length && comp.events[P.idx].t < offset - 1e-6) P.idx++;   // (from the middle: skip what's before)
@@ -235,27 +235,40 @@ AQ.Delta = (function () {
 
   // ---------------------------------------------------------------- songs from audio files (assets/music)
   // assets/music/manifest.js lists them; each is fetched (or, opened from disk, read from the embedded copy
-  // made by tools/embed-music.js), decoded once, measured, and turned up or down to sit with the built-in
+  // made by tools/embed-music.js), measured once, and turned up or down to sit with the built-in
   // songs. Until it has loaded (or if it can't), it simply isn't offered.
   const fileSongs = [];
   DL.fileSongs = fileSongs;
+  // (Phones: a decoded 3-minute song is about 70 MB, the file itself 3-4 MB. So only the file is kept: each
+  // song is decoded once at the start to measure it (one at a time), then again only when it is about to
+  // play, and let go when it's done.)
   DL.loadFiles = function (ctx) {
+    DL.fileCtx = ctx;
     const list = (AQ.data.musicFiles || []).filter((f) => f && f.file);
-    list.forEach((f, i) => {
+    let chain = Promise.resolve();
+    list.forEach((f) => {
       const song = { id: 'file:' + f.file, file: f.file, name: f.title || f.file, places: f.places || (f.place ? [f.place] : []), time: f.night === true ? 'night' : f.night === false ? 'day' : (f.time || 'any'), loading: true };
       fileSongs.push(song);
       const emb = AQ.data.musicEmbedded && AQ.data.musicEmbedded[f.file];
-      const bytes = emb ? Promise.resolve(Uint8Array.from(atob(emb), (ch) => ch.charCodeAt(0)).buffer) : fetch(f.file).then((r) => { if (!r.ok) throw new Error(r.status); return r.arrayBuffer(); });
-      bytes.then((ab) => ctx.decodeAudioData(ab)).then((buf) => {
-        let sum = 0, n = 0;                                        // its average level (every 7th sample is plenty)
-        for (let ch = 0; ch < buf.numberOfChannels; ch++) { const d = buf.getChannelData(ch); for (let k = 0; k < d.length; k += 7) { sum += d[k] * d[k]; n++; } }
-        const db = 10 * Math.log10(sum / Math.max(1, n) + 1e-12), R = cfg().fileGainRange;
-        song.buffer = buf; song.level = db; song.gain = Math.max(R[0], Math.min(R[1], Math.pow(10, (cfg().fileLoudness - db) / 20)));
-        song.loading = false;
-      }).catch((e) => { song.loading = false; song.failed = true; console.warn(`[music] couldn't load ${f.file}: ${e && e.message ? e.message : e}`); });
+      chain = chain.then(() => (emb ? Promise.resolve(Uint8Array.from(atob(emb), (ch) => ch.charCodeAt(0)).buffer) : fetch(f.file).then((r) => { if (!r.ok) throw new Error(r.status); return r.arrayBuffer(); }))
+        .then((ab) => { song.bytes = ab; return AQ.Audio.decode(ctx, ab.slice(0)); })
+        .then((buf) => {
+          let sum = 0, n = 0;                                      // its average level (every 7th sample is plenty)
+          for (let ch = 0; ch < buf.numberOfChannels; ch++) { const d = buf.getChannelData(ch); for (let k = 0; k < d.length; k += 7) { sum += d[k] * d[k]; n++; } }
+          const db = 10 * Math.log10(sum / Math.max(1, n) + 1e-12), R = cfg().fileGainRange;
+          song.duration = buf.duration; song.level = db; song.gain = Math.max(R[0], Math.min(R[1], Math.pow(10, (cfg().fileLoudness - db) / 20)));
+          song.loading = false; song.ready = true;                 // (the decoded sound itself is let go here)
+        })
+        .catch((e) => { song.loading = false; song.failed = true; console.warn(`[music] couldn't load ${f.file}: ${e && e.message ? e.message : e}`); }));
     });
   };
-  const ready = (s) => !s.file || !!s.buffer;
+  // the decoded sound of a song from a file, made when it's needed (the one playing keeps it)
+  DL.prepare = function (song, ctx) {
+    if (!song.file || song.buffer) return Promise.resolve(song);
+    return AQ.Audio.decode(ctx || DL.fileCtx, song.bytes.slice(0)).then((buf) => { song.buffer = buf; return song; });
+  };
+  DL.release = function (song) { if (song && song.file && (!DL.playing() || DL.playing() !== song)) song.buffer = null; };
+  const ready = (s) => !s.file || !!s.ready;
   // every song: the built-in ones, then the audio files that have loaded
   DL.all = () => songs().concat(fileSongs.filter(ready));
 
@@ -315,8 +328,16 @@ AQ.Delta = (function () {
   // how: 'test' (the Sound Test: not counted as heard), 'jukebox' (you chose it: no NOW PLAYING toast)
   function begin(song, how) {
     if (!song || !DL.player) return;
+    if (song.file && !song.buffer) {                               // a song from a file: decode it first, then begin
+      DL.pending = song;
+      DL.prepare(song).then(() => { if (DL.pending === song) { DL.pending = null; begin(song, how); } }, () => { DL.pending = null; });
+      return;
+    }
+    DL.pending = null;
     const test = how === true || how === 'test';
-    if (DL.playing()) DL.player.clear();
+    const was = DL.playing();
+    if (was) DL.player.clear();
+    if (was && was !== song) DL.release(was);
     DL.player.start(song);
     DL.isTest = test; DL.how = test ? 'test' : how || 'auto';
     if (!test && how !== 'jukebox' && DL.titlesOn() && (!AQ.Tips || AQ.Tips.hintsOn()) && AQ.Badges && AQ.Badges.announceSong) AQ.Badges.announceSong(song);
@@ -332,8 +353,7 @@ AQ.Delta = (function () {
   DL.test = function (id) {
     if (!DL.player) return;
     if (DL.playing() && DL.playing().id === id) { DL.player.stop(1.5); return; }
-    if (DL.playing()) DL.player.clear();
-    begin(DL.byId(id), true);
+    begin(DL.byId(id), true);                                      // (begin clears the one playing)
   };
   DL.stop = function (fade = 1.5) { if (DL.playing()) DL.player.stop(fade); };
 
@@ -347,8 +367,9 @@ AQ.Delta = (function () {
     if (!DL.player) return;
     DL.player.pump();
     if (DL.playing() && DL.player.done()) {                        // it has rung out
-      const how = DL.how;
+      const how = DL.how, was = DL.playing();
       DL.player.clear(); DL.isTest = false; DL.how = null;
+      DL.release(was);                                             // (a song from a file lets go of its decoded sound)
       DL.wait = interval(DL.frequency());
       if (how === 'jukebox' && AQ.Jukebox) AQ.Jukebox.ended();     // the jukebox plays on (next, shuffle, repeat)
       if (DL.onEnd) DL.onEnd();
@@ -371,7 +392,7 @@ AQ.Delta = (function () {
       DL.titleT -= dt;
       if (DL.titleT <= 0) { DL.titleT = null; if (f !== 'off' && !DL.playing() && !DL.blocked(game) && DL.byId('delta')) begin(DL.byId('delta')); }
     }
-    if (f === 'off' || DL.playing() || st === 'soundtest') return;
+    if (f === 'off' || DL.playing() || DL.pending || st === 'soundtest') return;
     if (DL.wait == null || !isFinite(DL.wait)) DL.wait = interval(f);
     DL.wait -= dt;
     if (DL.wait <= 0 && !DL.blocked(game)) {

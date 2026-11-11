@@ -194,7 +194,7 @@ AQ.SoundTest = (function () {
     items().forEach((it, i) => ui.push({ id: 'item', i, it, x: X0 + (i % cols()) * (cw() + 2), y: Y0 + Math.floor(i / cols()) * STEP, w: cw(), h: CH, label: it.label }));
     if (TABS[T.tab][0] === 'delta' && AQ.Delta.playing()) ui.push({ id: 'stopsong', x: 270, y: 146, w: 42, h: 10, label: AQ.t('soundtest.stop') });
     // TESTING (debug.musicPreview): the picked one, or all of this tab, rendered to WAV files
-    if (AQ.TUNING.debug.musicPreview && AQ.MusicPreview && (TABS[T.tab][0] === 'delta' || TABS[T.tab][0] === 'music')) {
+    if (AQ.TUNING.debug.musicPreview && AQ.MusicPreview && AQ.MusicPreview.can() && (TABS[T.tab][0] === 'delta' || TABS[T.tab][0] === 'music')) {
       const busy = !!AQ.MusicPreview.busy;
       ui.push({ id: 'preview', x: 8, y: 136, w: 60, h: 10, label: AQ.t('soundtest.preview'), off: busy });
       ui.push({ id: 'exportall', x: 72, y: 136, w: 72, h: 10, label: AQ.t('soundtest.exportAll'), off: busy });

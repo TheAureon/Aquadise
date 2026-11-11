@@ -166,6 +166,7 @@ AQ.Game = (function () {
     if (AQ.SaveFile && G.player) AQ.SaveFile.tick(dt, G);   // play time, keeping the save, the gentle backup reminder
     if (AQ.Quests && G.player) AQ.Quests.tick(dt, G);       // station requests: checked wherever you are
     if (AQ.SoundDirector) AQ.SoundDirector.update(dt, G);
+    if (AQ.SlowWatch) AQ.SlowWatch.update(G);       // a slow device: lighter music, and a LOW EFFECTS hint once
     AQ.Transition.update(dt);
     if (AQ.Breeding && G.state !== 'loading') AQ.Breeding.update(dt);   // tanks live on wherever you are
     I.endFrame();

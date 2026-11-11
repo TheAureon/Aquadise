@@ -100,16 +100,24 @@ AQ.Audio = (function () {
     for (let i = 0; i < len; i++) d[i] = Math.random() * 2 - 1;
     return buf;
   }
+  // Not running but should be: 'suspended' (not started yet, or the tab was hidden) or, on iPhones and iPads,
+  // 'interrupted' (a phone call, Siri, an alarm, the lock screen). Any touch or key wakes it again.
+  const asleep = () => A.ctx && A.ctx.state !== 'running' && A.ctx.state !== 'closed';
+  const wake = () => { if (asleep() && !document.hidden) { const p = A.ctx.resume(); if (p && p.catch) p.catch(() => {}); } };
   A.attach = function () {
-    const go = () => { init(); if (A.ctx && A.ctx.state === 'suspended' && !document.hidden) A.ctx.resume().catch(() => {}); };
+    const go = () => { init(); wake(); };
     window.addEventListener('pointerdown', go, true);
     window.addEventListener('keydown', go, true);
     window.addEventListener('touchend', go, true);       // iOS only lets sound start from a touch's end
     document.addEventListener('visibilitychange', () => {
       if (!A.ctx) return;
-      if (document.hidden) A.ctx.suspend().catch(() => {}); else A.ctx.resume().catch(() => {});
+      if (document.hidden) { const p = A.ctx.suspend(); if (p && p.catch) p.catch(() => {}); } else wake();
     });
+    window.addEventListener('pageshow', wake);           // back from the browser's back / forward cache
+    window.addEventListener('focus', wake);              // (some phones resume here rather than on visibility)
   };
+  // decodeAudioData, the promise way or (older Safari) the callback way
+  A.decode = (ctx, ab) => new Promise((ok, no) => { try { const p = ctx.decodeAudioData(ab, ok, no); if (p && p.then) p.then(ok, no); } catch (e) { no(e); } });
 
   // ---------------------------------------------------------------- playing
   A.now = () => (A.ctx ? A.ctx.currentTime : 0);
@@ -211,7 +219,7 @@ AQ.Audio = (function () {
         A.buffers[url] = 'loading';
         const emb = AQ.data.audioEmbedded && AQ.data.audioEmbedded[url];
         const bytes = emb ? Promise.resolve(Uint8Array.from(atob(emb), (ch) => ch.charCodeAt(0)).buffer) : fetch(url).then((r) => r.arrayBuffer());
-        bytes.then((ab) => A.ctx.decodeAudioData(ab)).then((buf) => { A.buffers[url] = buf; }).catch(() => { A.buffers[url] = 'failed'; });
+        bytes.then((ab) => A.decode(A.ctx, ab)).then((buf) => { A.buffers[url] = buf; }).catch(() => { A.buffers[url] = 'failed'; });
       });
     }
   }
