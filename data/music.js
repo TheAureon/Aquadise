@@ -62,9 +62,7 @@ AQ.data.creatureVoices = {
   mammal: 'voice_mammal', amphibian: 'voice_amphibian', reptile: 'voice_reptile'
 };
 
-// Swap any generated sound for a real recording: map its id to a file. Effects use their id, ambience
-// beds 'amb:<place>' (they loop), the two reward phrases 'music:reward' / 'music:shower', e.g.
-//   AQ.data.audioFiles = { catch: 'audio/catch.ogg', 'amb:kelp': 'audio/kelp-bed.ogg' };
+// Real recordings in place of generated sounds: assets/audio/manifest.js (how: docs/ADDING_SOUNDS.md).
 // The SOUND TEST screen lists every id. Serve the game over http for files to play reliably.
 // A value can be one file, a list (one is picked at random each time), or
 //   { files: [...], vol: 0..1, vary: 0..0.2 }   (vol = loudness, vary = random pitch change).

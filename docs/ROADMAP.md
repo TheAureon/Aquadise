@@ -42,7 +42,7 @@ own German pass, which I'd do at the end of each update.
 - Write `docs/DEVICE_TESTING.md`: a short checklist for you to run on a real iPhone, iPad and Android phone
   (what to tap, what you should hear and see), since that can't be done from here.
 
-**A2. Real recordings for signature sounds.**
+**A2. Real recordings for signature sounds.** *(Done.)*
 - Make effects work like the music's audio files: drop a recording into `assets/audio/`, add one line, and
   it's loudness-matched and used (with several takes picked at random).
 - Prepare slots and placeholders for bubbles, the net swish, a catch, splashes and the hydrophone ping.

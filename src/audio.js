@@ -182,25 +182,62 @@ AQ.Audio = (function () {
       A.ambBus.gain.setTargetAtTime(st.sfx * cfg().ambienceLevel * lis, t, 0.05); }
   };
   // ---------------------------------------------------------------- recordings (AQ.data.audioFiles)
-  // An effect mapped to recordings plays one of them (picked at random, with a tiny pitch change so
-  // repeats don't sound identical) through the same mixer as everything else: volume sliders,
-  // underwater muffling and the voice limit all apply. Until a file has loaded (or if it can't load),
-  // the generated version plays instead. Files packed by tools/embed-audio.js load from
-  // AQ.data.audioEmbedded, so they also work when the game is opened straight from disk.
+  // An effect mapped to recordings (assets/audio/manifest.js, docs/ADDING_SOUNDS.md) plays one of them
+  // (several takes: picked at random, never the same one twice in a row, with a tiny pitch change)
+  // through the same mixer as everything else: volume sliders, underwater muffling and the voice limit
+  // all apply. Until a file has loaded (or if it can't load), the generated version plays instead.
+  // Loudness: each recording is measured once and turned up or down to match the generated sound it
+  // replaces (times `level`), unless `vol` sets its volume by hand. Files packed by tools/embed-audio.js
+  // load from AQ.data.audioEmbedded, so they also work when the game is opened straight from disk.
   const mapOf = (id) => {
     const m = AQ.data.audioFiles && AQ.data.audioFiles[id];
     if (!m) return null;
-    if (typeof m === 'string') return { files: [m], vol: 1 };
-    if (Array.isArray(m)) return { files: m, vol: 1 };
-    return { files: m.files || [], vol: m.vol != null ? m.vol : 1, vary: m.vary };
+    if (typeof m === 'string') return { files: [m], level: 1 };
+    if (Array.isArray(m)) return { files: m, level: 1 };
+    return { files: (m.files || (m.file ? [m.file] : [])).filter(Boolean), vol: m.vol, level: m.level != null ? m.level : 1, vary: m.vary };
   };
+  A.lastTake = {};
+  A.builtIn = false;                                               // the Sound Test's HEAR: BUILT-IN (not saved)
   function recordingFor(id) {
     const m = mapOf(id);
-    if (!m) return null;
-    const ready = m.files.map((f) => A.buffers[f]).filter((b) => b && b !== 'loading' && b !== 'failed');
-    return ready.length ? { buf: ready[Math.floor(Math.random() * ready.length)], vol: m.vol, vary: m.vary != null ? m.vary : 0.05 } : null;
+    if (!m || A.builtIn) return null;
+    const ready = m.files.filter((f) => A.buffers[f] && A.buffers[f].duration);
+    if (!ready.length) return null;
+    let f = ready[Math.floor(Math.random() * ready.length)];
+    if (ready.length > 1 && f === A.lastTake[id]) f = ready[(ready.indexOf(f) + 1 + Math.floor(Math.random() * (ready.length - 1))) % ready.length];
+    A.lastTake[id] = f;
+    const gain = m.vol != null ? m.vol : (A.matched[f] != null ? A.matched[f] * m.level : null);
+    return gain == null ? null : { buf: A.buffers[f], vol: gain, vary: m.vary != null ? m.vary : 0.05 };
   }
-  A.hasRecording = (id) => !!mapOf(id);
+  A.hasRecording = (id) => !!mapOf(id) && mapOf(id).files.length > 0;
+  A.recordingReady = (id) => { const m = mapOf(id); return !!m && m.files.some((f) => A.buffers[f] && A.buffers[f].duration); };
+  // How loud a sound is, for matching: the average of its 20 ms windows within 20 dB of its loudest one
+  // (so a long quiet tail or silence at the ends doesn't count).
+  A.loudness = function (buf) {
+    const n = buf.length, win = Math.max(1, Math.floor(buf.sampleRate * 0.02)), pw = [];
+    const chans = []; for (let c = 0; c < buf.numberOfChannels; c++) chans.push(buf.getChannelData(c));
+    for (let i = 0; i + win <= n; i += win) {
+      let s = 0; for (let k = i; k < i + win; k++) { let v = 0; for (const d of chans) v += d[k]; v /= chans.length; s += v * v; }
+      pw.push(s / win);
+    }
+    const top = Math.max(1e-12, ...pw), keep = pw.filter((p) => p >= top / 100);
+    return 10 * Math.log10(keep.reduce((a, b) => a + b, 0) / Math.max(1, keep.length) + 1e-12);
+  };
+  // the generated sound's loudness, rendered once offline (null if this browser can't)
+  A.generatedDb = {};
+  A.measureGenerated = function (id) {
+    if (id in A.generatedDb) return Promise.resolve(A.generatedDb[id]);
+    const s = A.sounds[id], Off = typeof OfflineAudioContext === 'function' ? OfflineAudioContext : (typeof webkitOfflineAudioContext === 'function' ? webkitOfflineAudioContext : null);
+    if (!s || !s.fn || !Off) return Promise.resolve(A.generatedDb[id] = null);
+    try {
+      const sr = A.ctx ? A.ctx.sampleRate : 44100, c = new Off(1, Math.ceil(sr * cfg().recordings.measureSeconds), sr), out = c.createGain();
+      out.connect(c.destination);
+      s.fn(c, out, 0.01, {});
+      return c.startRendering().then((buf) => (A.generatedDb[id] = A.loudness(buf)), () => (A.generatedDb[id] = null));
+    } catch (e) { return Promise.resolve(A.generatedDb[id] = null); }
+  };
+  A.matched = {};                                                  // file -> its gain (matched to the generated sound)
+  A.recordingDb = {};                                              // file -> its own loudness (dB)
   function playBuffer(rec, out, t) {
     const src = A.ctx.createBufferSource(), g = A.ctx.createGain();
     src.buffer = rec.buf; src.playbackRate.value = 1 + (Math.random() * 2 - 1) * rec.vary;
@@ -209,17 +246,25 @@ AQ.Audio = (function () {
     return rec.buf.duration / src.playbackRate.value;
   }
   function loadRecordings() {
-    const all = AQ.data.audioFiles || {};
+    const all = AQ.data.audioFiles || {}, R = cfg().recordings;
     for (const id in all) {
       if (A.sounds[id] && A.sounds[id].kind !== 'sfx') continue;    // beds + music stream instead
       const m = mapOf(id);
       if (!m) continue;
+      if (!A.sounds[id]) console.warn(`[sound] assets/audio/manifest.js: there is no sound called "${id}" (the Sound Test lists every id)`);
       m.files.forEach((url) => {
         if (A.buffers[url]) return;
         A.buffers[url] = 'loading';
         const emb = AQ.data.audioEmbedded && AQ.data.audioEmbedded[url];
-        const bytes = emb ? Promise.resolve(Uint8Array.from(atob(emb), (ch) => ch.charCodeAt(0)).buffer) : fetch(url).then((r) => r.arrayBuffer());
-        bytes.then((ab) => A.decode(A.ctx, ab)).then((buf) => { A.buffers[url] = buf; }).catch(() => { A.buffers[url] = 'failed'; });
+        const bytes = emb ? Promise.resolve(Uint8Array.from(atob(emb), (ch) => ch.charCodeAt(0)).buffer) : fetch(url).then((r) => { if (!r.ok) throw new Error('not found'); return r.arrayBuffer(); });
+        bytes.then((ab) => A.decode(A.ctx, ab)).then((buf) => {
+          const db = A.recordingDb[url] = A.loudness(buf);
+          // matched to the generated sound (or, where that can't be measured, to a usual effect level)
+          return A.measureGenerated(id).then((gen) => {
+            A.matched[url] = Math.max(R.gainRange[0], Math.min(R.gainRange[1], Math.pow(10, ((gen != null ? gen : R.fallbackDb) - db) / 20)));
+            A.buffers[url] = buf;
+          });
+        }).catch((e) => { A.buffers[url] = 'failed'; console.warn(`[sound] couldn't load ${url} (for "${id}"): ${e && e.message ? e.message : e}`); });
       });
     }
   }

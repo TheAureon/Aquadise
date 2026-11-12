@@ -143,6 +143,8 @@ AQ.langFiles.en = {
   'soundtest.info.music': 'ID: {id}{rec}  (CLICK AGAIN TO STOP)',
   'soundtest.info.music.touch': 'ID: {id}{rec}  (TAP AGAIN TO STOP)',
   'soundtest.recording': '  (RECORDING)',
+  'soundtest.hear.recording': 'HEAR: RECORDING',   // a button (R): this sound plays its recording; press for the built-in one
+  'soundtest.hear.builtIn': 'HEAR: BUILT-IN',       // ...and the other way round (the game's own generated sound)
   'soundtest.footer': 'CLICK / ENTER: PLAY   Q/E: SWITCH LIST   ESC: BACK',
   'soundtest.footer.touch': 'TAP: PLAY   TABS: SWITCH LIST   BACK: LEAVE',
 

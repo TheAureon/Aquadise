@@ -697,7 +697,14 @@ AQ.TUNING = {
     creatureVoiceEvery: 9,    // average seconds between little creature sounds (higher = rarer)
     creatureVoiceRange: 120,  // only creatures this close (px) make sounds
     stepEvery: 20,            // px walked between footsteps (about two steps a second at walking speed)
-    muteKey: 'KeyO'           // quick mute / unmute, anywhere
+    muteKey: 'KeyO',          // quick mute / unmute, anywhere
+    // recordings in place of generated sounds (assets/audio/manifest.js, docs/ADDING_SOUNDS.md): each is
+    // measured and matched to the loudness of the sound it replaces (unless the line sets `vol` by hand)
+    recordings: {
+      gainRange: [0.02, 4],   // the most a recording is turned down / up to match
+      fallbackDb: -30,        // the level matched to if the generated sound can't be measured (dB)
+      measureSeconds: 2.5     // how much of a generated sound is measured
+    }
   },
 
   // ---- the music mixer and instruments (src/musicmix.js, src/instruments.js); see docs/MUSIC_PLAN.md

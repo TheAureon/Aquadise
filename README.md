@@ -951,10 +951,14 @@ before that), and pauses while the tab is hidden.
   by category, or its own `voice:` in `data/creatures.js`.
 - **Recordings:** footsteps on sand and grass, and going into and climbing out of the water, use real recordings
   (single steps cut from the walking clips in `assets/audio/`; a random one plays each step).
-  To swap any other sound for a file, put it in `assets/audio/`, map its id in
-  `AQ.data.audioFiles` (`data/music.js`), and run `node tools/embed-audio.js` so it also plays when
-  the game is opened straight from disk. Effects use their id and beds use `amb:<place>`; the
-  two reward phrases can be replaced as `music:reward` and `music:shower`.
+  To swap any other sound for a file (`docs/ADDING_SOUNDS.md`), put it in `assets/audio/`, add its
+  line to `assets/audio/manifest.js` (ready-made lines for bubbles, the net swish, catches, splashes
+  and the sonar ping), and run `node tools/embed-audio.js` so it also plays when the game is opened
+  straight from disk. Each recording is matched to the loudness of the sound it replaces
+  (`AQ.TUNING.audio.recordings`; `level` adjusts it, `vol` sets it by hand); several takes are
+  picked at random, never the same twice in a row. The Sound Test's HEAR: RECORDING / BUILT-IN (R)
+  compares the two. Effects use their id and beds use `amb:<place>`; the two reward phrases can be
+  replaced as `music:reward` and `music:shower`.
 - **Tuning** (`AQ.TUNING.audio` in `src/config.js`): `master` (overall volume), `creatureVoiceEvery` (seconds between creature
   sounds), plus the default volumes, ambience level, crossfade time, menu duck, underwater muffle
   and the mute key.
@@ -1078,6 +1082,7 @@ tools/lang-check.js         checks a translation against English (keys, placehol
 tools/lang-csv.js           exports all text to a CSV for translators, and imports it back
 docs/TRANSLATING.md         how to translate the game
 docs/DEVICE_TESTING.md      a checklist for trying the game on a real iPhone, iPad and Android phone
+docs/ADDING_SOUNDS.md       how to use real recordings in place of the game's sounds
 tools/sprites.html          animated preview of every sprite
 docs/SPRITE_SPEC.md         how to make sprites that drop in cleanly
 docs/GRAPHICS_PLAN.md       the shader layer: how it works, each stage, measurements

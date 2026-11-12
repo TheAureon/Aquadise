@@ -1,6 +1,6 @@
 // Sound effect recipes. Each one is registered by id and built from a few soft oscillators and
 // filtered noise (helpers in AQ.Audio.H). Everything is gentle on purpose: soft attacks, low volume,
-// no harsh highs. To replace one with a real recording, map its id in AQ.data.audioFiles.
+// no harsh highs. To replace one with a real recording: assets/audio/manifest.js (docs/ADDING_SOUNDS.md).
 //
 //   AQ.Audio.register(id, { group, fn(ctx, out, t, opts) -> seconds, minGap, important })   (its name: sfx.<id> in data/lang/)
 var AQ = (typeof AQ !== 'undefined') ? AQ : {};

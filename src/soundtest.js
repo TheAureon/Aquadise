@@ -191,8 +191,12 @@ AQ.SoundTest = (function () {
     const tw = Math.floor(305 / TABS.length);                      // (the tabs share the row: a 6th one makes them a little narrower)
     const ui = TABS.map(([, name], i) => ({ id: 'tab', i, x: 8 + i * tw, y: 14, w: tw - 2, h: 10, label: AQ.t(name), on: i === T.tab }));
     ui.push({ id: 'back', x: 270, y: 2, w: 46, h: 10, label: AQ.t('ui.back') });
-    items().forEach((it, i) => ui.push({ id: 'item', i, it, x: X0 + (i % cols()) * (cw() + 2), y: Y0 + Math.floor(i / cols()) * STEP, w: cw(), h: CH, label: it.label }));
+    const list = items(), tight = Math.ceil(list.length / cols()) * STEP > 130;   // a long list: rows a pixel closer, clear of the line below
+    list.forEach((it, i) => ui.push({ id: 'item', i, it, x: X0 + (i % cols()) * (cw() + 2), y: Y0 + Math.floor(i / cols()) * (tight ? STEP - 1 : STEP), w: cw(), h: tight ? CH - 1 : CH, label: it.label }));
     if (TABS[T.tab][0] === 'delta' && AQ.Delta.playing()) ui.push({ id: 'stopsong', x: 270, y: 146, w: 42, h: 10, label: AQ.t('soundtest.stop') });
+    // a sound with a recording: hear the recording or the built-in (generated) one, to compare
+    const k = TABS[T.tab][0], sel = items()[T.sel];
+    if (k !== 'amb' && k !== 'music' && k !== 'delta' && sel && A.hasRecording(sel.key)) ui.push({ id: 'hear', x: 226, y: 160, w: 86, h: 10, label: AQ.t(A.builtIn ? 'soundtest.hear.builtIn' : 'soundtest.hear.recording') });
     // TESTING (debug.musicPreview): the picked one, or all of this tab, rendered to WAV files
     if (AQ.TUNING.debug.musicPreview && AQ.MusicPreview && AQ.MusicPreview.can() && (TABS[T.tab][0] === 'delta' || TABS[T.tab][0] === 'music')) {
       const busy = !!AQ.MusicPreview.busy;
@@ -234,9 +238,11 @@ AQ.SoundTest = (function () {
     if (all) MP.export(list.map((it) => Object.assign(places(it), { seconds: AQ.TUNING.debug.exportAllSeconds })));
     else { const it = items()[T.sel]; if (it && !it.stinger) MP.export([places(it)]); }
   }
+  // HEAR: RECORDING / BUILT-IN (R): switch, and play the picked sound the new way
+  function hear() { A.builtIn = !A.builtIn; const it = items()[T.sel]; if (it) trigger(it); }
   function setTab(i) { T.tab = (i + TABS.length) % TABS.length; T.sel = 0; A.play('menu_move'); }
   function close(game) {
-    AQ.Music.test = null; AQ.Ambience.test = null;
+    AQ.Music.test = null; AQ.Ambience.test = null; A.builtIn = false;
     if (AQ.Delta.isTest) AQ.Delta.stop(1.5);                         // a song started here stops when you leave
     A.play('menu_select');
     if (T.from === 'title') { AQ.Title.open(game); AQ.Title.panel = 'sound'; }
@@ -264,9 +270,11 @@ AQ.SoundTest = (function () {
       if (T.hover.id === 'tab') setTab(T.hover.i);
       else if (T.hover.id === 'back') close(game);
       else if (T.hover.id === 'stopsong') { AQ.Delta.stop(1.5); A.play('menu_select'); }
+      else if (T.hover.id === 'hear') hear();
       else if ((T.hover.id === 'preview' || T.hover.id === 'exportall') && !T.hover.off) { A.play('menu_select'); exportWavs(T.hover.id === 'exportall'); }
       else if (T.hover.id === 'item') trigger(T.hover.it);
     } else if (I.rawPressed('Enter', 'Space')) { const it = items()[T.sel]; if (it) trigger(it); }
+    else if (I.rawPressed('KeyR') && T.ui.some((r) => r.id === 'hear')) hear();
   };
 
   T.draw = function (g) {
@@ -312,7 +320,7 @@ AQ.SoundTest = (function () {
       return;
     }
     // (the font has no '_': ids show it as a space, as they always looked)
-    if (cur) F().draw(g, AQ.t(`soundtest.info.${kind === 'sfx' || OWN_TAB.indexOf(kind) >= 0 ? 'sfx' : kind === 'amb' ? 'amb' : cur.stinger ? 'stinger' : 'music'}`, { id: cur.key.replace(/_/g, ' '), rec: A.hasRecording(cur.key) ? AQ.t('soundtest.recording') : '' }), 8, 162, '#8fb6cc');
+    if (cur) F().draw(g, AQ.t(`soundtest.info.${kind === 'sfx' || OWN_TAB.indexOf(kind) >= 0 ? 'sfx' : kind === 'amb' ? 'amb' : cur.stinger ? 'stinger' : 'music'}`, { id: cur.key.replace(/_/g, ' '), rec: A.hasRecording(cur.key) ? AQ.t('soundtest.recording') : '' }), 8, 162, '#8fb6cc', { max: A.hasRecording(cur.key) && kind !== 'amb' && kind !== 'music' ? 214 : 304 });
     F().draw(g, AQ.t('soundtest.footer'), 160, 172, '#5f7f96', { align: 'center' });
   };
   return T;
