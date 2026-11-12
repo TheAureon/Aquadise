@@ -16,7 +16,8 @@ AQ.Render = (function () {
     if (!AQ.Clock || (AQ.Game && AQ.Game.state === 'title')) return SKY;
     const d = AQ.Clock.daylight(), tw = AQ.Clock.twilight();
     const base = [U.mix(SKY_NIGHT[0], SKY[0], d), U.mix(SKY_NIGHT[1], SKY[1], d)];
-    return [U.mix(base[0], SKY_TWI[0], tw * 0.6), U.mix(base[1], SKY_TWI[1], tw * 0.75)];
+    const cols = [U.mix(base[0], SKY_TWI[0], tw * 0.6), U.mix(base[1], SKY_TWI[1], tw * 0.75)];
+    return AQ.Weather ? AQ.Weather.skyTint(cols) : cols;            // greyer under clouds, darker in a storm
   };
   const bandCache = new Map();
 
@@ -109,7 +110,7 @@ AQ.Render = (function () {
       ctx.restore();
     }
     // stars over the sea at night
-    const night = AQ.Clock && !(AQ.Game && AQ.Game.state === 'title') ? 1 - AQ.Clock.daylight() : 0;
+    const night = (AQ.Clock && !(AQ.Game && AQ.Game.state === 'title') ? 1 - AQ.Clock.daylight() : 0) * (AQ.Weather ? AQ.Weather.starsK() : 1);   // (clouds hide them)
     if (night > 0.05 && seaY > 0) {
       for (let i = 0; i < 40; i++) {
         const x = ((i * 97 + 13 - left * 0.05) % 320 + 320) % 320, y = (i * 53) % Math.max(1, Math.min(seaY - 4, 120));
@@ -127,18 +128,25 @@ AQ.Render = (function () {
       const y = ((s.y - top * s.s + R.t * s.v) % 220 + 220) % 220 - 20;
       if (top + y > W.sea) ctx.fillRect(Math.round(x), Math.round(y), 1, 1);
     }
+    if (AQ.Weather && !(AQ.Game && AQ.Game.state === 'title')) AQ.Weather.drawSky(ctx, cam);   // clouds (and a storm's soft glow)
   };
 
+  // the surface line; in wind and storms (AQ.Weather) the waves grow, with whitecaps on the crests
   R.surface = function (cam) {
-    const ctx = R.ctx, W = AQ.World;
-    const left = cam.left(), seaY = W.sea - cam.top();
-    if (seaY < -4 || seaY > cam.h + 4) return;
+    const ctx = R.ctx, W = AQ.World, top = cam.top();
+    const left = cam.left(), seaY = W.sea - top;
+    const k = AQ.Weather && !(AQ.Game && AQ.Game.state === 'title') ? AQ.Weather.waveScale() : 1, t = R.t * (k > 1 ? 1 + (k - 1) * 0.25 : 1);
+    if (seaY < -4 - k * 2 || seaY > cam.h + 4 + k * 2) return;
     for (let x = 0; x < cam.w; x++) {
       const wx = left + x;
       if (W.solid(wx, W.sea) || W.solid(wx, W.sea - 1) || W.poolAt(wx, W.sea)) continue;
-      const o = Math.round(Math.sin(wx * 0.09 + R.t * 2.2) * 0.8 + Math.sin(wx * 0.031 - R.t * 1.3) * 0.7);
+      const o = Math.round((Math.sin(wx * 0.09 + t * 2.2) * 0.8 + Math.sin(wx * 0.031 - t * 1.3) * 0.7) * k);
+      // a taller wave: water above the still line, or sky showing in a trough
+      if (o < -1) { ctx.fillStyle = R.waterCss(wx, W.sea + 2); ctx.fillRect(x, seaY + o + 1, 1, -o - 1); }
+      else if (o > 1) { ctx.fillStyle = R.waterCss(wx, W.sea - 2); ctx.fillRect(x, seaY, 1, o - 1); }
       ctx.fillStyle = 'rgba(240,255,255,0.85)'; ctx.fillRect(x, seaY + o - 1, 1, 1);
       ctx.fillStyle = 'rgba(150,225,240,0.6)'; ctx.fillRect(x, seaY + o, 1, 1);
+      if (k > 1 && o < 0 && AQ.Weather.whitecap(wx, t)) { ctx.fillStyle = 'rgba(255,255,255,0.9)'; ctx.fillRect(x, seaY + o - 2, 1, 2); }
     }
   };
 

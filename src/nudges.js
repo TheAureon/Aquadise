@@ -56,6 +56,7 @@ AQ.Nudges = (function () {
     if (d.tabOpensAquarium) out.add('Tab');
     if (d.nudges) out.add(d.nudgeKey);
     if (d.musicKeys) out.add(d.nextSongKey);
+    if (d.weatherKeys) out.add(d.weatherKey);
     return out;
   }
   const IGNORE = /^(Shift|Control|Alt|Meta|CapsLock|F\d+|Escape)/;

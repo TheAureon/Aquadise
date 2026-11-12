@@ -716,6 +716,7 @@ AQ.MapUI = (function () {
       });
       if (AQ.Chests) for (const c of AQ.Chests.list) { g.fillStyle = '#ffd56b'; g.fillRect(Math.round(ox + c.x / S) - 1, Math.round(oy + c.y / S) - 1, 2, 2); }
       if (AQ.Starfall) AQ.Starfall.drawMap(g, ox, oy, S, game.time);
+      if (AQ.Weather) AQ.Weather.drawMap(g, ox, oy, S);           // today's weather above each region
       const P = game.player;
       if (AQ.U.calm() || Math.floor(game.time * 4) % 2) { g.fillStyle = '#ff5a7a'; g.fillRect(Math.round(ox + P.x / S) - 1, Math.round(oy + P.y / S) - 1, 3, 3); }
       F().draw(g, AQ.t('map.you'), ox + P.x / S, oy + P.y / S + 4, '#ff9fb0', { align: 'center' });

@@ -439,6 +439,7 @@ kept in git. `node tools/check-game.js --build` checks every screen of the built
 - **REDUCE FLASHING.** In SETTINGS > OPTIONS (pause menu or title), saved with your other settings.
   When it's on: the photo camera flash becomes a faint, slow fade instead of a white flash; shooting
   stars, the underwater glow and falling stars are dimmer and slower (and meteor-shower skies calmer);
+  a storm's lightning is a soft distant glow instead of a flash;
   a falling star lands with a soft glow instead of a sparkle burst; the UFO beam, its lights and the
   beam pad hold still instead of animating and pulsing (and the station beam eases up instead of
   jumping bright); scene fades are smooth instead of stepped; and fast blinking is held steady: your
@@ -519,6 +520,19 @@ kept in git. `node tools/check-game.js --build` checks every screen of the built
 - **Key bindings in one place:** `AQ.TUNING.keys` in config.js (plus `interactKeys`, `audio.muteKey`,
   `photo.key`, `station.zoomKey`). The game reads them, and the help line, the title's CONTROLS panel
   and every tip show key names from them (`src/keys.js`), so changing a key changes the text too.
+- **Weather.** Each part of the sea that reaches the surface (tide pools, coral, ruins, open ocean,
+  kelp, mangrove, ice) has its own weather: calm, breezy, choppy, rain, fog, or a rare storm night. It
+  follows real time, a stretch at a time (45 minutes, `AQ.TUNING.weather.stretchMinutes`), changing
+  slowly, and blends from one region into the next as you swim along. A storm only rages at night (by
+  day it's rain, building at dusk). How it looks: a greyer sky and clouds, rain streaks and rings on the
+  surface, taller waves with whitecaps, a fog veil (thicker depth haze on GRAPHICS LOW-HIGH), a darker
+  sea in rain and storms, and lightning: a short flash with a far-off bolt, or with REDUCE FLASHING
+  only a soft distant glow. Every graphics level has it, CLASSIC included. The HUD's sun / moon icon
+  shows the weather where you are, a region's weather shows under its name as you swim in, a short line
+  says when it changes, and the map (M) shows each region's weather above it. The hill shares the tide
+  pools' weather. Never bad for you: nothing is lost and nothing gets harder. Kinds and how likely each
+  is per region: `data/weather.js`; saved: a seed only. Testing: `debug.weather` (one kind everywhere),
+  `debug.weatherKeys` (3 steps the weather where you are).
 - **Falling stars and meteor showers.** Some nights a star visibly falls and lands somewhere in the
   sea or on the shore: always a spot you can reach at upgrade level 0 (the same scan and checks as the
   message bottles), with a clear drop from the sky (never in a cave), never inside terrain, past the
@@ -1045,6 +1059,7 @@ src/nudges.js         friendly nudges: noticing a stuck player (net spam, no cat
 src/guide.js          the GUIDE: a paged field-guide book (title, pause menu, help-line key)
 src/savefile.js       SAVE & BACKUP: backing up (file, one file, save code), restoring (checks + confirm), erasing, reminders, the save-recovery choice
 src/starfall.js       falling stars + meteor showers: nightly plan, landings, light columns, map/HUD marks
+src/weather.js        each sea region's weather: real-time stretches, rain, waves, fog, clouds, lightning, HUD/map
 src/bottles.js        message bottles: deterministic, reachable placement, pickup, glint
 assets/sprites-embedded.js   base64 copy of the sprites for file:// (tools/embed-sprites.js)
 src/audio.js          audio engine: mixer, voice limit, underwater filter, settings, file mapping
@@ -1067,6 +1082,7 @@ src/gfx/shaders.js    the shaders (GLSL strings): sharp upscale, grading, fog, b
 src/touchtest.js      the TOUCH TEST screen (SETTINGS > TOUCH): every finger, button and the joystick, live
 data/tutorial.js      tutorial structure: tips, guided dive steps, Guide pages (their text is in data/lang/)
 src/langdata.js       gives the data files their text (names, hints, field notes...) from data/lang/
+data/weather.js       the weather's kinds (how each looks) and how likely each is per region
 data/music.js         ATARAXIA's setting for each place, the reward phrases, creature voice map, audio files
 data/songs.js         DELTA: the ten composed songs
 assets/music/         your own songs (audio files) and their list, manifest.js (docs/ADDING_MUSIC.md)

@@ -528,6 +528,22 @@ AQ.langFiles.en = {
   'dive.title': 'GUIDED DIVE',
   'dive.stepOf': 'STEP {n} OF {total}',
 
+  // ---------------------------------------------------------------- the weather (src/weather.js)
+  'weather.calm': 'CALM',        // under a region's name as you swim into it, and the change lines below
+  'weather.breezy': 'BREEZY',
+  'weather.choppy': 'CHOPPY',
+  'weather.rain': 'RAIN',
+  'weather.fog': 'FOG',
+  'weather.storm': 'STORM',
+  'weather.change.calm': 'The sea is calming down.',
+  'weather.change.breezy': 'A breeze is picking up.',
+  'weather.change.choppy': 'The waves are getting bigger.',
+  'weather.change.rain': 'It\'s starting to rain.',
+  'weather.change.fog': 'Fog is rolling in.',
+  'weather.change.storm': 'A storm is rolling in. Down in the sea, all stays calm.',
+  'debug.weather': 'WEATHER HERE: {kind}',   // testing key (debug.weatherKeys)
+  'debug.weatherUsual': 'WEATHER HERE: AS USUAL',
+
   // ---------------------------------------------------------------- friendly nudges (src/nudges.js): short, light, never bossy
   // lots of net swings and no catch (teasing, gentle)
   'nudge.spam.1': 'The net appreciates the enthusiasm. The fish do not.',

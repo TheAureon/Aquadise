@@ -240,7 +240,10 @@ AQ.TUNING = {
     musicPreviewSeconds: 90,  //   how long an ATARAXIA preview is (a song is always whole)
     exportAllSeconds: 45,     //   ...and each place's, day and night, in ATARAXIA's EXPORT ALL
     musicKeys: false,         // TESTING ONLY: true adds a key (any screen) that starts the next DELTA song right now
-    nextSongKey: 'Digit2'     //   2 = the next song (picked as usual for the place and time of day)
+    nextSongKey: 'Digit2',    //   2 = the next song (picked as usual for the place and time of day)
+    weather: null,            // TESTING ONLY: 'calm' | 'breezy' | 'choppy' | 'rain' | 'fog' | 'storm' everywhere (null = as usual)
+    weatherKeys: false,       // TESTING ONLY: true adds a key that steps the weather where you are to the next kind
+    weatherKey: 'Digit3'      //   3 = the next weather here (calm > breezy > choppy > rain > fog > storm > as usual)
   },
   // Text that doesn't fit (long translations): it is squeezed sideways down to this much of its width,
   // then cut short with ".." (src/font.js). screenMargin: px kept free at the screen's edges.
@@ -450,6 +453,25 @@ AQ.TUNING = {
     maxParticles: 250,        // particles alive at once (normally 600)
     particleShare: 0.5,       // sparkles and puffs: this share of the usual count
     wholeViewEvery: 3         // the whole-building view redraws the building every this many frames
+  },
+  // The weather (src/weather.js; kinds and how likely each is per region: data/weather.js). Each sea region's
+  // weather changes over real time, a stretch at a time. Never bad for the player: it only looks (and later
+  // sounds) different.
+  weather: {
+    enabled: true,
+    stretchMinutes: 45,       // real minutes one stretch of weather lasts in a region...
+    blendSeconds: 90,         // ...and how long the change to the next one takes
+    edge: 260,                // px either side of a region's border over which its weather blends into the next
+    rainDrops: 110,           // raindrops on screen at full rain (LOW EFFECTS: half)
+    rainSpeed: 230,           // how fast they fall (px a second)
+    waveHeight: 2.6,          // how much taller the waves get at full strength
+    flashEvery: [9, 22],      // a storm's lightning: seconds between flashes (random in this range)
+    flash: 0.32,              // how bright a flash is over the sky (0-1; underwater much less)
+    glow: 0.32,               // REDUCE FLASHING: instead of a flash, a soft distant glow this bright
+    fogAbove: 0.55,           // the fog veil over the sky at full fog...
+    fogBelow: 0.3,            // ...and over the sea near the surface (fading with depth)
+    shaderFog: 0.3,           // GRAPHICS LOW-HIGH: fog adds this much to the depth fog
+    changeToast: true         // a short line when the weather where you are changes
   },
   // The slow-device watch (src/slowwatch.js): real frame times while playing. Slow for a while: the music plays
   // fewer notes at once (music.lowFxVoices) and a toast suggests LOW EFFECTS (once per save).

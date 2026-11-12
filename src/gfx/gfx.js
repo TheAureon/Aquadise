@@ -357,6 +357,7 @@ AQ.Gfx = (function () {
     if (key === 'sea' && !X.off.fog && !X.photoScene) {
       const W = AQ.World, cam = AQ.Camera;
       amt = Math.max(0, Math.min(1, (cam.y - W.sea - F.startDepth) / F.fullDepth)) * F.max;
+      if (AQ.Weather) amt = Math.min(F.max, amt + AQ.Weather.mix.fog * AQ.TUNING.weather.shaderFog);   // fog thickens the haze
       surf = (W.sea - cam.top()) / AQ.TUNING.view.h;
       if (surf <= 0) surf = -1;
     }
@@ -462,6 +463,7 @@ AQ.Gfx = (function () {
       if (isSea) { const W = AQ.World; P.sky[0] = cam.top() / W.sea; P.sky[1] = 1 / W.sea; P.sky[3] = Math.max(0, W.sea - cam.top()); }
       else { P.sky[0] = 0; P.sky[1] = 1 / 150; P.sky[3] = 152; }
       P.sky[2] = (S.clouds * day + S.cloudsNight * (1 - day)) * (1 - tw * 0.6);
+      if (AQ.Weather) P.sky[2] = Math.max(P.sky[2], Math.min(1, AQ.Weather.mix.cloud) * 0.9);   // more clouds in rough weather
       if (key === 'hill') {
         const glow = BODY.sun ? S.sunGlow : S.moonGlow, fade = Math.max(0, 1 - tw / 0.7);
         P.sun[0] = BODY.x; P.sun[1] = BODY.y; P.sun[2] = glow.radius; P.sun[3] = glow.strength * fade;

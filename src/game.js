@@ -166,6 +166,7 @@ AQ.Game = (function () {
     if (AQ.SaveFile && G.player) AQ.SaveFile.tick(dt, G);   // play time, keeping the save, the gentle backup reminder
     if (AQ.Quests && G.player) AQ.Quests.tick(dt, G);       // station requests: checked wherever you are
     if (AQ.SoundDirector) AQ.SoundDirector.update(dt, G);
+    if (AQ.Weather && G.player) AQ.Weather.update(dt, G);   // each sea region's weather (rain, fog, waves, storms)
     if (AQ.SlowWatch) AQ.SlowWatch.update(G);       // a slow device: lighter music, and a LOW EFFECTS hint once
     AQ.Transition.update(dt);
     if (AQ.Breeding && G.state !== 'loading') AQ.Breeding.update(dt);   // tanks live on wherever you are
@@ -222,8 +223,10 @@ AQ.Game = (function () {
     ctx.restore();
     if (AQ.Terrain.drawFront) AQ.Terrain.drawFront(ctx, cam);
     AQ.Render.surface(cam);
+    if (!title && AQ.Weather) AQ.Weather.drawSea(ctx, cam);                // rain and its rings on the surface
     AQ.Render.lighting(cam, collectLights(), targetDarkness());
     AQ.Render.twilightTint(cam);
+    if (!title && AQ.Weather) AQ.Weather.drawOver(ctx, cam);               // the fog veil, the lightning
     if (!title && AQ.ShootingStars) AQ.ShootingStars.drawWater(ctx, G);   // a star's glow passing through the water
     if (!title && AQ.Starfall) AQ.Starfall.draw(ctx, G);                   // falling stars + light columns over landings
     if (!title && AQ.Dive) AQ.Dive.drawWorld(ctx, G);                      // the guided dive's glowing marker
@@ -257,7 +260,8 @@ AQ.Game = (function () {
     const depth = AQ.U.clamp((cy - W.sea - 320) / 900, 0, 0.65);
     // night darkens the sunlit sea; places that are already darker (deep water, caves) are unchanged
     const night = G.state === 'title' ? 0 : (1 - AQ.Clock.daylight()) * AQ.TUNING.clock.nightDarkness;
-    return Math.max(b.dark || 0, depth, night);
+    const weather = G.state === 'title' || !AQ.Weather ? 0 : AQ.Weather.dark();   // rain and storms darken the sunlit sea a little
+    return Math.max(b.dark || 0, depth, night, weather);
   }
 
   function collectLights() {

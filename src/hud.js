@@ -76,6 +76,8 @@ AQ.HUD = (function () {
     if (H.banner && H.bannerT < 3) {
       ctx.globalAlpha = Math.min(1, H.bannerT * 2.5, (3 - H.bannerT) * 1.5);
       F.draw(ctx, H.banner, vw / 2, 7, '#f2fbff', { align: 'center', shadow: SH });
+      const wl = AQ.Weather ? AQ.Weather.bannerLine(game) : '';     // ...and its weather under it
+      if (wl) F.draw(ctx, wl, vw / 2, 15, '#bfe0ee', { align: 'center', shadow: SH, max: 120 });
       ctx.globalAlpha = 1;
     }
     // upgrades as quiet pips (top-left)
@@ -96,6 +98,7 @@ AQ.HUD = (function () {
     }
     // the time of day (sea only): sun, sunrise/sunset or moon
     if (game.scene !== 'station') drawClockIcon(ctx, vw - 12, 12);   // (the station floats in space: no sun there)
+    if (AQ.Weather) AQ.Weather.drawHud(ctx, vw - 9, 16, game);       // the weather here, over the icon's corner
     if (AQ.Starfall) AQ.Starfall.drawHud(ctx, vw - 20, 13, game.time);   // a star waiting / a meteor-shower night
     // glass panes (top-right, under the clock), once you've found any
     if (AQ.Panes && AQ.Panes.known()) { ctx.globalAlpha = 0.85; AQ.Panes.drawCounter(ctx, vw - 3, 22); ctx.globalAlpha = 1; }

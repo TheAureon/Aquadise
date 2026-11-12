@@ -38,13 +38,13 @@ module.exports = async function live(pw, port, problems, notes) {
       return null; };
     for (const night of [false, true]) {
       AQ.Clock.set(night ? 23 : 12);
-      const go = async (id, setup, wait = 250) => { setup(); await sleep(wait); out.push([id, night, AQ.Music.current, AQ.Ataraxia.state().place, AQ.Ataraxia.state().feel.night]); };
+      const go = async (id, setup, wait = 250) => { setup(); await sleep(wait); for (let k = 0; k < 23 && wait > 1000 && (AQ.Music.current || '').split(':')[0] !== id; k++) await sleep(100); out.push([id, night, AQ.Music.current, AQ.Ataraxia.state().place, AQ.Ataraxia.state().feel.night]); };
       await go('title', () => AQ.Title.open(G));
       await go('aquarium', () => { G.state = 'play'; AQ.Aquarium.open(G, 'play', 'kelp'); });
       await go('station', () => { G.state = 'play'; AQ.Scenes.restore(G, 'station', 300, 380); });
       await go('hill', () => { G.state = 'play'; AQ.Scenes.restore(G, 'hill', 200, 100); });
       G.state = 'play'; AQ.Scenes.restore(G, 'world', 300, 300); await sleep(1200);   // (back in the sea: let the scene change finish)
-      for (const b of AQ.data.world.biomes) { const s = spot(b.id); if (s) await go(b.id, () => { G.state = 'play'; AQ.Scenes.restore(G, 'world', s[0], s[1]); G.player.x = s[0]; G.player.y = s[1]; }, 1700); }   // (swimming between places waits 1.2 s before it changes)
+      for (const b of AQ.data.world.biomes) { const s = spot(b.id); if (s) await go(b.id, () => { G.state = 'play'; AQ.Scenes.restore(G, 'world', s[0], s[1]); G.player.x = s[0]; G.player.y = s[1]; }, 1700); }   // (swimming between places waits 1.2 s before it changes; a slow frame can stretch that, so up to 4 s)
     }
     return out;
   });

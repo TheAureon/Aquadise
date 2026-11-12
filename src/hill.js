@@ -114,7 +114,7 @@ AQ.Hill = (function () {
     for (let y = 0; y < 150; y += 2) { ctx.fillStyle = U.css(U.mix(sky[0], sky[1], y / 150)); ctx.fillRect(0, y, 320, 2); }
     if (d < 0.95) {                                            // stars
       for (let i = 0; i < 46; i++) {
-        ctx.globalAlpha = (1 - d) * (U.calm() ? 0.65 : 0.45 + 0.4 * Math.sin(t * (1 + (i % 3)) + i));   // (REDUCE FLASHING: no twinkle)
+        ctx.globalAlpha = (1 - d) * (AQ.Weather ? AQ.Weather.starsK() : 1) * (U.calm() ? 0.65 : 0.45 + 0.4 * Math.sin(t * (1 + (i % 3)) + i));   // (REDUCE FLASHING: no twinkle; clouds hide them)
         ctx.fillStyle = i % 5 ? '#e8f0ff' : '#fff6d0'; ctx.fillRect((i * 97 + 13) % 320, (i * 53) % 120, 1, 1);
       }
       ctx.globalAlpha = 1;
@@ -122,8 +122,9 @@ AQ.Hill = (function () {
     // the sun crosses the sky by day, the moon by night
     const c = AQ.TUNING.clock, sunUp = (h - c.dawnHour) / (c.duskHour + c.duskHours - c.dawnHour);
     const moonUp = (((h - (c.duskHour + c.duskHours)) % 24) + 24) % 24 / (24 - (c.duskHour + c.duskHours - c.dawnHour));
-    const body = (u, r, col) => { if (u < 0 || u > 1 || tw > 0.7) return; ctx.globalAlpha = 1 - tw / 0.7; const x = 20 + u * 280, y = 140 - Math.sin(u * Math.PI) * 110; ctx.fillStyle = col; ctx.beginPath(); ctx.arc(Math.round(x), Math.round(y), r, 0, Math.PI * 2); ctx.fill(); ctx.globalAlpha = 1; };
+    const body = (u, r, col) => { if (u < 0 || u > 1 || tw > 0.7) return; ctx.globalAlpha = (1 - tw / 0.7) * (AQ.Weather ? 1 - Math.min(1, AQ.Weather.mix.cloud) * 0.6 : 1); const x = 20 + u * 280, y = 140 - Math.sin(u * Math.PI) * 110; ctx.fillStyle = col; ctx.beginPath(); ctx.arc(Math.round(x), Math.round(y), r, 0, Math.PI * 2); ctx.fill(); ctx.globalAlpha = 1; };
     body(sunUp, 9, '#fff2c0'); body(moonUp, 6, '#e8eeff');
+    if (AQ.Weather) AQ.Weather.drawHillSky(ctx);                 // clouds over the sky (the tide pools' weather)
     const k = 1 - d;
     ctx.fillStyle = mixRGB(HILLS_DAY[0], HILLS_NIGHT[0], k);
     for (let x = 0; x < 320; x++) { const y = 134 - Math.sin(x * 0.02 + 1) * 6 - Math.sin(x * 0.051) * 3; ctx.fillRect(x, Math.round(y), 1, 152 - Math.round(y)); }
@@ -182,6 +183,13 @@ AQ.Hill = (function () {
     AQ.Assets.draw(ctx, 'misc.ufo', 'idle', G.beamX, uy, AQ.U.calm() ? { frame: 0 } : { t });      // its chase lights hold still with REDUCE FLASHING
     AQ.FX.draw(ctx);
     ctx.restore();
+    if (AQ.Weather) AQ.Weather.drawHill(ctx);                    // rain, fog and lightning on the hill
+  };
+  // where the ground is under a screen column (rain lands there; the little sea below: y 152)
+  H.groundAt = function (sx) {
+    if (!G) return 152;
+    const x = Math.round(sx + AQ.Camera.left());
+    return x < 0 || x >= G.w || G.surface[x] == null ? 152 : Math.min(152, G.surface[x] - AQ.Camera.top());
   };
   // interface on top (after the world: never touched by the shader layer's effects)
   H.drawUI = function (ctx, game) {

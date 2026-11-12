@@ -52,7 +52,7 @@ own German pass, which I'd do at the end of each update.
 
 ## B. Weather
 
-**B1. The weather system and how it looks.**
+**B1. The weather system and how it looks.** *(Done.)*
 - Weather by sea region, changing slowly over real time: calm, breezy, choppy, rain, fog, and a rare storm
   night. It's saved, and the weather shows on the HUD icon.
 - **How it looks:**
