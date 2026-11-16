@@ -71,7 +71,7 @@ own German pass, which I'd do at the end of each update.
 - The hydrophone hears less in a storm.
 - A rain shower sounds different from the surface and from below.
 
-**B3. Weather life.**
+**B3. Weather life.** *(Done.)*
 - A few creatures that only appear in some weather (a fog-only drifter, a rain-loving surface fish, a
   storm-night visitor).
 - Log entries and field notes, a weather Guide page, and a gentle badge or two.

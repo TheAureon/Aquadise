@@ -95,6 +95,13 @@ AQ.Weather = (function () {
     return out;
   };
   W.on = () => cfg().enabled;
+  // is a weather creature out at x? ('rain' also likes storms; 'storm' means a storm night: W.kind says so only at night)
+  W.allows = function (def, x) {
+    if (!def.weather) return true;
+    if (!W.on()) return true;                                      // (weather switched off: always out, so nothing is missed)
+    const k = W.kind(W.regionAt(x).id);
+    return k === def.weather || (def.weather === 'rain' && k === 'storm');
+  };
   // where the player is: the sea (by the camera), the hill, or somewhere without weather
   function scene(game) {
     if (!W.on() || !game || game.state === 'title' || game.state === 'loading') return null;
@@ -184,6 +191,7 @@ AQ.Weather = (function () {
     const id = W.here(game), kind = id ? W.kind(id) : null;
     const prev = W.lastHere;
     W.lastHere = id ? { id, kind } : null;
+    if (id && game.state === 'play' && AQ.Badges && (!prev || prev.kind !== kind)) AQ.Badges.addTo('weathers', kind);   // (a badge: every kind of weather)
     if (!id || !prev || prev.id !== id || prev.kind === kind || game.state !== 'play') return;
     if (cfg().changeToast && AQ.HUD) AQ.HUD.toast(AQ.t('weather.change.' + kind), '#cfe8ff', 4);
   }

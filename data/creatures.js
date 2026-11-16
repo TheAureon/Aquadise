@@ -26,6 +26,8 @@
 //   requires_hydro                       tracker: hydrophone (EAR) level needed to hear / see its calls (default 0;
 //                                        log tag "needs hydrophone n"); it can still be netted by chance close up
 //   active                               optional 'night' | 'day': only out at those hours (default: always)
+//   weather                              optional 'fog' | 'rain' | 'storm': only out in that weather where it lives
+//                                        (src/weather.js; 'rain' includes storms, 'storm' is storm nights only)
 //   bloom                                plants: 'night' = closed (not harvestable) by day, open + glowing at night
 //   requires_depth                       lives past a depth limit: needs that DEPTH upgrade level to reach (log tag)
 //   eggs                                 optional true/false: lays eggs when breeding (default: all but mammals)
@@ -33,6 +35,7 @@
 //   color, accent, art                   placeholder-art hints only (ignored once real art exists)
 //   spawn                                { n, at: floor|water|surface|wall|ceiling|pool|ice_top|reef, area:[x0,x1], y:[y0,y1] }
 //                                        + optional extra: [{ n, at, area, y }, ...] for more places it also lives
+//                                        (biomeHere: true on one = it turns up in whichever biome that area is in)
 //   glow                                 { color, radius, strength, pulse? } it glows: real coloured light at night and in
 //                                        the deep (radius in px; strength 1 = normal; pulse = only while it's pulsing)
 //   tank                                 tank idle locomotion: swim | crawl | still (default from category)
@@ -423,6 +426,24 @@ AQ.data.creatures = [
     event: 'shower', bottle: 'coral', glow: { color: '#b8d8ff', radius: 30, strength: 1 },
     params: { approachR: 130, keepDist: 26 },
     sprite_size: 'widelarge', color: '#3a4a8a', accent: '#bfe8ff', art: { shape: 'ray' } },
+
+  // ---- Weather update: three creatures that only come out in some weather (src/weather.js)
+  { id: 'mistbell_jelly', likes: ['ice', 'light'], biome: 'ice', category: 'cephalopod', catch_behavior: 'drift', weather: 'fog',
+    params: { speed: 4, alpha: 0.72 },
+    sprite_size: 'small', color: '#dbe6ec', accent: '#a8d8e8', art: { shape: 'jelly' }, glow: { color: '#d8f0ff', radius: 16, strength: 0.7 },
+    spawn: { n: 3, at: 'water', y: [112, 300] } },
+  { id: 'raindrop_darter', likes: ['roots', 'bubbles'], biome: 'mangrove', category: 'fish', catch_behavior: 'midair', weather: 'rain',
+    params: { leapEvery: [1.6, 3.2], leap: 105, speed: 20, depth: 10, wanderR: 80 },
+    sprite_size: 'small', color: '#6aa8cc', accent: '#e8f6ff', art: { shape: 'fish', starry: true },
+    spawn: { n: 3, at: 'surface' } },
+  // a storm-night visitor: it turns up in whichever part of the sea has a storm tonight (the open-ocean tank)
+  { id: 'thunderhead_ray', likes: ['arch', 'light'], biome: 'open_ocean', category: 'fish', catch_behavior: 'curious', weather: 'storm',
+    params: { approachR: 120, keepDist: 26 },
+    sprite_size: 'widelarge', color: '#2e3550', accent: '#e8f0ff', art: { shape: 'ray' }, glow: { color: '#cfe0ff', radius: 26, strength: 0.8, pulse: true },
+    spawn: { n: 1, at: 'water', area: [2500, 3900], y: [120, 260], extra: [
+      { n: 1, at: 'water', biomeHere: true, area: [600, 720], y: [110, 160] }, { n: 1, at: 'water', biomeHere: true, area: [800, 1880], y: [120, 230] },
+      { n: 1, at: 'water', biomeHere: true, area: [1920, 2400], y: [120, 250] }, { n: 1, at: 'water', biomeHere: true, area: [3990, 4880], y: [120, 260] },
+      { n: 1, at: 'water', biomeHere: true, area: [4920, 5680], y: [120, 220] }, { n: 1, at: 'water', biomeHere: true, area: [5720, 6780], y: [112, 200] }] } },
 ];
 
 // Families: species that belong together (the log groups them under one heading). A family with

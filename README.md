@@ -542,6 +542,13 @@ kept in git. `node tools/check-game.js --build` checks every screen of the built
   faint crackle while you LISTEN; what you can hear and its ripples stay exactly the same. The Sound
   Test's AMBIENCE tab plays each weather sound on its own, and THUNDER is an effect a recording can
   replace.
+  **Weather life:** three creatures only come out in some weather (`weather:` in `data/creatures.js`):
+  the Mistbell Jelly drifts under the ice in fog, the Raindrop Darter leaps for raindrops in the
+  mangroves when it rains (or storms), and the Thunderhead Ray glides in under any stormy sea at night
+  (it lives in the open-ocean tank). When the weather moves on they slip away, like night creatures at
+  dawn. Each has field notes in a bottle and a log tag (FOG ONLY, RAIN ONLY, STORM NIGHTS); the Guide
+  has a WEATHER page; badges: WEATHER WATCHER (be out in 3, then all 6 kinds of weather) and RAIN OR
+  SHINE (catch all three).
 - **Falling stars and meteor showers.** Some nights a star visibly falls and lands somewhere in the
   sea or on the shore: always a spot you can reach at upgrade level 0 (the same scan and checks as the
   message bottles), with a clear drop from the sky (never in a cave), never inside terrain, past the

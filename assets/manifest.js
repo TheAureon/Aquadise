@@ -12777,6 +12777,492 @@ AQ.manifest = {
     19
    ]
   },
+  "creature.mistbell_jelly": {
+   "file": "sprites/creatures/mistbell_jelly.png",
+   "fw": 16,
+   "fh": 16,
+   "anchor": [
+    8,
+    8
+   ],
+   "anims": {
+    "idle": {
+     "row": 0,
+     "frames": 4,
+     "fps": 5
+    },
+    "move": {
+     "row": 1,
+     "frames": 4,
+     "fps": 10
+    }
+   },
+   "vis": [
+    1,
+    1,
+    14,
+    14
+   ]
+  },
+  "creature.mistbell_jelly.v": {
+   "file": "sprites/creatures/mistbell_jelly_v.png",
+   "fw": 16,
+   "fh": 16,
+   "anchor": [
+    8,
+    8
+   ],
+   "anims": {
+    "idle": {
+     "row": 0,
+     "frames": 4,
+     "fps": 5
+    },
+    "move": {
+     "row": 1,
+     "frames": 4,
+     "fps": 10
+    }
+   },
+   "vis": [
+    1,
+    1,
+    14,
+    14
+   ]
+  },
+  "creature.mistbell_jelly.v.m": {
+   "file": "sprites/creatures/mistbell_jelly_v_m.png",
+   "fw": 16,
+   "fh": 16,
+   "anchor": [
+    8,
+    8
+   ],
+   "anims": {
+    "idle": {
+     "row": 0,
+     "frames": 4,
+     "fps": 5
+    },
+    "move": {
+     "row": 1,
+     "frames": 4,
+     "fps": 10
+    }
+   },
+   "vis": [
+    1,
+    1,
+    14,
+    14
+   ]
+  },
+  "creature.mistbell_jelly.baby.v": {
+   "file": "sprites/creatures/mistbell_jelly_baby_v.png",
+   "fw": 16,
+   "fh": 16,
+   "anchor": [
+    8,
+    8
+   ],
+   "anims": {
+    "idle": {
+     "row": 0,
+     "frames": 4,
+     "fps": 5
+    },
+    "move": {
+     "row": 1,
+     "frames": 4,
+     "fps": 10
+    }
+   },
+   "vis": [
+    3,
+    3,
+    13,
+    14
+   ]
+  },
+  "creature.mistbell_jelly.baby": {
+   "file": "sprites/creatures/mistbell_jelly_baby.png",
+   "fw": 16,
+   "fh": 16,
+   "anchor": [
+    8,
+    8
+   ],
+   "anims": {
+    "idle": {
+     "row": 0,
+     "frames": 4,
+     "fps": 5
+    },
+    "move": {
+     "row": 1,
+     "frames": 4,
+     "fps": 10
+    }
+   },
+   "vis": [
+    3,
+    3,
+    13,
+    14
+   ]
+  },
+  "creature.mistbell_jelly.m": {
+   "file": "sprites/creatures/mistbell_jelly_m.png",
+   "fw": 16,
+   "fh": 16,
+   "anchor": [
+    8,
+    8
+   ],
+   "anims": {
+    "idle": {
+     "row": 0,
+     "frames": 4,
+     "fps": 5
+    },
+    "move": {
+     "row": 1,
+     "frames": 4,
+     "fps": 10
+    }
+   },
+   "vis": [
+    1,
+    1,
+    14,
+    14
+   ]
+  },
+  "creature.raindrop_darter": {
+   "file": "sprites/creatures/raindrop_darter.png",
+   "fw": 16,
+   "fh": 16,
+   "anchor": [
+    8,
+    8
+   ],
+   "anims": {
+    "idle": {
+     "row": 0,
+     "frames": 4,
+     "fps": 5
+    },
+    "move": {
+     "row": 1,
+     "frames": 4,
+     "fps": 10
+    }
+   },
+   "vis": [
+    2,
+    2,
+    14,
+    13
+   ]
+  },
+  "creature.raindrop_darter.v": {
+   "file": "sprites/creatures/raindrop_darter_v.png",
+   "fw": 16,
+   "fh": 16,
+   "anchor": [
+    8,
+    8
+   ],
+   "anims": {
+    "idle": {
+     "row": 0,
+     "frames": 4,
+     "fps": 5
+    },
+    "move": {
+     "row": 1,
+     "frames": 4,
+     "fps": 10
+    }
+   },
+   "vis": [
+    2,
+    2,
+    14,
+    13
+   ]
+  },
+  "creature.raindrop_darter.v.m": {
+   "file": "sprites/creatures/raindrop_darter_v_m.png",
+   "fw": 16,
+   "fh": 16,
+   "anchor": [
+    8,
+    8
+   ],
+   "anims": {
+    "idle": {
+     "row": 0,
+     "frames": 4,
+     "fps": 5
+    },
+    "move": {
+     "row": 1,
+     "frames": 4,
+     "fps": 10
+    }
+   },
+   "vis": [
+    2,
+    2,
+    14,
+    13
+   ]
+  },
+  "creature.raindrop_darter.baby.v": {
+   "file": "sprites/creatures/raindrop_darter_baby_v.png",
+   "fw": 16,
+   "fh": 16,
+   "anchor": [
+    8,
+    8
+   ],
+   "anims": {
+    "idle": {
+     "row": 0,
+     "frames": 4,
+     "fps": 5
+    },
+    "move": {
+     "row": 1,
+     "frames": 4,
+     "fps": 10
+    }
+   },
+   "vis": [
+    4,
+    4,
+    11,
+    12
+   ]
+  },
+  "creature.raindrop_darter.baby": {
+   "file": "sprites/creatures/raindrop_darter_baby.png",
+   "fw": 16,
+   "fh": 16,
+   "anchor": [
+    8,
+    8
+   ],
+   "anims": {
+    "idle": {
+     "row": 0,
+     "frames": 4,
+     "fps": 5
+    },
+    "move": {
+     "row": 1,
+     "frames": 4,
+     "fps": 10
+    }
+   },
+   "vis": [
+    4,
+    4,
+    11,
+    12
+   ]
+  },
+  "creature.raindrop_darter.m": {
+   "file": "sprites/creatures/raindrop_darter_m.png",
+   "fw": 16,
+   "fh": 16,
+   "anchor": [
+    8,
+    8
+   ],
+   "anims": {
+    "idle": {
+     "row": 0,
+     "frames": 4,
+     "fps": 5
+    },
+    "move": {
+     "row": 1,
+     "frames": 4,
+     "fps": 10
+    }
+   },
+   "vis": [
+    2,
+    2,
+    14,
+    13
+   ]
+  },
+  "creature.thunderhead_ray": {
+   "file": "sprites/creatures/thunderhead_ray.png",
+   "fw": 48,
+   "fh": 24,
+   "anchor": [
+    24,
+    12
+   ],
+   "anims": {
+    "idle": {
+     "row": 0,
+     "frames": 4,
+     "fps": 5
+    },
+    "move": {
+     "row": 1,
+     "frames": 4,
+     "fps": 10
+    }
+   },
+   "vis": [
+    1,
+    2,
+    46,
+    19
+   ]
+  },
+  "creature.thunderhead_ray.v": {
+   "file": "sprites/creatures/thunderhead_ray_v.png",
+   "fw": 48,
+   "fh": 24,
+   "anchor": [
+    24,
+    12
+   ],
+   "anims": {
+    "idle": {
+     "row": 0,
+     "frames": 4,
+     "fps": 5
+    },
+    "move": {
+     "row": 1,
+     "frames": 4,
+     "fps": 10
+    }
+   },
+   "vis": [
+    1,
+    2,
+    46,
+    19
+   ]
+  },
+  "creature.thunderhead_ray.v.m": {
+   "file": "sprites/creatures/thunderhead_ray_v_m.png",
+   "fw": 48,
+   "fh": 24,
+   "anchor": [
+    24,
+    12
+   ],
+   "anims": {
+    "idle": {
+     "row": 0,
+     "frames": 4,
+     "fps": 5
+    },
+    "move": {
+     "row": 1,
+     "frames": 4,
+     "fps": 10
+    }
+   },
+   "vis": [
+    1,
+    2,
+    46,
+    19
+   ]
+  },
+  "creature.thunderhead_ray.baby.v": {
+   "file": "sprites/creatures/thunderhead_ray_baby_v.png",
+   "fw": 48,
+   "fh": 24,
+   "anchor": [
+    24,
+    12
+   ],
+   "anims": {
+    "idle": {
+     "row": 0,
+     "frames": 4,
+     "fps": 5
+    },
+    "move": {
+     "row": 1,
+     "frames": 4,
+     "fps": 10
+    }
+   },
+   "vis": [
+    1,
+    4,
+    42,
+    17
+   ]
+  },
+  "creature.thunderhead_ray.baby": {
+   "file": "sprites/creatures/thunderhead_ray_baby.png",
+   "fw": 48,
+   "fh": 24,
+   "anchor": [
+    24,
+    12
+   ],
+   "anims": {
+    "idle": {
+     "row": 0,
+     "frames": 4,
+     "fps": 5
+    },
+    "move": {
+     "row": 1,
+     "frames": 4,
+     "fps": 10
+    }
+   },
+   "vis": [
+    1,
+    4,
+    42,
+    17
+   ]
+  },
+  "creature.thunderhead_ray.m": {
+   "file": "sprites/creatures/thunderhead_ray_m.png",
+   "fw": 48,
+   "fh": 24,
+   "anchor": [
+    24,
+    12
+   ],
+   "anims": {
+    "idle": {
+     "row": 0,
+     "frames": 4,
+     "fps": 5
+    },
+    "move": {
+     "row": 1,
+     "frames": 4,
+     "fps": 10
+    }
+   },
+   "vis": [
+    1,
+    2,
+    46,
+    19
+   ]
+  },
   "decor.pebble_rock": {
    "file": "sprites/decor/pebble_rock.png",
    "fw": 16,

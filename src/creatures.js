@@ -80,10 +80,13 @@ AQ.Creatures = (function () {
   // one creature at (x, y) with no slot (it never respawns): falling-star creatures
   C.spawnAt = function (def, x, y) { def.params = def.params || {}; def.spriteKey = def.spriteKey || 'creature.' + def.id; return makeCreature(def, x, y, null); };
 
+  // is it out now? its hours (night / day only), and its weather where it lives (fog / rain / storm only)
+  const slotX = (def, sp) => (sp && sp.area ? (sp.area[0] + sp.area[1]) / 2 : AQ.World.biomeById[def.biome].rect[0] + AQ.World.biomeById[def.biome].rect[2] / 2);
+  C.outNow = (def, x) => (!AQ.Clock || AQ.Clock.activeFor(def)) && (!def.weather || !AQ.Weather || AQ.Weather.allows(def, x));
   function spawnSlot(slot) {
     if (slot.pool) slot.def = pickWeighted(slot.pool);           // family slot: which member turns up this time
     const def = slot.def, sp = slot.sp || def.spawn || { at: 'water' };
-    if (AQ.Clock && !AQ.Clock.activeFor(def)) { slot.timer = 8; return; }   // night-only (or day-only): wait for its hours
+    if (!C.outNow(def, slotX(def, sp))) { slot.timer = 8; return; }   // not its hours or its weather: wait
     if (def.rare !== undefined && R() > def.rare) { slot.timer = 60; return; }
     if (def.catch_behavior === 'school') {
       const spot = C.findSpot(def, sp.at, undefined, undefined, sp);
@@ -128,8 +131,10 @@ AQ.Creatures = (function () {
   }
 
   // Returns a creature-centre position for placement kind `at`, or null.
+  // (spawn.biomeHere: it turns up in whichever biome that area is in, not only its own: a weather visitor)
   C.findSpot = function (def, at, nearX, radius, spawn) {
-    const W = AQ.World, b = W.biomeById[def.biome], sp = spawn || def.spawn || {};
+    const W = AQ.World, sp = spawn || def.spawn || {};
+    const b = sp.biomeHere && sp.area ? W.biomeAt((sp.area[0] + sp.area[1]) / 2, sp.y ? (sp.y[0] + sp.y[1]) / 2 : W.sea + 20) : W.biomeById[def.biome];
     const r = spriteR(def);
     const [bx, by, bw, bh] = b.rect;
     let x0 = Math.max(bx, (sp.area && sp.area[0]) || bx), x1 = Math.min(bx + bw, (sp.area && sp.area[1]) || bx + bw);
@@ -204,12 +209,13 @@ AQ.Creatures = (function () {
       const dx = P.x - c.x, dy = P.y - c.y;
       const far = Math.abs(dx) > simR || Math.abs(dy) > simR;
       // out of its hours and nowhere near you: it has simply gone home
-      if (far && c.def.active && AQ.Clock && !AQ.Clock.activeFor(c.def)) { C.remove(c); if (c.slot) c.slot.timer = 8; continue; }
+      const gone = (c.def.active || c.def.weather) && !C.outNow(c.def, c.hx != null ? c.hx : c.x);
+      if (far && gone) { C.remove(c); if (c.slot) c.slot.timer = 8; continue; }
       if (far) continue;
       ctx.dx = dx; ctx.dy = dy; ctx.dist = Math.hypot(dx, dy);
       c.t += dt; c.iconT -= dt; c.hitCD -= dt;
       c.bhv.update(c, ctx, dt);
-      if (c.def.active && AQ.Clock && !AQ.Clock.activeFor(c.def)) leave(c, dt);
+      if (gone) leave(c, dt);                     // its hours or its weather are over: it slips away
       if (c.movement === 'swim' && !c.hidden && AQ.World.solid(c.x, c.y)) unstick(c);
       c.alpha += (c.targetAlpha - c.alpha) * Math.min(1, dt * (c.leaving ? 1 : 5));
       if (c.cap !== undefined) {                 // fading away (a falling star's creature at the end of its stay)

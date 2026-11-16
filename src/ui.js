@@ -497,10 +497,11 @@ AQ.LogUI = (function () {
       F().draw(g, has ? d.name.toUpperCase() : AQ.t('log.unknown'), 9, 131, has ? C.title : C.dim);
       const tags = [catLabel(d.category), d.is_plant ? AQ.t('req.harvest') : '', d.requires_upgraded_net ? AQ.t('req.net2') : '',
         d.active === 'night' || d.bloom === 'night' ? AQ.t('req.night') : d.active === 'day' ? AQ.t('req.day') : '',
+        d.weather ? AQ.t('req.wx.' + d.weather) : '',             // LANG_PREFIX: 'req.wx.'  LANG_PREFIX: 'req.tip.wx.'
         d.event === 'star' ? AQ.t('req.star') : d.event === 'shower' ? AQ.t('req.shower') : '',
         d.requires_depth ? AQ.t('req.depth', { n: d.requires_depth }) : '', d.requires_hydro ? AQ.t('req.hydro', { n: d.requires_hydro }) : '', d.rare ? AQ.t('req.rare') : '', d.hostile ? AQ.t('req.hostile') : '', d.draft ? AQ.t('req.draft') : ''].filter(Boolean).join(AQ.t('ui.listSep'));
       F().draw(g, tags.toUpperCase(), 311, 131, C.info, { align: 'right', max: 311 - 9 - F().width(has ? d.name.toUpperCase() : AQ.t('log.unknown')) - 8 });   // (squeezed rather than over the name)
-      const tip = [d.active === 'night' ? AQ.t('req.tip.night') : d.bloom === 'night' ? AQ.t('req.tip.bloom') : d.active === 'day' ? AQ.t('req.tip.day') : '', d.requires_depth ? AQ.t('req.tip.depth', { n: d.requires_depth }) : '',
+      const tip = [d.active === 'night' ? AQ.t('req.tip.night') : d.bloom === 'night' ? AQ.t('req.tip.bloom') : d.active === 'day' ? AQ.t('req.tip.day') : '', d.weather ? AQ.t('req.tip.wx.' + d.weather) : '', d.requires_depth ? AQ.t('req.tip.depth', { n: d.requires_depth }) : '',
         d.catch_behavior === 'tracker' ? AQ.t(d.requires_hydro ? 'req.tip.hydro' : 'req.tip.caller', { n: d.requires_hydro }) : '', d.hint || ''].filter(Boolean).join(' ');
       const tl = wrap(tip, 75);
       tl.slice(0, 2).forEach((l, i) => F().draw(g, l + (i === 1 && tl.length > 2 ? '...' : ''), 9, 140 + i * 7, C.text));
