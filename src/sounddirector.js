@@ -15,6 +15,7 @@ AQ.SoundDirector = (function () {
     if (!A.ready) return;
     if (AQ.Music) AQ.Music.update(dt, game);
     if (AQ.Ambience) AQ.Ambience.update(dt, game);
+    if (AQ.WeatherSound) AQ.WeatherSound.update(dt, game);       // rain, wind, waves, thunder (src/weather.js decides)
     const st = game.state, P = game.player;
     // underwater: muffled while submerged in the sea (and on the title screen's underwater view)
     const inSea = st === 'play' || st === 'map' || st === 'pause' || (st === 'log' && AQ.LogUI.from === 'play');

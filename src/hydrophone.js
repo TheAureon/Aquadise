@@ -58,7 +58,9 @@ AQ.Hydro = (function () {
     if (!game || !H.hears(src, game)) return false;
     const g = guess(src), d = Math.hypot(src.x - P().x, src.y - P().y);
     src.heard = { x: g.x, y: g.y, t: 0 };
-    if (src.sound) AQ.Audio.playAt(src.sound, src.x, src.y, { range: H.range(), key: src.key || src.sound, vol: opts.vol });
+    // (in a storm a call sounds quieter and duller under the noise; the range and its ripples stay the same)
+    const WS = AQ.WeatherSound, stormVol = WS ? WS.callVol() : 1, dull = WS ? WS.callDull() : 1;
+    if (src.sound) AQ.Audio.playAt(src.sound, src.x, src.y, { range: H.range(), key: src.key || src.sound, vol: (opts.vol != null ? opts.vol : 1) * stormVol, lpScale: dull });
     ripple(g.x, g.y, false, src.color, opts.faint);
     if (!onScreen(g.x, g.y, 4)) flash(g.x, g.y, d);
     if (opts.echo) {                                     // an echo: a fainter ripple a moment later, a little way off (either side)

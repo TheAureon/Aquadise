@@ -160,6 +160,7 @@ AQ.Audio = (function () {
   // A sound from a spot in the world (x, y), heard from the player: panned left / right, quieter with
   // distance, duller (lower lowpass) far away, and silent beyond opts.range. opts: { range, key, vol }.
   // It goes through play(), so volume, mute, the rate limit and the underwater muffling all apply.
+  // (opts.lpScale < 1 makes it duller still.)
   A.playAt = function (id, x, y, opts = {}) {
     const P = AQ.Game && AQ.Game.player;
     if (!P) return;
@@ -170,7 +171,7 @@ AQ.Audio = (function () {
       key: opts.key, delay: opts.delay,
       pan: Math.max(-1, Math.min(1, dx / c.panWidth)) * c.panMax,
       vol: (opts.vol != null ? opts.vol : 1) * (c.minVol + (1 - c.minVol) * near * near),
-      lp: Math.round(c.farCutoff * Math.pow(c.nearCutoff / c.farCutoff, near))
+      lp: Math.round(c.farCutoff * Math.pow(c.nearCutoff / c.farCutoff, near) * (opts.lpScale || 1))   // (lpScale: duller, e.g. a call in a storm)
     });
   };
   // LISTEN (src/hydrophone.js): k = how loud music + ambience stay (1 = normal)

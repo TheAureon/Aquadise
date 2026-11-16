@@ -2231,6 +2231,7 @@ AQ.langFiles.en = {
   'sfx.star_land': 'STAR LANDS',
   'sfx.step_done': 'STEP COMPLETE',
   'sfx.tip_new': 'NEW TIP',
+  'sfx.thunder': 'THUNDER',
   'sfx.gull_far': 'DISTANT GULLS',
   'sfx.page_turn': 'PAGE TURN',
   'sfx.toast': 'TOAST BLIP',
@@ -2301,6 +2302,11 @@ AQ.langFiles.en = {
   'amb.station': 'STATION',
   'amb.cave': 'FLOODED CAVE',
   'amb.trench': 'DEEP TRENCH',
+  'amb.wx_breezy': 'WEATHER: BREEZE',   // the weather's sounds on their own (Sound Test > AMBIENCE)
+  'amb.wx_choppy': 'WEATHER: ROUGH SEA',
+  'amb.wx_rain': 'WEATHER: RAIN',
+  'amb.wx_rain_below': 'WEATHER: RAIN FROM BELOW',
+  'amb.wx_storm': 'WEATHER: STORM',
 
   // ---------------------------------------------------------------- times of day
   'clock.time': '{phase} {h}:{m}',   // {h} hours, {m} minutes

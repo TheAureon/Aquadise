@@ -65,7 +65,7 @@ own German pass, which I'd do at the end of each update.
 - **REDUCE FLASHING:** no lightning flash, only a soft distant glow.
 - **The map:** shows today's weather per region.
 
-**B2. How it sounds.**
+**B2. How it sounds.** *(Done.)*
 - Rain and wind ambience beds, muffled underwater.
 - Ataraxia leans darker and softer in rain, hazier in fog, and lower and slower in a storm.
 - The hydrophone hears less in a storm.

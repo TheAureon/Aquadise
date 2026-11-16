@@ -533,6 +533,15 @@ kept in git. `node tools/check-game.js --build` checks every screen of the built
   pools' weather. Never bad for you: nothing is lost and nothing gets harder. Kinds and how likely each
   is per region: `data/weather.js`; saved: a seed only. Testing: `debug.weather` (one kind everywhere),
   `debug.weatherKeys` (3 steps the weather where you are).
+  **How it sounds** (`src/weathersound.js`, `AQ.TUNING.weather.sound`): above the water, rain is a hiss
+  and a patter of drops; just below the surface it becomes a low drumming with soft plinks, fading out as
+  you dive (silent below `hearDepth`). Wind rushes in gusts, rough water washes, and thunder rolls in a
+  moment after each lightning flash (farther = later and softer). ATARAXIA leans with it: darker and
+  softer in rain, hazier in fog (softer, longer notes), lower and slower in a storm
+  (`AQ.TUNING.ataraxia.weather`). In a storm the hydrophone's calls sound quieter and duller, with a
+  faint crackle while you LISTEN; what you can hear and its ripples stay exactly the same. The Sound
+  Test's AMBIENCE tab plays each weather sound on its own, and THUNDER is an effect a recording can
+  replace.
 - **Falling stars and meteor showers.** Some nights a star visibly falls and lands somewhere in the
   sea or on the shore: always a spot you can reach at upgrade level 0 (the same scan and checks as the
   message bottles), with a clear drop from the sky (never in a cave), never inside terrain, past the
@@ -1060,6 +1069,7 @@ src/guide.js          the GUIDE: a paged field-guide book (title, pause menu, he
 src/savefile.js       SAVE & BACKUP: backing up (file, one file, save code), restoring (checks + confirm), erasing, reminders, the save-recovery choice
 src/starfall.js       falling stars + meteor showers: nightly plan, landings, light columns, map/HUD marks
 src/weather.js        each sea region's weather: real-time stretches, rain, waves, fog, clouds, lightning, HUD/map
+src/weathersound.js   how the weather sounds: rain above / below, wind, waves, thunder, hydrophone static
 src/bottles.js        message bottles: deterministic, reachable placement, pickup, glint
 assets/sprites-embedded.js   base64 copy of the sprites for file:// (tools/embed-sprites.js)
 src/audio.js          audio engine: mixer, voice limit, underwater filter, settings, file mapping

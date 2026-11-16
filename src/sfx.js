@@ -173,6 +173,15 @@ var AQ = (typeof AQ !== 'undefined') ? AQ : {};
     return 0.7;
   }, { minGap: 0.3 });
   reg('tip_new', 'tutorial', (c, o, t) => H.tone(c, o, t, { type: 'sine', f: 1568, f2: 1760, glide: 0.06, a: 0.004, d: 0.12, v: 0.022 }), { minGap: 0.5 });
+  // distant thunder after a storm's lightning (src/weathersound.js): a low rumble that rolls away, with a
+  // soft crack at the front when it's close
+  reg('thunder', 'world', (c, o, t) => {
+    const close = Math.random() < 0.35;
+    if (close) H.noise(c, o, t, { ft: 'lowpass', f: 1400, f2: 300, a: 0.01, d: 0.35, v: 0.14 });
+    H.noise(c, o, t + 0.05, { ft: 'lowpass', f: 260, f2: 70, q: 0.8, a: 0.25, d: rnd(2.6, 3.8), v: 0.42 });
+    H.noise(c, o, t + rnd(0.4, 0.9), { ft: 'lowpass', f: 180, f2: 60, q: 0.8, a: 0.4, d: rnd(1.8, 2.8), v: 0.3, rate: 0.8 });
+    return 4.5;
+  }, { minGap: 1.5 });
   reg('gull_far', 'world', (c, o, t) => {
     const n = 1 + Math.floor(Math.random() * 2);
     for (let i = 0; i < n; i++) {

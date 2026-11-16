@@ -9,13 +9,14 @@
 //
 //   AQ.Ataraxia.start(mix)                     once the audio is unlocked
 //   AQ.Ataraxia.setPlace(id, seconds)          where we are ('kelp', 'title', ...)
-//   AQ.Ataraxia.setMood({ depth, daylight, shower })   0..1 deep, 0..1 day, a shower night
+//   AQ.Ataraxia.setMood({ depth, daylight, shower, rain, fog, storm })   0..1 deep, 0..1 day, a shower night,
+//                                              and the weather (0..1 each: src/weather.js)
 //   AQ.Ataraxia.tick()                         often (every frame and on a timer): schedules what's next
 //   AQ.Ataraxia.make()                         a separate copy (offline renders, tests) with the same calls
 var AQ = (typeof AQ !== 'undefined') ? AQ : {};
 
 AQ.Ataraxia = (function make() {
-  const X = { place: null, pad: null, sub: null, mood: { depth: 0, daylight: 1, shower: false }, lastNote: null, applied: {} };
+  const X = { place: null, pad: null, sub: null, mood: { depth: 0, daylight: 1, shower: false, rain: 0, fog: 0, storm: 0 }, lastNote: null, applied: {} };
   const cfg = () => AQ.TUNING.ataraxia;
   const D = () => AQ.data.music.ataraxia;
   const IN = () => AQ.Instruments;
@@ -28,13 +29,16 @@ AQ.Ataraxia = (function make() {
   X.places = () => Object.keys(D());
   X.has = (id) => !!D()[id];
 
-  // how much slower everything is now (night and depth), how dark, how loud
+  // how much slower everything is now (night, depth, a storm), how dark, how loud; the weather leans it:
+  // rain darker and softer, fog hazier (softer, longer notes), a storm lower and slower
   function feel() {
-    const C = cfg(), m = X.mood, day = Math.max(0, Math.min(1, m.daylight)), dep = Math.max(0, Math.min(1, m.depth));
+    const C = cfg(), m = X.mood, day = Math.max(0, Math.min(1, m.daylight)), dep = Math.max(0, Math.min(1, m.depth)), Wc = C.weather;
+    const rain = m.rain || 0, fog = m.fog || 0, storm = m.storm || 0;
     return {
-      slow: lerp(C.night.slower, 1, day) * lerp(1, C.depth.slower, dep),
-      bright: lerp(C.night.bright, 1, day) * (1 - C.depth.dark * dep),
-      level: lerp(C.night.level, 1, day) * (1 - C.depth.quiet * dep),
+      slow: lerp(C.night.slower, 1, day) * lerp(1, C.depth.slower, dep) * (1 + Wc.fogSlower * fog) * (1 + Wc.stormSlower * storm),
+      bright: lerp(C.night.bright, 1, day) * (1 - C.depth.dark * dep) * (1 - Wc.rainDark * rain) * (1 - Wc.fogDark * fog) * (1 - Wc.stormDark * storm),
+      level: lerp(C.night.level, 1, day) * (1 - C.depth.quiet * dep) * (1 - Wc.rainQuiet * rain),
+      haze: fog, low: storm,
       night: day < 0.35
     };
   }
@@ -78,7 +82,8 @@ AQ.Ataraxia = (function make() {
     let inst = p.notes[Math.floor(Math.random() * p.notes.length)];
     if (f.night && Math.random() < C.night.chip) inst = 'chip';
     if (X.mood.shower && Math.random() < C.showerShimmer) inst = 'glass';
-    const lo = p.root + p.high[0] + (inst === 'chip' || inst === 'glass' ? 5 : 0), hi = p.root + p.high[1] + (inst === 'glass' && X.mood.shower ? 7 : 0);
+    const down = f.low > 0.5 ? C.weather.stormLower : 0;           // a storm: the notes sit lower
+    const lo = p.root + p.high[0] + (inst === 'chip' || inst === 'glass' ? 5 : 0) - down, hi = p.root + p.high[1] + (inst === 'glass' && X.mood.shower ? 7 : 0) - down;
     const pool = [];
     chordOf(p, X.chord).forEach((m) => { for (let k = m; k <= hi; k += 12) if (k >= lo) pool.push(k); });
     const ok = pool.filter((m) => X.lastNote == null || m === X.lastNote || Math.abs(m - X.lastNote) >= 5);
@@ -86,8 +91,8 @@ AQ.Ataraxia = (function make() {
     if (!list.length) return;
     const m = list[Math.floor(Math.random() * list.length)];
     X.lastNote = m;
-    const v = rnd(0.32, 0.55) * (inst === 'piano' ? 0.9 : 1) * f.level;
-    IN().play(X.mix, LAYER, inst, t, m, v, inst === 'piano' ? rnd(2, 4) : inst === 'chip' ? 0.5 : 2, { pan: rnd(-0.6, 0.6) });
+    const v = rnd(0.32, 0.55) * (inst === 'piano' ? 0.9 : 1) * f.level * (1 - C.weather.fogSoft * f.haze);   // (fog: softer, longer)
+    IN().play(X.mix, LAYER, inst, t, m, v, (inst === 'piano' ? rnd(2, 4) : inst === 'chip' ? 0.5 : 2) * (1 + f.haze), { pan: rnd(-0.6, 0.6) * (1 + f.haze * 0.5) });
   }
 
   X.tick = function () {

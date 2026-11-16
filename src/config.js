@@ -471,7 +471,21 @@ AQ.TUNING = {
     fogAbove: 0.55,           // the fog veil over the sky at full fog...
     fogBelow: 0.3,            // ...and over the sea near the surface (fading with depth)
     shaderFog: 0.3,           // GRAPHICS LOW-HIGH: fog adds this much to the depth fog
-    changeToast: true         // a short line when the weather where you are changes
+    changeToast: true,        // a short line when the weather where you are changes
+    // how it sounds (src/weathersound.js), all on the effects volume, muffled under water
+    sound: {
+      rainHiss: 0.05,         // rain above the water: the hiss...
+      patter: 1, patterPerSecond: 34,   // ...and the patter of drops (loudness, drops a second at full rain)
+      rainDrum: 0.16,         // rain heard from below the surface: a low drumming...
+      plinks: 1, plinksPerSecond: 9,   // ...and soft plinks
+      hearDepth: 380,         // px below the surface where the rain (and wind, waves) can no longer be heard
+      wind: 0.07,             // the wind's rush (breezy and up)
+      waves: 0.06,            // the wash of rough water
+      thunder: 0.8,           // thunder after a flash (farther ones are later and softer)
+      listenStatic: 0.03,     // a faint crackle in the hydrophone while you LISTEN in a storm
+      stormCallQuieter: 0.4,  // a storm: the hydrophone's calls this much quieter...
+      stormCallDuller: 0.5    // ...and duller (the range and the ripples stay exactly the same)
+    }
   },
   // The slow-device watch (src/slowwatch.js): real frame times while playing. Slow for a while: the music plays
   // fewer notes at once (music.lowFxVoices) and a toast suggests LOW EFFECTS (once per save).
@@ -774,6 +788,12 @@ AQ.TUNING = {
     depth: { dark: 0.7, quiet: 0.35, slower: 1.4 },   // at the very bottom of the sea: pad this much darker, this much
                               // quieter, notes this much rarer (in between: in proportion)
     showerShimmer: 0.25,      // a meteor-shower night: share of notes that are a high glass shimmer instead
+    // the weather (src/weather.js) leans it: rain darker and softer, fog hazier, a storm lower and slower
+    weather: {
+      rainDark: 0.3, rainQuiet: 0.15,   // full rain: the pad this much darker, everything this much quieter
+      fogDark: 0.15, fogSlower: 0.25, fogSoft: 0.25,   // full fog: a little darker, rarer notes, each softer and longer
+      stormDark: 0.35, stormSlower: 0.6, stormLower: 12   // a storm: darker, much slower, and the notes an octave lower
+    },
     padBright: [320, 4800]    // the pad's filter range (Hz) from darkest to brightest
   },
   // ---- DELTA: the composed songs (src/delta.js; the songs: data/songs.js)
