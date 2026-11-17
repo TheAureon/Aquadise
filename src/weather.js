@@ -193,7 +193,7 @@ AQ.Weather = (function () {
     W.lastHere = id ? { id, kind } : null;
     if (id && game.state === 'play' && AQ.Badges && (!prev || prev.kind !== kind)) AQ.Badges.addTo('weathers', kind);   // (a badge: every kind of weather)
     if (!id || !prev || prev.id !== id || prev.kind === kind || game.state !== 'play') return;
-    if (cfg().changeToast && AQ.HUD) AQ.HUD.toast(AQ.t('weather.change.' + kind), '#cfe8ff', 4);
+    if (cfg().changeToast && AQ.HUD) AQ.HUD.toast(AQ.t(`weather.change.${kind}`), '#cfe8ff', 4);
   }
   function debugKey(game) {
     const d = AQ.TUNING.debug;
@@ -202,7 +202,7 @@ AQ.Weather = (function () {
     if (!id) return;
     const order = D().order, cur = W.forced[id], i = cur ? order.indexOf(cur) : -1;
     if (i === order.length - 1) delete W.forced[id]; else W.forced[id] = order[i + 1];
-    if (AQ.HUD) AQ.HUD.toast(W.forced[id] ? AQ.t('debug.weather', { kind: AQ.t('weather.' + W.forced[id]) }) : AQ.t('debug.weatherUsual'), '#cfe8ff');
+    if (AQ.HUD) AQ.HUD.toast(W.forced[id] ? AQ.t('debug.weather', { kind: AQ.t(`weather.${W.forced[id]}`) }) : AQ.t('debug.weatherUsual'), '#cfe8ff');
     W.lastHere = { id, kind: W.kind(id) };
   }
   W.dark = () => W.mix.dark;
@@ -384,6 +384,6 @@ AQ.Weather = (function () {
     }
   };
   // the region banner's second line: this region's weather
-  W.bannerLine = function (game) { const id = W.here(game); return id ? AQ.t('weather.' + W.kind(id)) : ''; };
+  W.bannerLine = function (game) { const id = W.here(game); return id ? AQ.t(`weather.${W.kind(id)}`) : ''; };
   return W;
 })();
