@@ -54,6 +54,11 @@ AQ.Seasons = (function () {
   // the season the plants are drawn in (whichever shows more)
   S.lookId = function () { const w = S.weights(); return D().order.reduce((a, b) => (w[b] > w[a] ? b : a)); };
 
+  // is a seasonal creature or plant out? (seasons switched off: always, so nothing is missed)
+  S.allows = (def) => !def.season || !S.on() || S.lookId() === def.season;
+  // spring is spawning season: breeding starts more often and tanks rest less between babies
+  S.springBreeding = () => (S.on() ? S.weights().spring : 0);
+
   // ---------------------------------------------------------------- colours
   const mixC = (a, b, k) => [a[0] + (b[0] - a[0]) * k, a[1] + (b[1] - a[1]) * k, a[2] + (b[2] - a[2]) * k];
   // the sky's colours [top, horizon], leaning toward the season's

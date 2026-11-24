@@ -19,6 +19,7 @@ AQ.Breeding = (function () {
   const defOf = (id) => (AQ.Creatures && AQ.Creatures.defs[id]) || AQ.data.creatures.find((d) => d.id === id);
   const fast = () => !!(AQ.TUNING.debug && AQ.TUNING.debug.fastNursery);
   // how long each step takes, in ms (minutes from AQ.TUNING.breeding, or seconds in the fast test mode)
+  const spring = () => (AQ.Seasons ? AQ.Seasons.springBreeding() : 0);   // 0 - 1: how much spring it is
   B.ms = (step) => (fast() ? AQ.TUNING.debug.fastNurserySeconds[step] * 1000 : cfg()[step + 'Minutes'] * MIN);
   const nursery = () => AQ.Nursery;
 
@@ -56,7 +57,7 @@ AQ.Breeding = (function () {
     if (vibe.stressed) return 'nervous';
     if (AQ.Vibe.fedLevel(tank, now) < c.fedLevel) return 'hungry';
     if (vibe.stars < c.minStars) return 'vibe';
-    if (tank.lastBirth && now - tank.lastBirth < B.ms('cooldown')) return 'resting';
+    if (tank.lastBirth && now - tank.lastBirth < B.ms('cooldown') * (1 - (1 - cfg().spring.cooldown) * spring())) return 'resting';   // (spring: shorter rests)
     return null;
   };
 
@@ -161,7 +162,7 @@ AQ.Breeding = (function () {
       const vibe = AQ.Vibe.evaluate(id), why = B.blocker(tank, vibe, now);
       if (why && why !== 'resting') continue;                     // paused: courtship (if any) waits
       if (!tank.court) {
-        if (why === 'resting' || (!fast() && Math.random() > c.startChance)) continue;
+        if (why === 'resting' || (!fast() && Math.random() > c.startChance * (1 + (c.spring.start - 1) * spring()))) continue;   // (spring: courting starts more often)
         const p = pairs[Math.floor(Math.random() * pairs.length)];
         tank.court = { a: p[0].uid, b: p[1].uid, id: p[0].id, progress: 0 };
         AQ.Audio.play('court');

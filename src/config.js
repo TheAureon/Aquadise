@@ -583,7 +583,9 @@ AQ.TUNING = {
     cooldownMinutes: 20,      // real minutes a tank rests after a new arrival
     growMinutes: 30,          // real minutes for a baby to grow up
     variantChance: 0.04,      // chance a newborn is a rare colour variant (bred babies only, never wild)
-    checkSeconds: 5           // how often all tanks are checked (cheap; runs anywhere in the game)
+    checkSeconds: 5,          // how often all tanks are checked (cheap; runs anywhere in the game)
+    spring: { start: 1.8, cooldown: 0.5 }   // spring (src/seasons.js): courting starts this many times as often, and
+                              // tanks rest this share as long between babies: more babies in spring
   },
 
   // The Universal Nursery (src/nursery.js): every bred egg and baby lives here until it grows up.

@@ -13263,6 +13263,698 @@ AQ.manifest = {
     19
    ]
   },
+  "creature.blossom_nudibranch": {
+   "file": "sprites/creatures/blossom_nudibranch.png",
+   "fw": 12,
+   "fh": 12,
+   "anchor": [
+    6,
+    6
+   ],
+   "anims": {
+    "idle": {
+     "row": 0,
+     "frames": 4,
+     "fps": 5
+    },
+    "move": {
+     "row": 1,
+     "frames": 4,
+     "fps": 10
+    }
+   },
+   "vis": [
+    1,
+    3,
+    10,
+    9
+   ]
+  },
+  "creature.blossom_nudibranch.v": {
+   "file": "sprites/creatures/blossom_nudibranch_v.png",
+   "fw": 12,
+   "fh": 12,
+   "anchor": [
+    6,
+    6
+   ],
+   "anims": {
+    "idle": {
+     "row": 0,
+     "frames": 4,
+     "fps": 5
+    },
+    "move": {
+     "row": 1,
+     "frames": 4,
+     "fps": 10
+    }
+   },
+   "vis": [
+    1,
+    3,
+    10,
+    9
+   ]
+  },
+  "creature.blossom_nudibranch.v.m": {
+   "file": "sprites/creatures/blossom_nudibranch_v_m.png",
+   "fw": 12,
+   "fh": 12,
+   "anchor": [
+    6,
+    6
+   ],
+   "anims": {
+    "idle": {
+     "row": 0,
+     "frames": 4,
+     "fps": 5
+    },
+    "move": {
+     "row": 1,
+     "frames": 4,
+     "fps": 10
+    }
+   },
+   "vis": [
+    1,
+    3,
+    10,
+    9
+   ]
+  },
+  "creature.blossom_nudibranch.baby.v": {
+   "file": "sprites/creatures/blossom_nudibranch_baby_v.png",
+   "fw": 12,
+   "fh": 12,
+   "anchor": [
+    6,
+    6
+   ],
+   "anims": {
+    "idle": {
+     "row": 0,
+     "frames": 4,
+     "fps": 5
+    },
+    "move": {
+     "row": 1,
+     "frames": 4,
+     "fps": 10
+    }
+   },
+   "vis": [
+    1,
+    3,
+    10,
+    9
+   ]
+  },
+  "creature.blossom_nudibranch.baby": {
+   "file": "sprites/creatures/blossom_nudibranch_baby.png",
+   "fw": 12,
+   "fh": 12,
+   "anchor": [
+    6,
+    6
+   ],
+   "anims": {
+    "idle": {
+     "row": 0,
+     "frames": 4,
+     "fps": 5
+    },
+    "move": {
+     "row": 1,
+     "frames": 4,
+     "fps": 10
+    }
+   },
+   "vis": [
+    1,
+    3,
+    10,
+    9
+   ]
+  },
+  "creature.blossom_nudibranch.m": {
+   "file": "sprites/creatures/blossom_nudibranch_m.png",
+   "fw": 12,
+   "fh": 12,
+   "anchor": [
+    6,
+    6
+   ],
+   "anims": {
+    "idle": {
+     "row": 0,
+     "frames": 4,
+     "fps": 5
+    },
+    "move": {
+     "row": 1,
+     "frames": 4,
+     "fps": 10
+    }
+   },
+   "vis": [
+    1,
+    3,
+    10,
+    9
+   ]
+  },
+  "creature.sunfleck_butterflyfish": {
+   "file": "sprites/creatures/sunfleck_butterflyfish.png",
+   "fw": 16,
+   "fh": 16,
+   "anchor": [
+    8,
+    8
+   ],
+   "anims": {
+    "idle": {
+     "row": 0,
+     "frames": 4,
+     "fps": 5
+    },
+    "move": {
+     "row": 1,
+     "frames": 4,
+     "fps": 10
+    }
+   },
+   "vis": [
+    3,
+    1,
+    13,
+    13
+   ]
+  },
+  "creature.sunfleck_butterflyfish.v": {
+   "file": "sprites/creatures/sunfleck_butterflyfish_v.png",
+   "fw": 16,
+   "fh": 16,
+   "anchor": [
+    8,
+    8
+   ],
+   "anims": {
+    "idle": {
+     "row": 0,
+     "frames": 4,
+     "fps": 5
+    },
+    "move": {
+     "row": 1,
+     "frames": 4,
+     "fps": 10
+    }
+   },
+   "vis": [
+    3,
+    1,
+    13,
+    13
+   ]
+  },
+  "creature.sunfleck_butterflyfish.v.m": {
+   "file": "sprites/creatures/sunfleck_butterflyfish_v_m.png",
+   "fw": 16,
+   "fh": 16,
+   "anchor": [
+    8,
+    8
+   ],
+   "anims": {
+    "idle": {
+     "row": 0,
+     "frames": 4,
+     "fps": 5
+    },
+    "move": {
+     "row": 1,
+     "frames": 4,
+     "fps": 10
+    }
+   },
+   "vis": [
+    3,
+    1,
+    13,
+    13
+   ]
+  },
+  "creature.sunfleck_butterflyfish.baby.v": {
+   "file": "sprites/creatures/sunfleck_butterflyfish_baby_v.png",
+   "fw": 16,
+   "fh": 16,
+   "anchor": [
+    8,
+    8
+   ],
+   "anims": {
+    "idle": {
+     "row": 0,
+     "frames": 4,
+     "fps": 5
+    },
+    "move": {
+     "row": 1,
+     "frames": 4,
+     "fps": 10
+    }
+   },
+   "vis": [
+    4,
+    3,
+    11,
+    13
+   ]
+  },
+  "creature.sunfleck_butterflyfish.baby": {
+   "file": "sprites/creatures/sunfleck_butterflyfish_baby.png",
+   "fw": 16,
+   "fh": 16,
+   "anchor": [
+    8,
+    8
+   ],
+   "anims": {
+    "idle": {
+     "row": 0,
+     "frames": 4,
+     "fps": 5
+    },
+    "move": {
+     "row": 1,
+     "frames": 4,
+     "fps": 10
+    }
+   },
+   "vis": [
+    4,
+    3,
+    11,
+    13
+   ]
+  },
+  "creature.sunfleck_butterflyfish.m": {
+   "file": "sprites/creatures/sunfleck_butterflyfish_m.png",
+   "fw": 16,
+   "fh": 16,
+   "anchor": [
+    8,
+    8
+   ],
+   "anims": {
+    "idle": {
+     "row": 0,
+     "frames": 4,
+     "fps": 5
+    },
+    "move": {
+     "row": 1,
+     "frames": 4,
+     "fps": 10
+    }
+   },
+   "vis": [
+    3,
+    1,
+    13,
+    13
+   ]
+  },
+  "creature.amberleaf_pipefish": {
+   "file": "sprites/creatures/amberleaf_pipefish.png",
+   "fw": 16,
+   "fh": 16,
+   "anchor": [
+    8,
+    8
+   ],
+   "anims": {
+    "idle": {
+     "row": 0,
+     "frames": 4,
+     "fps": 5
+    },
+    "move": {
+     "row": 1,
+     "frames": 4,
+     "fps": 10
+    }
+   },
+   "vis": [
+    1,
+    5,
+    14,
+    11
+   ]
+  },
+  "creature.amberleaf_pipefish.v": {
+   "file": "sprites/creatures/amberleaf_pipefish_v.png",
+   "fw": 16,
+   "fh": 16,
+   "anchor": [
+    8,
+    8
+   ],
+   "anims": {
+    "idle": {
+     "row": 0,
+     "frames": 4,
+     "fps": 5
+    },
+    "move": {
+     "row": 1,
+     "frames": 4,
+     "fps": 10
+    }
+   },
+   "vis": [
+    1,
+    5,
+    14,
+    11
+   ]
+  },
+  "creature.amberleaf_pipefish.v.m": {
+   "file": "sprites/creatures/amberleaf_pipefish_v_m.png",
+   "fw": 16,
+   "fh": 16,
+   "anchor": [
+    8,
+    8
+   ],
+   "anims": {
+    "idle": {
+     "row": 0,
+     "frames": 4,
+     "fps": 5
+    },
+    "move": {
+     "row": 1,
+     "frames": 4,
+     "fps": 10
+    }
+   },
+   "vis": [
+    1,
+    5,
+    14,
+    11
+   ]
+  },
+  "creature.amberleaf_pipefish.baby.v": {
+   "file": "sprites/creatures/amberleaf_pipefish_baby_v.png",
+   "fw": 16,
+   "fh": 16,
+   "anchor": [
+    8,
+    8
+   ],
+   "anims": {
+    "idle": {
+     "row": 0,
+     "frames": 4,
+     "fps": 5
+    },
+    "move": {
+     "row": 1,
+     "frames": 4,
+     "fps": 10
+    }
+   },
+   "vis": [
+    3,
+    5,
+    14,
+    11
+   ]
+  },
+  "creature.amberleaf_pipefish.baby": {
+   "file": "sprites/creatures/amberleaf_pipefish_baby.png",
+   "fw": 16,
+   "fh": 16,
+   "anchor": [
+    8,
+    8
+   ],
+   "anims": {
+    "idle": {
+     "row": 0,
+     "frames": 4,
+     "fps": 5
+    },
+    "move": {
+     "row": 1,
+     "frames": 4,
+     "fps": 10
+    }
+   },
+   "vis": [
+    3,
+    5,
+    14,
+    11
+   ]
+  },
+  "creature.amberleaf_pipefish.m": {
+   "file": "sprites/creatures/amberleaf_pipefish_m.png",
+   "fw": 16,
+   "fh": 16,
+   "anchor": [
+    8,
+    8
+   ],
+   "anims": {
+    "idle": {
+     "row": 0,
+     "frames": 4,
+     "fps": 5
+    },
+    "move": {
+     "row": 1,
+     "frames": 4,
+     "fps": 10
+    }
+   },
+   "vis": [
+    1,
+    5,
+    14,
+    11
+   ]
+  },
+  "creature.frostfin_icefish": {
+   "file": "sprites/creatures/frostfin_icefish.png",
+   "fw": 16,
+   "fh": 16,
+   "anchor": [
+    8,
+    8
+   ],
+   "anims": {
+    "idle": {
+     "row": 0,
+     "frames": 4,
+     "fps": 5
+    },
+    "move": {
+     "row": 1,
+     "frames": 4,
+     "fps": 10
+    }
+   },
+   "vis": [
+    1,
+    3,
+    14,
+    13
+   ]
+  },
+  "creature.frostfin_icefish.v": {
+   "file": "sprites/creatures/frostfin_icefish_v.png",
+   "fw": 16,
+   "fh": 16,
+   "anchor": [
+    8,
+    8
+   ],
+   "anims": {
+    "idle": {
+     "row": 0,
+     "frames": 4,
+     "fps": 5
+    },
+    "move": {
+     "row": 1,
+     "frames": 4,
+     "fps": 10
+    }
+   },
+   "vis": [
+    1,
+    3,
+    14,
+    13
+   ]
+  },
+  "creature.frostfin_icefish.v.m": {
+   "file": "sprites/creatures/frostfin_icefish_v_m.png",
+   "fw": 16,
+   "fh": 16,
+   "anchor": [
+    8,
+    8
+   ],
+   "anims": {
+    "idle": {
+     "row": 0,
+     "frames": 4,
+     "fps": 5
+    },
+    "move": {
+     "row": 1,
+     "frames": 4,
+     "fps": 10
+    }
+   },
+   "vis": [
+    1,
+    3,
+    14,
+    13
+   ]
+  },
+  "creature.frostfin_icefish.baby.v": {
+   "file": "sprites/creatures/frostfin_icefish_baby_v.png",
+   "fw": 16,
+   "fh": 16,
+   "anchor": [
+    8,
+    8
+   ],
+   "anims": {
+    "idle": {
+     "row": 0,
+     "frames": 4,
+     "fps": 5
+    },
+    "move": {
+     "row": 1,
+     "frames": 4,
+     "fps": 10
+    }
+   },
+   "vis": [
+    3,
+    4,
+    12,
+    12
+   ]
+  },
+  "creature.frostfin_icefish.baby": {
+   "file": "sprites/creatures/frostfin_icefish_baby.png",
+   "fw": 16,
+   "fh": 16,
+   "anchor": [
+    8,
+    8
+   ],
+   "anims": {
+    "idle": {
+     "row": 0,
+     "frames": 4,
+     "fps": 5
+    },
+    "move": {
+     "row": 1,
+     "frames": 4,
+     "fps": 10
+    }
+   },
+   "vis": [
+    3,
+    4,
+    12,
+    12
+   ]
+  },
+  "creature.frostfin_icefish.m": {
+   "file": "sprites/creatures/frostfin_icefish_m.png",
+   "fw": 16,
+   "fh": 16,
+   "anchor": [
+    8,
+    8
+   ],
+   "anims": {
+    "idle": {
+     "row": 0,
+     "frames": 4,
+     "fps": 5
+    },
+    "move": {
+     "row": 1,
+     "frames": 4,
+     "fps": 10
+    }
+   },
+   "vis": [
+    1,
+    3,
+    14,
+    13
+   ]
+  },
+  "plant.sea_blossom": {
+   "file": "sprites/plants/sea_blossom.png",
+   "fw": 16,
+   "fh": 16,
+   "anchor": [
+    8,
+    15
+   ],
+   "anims": {
+    "idle": {
+     "row": 0,
+     "frames": 4,
+     "fps": 3
+    }
+   },
+   "vis": [
+    1,
+    4,
+    14,
+    15
+   ]
+  },
+  "plant.frost_lace": {
+   "file": "sprites/plants/frost_lace.png",
+   "fw": 16,
+   "fh": 16,
+   "anchor": [
+    8,
+    15
+   ],
+   "anims": {
+    "idle": {
+     "row": 0,
+     "frames": 4,
+     "fps": 3
+    }
+   },
+   "vis": [
+    1,
+    2,
+    14,
+    15
+   ]
+  },
   "decor.pebble_rock": {
    "file": "sprites/decor/pebble_rock.png",
    "fw": 16,
@@ -15021,6 +15713,94 @@ AQ.manifest = {
     5,
     12,
     31
+   ]
+  },
+  "decor.blossom_coral": {
+   "file": "sprites/decor/blossom_coral.png",
+   "fw": 24,
+   "fh": 24,
+   "anchor": [
+    12,
+    23
+   ],
+   "anims": {
+    "idle": {
+     "row": 0,
+     "frames": 1,
+     "fps": 1
+    }
+   },
+   "vis": [
+    1,
+    4,
+    22,
+    23
+   ]
+  },
+  "decor.sun_shell": {
+   "file": "sprites/decor/sun_shell.png",
+   "fw": 16,
+   "fh": 16,
+   "anchor": [
+    8,
+    15
+   ],
+   "anims": {
+    "idle": {
+     "row": 0,
+     "frames": 1,
+     "fps": 1
+    }
+   },
+   "vis": [
+    1,
+    6,
+    14,
+    15
+   ]
+  },
+  "decor.amber_kelp": {
+   "file": "sprites/decor/amber_kelp.png",
+   "fw": 16,
+   "fh": 32,
+   "anchor": [
+    8,
+    31
+   ],
+   "anims": {
+    "idle": {
+     "row": 0,
+     "frames": 1,
+     "fps": 1
+    }
+   },
+   "vis": [
+    3,
+    2,
+    14,
+    31
+   ]
+  },
+  "decor.snow_chunk": {
+   "file": "sprites/decor/snow_chunk.png",
+   "fw": 24,
+   "fh": 24,
+   "anchor": [
+    12,
+    23
+   ],
+   "anims": {
+    "idle": {
+     "row": 0,
+     "frames": 1,
+     "fps": 1
+    }
+   },
+   "vis": [
+    1,
+    5,
+    22,
+    23
    ]
   }
  }

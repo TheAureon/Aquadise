@@ -86,7 +86,7 @@ own German pass, which I'd do at the end of each update.
   kelp and drifting leaves on the hill, winter ice reaching further and snow on the hill.
 - Shown on the HUD and the map.
 
-**C2. Seasonal life and things to find.**
+**C2. Seasonal life and things to find.** *(Done. Migrations come with D2.)*
 - Seasonal creatures and plants, and seasonal decorations unlocked as usual.
 - **Spawning in spring:** more babies.
 - **Migrations:** ties in with D2.

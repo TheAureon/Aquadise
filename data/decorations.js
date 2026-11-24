@@ -5,6 +5,7 @@
 //          treasure vent bubbles meteorite stardust
 // biomes:  tanks it matches for the vibe "theme" bonus (omit = fits anywhere, no bonus)
 // unlock:  { biome | tank, tier } - unlocked when that biome's (or predator) tank first reaches the star count for that tier
+//          { species } - unlocked when you first catch that species (the seasonal pieces)
 //          (tiers 1/2/3 = AQ.TUNING.aquarium.unlockStars in config.js; `stars: n` overrides). Omit = always.
 // glow:    colour of the soft light it gives off in dark tanks (light-tagged pieces)
 // The first 13 pieces are the basic set; after them each biome has one free themed piece and
@@ -118,5 +119,11 @@ AQ.data.decorations = [
   { id: 'stardust_patch', kind: 'floor', sprite_size: 'small', color: '#3a3460', accent: '#fff3b0', art: { shape: 'stardust' }, tags: ['stardust'], glow: '#d8d0ff', biomes: ['starfall'] },
   { id: 'meteorite_rock', kind: 'floor', sprite_size: 'medium', color: '#4a4650', accent: '#ff9a5a', art: { shape: 'meteorite' }, tags: ['meteorite', 'rock', 'perch'], glow: '#ffb070', biomes: ['starfall'], unlock: { tank: 'starfall', tier: 1 } },
   { id: 'crater_bowl', kind: 'floor', sprite_size: 'wide', color: '#5a5668', accent: '#b8b0d8', art: { shape: 'crater' }, tags: ['meteorite', 'hideout', 'rock'], biomes: ['starfall'], unlock: { tank: 'starfall', tier: 2 } },
-  { id: 'star_lantern', kind: 'floor', sprite_size: 'tall', color: '#3a3a5a', accent: '#fff3a8', art: { shape: 'starlantern' }, tags: ['light', 'pillar'], glow: '#fff1a8', biomes: ['starfall'], unlock: { tank: 'starfall', tier: 3 } }
+  { id: 'star_lantern', kind: 'floor', sprite_size: 'tall', color: '#3a3a5a', accent: '#fff3a8', art: { shape: 'starlantern' }, tags: ['light', 'pillar'], glow: '#fff1a8', biomes: ['starfall'], unlock: { tank: 'starfall', tier: 3 } },
+
+  // ---- Seasons: one piece per season, unlocked by catching that season's creature
+  { id: 'blossom_coral', kind: 'floor', sprite_size: 'medium', color: '#ffb0d0', accent: '#fff0f6', art: { shape: 'branchcoral' }, tags: ['coral', 'plant'], biomes: ['coral'], unlock: { species: 'blossom_nudibranch' } },
+  { id: 'sun_shell', kind: 'floor', sprite_size: 'small', color: '#ffd060', accent: '#fff4c0', art: { shape: 'shell' }, tags: ['shell'], biomes: ['coral', 'tide_pools'], unlock: { species: 'sunfleck_butterflyfish' } },
+  { id: 'amber_kelp', kind: 'floor', sprite_size: 'tall', color: '#c8962c', accent: '#f0c860', art: { shape: 'kelp' }, tags: ['kelp', 'plant'], biomes: ['kelp'], unlock: { species: 'amberleaf_pipefish' } },
+  { id: 'snow_chunk', kind: 'floor', sprite_size: 'medium', color: '#eef6fc', accent: '#bcd8ee', art: { shape: 'icechunk' }, tags: ['ice', 'rock'], biomes: ['ice'], unlock: { species: 'frostfin_icefish' } },
 ];

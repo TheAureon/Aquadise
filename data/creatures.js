@@ -28,6 +28,8 @@
 //   active                               optional 'night' | 'day': only out at those hours (default: always)
 //   weather                              optional 'fog' | 'rain' | 'storm': only out in that weather where it lives
 //                                        (src/weather.js; 'rain' includes storms, 'storm' is storm nights only)
+//   season                               optional 'spring' | 'summer' | 'autumn' | 'winter': only out in that season
+//                                        (src/seasons.js); the log says which
 //   bloom                                plants: 'night' = closed (not harvestable) by day, open + glowing at night
 //   requires_depth                       lives past a depth limit: needs that DEPTH upgrade level to reach (log tag)
 //   eggs                                 optional true/false: lays eggs when breeding (default: all but mammals)
@@ -444,6 +446,30 @@ AQ.data.creatures = [
       { n: 1, at: 'water', biomeHere: true, area: [600, 720], y: [110, 160] }, { n: 1, at: 'water', biomeHere: true, area: [800, 1880], y: [120, 230] },
       { n: 1, at: 'water', biomeHere: true, area: [1920, 2400], y: [120, 250] }, { n: 1, at: 'water', biomeHere: true, area: [3990, 4880], y: [120, 260] },
       { n: 1, at: 'water', biomeHere: true, area: [4920, 5680], y: [120, 220] }, { n: 1, at: 'water', biomeHere: true, area: [5720, 6780], y: [112, 200] }] } },
+
+  // ---- Seasons update: a creature for each season, and two seasonal plants (src/seasons.js)
+  { id: 'blossom_nudibranch', likes: ['coral', 'plant'], biome: 'coral', category: 'gastropod', catch_behavior: 'spotting', season: 'spring',
+    params: { alpha: 0.55, speed: 2.5, trail: '#ffd8ec' },
+    sprite_size: 'tiny', color: '#ffb0d0', accent: '#fff4f8', art: { shape: 'snail' },
+    spawn: { n: 3, at: 'floor' } },
+  { id: 'sunfleck_butterflyfish', likes: ['coral', 'shell'], biome: 'coral', category: 'fish', catch_behavior: 'wary', season: 'summer',
+    params: { reaction: 'flee', alertR: 50, fleeTime: [0.8, 1.3], wanderR: 30, speed: 14 },
+    sprite_size: 'small', color: '#ffd23a', accent: '#ffffff', art: { shape: 'fish', stripes: true, tall: 1.35, long: 0.95 },
+    spawn: { n: 3, at: 'water', y: [120, 240] } },
+  { id: 'amberleaf_pipefish', likes: ['kelp', 'plant'], biome: 'kelp', category: 'fish', catch_behavior: 'camouflage', season: 'autumn',
+    params: { alpha: 0.12, moveEvery: [3, 6], moveSpeed: 22 },
+    sprite_size: 'small', color: '#d8a83a', accent: '#8a5a1c', art: { shape: 'fish', pipe: true, long: 1.3, tall: 0.55 },
+    spawn: { n: 3, at: 'water', y: [180, 420] } },
+  { id: 'frostfin_icefish', likes: ['ice', 'crystal'], biome: 'ice', category: 'fish', catch_behavior: 'wary', season: 'winter',
+    params: { reaction: 'flee', alertR: 46, carelessNoise: 0.4, wanderR: 24, fleeSpeed: 70 },
+    sprite_size: 'small', color: '#e4f0f8', accent: '#a8d0ec', art: { shape: 'fish', long: 1.2 },
+    spawn: { n: 3, at: 'water', y: [130, 380] } },
+  { id: 'sea_blossom', tags: ['plant', 'coral'], biome: 'tide_pools', category: 'plant', is_plant: true, catch_behavior: 'plant', season: 'spring',
+    sprite_size: 'small', color: '#5aa860', accent: '#ffb8d8', art: { shape: 'tuft' },
+    spawn: { n: 5, at: 'floor', area: [480, 720] } },
+  { id: 'frost_lace', tags: ['ice', 'plant'], biome: 'ice', category: 'plant', is_plant: true, catch_behavior: 'plant', season: 'winter',
+    sprite_size: 'small', color: '#cfe4f2', accent: '#ffffff', art: { shape: 'frond' },
+    spawn: { n: 5, at: 'floor' } },
 ];
 
 // Families: species that belong together (the log groups them under one heading). A family with

@@ -82,7 +82,7 @@ AQ.Creatures = (function () {
 
   // is it out now? its hours (night / day only), and its weather where it lives (fog / rain / storm only)
   const slotX = (def, sp) => (sp && sp.area ? (sp.area[0] + sp.area[1]) / 2 : AQ.World.biomeById[def.biome].rect[0] + AQ.World.biomeById[def.biome].rect[2] / 2);
-  C.outNow = (def, x) => (!AQ.Clock || AQ.Clock.activeFor(def)) && (!def.weather || !AQ.Weather || AQ.Weather.allows(def, x));
+  C.outNow = (def, x) => (!AQ.Clock || AQ.Clock.activeFor(def)) && (!def.weather || !AQ.Weather || AQ.Weather.allows(def, x)) && (!def.season || !AQ.Seasons || AQ.Seasons.allows(def));
   function spawnSlot(slot) {
     if (slot.pool) slot.def = pickWeighted(slot.pool);           // family slot: which member turns up this time
     const def = slot.def, sp = slot.sp || def.spawn || { at: 'water' };
@@ -209,7 +209,7 @@ AQ.Creatures = (function () {
       const dx = P.x - c.x, dy = P.y - c.y;
       const far = Math.abs(dx) > simR || Math.abs(dy) > simR;
       // out of its hours and nowhere near you: it has simply gone home
-      const gone = (c.def.active || c.def.weather) && !C.outNow(c.def, c.hx != null ? c.hx : c.x);
+      const gone = (c.def.active || c.def.weather || c.def.season) && !C.outNow(c.def, c.hx != null ? c.hx : c.x);
       if (far && gone) { C.remove(c); if (c.slot) c.slot.timer = 8; continue; }
       if (far) continue;
       ctx.dx = dx; ctx.dy = dy; ctx.dist = Math.hypot(dx, dy);

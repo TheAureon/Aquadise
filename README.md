@@ -560,6 +560,13 @@ kept in git. `node tools/check-game.js --build` checks every screen of the built
   winter. Every graphics level, CLASSIC included. The HUD shows a small season mark left of the sun /
   moon, the map shows the season and its day, and a short line says when a new one arrives. Saved: when
   the first spring began (a number). Testing: `debug.season`, `debug.seasonKeys` (4 = the next season).
+  **Seasonal life** (`season:` in `data/creatures.js`): the Blossom Nudibranch on the spring coral, the
+  Sunfleck Butterflyfish on the summer coral shelf, the Amberleaf Pipefish hiding in autumn's golden kelp,
+  the Frostfin Icefish under the winter ice, and two plants: Sea Blossom (spring, the tide-pool slope)
+  and Frost Lace (winter, the icy seabed). Each has field notes in a bottle and a season tag in the log.
+  Catching each season's creature unlocks its decoration (Blossom Coral, Sun Shell, Amber Kelp, Snow
+  Chunk; `unlock: { species }` in `data/decorations.js`). Spring is spawning season: in the tanks,
+  courting starts more often and tanks rest half as long between babies (`breeding.spring`).
 - **Falling stars and meteor showers.** Some nights a star visibly falls and lands somewhere in the
   sea or on the shore: always a spot you can reach at upgrade level 0 (the same scan and checks as the
   message bottles), with a clear drop from the sky (never in a cave), never inside terrain, past the

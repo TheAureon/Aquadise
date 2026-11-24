@@ -36,6 +36,11 @@ AQ.Collection = (function () {
     const entry = { uid: AQ.U.uid(), id: def.id };
     if (sex) { entry.sex = sex; AQ.Sex.logOf(def.id)[sex] = true; }
     if (tank.creatures.length < AQ.Tanks.capacity(AQ.Tanks.forCreature(def))) tank.creatures.push(entry); else tank.storage.push(entry);
+    // decorations unlocked by catching this species (the seasonal pieces: unlock { species })
+    AQ.data.decorations.filter((d) => d.unlock && d.unlock.species === def.id && !(S().unlocks || {})[d.id]).forEach((d) => {
+      (S().unlocks = S().unlocks || {})[d.id] = true;
+      if (AQ.HUD) AQ.HUD.toast(AQ.t('tank.unlocked', { name: d.name }), '#ffe08a', 5);
+    });
     AQ.Save && AQ.Save.dirty();
     return isNew;
   };
