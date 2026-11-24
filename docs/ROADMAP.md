@@ -109,7 +109,7 @@ FLASHING-gentle version.
 - You hear it on the hydrophone before you see it, and a small field note is added.
 - Never catchable, just watched; a badge for seeing each one.
 
-**D3. Hidden grottoes.**
+**D3. Hidden grottoes.** *(Done.)*
 - Small secret rooms behind cracked coral or rock that the net can pry open, a few in each region.
 - Inside: a bottle, a rare plant or a little scene.
 - They're marked on the map once found, and appear in a Guide line.

@@ -89,6 +89,7 @@ AQ.Terrain = (function () {
       const c = buildChunk(W, b);
       if (c) T.chunks[i] = c;
     });
+    if (AQ.Grottoes) AQ.Grottoes.recut();                           // (open grottoes stay open in the new picture)
   };
 
   // Fireflies drifting in the lush cave's air pocket (they glow through the darkness).

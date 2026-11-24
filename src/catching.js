@@ -74,7 +74,7 @@ AQ.Catching = (function () {
         target.pryProgress = (target.pryProgress || 0) + dt / T().pryTime;
         if (R.chance(dt * 10)) AQ.FX.puff(target.x, target.y, 'rgba(200,190,170,0.5)', 1);
         if (target.pryProgress >= 1) { target.pryProgress = 0; K.pryTarget = null; tryCatch(game, target, true); }
-      }
+      } else if (AQ.Grottoes) AQ.Grottoes.pryAt(net, dt);           // a cracked rock face: pry it open (a hidden grotto)
     } else {
       if (K.pryTarget) K.pryTarget.pryProgress = 0;
       K.pryTarget = null; K.hold = 0; K.holdNet = null;

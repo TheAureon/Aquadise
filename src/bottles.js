@@ -47,6 +47,7 @@ AQ.Bottles = (function () {
     return (x, y) => { const cx = Math.floor(x / CELL), cy = Math.floor(y / CELL); return cx >= 0 && cy >= 0 && cx < gw && cy < gh && !!seen[cx + cy * gw]; };
   }
 
+  B.reachable = reachable;                                         // (the hidden grottoes use it too)
   // Every possible bottle spot, by biome: seabed (water above solid), the surface of open water
   // (floating) and dry ground right by the waterline (the shore).
   function candidates(canReach) {

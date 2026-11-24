@@ -55,6 +55,7 @@ AQ.Game = (function () {
     if (AQ.Doors) AQ.Doors.init();
     if (AQ.Creatures) AQ.Creatures.init(G);
     if (AQ.Chests) AQ.Chests.init(G);
+    if (AQ.Grottoes) AQ.Grottoes.init();         // hidden grottoes (after the chests and bottles: they keep away from them)
     if (AQ.Starfall) AQ.Starfall.init();           // stars still waiting from last time (after the creatures)
     AQ.Scenes.restore(G, G.scene, G.player.x, G.player.y);
     document.getElementById('loading').style.display = 'none';
@@ -168,7 +169,8 @@ AQ.Game = (function () {
     if (AQ.SoundDirector) AQ.SoundDirector.update(dt, G);
     if (AQ.Seasons && G.player) AQ.Seasons.update(dt, G);
     if (AQ.NightLights && G.player) AQ.NightLights.update(dt, G);
-    if (AQ.Migrations && G.player) AQ.Migrations.update(dt, G);   // a whale, mantas or turtles crossing the open ocean now and then   // glowing plankton in your wake, glowing creatures' trails   // the season: redraws plants when it turns, drifting specks
+    if (AQ.Migrations && G.player) AQ.Migrations.update(dt, G);
+    if (AQ.Grottoes && G.player) AQ.Grottoes.update(dt, G);         // a grotto's message bottle   // a whale, mantas or turtles crossing the open ocean now and then   // glowing plankton in your wake, glowing creatures' trails   // the season: redraws plants when it turns, drifting specks
     if (AQ.Weather && G.player) AQ.Weather.update(dt, G);   // each sea region's weather (rain, fog, waves, storms)
     if (AQ.SlowWatch) AQ.SlowWatch.update(G);       // a slow device: lighter music, and a LOW EFFECTS hint once
     AQ.Transition.update(dt);
@@ -213,6 +215,7 @@ AQ.Game = (function () {
     ctx.save();
     ctx.translate(-cam.left(), -cam.top());
     if (AQ.Chests) AQ.Chests.draw(ctx, G);
+    if (AQ.Grottoes && !title) AQ.Grottoes.draw(ctx, G);                   // cracks in the rock, open grottoes
     if (AQ.Bottles && !title) AQ.Bottles.draw(ctx);
     if (!title) AQ.Scenes.drawEntranceCue(ctx, G);
     if (AQ.Doors) AQ.Doors.draw(ctx);
@@ -285,6 +288,7 @@ AQ.Game = (function () {
     if (AQ.Bottles && G.state !== 'title') AQ.Bottles.lights(L);
     if (AQ.Starfall && G.state !== 'title') AQ.Starfall.lights(L);
     if (AQ.NightLights && G.state !== 'title') AQ.NightLights.lights(L);
+    if (AQ.Grottoes && G.state !== 'title') AQ.Grottoes.lights(L);
     return L;
   }
 

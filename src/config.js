@@ -528,6 +528,18 @@ AQ.TUNING = {
     seeSeconds: 1.5,          // on screen this long counts as seen
     farAlpha: 0.78            // they're far off: drawn a little faded, behind the scenery
   },
+  // Hidden grottoes (src/grottoes.js): small rooms behind cracked rock; hold the net on the crack to pry it open.
+  grottoes: {
+    perRegion: 2,             // how many in each part of the sea that reaches the surface (where the rock allows)
+    room: [16, 10],           // the room's half width and half height (px)
+    plug: 6,                  // how thick the cracked rock in front of it is (px)
+    plugH: 6,                 // ...and its half height
+    margin: 5,                // solid rock kept all round a room (so no room ever breaks into other water)
+    apart: 300,               // grottoes at least this far apart (px)
+    awayFrom: 40,             // ...and this far from chests and message bottles
+    pryTime: 1.4,             // seconds of holding the net on the crack to open it
+    kinds: ['scene', 'plant', 'bottle']   // what's inside, in turn
+  },
   // The slow-device watch (src/slowwatch.js): real frame times while playing. Slow for a while: the music plays
   // fewer notes at once (music.lowFxVoices) and a toast suggests LOW EFFECTS (once per save).
   slowWatch: {

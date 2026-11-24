@@ -549,6 +549,15 @@ kept in git. `node tools/check-game.js --build` checks every screen of the built
   dawn. Each has field notes in a bottle and a log tag (FOG ONLY, RAIN ONLY, STORM NIGHTS); the Guide
   has a WEATHER page; badges: WEATHER WATCHER (be out in 3, then all 6 kinds of weather) and RAIN OR
   SHINE (catch all three).
+- **Hidden grottoes.** Cracks in the rock (a dark fissure, loose pebbles, now and then a glint) hide
+  small rooms, a couple in each part of the sea where the rock is thick enough (`src/grottoes.js`).
+  Swing the net at a crack and hold it there to pry the rock loose: it crumbles into a little
+  water-filled room with a scene (an old treasure corner, a crystal garden, a forgotten statue), a plant
+  growing in the dark, or a message bottle holding a letter (the log: NOTES > GROTTOES). Found grottoes
+  stay open (saved) and are marked on the map; badge: GROTTO FINDER. Placement is worked out from the
+  world, the same every time: only where the rock is thick enough (it never breaks into other water),
+  reachable from the start without upgrades, away from chests and bottles. Closed grottoes are solid
+  rock, so nothing can spawn inside one. Tuning: `AQ.TUNING.grottoes`.
 - **Migrations.** Now and then (every 9-18 minutes of play in the sea, `AQ.TUNING.migrations`) a whale,
   a school of mantas or a line of sea turtles crosses the open ocean, far off behind the scenery
   (`src/migrations.js`, `data/migrations.js`). They call as they go, so with the hydrophone you hear
@@ -1114,6 +1123,7 @@ src/nudges.js         friendly nudges: noticing a stuck player (net spam, no cat
 src/guide.js          the GUIDE: a paged field-guide book (title, pause menu, help-line key)
 src/savefile.js       SAVE & BACKUP: backing up (file, one file, save code), restoring (checks + confirm), erasing, reminders, the save-recovery choice
 src/starfall.js       falling stars + meteor showers: nightly plan, landings, light columns, map/HUD marks
+src/grottoes.js       hidden grottoes behind cracked rock: placement, prying open, contents, letters
 src/migrations.js     rare migrations (whale, mantas, turtles) crossing the open ocean; sightings
 src/nightlights.js    glowing plankton in your wake at night / in caves, glowing creatures' trails
 src/seasons.js        the seasons: the real-day clock, sky / water / plant colours, spawn, floes, snow, hill

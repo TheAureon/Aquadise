@@ -34,7 +34,7 @@ AQ.data.tutorial = {
   guide: [
     { id: 'moving', icon: 'player', scale: 2, lines: 5 },
     { id: 'catching', icon: 'creature.glasswinged_minnow', lines: 6 },
-    { id: 'chests', icon: 'chest', needs: 'Chests', lines: 7, lineNeeds: { 6: 'Hydro', 7: 'Panes' } },
+    { id: 'chests', icon: 'chest', needs: 'Chests', lines: 8, lineNeeds: { 6: 'Hydro', 7: 'Panes', 8: 'Grottoes' } },
     { id: 'daynight', icon: 'ui:1', lines: 5, lineNeeds: { 4: 'Starfall', 5: 'Starfall' } },
     { id: 'weather', icon: 'creature.mistbell_jelly', needs: 'Weather', lines: 5 },
     { id: 'seasons', icon: 'creature.amberleaf_pipefish', needs: 'Seasons', lines: 5 },

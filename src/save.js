@@ -80,6 +80,9 @@ AQ.Save = (function () {
     AQ.State.clock = st.clock && typeof st.clock.hour === 'number' ? st.clock : { hour: AQ.TUNING.clock.startHour };   // saves keep their time (very old ones without a clock start mid-morning)
     // the seasons: when the first spring began; older saves start their first spring now
     AQ.State.seasons = st.seasons && typeof st.seasons.origin === 'number' ? Object.assign({ origin: st.seasons.origin }, typeof st.seasons.paused === 'number' ? { paused: st.seasons.paused } : {}) : undefined;
+    // hidden grottoes opened and letters taken (numbers only); older saves have found none
+    const gr = st.grottoes && typeof st.grottoes === 'object' ? st.grottoes : {}, nums = (o) => (o && typeof o === 'object' ? Object.fromEntries(Object.entries(o).filter(([, v]) => typeof v === 'number')) : {});
+    AQ.State.grottoes = { found: nums(gr.found), letters: nums(gr.letters) };
     // migrations seen (numbers only); older saves have seen none
     const mg = st.migrations && typeof st.migrations === 'object' && st.migrations.seen && typeof st.migrations.seen === 'object' ? st.migrations.seen : {};
     AQ.State.migrations = { seen: Object.fromEntries(Object.entries(mg).filter(([, v]) => typeof v === 'number')) };
@@ -171,6 +174,7 @@ AQ.Save = (function () {
     AQ.State.weather = undefined;                                  // ...with its own weather (a new seed)
     AQ.State.seasons = undefined;                                  // ...and on the first day of spring
     AQ.State.migrations = { seen: {} };
+    AQ.State.grottoes = { found: {}, letters: {} };
     AQ.State.starfall = { night: 0, lastStar: 0, phase: null, plan: null, landings: [] };
     if (AQ.Creatures) AQ.Creatures.list.filter((c) => c.landing).forEach((c) => { c.fadedOut = true; AQ.Creatures.remove(c); });   // no stars waiting in a new game
     AQ.State.upgrades = { net: 1, speed: 1, lantern: 0, depth: 0, hydro: 0 };

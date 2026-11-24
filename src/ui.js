@@ -80,6 +80,12 @@ AQ.LogUI = (function () {
       rows.push({ type: 'head', h: HEAD_H, label: (b.short || b.name).toUpperCase(), count: `${list.length}/${all.length}` });
       list.forEach((d) => rows.push({ type: 'cells', h: NROW_H, items: [{ d, i: i++ }] }));
     });
+    // letters from the hidden grottoes (src/grottoes.js)
+    const letters = AQ.Grottoes ? (AQ.Grottoes.ensureLore(), AQ.Grottoes.letters()).filter((d) => AQ.data.lore[d.id]) : [];
+    if (letters.length) {
+      rows.push({ type: 'head', h: HEAD_H, label: AQ.t('log.notes.grottoes'), count: `${letters.length}` });
+      letters.forEach((d) => rows.push({ type: 'cells', h: NROW_H, items: [{ d, i: i++ }] }));
+    }
     // migrations you've watched go by (src/migrations.js): their own field notes
     const seen = AQ.Migrations ? AQ.Migrations.notes() : [];
     if (seen.length) {
@@ -725,6 +731,7 @@ AQ.MapUI = (function () {
       if (AQ.Chests) for (const c of AQ.Chests.list) { g.fillStyle = '#ffd56b'; g.fillRect(Math.round(ox + c.x / S) - 1, Math.round(oy + c.y / S) - 1, 2, 2); }
       if (AQ.Starfall) AQ.Starfall.drawMap(g, ox, oy, S, game.time);
       if (AQ.Weather) AQ.Weather.drawMap(g, ox, oy, S);           // today's weather above each region
+      if (AQ.Grottoes) AQ.Grottoes.drawMap(g, ox, oy, S);         // the hidden grottoes you've found
       const P = game.player;
       if (AQ.U.calm() || Math.floor(game.time * 4) % 2) { g.fillStyle = '#ff5a7a'; g.fillRect(Math.round(ox + P.x / S) - 1, Math.round(oy + P.y / S) - 1, 3, 3); }
       F().draw(g, AQ.t('map.you'), ox + P.x / S, oy + P.y / S + 4, '#ff9fb0', { align: 'center' });
