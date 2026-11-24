@@ -100,7 +100,7 @@ own German pass, which I'd do at the end of each update.
 
 ## D. Life in the sea
 
-**D1. Night lights.** Glowing plankton that sparkle where you swim at night, brighter on clear nights and in
+**D1. Night lights.** *(Done.)* Glowing plankton that sparkle where you swim at night, brighter on clear nights and in
 caves. Lantern creatures leave soft trails. Uses the shader lights, with a CLASSIC fallback and a REDUCE
 FLASHING-gentle version.
 

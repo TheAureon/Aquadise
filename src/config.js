@@ -501,6 +501,21 @@ AQ.TUNING = {
     snowBits: 45,             // winter: snowflakes over the ice and on the hill
     leafBits: 26              // autumn: leaves drifting down on the hill
   },
+  // Night lights (src/nightlights.js): glowing plankton in the dark, and glowing creatures' trails.
+  nightLights: {
+    enabled: true,
+    color: '#9ff8ff',         // the plankton's glow
+    minDark: 0.15,            // darkness (0-1) where they start to show...
+    fullDark: 0.55,           // ...and where they're at full brightness (night in the open sea, caves, the deep)
+    cloudDim: 0.4,            // clouds and rain dim them this much at most (clear nights are brightest)
+    minSpeed: 12,             // you have to be moving at least this fast (px/s) to stir them up
+    wakePerSecond: 36,        // sparks a second in your wake at full speed
+    swingBurst: 14,           // sparks a swing of the net throws up
+    trailEvery: 0.12,         // a glowing creature leaves a spark this often (seconds) while it moves
+    life: [1.1, 2.0],         // how long a spark glows (seconds)
+    max: 260,                 // most sparks at once (LOW EFFECTS: half)
+    wakeLight: 22             // MEDIUM / HIGH: the radius of the soft light that follows your wake
+  },
   // The slow-device watch (src/slowwatch.js): real frame times while playing. Slow for a while: the music plays
   // fewer notes at once (music.lowFxVoices) and a toast suggests LOW EFFECTS (once per save).
   slowWatch: {

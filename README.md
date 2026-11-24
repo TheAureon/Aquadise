@@ -549,6 +549,12 @@ kept in git. `node tools/check-game.js --build` checks every screen of the built
   dawn. Each has field notes in a bottle and a log tag (FOG ONLY, RAIN ONLY, STORM NIGHTS); the Guide
   has a WEATHER page; badges: WEATHER WATCHER (be out in 3, then all 6 kinds of weather) and RAIN OR
   SHINE (catch all three).
+- **Night lights.** In the dark (night in the sunlit sea, and always in caves and the deep), swimming
+  stirs up glowing plankton: blue-green sparks in your wake, a little cloud of them when you swing the
+  net, and glowing creatures leave a soft trail in their own colour (`src/nightlights.js`). The darker
+  it is the brighter they are; clouds and rain dim them (clear nights are best). On GRAPHICS MEDIUM /
+  HIGH a soft real light follows your wake; REDUCE FLASHING: no twinkle; LOW EFFECTS: half as many.
+  Tuning: `AQ.TUNING.nightLights`.
 - **Seasons.** Spring, summer, autumn and winter cycle over real days (7 each,
   `AQ.TUNING.seasons.daysPerSeason`); a new game (or an older save, the first time) starts on the first
   day of spring, and each season eases into the next over its last 12 hours. How each looks
@@ -1101,6 +1107,7 @@ src/nudges.js         friendly nudges: noticing a stuck player (net spam, no cat
 src/guide.js          the GUIDE: a paged field-guide book (title, pause menu, help-line key)
 src/savefile.js       SAVE & BACKUP: backing up (file, one file, save code), restoring (checks + confirm), erasing, reminders, the save-recovery choice
 src/starfall.js       falling stars + meteor showers: nightly plan, landings, light columns, map/HUD marks
+src/nightlights.js    glowing plankton in your wake at night / in caves, glowing creatures' trails
 src/seasons.js        the seasons: the real-day clock, sky / water / plant colours, spawn, floes, snow, hill
 src/weather.js        each sea region's weather: real-time stretches, rain, waves, fog, clouds, lightning, HUD/map
 src/weathersound.js   how the weather sounds: rain above / below, wind, waves, thunder, hydrophone static

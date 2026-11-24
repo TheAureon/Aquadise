@@ -166,7 +166,8 @@ AQ.Game = (function () {
     if (AQ.SaveFile && G.player) AQ.SaveFile.tick(dt, G);   // play time, keeping the save, the gentle backup reminder
     if (AQ.Quests && G.player) AQ.Quests.tick(dt, G);       // station requests: checked wherever you are
     if (AQ.SoundDirector) AQ.SoundDirector.update(dt, G);
-    if (AQ.Seasons && G.player) AQ.Seasons.update(dt, G);   // the season: redraws plants when it turns, drifting specks
+    if (AQ.Seasons && G.player) AQ.Seasons.update(dt, G);
+    if (AQ.NightLights && G.player) AQ.NightLights.update(dt, G);   // glowing plankton in your wake, glowing creatures' trails   // the season: redraws plants when it turns, drifting specks
     if (AQ.Weather && G.player) AQ.Weather.update(dt, G);   // each sea region's weather (rain, fog, waves, storms)
     if (AQ.SlowWatch) AQ.SlowWatch.update(G);       // a slow device: lighter music, and a LOW EFFECTS hint once
     AQ.Transition.update(dt);
@@ -227,6 +228,7 @@ AQ.Game = (function () {
     if (!title && AQ.Seasons) AQ.Seasons.drawSea(ctx, cam);                // coral spawn, snow over the ice, ice floes
     if (!title && AQ.Weather) AQ.Weather.drawSea(ctx, cam);                // rain and its rings on the surface
     AQ.Render.lighting(cam, collectLights(), targetDarkness());
+    if (!title && AQ.NightLights) AQ.NightLights.draw(ctx, cam);          // ...glowing over the dark
     AQ.Render.twilightTint(cam);
     if (!title && AQ.Seasons) AQ.Seasons.drawWater(ctx, cam);              // the season's tint on the sunlit water
     if (!title && AQ.Weather) AQ.Weather.drawOver(ctx, cam);               // the fog veil, the lightning
@@ -281,6 +283,7 @@ AQ.Game = (function () {
     if (AQ.Chests) AQ.Chests.lights(L);
     if (AQ.Bottles && G.state !== 'title') AQ.Bottles.lights(L);
     if (AQ.Starfall && G.state !== 'title') AQ.Starfall.lights(L);
+    if (AQ.NightLights && G.state !== 'title') AQ.NightLights.lights(L);
     return L;
   }
 
