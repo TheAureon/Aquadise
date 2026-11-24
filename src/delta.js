@@ -310,7 +310,8 @@ AQ.Delta = (function () {
     if (!list.length) list = DL.all().filter((s) => fits(s) && s.id !== 'delta');
     if (list.length > 1) list = list.filter((s) => s.id !== last);
     const recent = H.recent.slice(-cfg().recent);
-    const weight = (s) => (recent.indexOf(s.id) >= 0 ? 0.25 : 1) / (1 + 0.15 * (H.heard[s.id] || 0)) * (night && s.time === 'night' ? 2 : 1);
+    const season = AQ.Seasons && AQ.Seasons.on() ? AQ.Seasons.id() : null;   // (a song made for this season: picked more often)
+    const weight = (s) => (recent.indexOf(s.id) >= 0 ? 0.25 : 1) / (1 + 0.15 * (H.heard[s.id] || 0)) * (night && s.time === 'night' ? 2 : 1) * (season && (s.seasons || []).indexOf(season) >= 0 ? cfg().seasonFavour : 1);
     let r = Math.random() * list.reduce((a, s) => a + weight(s), 0);
     for (const s of list) { r -= weight(s); if (r <= 0) return s; }
     return list[0] || null;

@@ -4,6 +4,7 @@
 //
 // A song:
 //   id, places (where it is picked; see AQ.data.music.ataraxia for the place ids), time: day | night | any
+//   seasons: optional ['spring', ...]: picked more often in those seasons (AQ.TUNING.delta.seasonFavour)
 //   bpm, meter (beats in a bar: 4 or 3), lead (the melody's instrument), counter, bass (instrument), pad (true)
 //   form: the order its sections play in (a section can come back)
 //   ring: beats the last chord rings on after the last bar (the ending)
@@ -57,7 +58,7 @@ AQ.data.songs = [
     } },
 
   // ---------------------------------------------------------------- SEA GLASS MORNING: tide pools (a waltz, G major, then A)
-  { id: 'tide_pools', places: ['tide_pools', 'mangrove'], time: 'day', bpm: 96, meter: 3, lead: 'marimba', counter: 'bell', bass: 'bass', pad: true, ring: 6, echo: 1,
+  { id: 'tide_pools', places: ['tide_pools', 'mangrove'], seasons: ['summer'], time: 'day', bpm: 96, meter: 3, lead: 'marimba', counter: 'bell', bass: 'bass', pad: true, ring: 6, echo: 1,
     form: ['intro', 'A', 'A2', 'B', 'A3', 'outro'],
     sections: {
       intro: { bars: 4, dyn: 0.4, to: 0.5, chords: 'G | C | G | D',
@@ -81,7 +82,7 @@ AQ.data.songs = [
     } },
 
   // ---------------------------------------------------------------- CORAL LANTERNS: the reef (E major, lydian colour)
-  { id: 'coral', places: ['coral', 'ruins'], time: 'day', bpm: 76, meter: 4, lead: 'harp', counter: 'glass', bass: 'bass', pad: true, ring: 6,
+  { id: 'coral', places: ['coral', 'ruins'], seasons: ['spring'], time: 'day', bpm: 76, meter: 4, lead: 'harp', counter: 'glass', bass: 'bass', pad: true, ring: 6,
     form: ['intro', 'A', 'A2', 'B', 'A3', 'outro'],
     sections: {
       intro: { bars: 4, dyn: 0.35, to: 0.45, chords: 'Emaj7 | F#/E | Emaj7 | F#/E',
@@ -103,7 +104,7 @@ AQ.data.songs = [
     } },
 
   // ---------------------------------------------------------------- GREEN CATHEDRAL: the kelp forest (D dorian)
-  { id: 'kelp', places: ['kelp', 'mangrove'], time: 'any', bpm: 66, meter: 4, lead: 'piano', counter: 'harp', bass: 'bass', pad: true, ring: 6,
+  { id: 'kelp', places: ['kelp', 'mangrove'], seasons: ['autumn'], time: 'any', bpm: 66, meter: 4, lead: 'piano', counter: 'harp', bass: 'bass', pad: true, ring: 6,
     form: ['intro', 'A', 'A2', 'B', 'A3', 'outro'],
     sections: {
       intro: { bars: 4, dyn: 0.35, to: 0.45, chords: 'Dm9 | G6/D | Dm9 | G6/D',
@@ -127,7 +128,7 @@ AQ.data.songs = [
     } },
 
   // ---------------------------------------------------------------- BLUE MILE: the open ocean (C lydian, then D)
-  { id: 'open_ocean', places: ['open_ocean', 'ice'], time: 'any', bpm: 60, meter: 4, lead: 'bell', counter: 'piano', bass: 'sub', pad: true, ring: 8, echo: 1,
+  { id: 'open_ocean', places: ['open_ocean', 'ice'], seasons: ['winter'], time: 'any', bpm: 60, meter: 4, lead: 'bell', counter: 'piano', bass: 'sub', pad: true, ring: 8, echo: 1,
     form: ['intro', 'A', 'A2', 'B', 'A3', 'outro'],
     sections: {
       intro: { bars: 4, dyn: 0.35, to: 0.45, chords: 'Cmaj7 | D/C | Cmaj7 | D/C',

@@ -804,6 +804,13 @@ AQ.TUNING = {
     depth: { dark: 0.7, quiet: 0.35, slower: 1.4 },   // at the very bottom of the sea: pad this much darker, this much
                               // quieter, notes this much rarer (in between: in proportion)
     showerShimmer: 0.25,      // a meteor-shower night: share of notes that are a high glass shimmer instead
+    // the season (src/seasons.js) colours it: brightness, how much rarer chords and notes are, loudness
+    seasons: {
+      spring: { bright: 1.1, slow: 0.9, level: 1 },
+      summer: { bright: 1.15, slow: 1, level: 1.04 },
+      autumn: { bright: 0.88, slow: 1.1, level: 1 },
+      winter: { bright: 0.82, slow: 1.2, level: 0.96, glass: 0.3 }   // winter: this share of notes a frosty glass
+    },
     // the weather (src/weather.js) leans it: rain darker and softer, fog hazier, a storm lower and slower
     weather: {
       rainDark: 0.3, rainQuiet: 0.15,   // full rain: the pad this much darker, everything this much quieter
@@ -814,6 +821,7 @@ AQ.TUNING = {
   },
   // ---- DELTA: the composed songs (src/delta.js; the songs: data/songs.js)
   delta: {
+    seasonFavour: 2,          // a song tagged with the current season (seasons: [...] in data/songs.js) is picked this many times as often
     level: 1,                 // the songs' loudness (Ataraxia is quieter)
     bedLevel: 0.3,            // while a song plays, Ataraxia dips to this share of its level (a thin bed underneath)
     dipSeconds: 4,            // ...taking this long to step back when a song begins...

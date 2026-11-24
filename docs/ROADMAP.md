@@ -92,7 +92,7 @@ own German pass, which I'd do at the end of each update.
 - **Migrations:** ties in with D2.
 - The log shows which season a creature is found in.
 
-**C3. Seasonal sound and polish.**
+**C3. Seasonal sound and polish.** *(Done.)*
 - Ataraxia's colour per season, and Delta picks favouring seasonal songs. There could be one new song per
   season later, written the same way as the others.
 - A Guide page, badges, and saves.

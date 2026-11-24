@@ -89,7 +89,7 @@ AQ.Badges = (function () {
     return [['net', T.net.maxLevel], ['speed', T.speedMaxLevel], ['lantern', T.upgrades.lanternMax], ['depth', T.upgrades.depthMax], ['hydro', T.hydrophone.max]];
   }
   // counters that have a natural "all"
-  const COUNTER_TOTALS = { biomes: () => AQ.World.biomes.length, weathers: () => AQ.data.weather.order.length };
+  const COUNTER_TOTALS = { biomes: () => AQ.World.biomes.length, weathers: () => AQ.data.weather.order.length, seasons: () => AQ.data.seasons.order.length };
   B.COUNTER_TOTALS = COUNTER_TOTALS;
 
   // ---------------------------------------------------------------- progress of one badge

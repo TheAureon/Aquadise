@@ -31,6 +31,7 @@ AQ.SoundUI = (function () {
       { id: 'autograd', kind: 'btn', label: AQ.t('settings.autoGraduate'), value: AQ.t(set().autoGraduate ? 'settings.on' : 'settings.off'), on: !!set().autoGraduate, toggle: true },
       { id: 'graphics', kind: 'btn', label: AQ.t('settings.graphics'), value: AQ.t(AQ.Gfx && AQ.Gfx.supported === false ? 'settings.gfx.unavailable' : `settings.gfx.${AQ.Gfx ? AQ.Gfx.level() : 'classic'}`), off: !AQ.Gfx || AQ.Gfx.supported === false || !AQ.TUNING.graphics.enabled, cycle: true },   // HIGH / MEDIUM / LOW / CLASSIC
       { id: 'flashing', kind: 'btn', label: AQ.t('settings.flashing'), value: AQ.t(AQ.U.calm() ? 'settings.reduced' : 'settings.normal'), on: AQ.U.calm(), cycle: true },
+      ...(AQ.Seasons && AQ.Seasons.on() ? [{ id: 'seasons', kind: 'btn', label: AQ.t('settings.seasons'), value: AQ.Seasons.paused() ? AQ.t('settings.seasons.paused', { season: AQ.t(`season.${AQ.Seasons.id()}`) }) : AQ.t('settings.seasons.flowing'), on: !AQ.Seasons.paused(), toggle: true }] : []),   // stay in one season
       { id: 'lowfx', kind: 'btn', label: AQ.t('settings.lowEffects'), value: AQ.t(AQ.U.lowFx() ? 'settings.on' : 'settings.off'), on: AQ.U.lowFx(), toggle: true },   // for slow phones
       { id: 'language', kind: 'btn', label: AQ.t('settings.language'), value: AQ.Lang.name(AQ.Lang.code), off: AQ.Lang.available().length < 2, cycle: true }];
     return [
@@ -78,6 +79,7 @@ AQ.SoundUI = (function () {
     else if (id === 'flashing') { set().reduceFlashing = !AQ.U.calm(); dirty(); }
     else if (id === 'graphics' && AQ.Gfx && AQ.Gfx.supported !== false && AQ.TUNING.graphics.enabled) { const L = AQ.Gfx.LEVELS, i = L.indexOf(AQ.Gfx.level()); AQ.Gfx.choose(L[(i + 1) % L.length], true); dirty(); }   // your choice: always kept
     else if (id === 'lowfx') { set().lowEffects = !AQ.U.lowFx(); dirty(); }
+    else if (id === 'seasons' && AQ.Seasons) { AQ.Seasons.setPaused(!AQ.Seasons.paused()); dirty(); }   // pause the seasons / let them flow
     else if (id === 'nudges' && AQ.Nudges) { set().nudges = !AQ.Nudges.playerOn(); if (!set().nudges) AQ.Nudges.cur = null; dirty(); }   // friendly nudges on / off (saved)
     else if (id === 'requests' && AQ.Quests) { AQ.Quests.setOn(!AQ.Quests.on()); dirty(); }   // station requests on / off (saved; resumes where it was)
     else if (id === 'reminders') { set().backupReminders = !(AQ.SaveFile && AQ.SaveFile.remindersOn()); dirty(); }   // backup reminders on / off

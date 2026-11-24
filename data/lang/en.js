@@ -90,6 +90,9 @@ AQ.langFiles.en = {
   'gfx.switched': 'Switched to lighter graphics. You can change this in SETTINGS.',
   'debug.gfxLevel': 'GRAPHICS: {level}',
   'debug.gfxEffect': 'EFFECT {effect}: {state}',
+  'settings.seasons': 'SEASONS',   // pause the seasons (stay in this one) or let them change (src/seasons.js)
+  'settings.seasons.flowing': 'CHANGING',
+  'settings.seasons.paused': 'STAY IN {season}',
   'settings.lowEffects': 'LOW EFFECTS',   // lighter lighting and fewer particles, for slow phones
   'perf.slowHint': 'Running a bit slowly? Try LOW EFFECTS in SETTINGS > OPTIONS.',   // a toast, once, on a slow device (src/slowwatch.js)
   'settings.reduced': 'REDUCED',
@@ -644,6 +647,12 @@ AQ.langFiles.en = {
   'guide.daynight.3': 'Night-blooming plants only open (and can be harvested) after dark.',
   'guide.daynight.4': 'Some nights a star falls into the sea: rare creatures wait where it lands,',
   'guide.daynight.5': 'but only for a few minutes. Meteor showers bring several. Follow the light.',
+  'guide.seasons.title': 'Seasons',
+  'guide.seasons.1': 'The sea has four seasons, each about {c:seasons.daysPerSeason} real days long. The HUD and map show which.',
+  'guide.seasons.2': 'Spring: the coral spawns, and tanks have more babies. Summer: bright, warm water.',
+  'guide.seasons.3': 'Autumn: the kelp turns gold. Winter: ice drifts past the ice shelf and snow falls.',
+  'guide.seasons.4': 'A few creatures and plants only appear in one season. The log says which.',
+  'guide.seasons.5': 'To stay in your favourite: SETTINGS > OPTIONS > SEASONS. Press it again to let them change.',
   'guide.weather.title': 'Weather',
   'guide.weather.1': 'Each part of the sea has its own weather: calm, breezy, choppy, rain, fog or storm.',
   'guide.weather.2': 'It changes slowly, every {c:weather.stretchMinutes} real minutes or so. The HUD and the map show it.',
@@ -2762,6 +2771,10 @@ AQ.langFiles.en = {
   'badge.weather_watcher.name': 'Weather Watcher',
   'badge.weather_watcher.desc': 'Be out in {n} different kinds of weather.',
   'badge.weather_watcher.tier2': 'Seen It All',
+  'badge.full_year.name': 'A Whole Year',
+  'badge.full_year.desc': 'Play in all four seasons.',
+  'badge.four_seasons.name': 'Four Seasons',
+  'badge.four_seasons.desc': 'Find every creature and plant that only appears in one season.',
   'badge.rain_or_shine.name': 'Rain or Shine',
   'badge.rain_or_shine.desc': 'Catch every creature that only comes out in some weather.',
   'badge.early_bird.name': 'Early Bird',

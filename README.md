@@ -567,6 +567,14 @@ kept in git. `node tools/check-game.js --build` checks every screen of the built
   Catching each season's creature unlocks its decoration (Blossom Coral, Sun Shell, Amber Kelp, Snow
   Chunk; `unlock: { species }` in `data/decorations.js`). Spring is spawning season: in the tanks,
   courting starts more often and tanks rest half as long between babies (`breeding.spring`).
+  **Seasonal sound and settings:** ATARAXIA takes on each season's colour (spring lighter and livelier,
+  summer bright and full, autumn warmer and slower, winter sparse with frosty glass notes;
+  `AQ.TUNING.ataraxia.seasons`), and songs tagged for a season (`seasons:` in `data/songs.js`: coral in
+  spring, tide pools in summer, kelp in autumn, open ocean in winter) are picked twice as often then
+  (`delta.seasonFavour`). SETTINGS > OPTIONS > SEASONS: CHANGING / STAY IN (season) pauses the seasons
+  exactly where they are and lets them flow on from there (saved with the game). The Guide has a SEASONS
+  page; badges: A WHOLE YEAR (play in all four seasons) and FOUR SEASONS (find every seasonal creature
+  and plant).
 - **Falling stars and meteor showers.** Some nights a star visibly falls and lands somewhere in the
   sea or on the shore: always a spot you can reach at upgrade level 0 (the same scan and checks as the
   message bottles), with a clear drop from the sky (never in a cave), never inside terrain, past the

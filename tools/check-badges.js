@@ -47,7 +47,7 @@ function available(cond) {
 function checkCond(b, cond, targets) {
   if (cond.counter) {
     if (!counters.has(cond.counter)) err(b, `counter '${cond.counter}' is never counted (no AQ.Badges.add / addTo('${cond.counter}') in src/)`);
-    if (targets.includes('all') && cond.counter !== 'biomes' && cond.counter !== 'weathers') err(b, `counter '${cond.counter}' has no 'all'`);
+    if (targets.includes('all') && cond.counter !== 'biomes' && cond.counter !== 'weathers' && cond.counter !== 'seasons') err(b, `counter '${cond.counter}' has no 'all'`);
   } else if (cond.check) {
     if (!checks.has(cond.check)) err(b, `unknown check '${cond.check}'`);
     const w = cond.where || {};

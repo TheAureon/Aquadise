@@ -35,6 +35,7 @@ AQ.Seasons = (function () {
   S.progress = function (now = Date.now()) {
     const order = D().order, f = S.forced || (AQ.TUNING.debug.season && order.indexOf(AQ.TUNING.debug.season) >= 0 ? AQ.TUNING.debug.season : null);
     if (f) return order.indexOf(f) + 0.5;
+    if (typeof st().paused === 'number') return st().paused;       // SEASONS: PAUSED (SETTINGS > OPTIONS): held still
     const len = cfg().daysPerSeason * DAY, p = (now - st().origin) / len;
     return ((p % 4) + 4) % 4;
   };
@@ -54,6 +55,15 @@ AQ.Seasons = (function () {
   // the season the plants are drawn in (whichever shows more)
   S.lookId = function () { const w = S.weights(); return D().order.reduce((a, b) => (w[b] > w[a] ? b : a)); };
 
+  // SETTINGS > OPTIONS > SEASONS: pause (stay in this season, at this very moment of it) or let them flow
+  // again from where they were. Saved with the game (AQ.State.seasons.paused).
+  S.paused = () => typeof st().paused === 'number';
+  S.setPaused = function (on) {
+    const s = st();
+    if (on && !S.paused()) { const f = S.forced; S.forced = null; s.paused = S.progress(); S.forced = f; }
+    else if (!on && S.paused()) { s.origin = Date.now() - s.paused * cfg().daysPerSeason * DAY; delete s.paused; }
+    if (AQ.Save) AQ.Save.dirty();
+  };
   // is a seasonal creature or plant out? (seasons switched off: always, so nothing is missed)
   S.allows = (def) => !def.season || !S.on() || S.lookId() === def.season;
   // spring is spawning season: breeding starts more often and tanks rest less between babies
@@ -111,6 +121,7 @@ AQ.Seasons = (function () {
     }
     if (S.rebuilding.length) AQ.Terrain.rebuild(AQ.World, [S.rebuilding.shift()]);   // (one biome a frame)
     const id = S.id();
+    if (id && game.state === 'play' && AQ.Badges && id !== S.lastId) AQ.Badges.addTo('seasons', id);   // (a badge: a whole year)
     if (S.lastId && id !== S.lastId && game.state === 'play' && AQ.HUD) AQ.HUD.toast(AQ.t(`season.arrive.${id}`), '#ffe9a8', 5);
     S.lastId = id;
     if (game.state !== 'play' && game.state !== 'map' && game.state !== 'pause') return;

@@ -79,7 +79,7 @@ AQ.Save = (function () {
     S.lastSavedAt = data.savedAt || null;
     AQ.State.clock = st.clock && typeof st.clock.hour === 'number' ? st.clock : { hour: AQ.TUNING.clock.startHour };   // saves keep their time (very old ones without a clock start mid-morning)
     // the seasons: when the first spring began; older saves start their first spring now
-    AQ.State.seasons = st.seasons && typeof st.seasons.origin === 'number' ? { origin: st.seasons.origin } : undefined;
+    AQ.State.seasons = st.seasons && typeof st.seasons.origin === 'number' ? Object.assign({ origin: st.seasons.origin }, typeof st.seasons.paused === 'number' ? { paused: st.seasons.paused } : {}) : undefined;
     // the weather's seed (which weather falls in which stretch); older saves get a new one
     AQ.State.weather = st.weather && typeof st.weather.seed === 'number' ? { seed: st.weather.seed } : undefined;
     // falling stars (night count, tonight's plan, stars still waiting); older saves start at night 0

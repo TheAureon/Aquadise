@@ -99,6 +99,8 @@ AQ.data.badges = [
   { id: 'meteor_witness', group: 'sky', icon: 'star', cond: { event: 'shower' } },
   { id: 'comet_chaser', group: 'sky', icon: 'star', cond: { check: 'discovered', where: { id: 'comet_ray' } }, target: 'all' },
   { id: 'weather_watcher', group: 'sky', icon: 'moon', cond: { counter: 'weathers' }, tiers: [{ target: 3 }, { target: 'all' }] },   // (src/weather.js counts each kind you're out in)
+  { id: 'full_year', group: 'sky', icon: 'moon', cond: { counter: 'seasons' }, target: 'all' },   // (src/seasons.js counts each season you play in)
+  { id: 'four_seasons', group: 'sky', icon: 'fish', cond: { check: 'discovered', where: { season: true } }, target: 'all' },
   { id: 'rain_or_shine', group: 'sky', icon: 'fish', cond: { check: 'discovered', where: { weather: true } }, target: 'all' },
   { id: 'early_bird', group: 'sky', icon: 'moon', cond: { event: 'sunrise' } },
   { id: 'stargazer', group: 'sky', icon: 'star', cond: { counter: 'shootingStars' }, target: 20 },

@@ -34,10 +34,15 @@ AQ.Ataraxia = (function make() {
   function feel() {
     const C = cfg(), m = X.mood, day = Math.max(0, Math.min(1, m.daylight)), dep = Math.max(0, Math.min(1, m.depth)), Wc = C.weather;
     const rain = m.rain || 0, fog = m.fog || 0, storm = m.storm || 0;
+    // the season's colour (weights from src/seasons.js): spring lighter and livelier, summer bright and full,
+    // autumn warmer and slower, winter sparse and crystalline
+    let sBright = 1, sSlow = 1, sLevel = 1;
+    for (const id in (m.seasons || {})) { const k = m.seasons[id], c = C.seasons[id]; if (!c || !k) continue; sBright *= 1 + (c.bright - 1) * k; sSlow *= 1 + (c.slow - 1) * k; sLevel *= 1 + (c.level - 1) * k; }
     return {
-      slow: lerp(C.night.slower, 1, day) * lerp(1, C.depth.slower, dep) * (1 + Wc.fogSlower * fog) * (1 + Wc.stormSlower * storm),
-      bright: lerp(C.night.bright, 1, day) * (1 - C.depth.dark * dep) * (1 - Wc.rainDark * rain) * (1 - Wc.fogDark * fog) * (1 - Wc.stormDark * storm),
-      level: lerp(C.night.level, 1, day) * (1 - C.depth.quiet * dep) * (1 - Wc.rainQuiet * rain),
+      slow: lerp(C.night.slower, 1, day) * lerp(1, C.depth.slower, dep) * (1 + Wc.fogSlower * fog) * (1 + Wc.stormSlower * storm) * sSlow,
+      bright: lerp(C.night.bright, 1, day) * (1 - C.depth.dark * dep) * (1 - Wc.rainDark * rain) * (1 - Wc.fogDark * fog) * (1 - Wc.stormDark * storm) * sBright,
+      level: lerp(C.night.level, 1, day) * (1 - C.depth.quiet * dep) * (1 - Wc.rainQuiet * rain) * sLevel,
+      winter: (m.seasons && m.seasons.winter) || 0,
       haze: fog, low: storm,
       night: day < 0.35
     };
@@ -82,6 +87,7 @@ AQ.Ataraxia = (function make() {
     let inst = p.notes[Math.floor(Math.random() * p.notes.length)];
     if (f.night && Math.random() < C.night.chip) inst = 'chip';
     if (X.mood.shower && Math.random() < C.showerShimmer) inst = 'glass';
+    else if (f.winter > 0 && Math.random() < C.seasons.winter.glass * f.winter) inst = 'glass';   // (winter: a frosty glass note now and then)
     const down = f.low > 0.5 ? C.weather.stormLower : 0;           // a storm: the notes sit lower
     const lo = p.root + p.high[0] + (inst === 'chip' || inst === 'glass' ? 5 : 0) - down, hi = p.root + p.high[1] + (inst === 'glass' && X.mood.shower ? 7 : 0) - down;
     const pool = [];

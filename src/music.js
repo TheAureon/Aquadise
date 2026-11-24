@@ -53,12 +53,13 @@ AQ.Music = (function () {
   // how it feels where the player is: depth (the sea only), daylight, a meteor-shower night
   function mood(game, key) {
     const [id, mode] = key.split(':');
-    if (M.test) return { depth: D().ataraxia[id] ? D().ataraxia[id].depth : 0, daylight: mode === 'night' ? 0 : 1, shower: false, rain: 0, fog: 0, storm: 0 };
+    if (M.test) return { depth: D().ataraxia[id] ? D().ataraxia[id].depth : 0, daylight: mode === 'night' ? 0 : 1, shower: false, rain: 0, fog: 0, storm: 0, seasons: {} };
     const inSea = game.scene === 'world' && (game.state === 'play' || game.state === 'map' || game.state === 'pause' || game.state === 'log');
     const depth = inSea && id !== 'title' && id !== 'aquarium' ? Math.max(0, Math.min(1, (game.player.y - AQ.World.sea) / (AQ.World.h - AQ.World.sea))) : 0;
     const daylight = id === 'station' ? 0.6 : AQ.Clock.daylight();              // (the station floats in space: always the same soft light)
     const w = AQ.Weather ? AQ.Weather.mix : {};                    // the weather where you are (none indoors / on the title)
-    return { depth, daylight, shower: !!(AQ.Starfall && AQ.Starfall.showerTonight && AQ.Starfall.showerTonight()), rain: w.rain || 0, fog: w.fog || 0, storm: w.storm || 0 };
+    return { depth, daylight, shower: !!(AQ.Starfall && AQ.Starfall.showerTonight && AQ.Starfall.showerTonight()), rain: w.rain || 0, fog: w.fog || 0, storm: w.storm || 0,
+      seasons: AQ.Seasons && id !== 'title' ? AQ.Seasons.weights() : {} };   // (the season's colour; not on the title screen)
   }
 
   M.update = function (dt, game) {
