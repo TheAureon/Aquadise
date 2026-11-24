@@ -549,6 +549,13 @@ kept in git. `node tools/check-game.js --build` checks every screen of the built
   dawn. Each has field notes in a bottle and a log tag (FOG ONLY, RAIN ONLY, STORM NIGHTS); the Guide
   has a WEATHER page; badges: WEATHER WATCHER (be out in 3, then all 6 kinds of weather) and RAIN OR
   SHINE (catch all three).
+- **Migrations.** Now and then (every 9-18 minutes of play in the sea, `AQ.TUNING.migrations`) a whale,
+  a school of mantas or a line of sea turtles crosses the open ocean, far off behind the scenery
+  (`src/migrations.js`, `data/migrations.js`). They call as they go, so with the hydrophone you hear
+  them (ripples, edge arrows, LISTEN's pulses) before you see them. Never catchable, just watched. The
+  first time you see each, a field note is added (log > NOTES > SIGHTINGS) and a badge is earned (Whale
+  Watcher, Manta Parade, Turtle Train). Each is likelier in its season (whales in winter, mantas in
+  summer, turtles in autumn) and while you haven't seen it yet. Testing: `debug.migrationKeys` (5).
 - **Night lights.** In the dark (night in the sunlit sea, and always in caves and the deep), swimming
   stirs up glowing plankton: blue-green sparks in your wake, a little cloud of them when you swing the
   net, and glowing creatures leave a soft trail in their own colour (`src/nightlights.js`). The darker
@@ -1107,6 +1114,7 @@ src/nudges.js         friendly nudges: noticing a stuck player (net spam, no cat
 src/guide.js          the GUIDE: a paged field-guide book (title, pause menu, help-line key)
 src/savefile.js       SAVE & BACKUP: backing up (file, one file, save code), restoring (checks + confirm), erasing, reminders, the save-recovery choice
 src/starfall.js       falling stars + meteor showers: nightly plan, landings, light columns, map/HUD marks
+src/migrations.js     rare migrations (whale, mantas, turtles) crossing the open ocean; sightings
 src/nightlights.js    glowing plankton in your wake at night / in caves, glowing creatures' trails
 src/seasons.js        the seasons: the real-day clock, sky / water / plant colours, spawn, floes, snow, hill
 src/weather.js        each sea region's weather: real-time stretches, rain, waves, fog, clouds, lightning, HUD/map
@@ -1133,6 +1141,7 @@ src/gfx/shaders.js    the shaders (GLSL strings): sharp upscale, grading, fog, b
 src/touchtest.js      the TOUCH TEST screen (SETTINGS > TOUCH): every finger, button and the joystick, live
 data/tutorial.js      tutorial structure: tips, guided dive steps, Guide pages (their text is in data/lang/)
 src/langdata.js       gives the data files their text (names, hints, field notes...) from data/lang/
+data/migrations.js    what migrates, when it's likeliest, how it's heard
 data/seasons.js       how each season looks: sky, water tints, plant colours, the hill, what drifts
 data/weather.js       the weather's kinds (how each looks) and how likely each is per region
 data/music.js         ATARAXIA's setting for each place, the reward phrases, creature voice map, audio files

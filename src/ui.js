@@ -80,6 +80,12 @@ AQ.LogUI = (function () {
       rows.push({ type: 'head', h: HEAD_H, label: (b.short || b.name).toUpperCase(), count: `${list.length}/${all.length}` });
       list.forEach((d) => rows.push({ type: 'cells', h: NROW_H, items: [{ d, i: i++ }] }));
     });
+    // migrations you've watched go by (src/migrations.js): their own field notes
+    const seen = AQ.Migrations ? AQ.Migrations.notes() : [];
+    if (seen.length) {
+      rows.push({ type: 'head', h: HEAD_H, label: AQ.t('log.notes.sightings'), count: `${seen.length}/${AQ.data.migrations.order.length}` });
+      seen.forEach((d) => rows.push({ type: 'cells', h: NROW_H, items: [{ d, i: i++ }] }));
+    }
     return rows;
   }
   // rows of the badges list: a heading per group (earned/total), then rows of BCOLS cards. A hidden
@@ -615,7 +621,7 @@ AQ.LogUI = (function () {
   // a field note: epithet, scientific-style name, then the lines ({name} hidden until caught).
   // compact: epithet and scientific name share one line (the entry page already shows the name)
   function drawNote(g, d, x, y, cols, lh, right, compact) {
-    const lore = AQ.data.lore[d.id], has = AQ.Collection.has(d.id);
+    const lore = AQ.data.lore[d.id], has = d.sighting || AQ.Collection.has(d.id);   // (a sighting: always named)
     F().draw(g, lore.title.toUpperCase(), x, y, '#ffe9a8');
     if (compact) F().draw(g, lore.sci.toUpperCase(), right, y, '#9fd3ee', { align: 'right' });
     else {

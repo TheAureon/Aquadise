@@ -104,7 +104,7 @@ own German pass, which I'd do at the end of each update.
 caves. Lantern creatures leave soft trails. Uses the shader lights, with a CLASSIC fallback and a REDUCE
 FLASHING-gentle version.
 
-**D2. Rare migrations.**
+**D2. Rare migrations.** *(Done.)*
 - Now and then a whale, a manta school or a turtle line crosses the open ocean.
 - You hear it on the hydrophone before you see it, and a small field note is added.
 - Never catchable, just watched; a badge for seeing each one.

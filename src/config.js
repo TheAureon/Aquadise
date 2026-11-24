@@ -246,7 +246,9 @@ AQ.TUNING = {
     weatherKey: 'Digit3',     //   3 = the next weather here (calm > breezy > choppy > rain > fog > storm > as usual)
     season: null,             // TESTING ONLY: 'spring' | 'summer' | 'autumn' | 'winter' (null = as usual)
     seasonKeys: false,        // TESTING ONLY: true adds a key that steps to the next season
-    seasonKey: 'Digit4'       //   4 = the next season (for this session; not saved)
+    seasonKey: 'Digit4',      //   4 = the next season (for this session; not saved)
+    migrationKeys: false,     // TESTING ONLY: true adds a key that starts a migration crossing now
+    migrationKey: 'Digit5'    //   5 = a whale, mantas or turtles start crossing the open ocean
   },
   // Text that doesn't fit (long translations): it is squeezed sideways down to this much of its width,
   // then cut short with ".." (src/font.js). screenMargin: px kept free at the screen's edges.
@@ -515,6 +517,16 @@ AQ.TUNING = {
     life: [1.1, 2.0],         // how long a spark glows (seconds)
     max: 260,                 // most sparks at once (LOW EFFECTS: half)
     wakeLight: 22             // MEDIUM / HIGH: the radius of the soft light that follows your wake
+  },
+  // Rare migrations (src/migrations.js; what crosses and when: data/migrations.js). Never catchable.
+  migrations: {
+    enabled: true,
+    everyMinutes: [9, 18],    // minutes of play in the sea between crossings (random in this range)...
+    nearBy: 500,              // ...each waits until you're in the open ocean or this close to it (px)
+    seasonFavour: 3,          // one is this many times as likely in its own season
+    unseenFavour: 2,          // ...and this many times as likely if you've never seen it
+    seeSeconds: 1.5,          // on screen this long counts as seen
+    farAlpha: 0.78            // they're far off: drawn a little faded, behind the scenery
   },
   // The slow-device watch (src/slowwatch.js): real frame times while playing. Slow for a while: the music plays
   // fewer notes at once (music.lowFxVoices) and a toast suggests LOW EFFECTS (once per save).

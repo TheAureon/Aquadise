@@ -281,6 +281,21 @@ var AQ = (typeof AQ !== 'undefined') ? AQ : {};
     return 0.7;
   }, { minGap: 0.6, ripple: { big: true, edge: true } });
 
+  // migrations (src/migrations.js): heard on the hydrophone as they cross the open ocean
+  // a whale: a long, low song that rises and falls, with a soft higher overtone
+  reg('whale_song', 'hydro', (c, o, t) => {
+    H.tone(c, o, t, { type: 'triangle', f: 150, f2: 230, glide: 1.1, a: 0.35, d: 1.6, v: 0.13, lp: 700 });
+    H.tone(c, o, t + 1.1, { type: 'triangle', f: 230, f2: 165, glide: 1.0, a: 0.2, d: 1.4, v: 0.1, lp: 700 });
+    H.tone(c, o, t + 0.3, { f: 460, f2: 520, glide: 1.2, a: 0.4, d: 1.2, v: 0.025, lp: 1400 });
+    return 3;
+  }, { minGap: 2, ripple: { big: true } });
+  // mantas: a soft rushing glide of wings
+  reg('manta_glide', 'hydro', (c, o, t) => {
+    H.noise(c, o, t, { ft: 'lowpass', f: 260, f2: 620, a: 0.35, d: 0.7, v: 0.1 });
+    H.noise(c, o, t + 0.5, { ft: 'lowpass', f: 300, f2: 560, a: 0.3, d: 0.6, v: 0.07 });
+    return 1.4;
+  }, { minGap: 1, ripple: {} });
+
   // ---------------------------------------------------------------- badges (src/achievements.js; their own Sound Test tab)
   // a badge: a soft, bright three-note chime (rising, like a little "ta-da")
   reg('badge', 'badges', (c, o, t) => run(c, o, t, [79, 84, 88], 0.09, 0.05, 0.8) + 0.1, { minGap: 0.6, important: true });

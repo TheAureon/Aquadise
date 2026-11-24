@@ -167,7 +167,8 @@ AQ.Game = (function () {
     if (AQ.Quests && G.player) AQ.Quests.tick(dt, G);       // station requests: checked wherever you are
     if (AQ.SoundDirector) AQ.SoundDirector.update(dt, G);
     if (AQ.Seasons && G.player) AQ.Seasons.update(dt, G);
-    if (AQ.NightLights && G.player) AQ.NightLights.update(dt, G);   // glowing plankton in your wake, glowing creatures' trails   // the season: redraws plants when it turns, drifting specks
+    if (AQ.NightLights && G.player) AQ.NightLights.update(dt, G);
+    if (AQ.Migrations && G.player) AQ.Migrations.update(dt, G);   // a whale, mantas or turtles crossing the open ocean now and then   // glowing plankton in your wake, glowing creatures' trails   // the season: redraws plants when it turns, drifting specks
     if (AQ.Weather && G.player) AQ.Weather.update(dt, G);   // each sea region's weather (rain, fog, waves, storms)
     if (AQ.SlowWatch) AQ.SlowWatch.update(G);       // a slow device: lighter music, and a LOW EFFECTS hint once
     AQ.Transition.update(dt);
@@ -207,7 +208,7 @@ AQ.Game = (function () {
     }
     AQ.Render.background(cam);
     if (G.state === 'title') AQ.Title.drawBack(ctx);
-    else { if (AQ.ShootingStars) AQ.ShootingStars.draw(ctx, G); if (AQ.Gulls) AQ.Gulls.draw(ctx, G); }   // far behind everything, just after the sky
+    else { if (AQ.ShootingStars) AQ.ShootingStars.draw(ctx, G); if (AQ.Gulls) AQ.Gulls.draw(ctx, G); if (AQ.Migrations) AQ.Migrations.draw(ctx, cam); }   // far behind everything, just after the sky
     AQ.Terrain.draw(ctx, cam);
     ctx.save();
     ctx.translate(-cam.left(), -cam.top());

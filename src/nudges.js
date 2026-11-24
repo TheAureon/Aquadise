@@ -58,6 +58,7 @@ AQ.Nudges = (function () {
     if (d.musicKeys) out.add(d.nextSongKey);
     if (d.weatherKeys) out.add(d.weatherKey);
     if (d.seasonKeys) out.add(d.seasonKey);
+    if (d.migrationKeys) out.add(d.migrationKey);
     return out;
   }
   const IGNORE = /^(Shift|Control|Alt|Meta|CapsLock|F\d+|Escape)/;

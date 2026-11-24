@@ -33,6 +33,7 @@ AQ.Hydro = (function () {
   H.sources = function () {
     const out = H.debugSrc.slice();
     if (AQ.Creatures) for (const c of AQ.Creatures.list) if (c.caller && !c.fadedOut && !c.leaving) out.push(c.caller);
+    if (AQ.Migrations) out.push(...AQ.Migrations.sources());       // a migration crossing the open ocean
     return out;
   };
   const P = () => AQ.Game.player;
