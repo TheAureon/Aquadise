@@ -541,6 +541,17 @@ AQ.langFiles.en = {
   'weather.change.rain': 'It\'s starting to rain.',
   'weather.change.fog': 'Fog is rolling in.',
   'weather.change.storm': 'A storm is rolling in. Down in the sea, all stays calm.',
+  // ---------------------------------------------------------------- the seasons (src/seasons.js)
+  'season.spring': 'SPRING',
+  'season.summer': 'SUMMER',
+  'season.autumn': 'AUTUMN',
+  'season.winter': 'WINTER',
+  'season.arrive.spring': 'Spring has come to the sea. The coral is spawning.',   // a toast when the season turns
+  'season.arrive.summer': 'Summer is here. The water is bright and warm.',
+  'season.arrive.autumn': 'Autumn has come. The kelp is turning gold.',
+  'season.arrive.winter': 'Winter is here. Ice drifts beyond the ice shelf.',
+  'map.season': '{season}, DAY {n} OF {total}',   // top-left of the map
+  'debug.season': 'SEASON: {season}',   // testing key (debug.seasonKeys)
   'debug.weather': 'WEATHER HERE: {kind}',   // testing key (debug.weatherKeys)
   'debug.weatherUsual': 'WEATHER HERE: AS USUAL',
 

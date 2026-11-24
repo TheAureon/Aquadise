@@ -51,31 +51,44 @@ AQ.Terrain = (function () {
   // ---------------------------------------------------------------- build
   T.build = function (W) {
     T.chunks = []; T.lights = []; T.emitters = [];
-    const data = W.data;
-    const mats = data.materials || {};
-    const matPal = W.materials.map((m) => (m === 'default' ? null : prepPalette(mats[m])));
-    W.biomes.forEach((b) => {
-      const crop = cropFor(W, b);
-      if (!crop) return;
-      const [x0, y0, x1, y1] = crop;
-      const back = new Painter(x0, y0, x1 - x0, y1 - y0);
-      let front = null;
-      const pal = prepPalette(b.palette);
-      paintTerrain(W, b, back, pal, matPal);
-      const surf = scanSurfaces(W, b, x0, y0, x1, y1);
-      const rng = U.rng((data.seed || 1) * 1000 + b.index * 77);
-      (b.props || []).forEach((spec) => {
-        const layer = spec.layer === 'front' ? (front = front || new Painter(x0, y0, x1 - x0, y1 - y0)) : back;
-        placeProps(W, b, spec, surf, rng).forEach((pt) => {
-          const fn = PROPS[spec.type];
-          if (fn) fn(layer, pt[0], pt[1], rng, b, pal, spec, T);
-          else console.warn('[terrain] unknown prop', spec.type);
-        });
-      });
-      T.chunks.push({ biome: b.id, x: x0, y: y0, w: x1 - x0, h: y1 - y0, canvas: back.toCanvas(), front: front && front.toCanvas() });
-    });
+    W.biomes.forEach((b) => { const c = buildChunk(W, b); if (c) T.chunks.push(c); });
     W.vents.forEach((v) => T.lights.push({ x: v.x, y: v.y - 4, r: 36, color: '#ff8a3a', flicker: true }));
     buildMinimap(W);
+  };
+  // one biome's bitmap. The plants' colours follow the season (AQ.Seasons.propSpec); where they stand
+  // never changes (the same seeded random numbers are drawn whatever the colours).
+  function buildChunk(W, b) {
+    const data = W.data, mats = data.materials || {};
+    const matPal = W.materials.map((m) => (m === 'default' ? null : prepPalette(mats[m])));
+    const crop = cropFor(W, b);
+    if (!crop) return null;
+    const [x0, y0, x1, y1] = crop;
+    const back = new Painter(x0, y0, x1 - x0, y1 - y0);
+    let front = null;
+    const pal = prepPalette(b.palette);
+    paintTerrain(W, b, back, pal, matPal);
+    const surf = scanSurfaces(W, b, x0, y0, x1, y1);
+    const rng = U.rng((data.seed || 1) * 1000 + b.index * 77);
+    (b.props || []).forEach((spec) => {
+      const layer = spec.layer === 'front' ? (front = front || new Painter(x0, y0, x1 - x0, y1 - y0)) : back;
+      const look = AQ.Seasons ? AQ.Seasons.propSpec(b.id, spec) : spec;
+      placeProps(W, b, spec, surf, rng).forEach((pt) => {
+        const fn = PROPS[spec.type];
+        if (fn) fn(layer, pt[0], pt[1], rng, b, pal, look, T);
+        else console.warn('[terrain] unknown prop', spec.type);
+      });
+    });
+    return { biome: b.id, x: x0, y: y0, w: x1 - x0, h: y1 - y0, canvas: back.toCanvas(), front: front && front.toCanvas() };
+  }
+  // redraw these biomes (the season turned). Only biomes whose plants give off no light (their lights
+  // would be added twice) and with no scenery-only shapes (those are released after the first build).
+  T.rebuild = function (W, ids) {
+    ids.forEach((id) => {
+      const b = W.biomeById[id], i = T.chunks.findIndex((c) => c.biome === id);
+      if (!b || i < 0) return;
+      const c = buildChunk(W, b);
+      if (c) T.chunks[i] = c;
+    });
   };
 
   // Fireflies drifting in the lush cave's air pocket (they glow through the darkness).

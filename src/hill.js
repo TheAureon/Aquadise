@@ -28,6 +28,7 @@ AQ.Hill = (function () {
     canvas = null;                                                     // painted lazily (needs the tile image)
   };
   H.world = () => W;
+  H.repaint = () => { canvas = null; };                              // (the season turned: painted again next frame)
   H.geom = () => G;
   H.zoneName = () => AQ.t('hill.name');
   H.valid = (x, y) => W.standable(x, y) && W.boxHits(x, y + 3, 5, 4);   // standing on ground
@@ -91,12 +92,23 @@ AQ.Hill = (function () {
         for (let y = sy + th; y < G.h; y += 12) g.drawImage(img, tx, th - 12, 1, 12, x, y, 1, 12);   // deeper soil repeats
       } else { g.fillStyle = '#78aa50'; g.fillRect(x, sy, 1, G.h - sy); }
     }
-    const r = U.rng(9);
-    for (let k = 0; k < 40; k++) {                                     // little flowers + grass tufts
+    // the season (AQ.Seasons): the grass's colour, snow lying on the ground, how many flowers
+    const look = AQ.Seasons && AQ.Seasons.on() ? AQ.Seasons.hillLook() : { flowers: 40 };
+    if (look.grass) {
+      const [cr, cg, cb, ca] = look.grass;
+      g.fillStyle = `rgba(${cr},${cg},${cb},${ca})`;
+      for (let x = 0; x < G.w; x++) g.fillRect(x, Math.max(0, G.surface[x]), 1, 5);
+    }
+    if (look.snow) for (let x = 0; x < G.w; x++) {
+      const y = Math.max(0, G.surface[x]), d = 2 + Math.round(U.noise1(x * 0.2, 7) * 2);
+      g.fillStyle = '#eef4fa'; g.fillRect(x, y, 1, d); g.fillStyle = '#c8d8e8'; g.fillRect(x, y + d, 1, 1);
+    }
+    const r = U.rng(9), tuft = look.snow ? '#b8c8d4' : look.grass && look.grass[0] > 180 ? '#a08a3a' : '#5a9a44';
+    for (let k = 0; k < Math.max(40, look.flowers); k++) {             // little flowers + grass tufts
       const x = Math.round(r.range(12, G.w - 6)), y = G.surface[x];
       if (Math.abs(x - G.beamX) < 10) continue;
-      g.fillStyle = '#5a9a44'; g.fillRect(x, y - 2, 1, 2);
-      if (k % 3) { g.fillStyle = ['#ffd0e0', '#fff1a8', '#ffffff', '#c8b0ff'][k % 4]; g.fillRect(x, y - 3, 1, 1); }
+      g.fillStyle = tuft; g.fillRect(x, y - 2, 1, 2);
+      if (k % 3 && k < look.flowers) { g.fillStyle = ['#ffd0e0', '#fff1a8', '#ffffff', '#c8b0ff'][k % 4]; g.fillRect(x, y - 3, 1, 1); }
     }
     g.fillStyle = '#7a7a86'; g.fillRect(0, G.top - 14, 9, 14); g.fillStyle = '#9a9aa8'; g.fillRect(0, G.top - 14, 8, 2);   // the rock
     g.fillStyle = '#6fa456'; g.fillRect(0, G.top - 15, 7, 1);
@@ -125,10 +137,10 @@ AQ.Hill = (function () {
     const body = (u, r, col) => { if (u < 0 || u > 1 || tw > 0.7) return; ctx.globalAlpha = (1 - tw / 0.7) * (AQ.Weather ? 1 - Math.min(1, AQ.Weather.mix.cloud) * 0.6 : 1); const x = 20 + u * 280, y = 140 - Math.sin(u * Math.PI) * 110; ctx.fillStyle = col; ctx.beginPath(); ctx.arc(Math.round(x), Math.round(y), r, 0, Math.PI * 2); ctx.fill(); ctx.globalAlpha = 1; };
     body(sunUp, 9, '#fff2c0'); body(moonUp, 6, '#e8eeff');
     if (AQ.Weather) AQ.Weather.drawHillSky(ctx);                 // clouds over the sky (the tide pools' weather)
-    const k = 1 - d;
-    ctx.fillStyle = mixRGB(HILLS_DAY[0], HILLS_NIGHT[0], k);
+    const k = 1 - d, FH = AQ.Seasons ? [AQ.Seasons.hillsTint(HILLS_DAY[0]), AQ.Seasons.hillsTint(HILLS_DAY[1])] : HILLS_DAY;   // (autumn browner, winter white)
+    ctx.fillStyle = mixRGB(FH[0], HILLS_NIGHT[0], k);
     for (let x = 0; x < 320; x++) { const y = 134 - Math.sin(x * 0.02 + 1) * 6 - Math.sin(x * 0.051) * 3; ctx.fillRect(x, Math.round(y), 1, 152 - Math.round(y)); }
-    ctx.fillStyle = mixRGB(HILLS_DAY[1], HILLS_NIGHT[1], k);
+    ctx.fillStyle = mixRGB(FH[1], HILLS_NIGHT[1], k);
     for (let x = 0; x < 320; x++) { const y = 142 - Math.sin(x * 0.033 + 4) * 5; ctx.fillRect(x, Math.round(y), 1, 152 - Math.round(y)); }
     ctx.fillStyle = mixRGB(SEA_DAY, SEA_NIGHT, k); ctx.fillRect(0, 152, 320, 28);
     ctx.fillStyle = `rgba(255,255,255,${(0.35 * d + 0.1).toFixed(2)})`;
@@ -183,6 +195,7 @@ AQ.Hill = (function () {
     AQ.Assets.draw(ctx, 'misc.ufo', 'idle', G.beamX, uy, AQ.U.calm() ? { frame: 0 } : { t });      // its chase lights hold still with REDUCE FLASHING
     AQ.FX.draw(ctx);
     ctx.restore();
+    if (AQ.Seasons) AQ.Seasons.drawHill(ctx);                    // autumn leaves, winter snowflakes
     if (AQ.Weather) AQ.Weather.drawHill(ctx);                    // rain, fog and lightning on the hill
   };
   // where the ground is under a screen column (rain lands there; the little sea below: y 152)

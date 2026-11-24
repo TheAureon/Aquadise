@@ -243,7 +243,10 @@ AQ.TUNING = {
     nextSongKey: 'Digit2',    //   2 = the next song (picked as usual for the place and time of day)
     weather: null,            // TESTING ONLY: 'calm' | 'breezy' | 'choppy' | 'rain' | 'fog' | 'storm' everywhere (null = as usual)
     weatherKeys: false,       // TESTING ONLY: true adds a key that steps the weather where you are to the next kind
-    weatherKey: 'Digit3'      //   3 = the next weather here (calm > breezy > choppy > rain > fog > storm > as usual)
+    weatherKey: 'Digit3',     //   3 = the next weather here (calm > breezy > choppy > rain > fog > storm > as usual)
+    season: null,             // TESTING ONLY: 'spring' | 'summer' | 'autumn' | 'winter' (null = as usual)
+    seasonKeys: false,        // TESTING ONLY: true adds a key that steps to the next season
+    seasonKey: 'Digit4'       //   4 = the next season (for this session; not saved)
   },
   // Text that doesn't fit (long translations): it is squeezed sideways down to this much of its width,
   // then cut short with ".." (src/font.js). screenMargin: px kept free at the screen's edges.
@@ -486,6 +489,17 @@ AQ.TUNING = {
       stormCallQuieter: 0.4,  // a storm: the hydrophone's calls this much quieter...
       stormCallDuller: 0.5    // ...and duller (the range and the ripples stay exactly the same)
     }
+  },
+  // The seasons (src/seasons.js; how each looks: data/seasons.js). Spring, summer, autumn and winter cycle
+  // over real days; a new game starts on the first day of spring.
+  seasons: {
+    enabled: true,
+    daysPerSeason: 7,         // real days each season lasts
+    blendHours: 12,           // a season eases into the next over its last this many real hours
+    tintDepth: 360,           // px below the surface the season's water tint reaches (fading out)
+    spawnBits: 40,            // spring: coral spawn specks drifting up on screen in the coral shelf (LOW EFFECTS: half)
+    snowBits: 45,             // winter: snowflakes over the ice and on the hill
+    leafBits: 26              // autumn: leaves drifting down on the hill
   },
   // The slow-device watch (src/slowwatch.js): real frame times while playing. Slow for a while: the music plays
   // fewer notes at once (music.lowFxVoices) and a toast suggests LOW EFFECTS (once per save).

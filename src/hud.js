@@ -99,7 +99,8 @@ AQ.HUD = (function () {
     // the time of day (sea only): sun, sunrise/sunset or moon
     if (game.scene !== 'station') drawClockIcon(ctx, vw - 12, 12);   // (the station floats in space: no sun there)
     if (AQ.Weather) AQ.Weather.drawHud(ctx, vw - 9, 16, game);       // the weather here, over the icon's corner
-    if (AQ.Starfall) AQ.Starfall.drawHud(ctx, vw - 20, 13, game.time);   // a star waiting / a meteor-shower night
+    if (AQ.Seasons) AQ.Seasons.drawHud(ctx, vw - 19, 13, game);    // the season (a small mark left of the sun / moon)
+    if (AQ.Starfall) AQ.Starfall.drawHud(ctx, vw - 27, 13, game.time);   // a star waiting / a meteor-shower night
     // glass panes (top-right, under the clock), once you've found any
     if (AQ.Panes && AQ.Panes.known()) { ctx.globalAlpha = 0.85; AQ.Panes.drawCounter(ctx, vw - 3, 22); ctx.globalAlpha = 1; }
     // collection progress (top-right)

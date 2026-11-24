@@ -703,6 +703,7 @@ AQ.MapUI = (function () {
       const ox = Math.round((320 - w) / 2), oy = 38;
       g.fillStyle = 'rgba(4,12,24,0.96)'; g.fillRect(0, 0, 320, 180);
       F().draw(g, AQ.t('map.title'), 160, 10, '#ffe9a8', { align: 'center' });
+      if (AQ.Seasons && AQ.Seasons.on()) { AQ.Seasons.drawGlyph(g, 6, 9); F().draw(g, AQ.Seasons.mapLine(), 14, 10, '#cfe8f5', { max: 110 }); }   // the season, and its day
       g.fillStyle = '#5fc6d9'; g.fillRect(ox - 1, oy - 1, w + 2, h + 2);
       g.drawImage(mm.canvas, ox, oy);
       // biome labels at open-water centroids, nudged apart

@@ -17,7 +17,8 @@ AQ.Render = (function () {
     const d = AQ.Clock.daylight(), tw = AQ.Clock.twilight();
     const base = [U.mix(SKY_NIGHT[0], SKY[0], d), U.mix(SKY_NIGHT[1], SKY[1], d)];
     const cols = [U.mix(base[0], SKY_TWI[0], tw * 0.6), U.mix(base[1], SKY_TWI[1], tw * 0.75)];
-    return AQ.Weather ? AQ.Weather.skyTint(cols) : cols;            // greyer under clouds, darker in a storm
+    const season = AQ.Seasons ? AQ.Seasons.skyTint(cols) : cols;    // the season's sky...
+    return AQ.Weather ? AQ.Weather.skyTint(season) : season;        // ...greyer under clouds, darker in a storm
   };
   const bandCache = new Map();
 

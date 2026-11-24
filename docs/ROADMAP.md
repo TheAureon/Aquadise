@@ -79,7 +79,7 @@ own German pass, which I'd do at the end of each update.
 
 ## C. Seasons
 
-**C1. The season clock and how it looks.**
+**C1. The season clock and how it looks.** *(Done.)*
 - Spring, summer, autumn and winter, cycling over real days (the length is a setting; the default is
   about one real week each).
 - **Each place's look shifts:** spring coral bloom and green shallows, summer brightness, autumn gold

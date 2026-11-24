@@ -78,6 +78,8 @@ AQ.Save = (function () {
     AQ.State.backups = st.backups && typeof st.backups === 'object' ? st.backups : {};   // when the last backup was made (older saves: never)
     S.lastSavedAt = data.savedAt || null;
     AQ.State.clock = st.clock && typeof st.clock.hour === 'number' ? st.clock : { hour: AQ.TUNING.clock.startHour };   // saves keep their time (very old ones without a clock start mid-morning)
+    // the seasons: when the first spring began; older saves start their first spring now
+    AQ.State.seasons = st.seasons && typeof st.seasons.origin === 'number' ? { origin: st.seasons.origin } : undefined;
     // the weather's seed (which weather falls in which stretch); older saves get a new one
     AQ.State.weather = st.weather && typeof st.weather.seed === 'number' ? { seed: st.weather.seed } : undefined;
     // falling stars (night count, tonight's plan, stars still waiting); older saves start at night 0
@@ -164,6 +166,7 @@ AQ.Save = (function () {
     AQ.State.settings = Object.assign({}, AQ.State.settings || {});
     AQ.State.clock = { hour: AQ.TUNING.clock.startHour };          // a new game starts in the bright mid-morning
     AQ.State.weather = undefined;                                  // ...with its own weather (a new seed)
+    AQ.State.seasons = undefined;                                  // ...and on the first day of spring
     AQ.State.starfall = { night: 0, lastStar: 0, phase: null, plan: null, landings: [] };
     if (AQ.Creatures) AQ.Creatures.list.filter((c) => c.landing).forEach((c) => { c.fadedOut = true; AQ.Creatures.remove(c); });   // no stars waiting in a new game
     AQ.State.upgrades = { net: 1, speed: 1, lantern: 0, depth: 0, hydro: 0 };

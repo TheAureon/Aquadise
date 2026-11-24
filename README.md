@@ -549,6 +549,17 @@ kept in git. `node tools/check-game.js --build` checks every screen of the built
   dawn. Each has field notes in a bottle and a log tag (FOG ONLY, RAIN ONLY, STORM NIGHTS); the Guide
   has a WEATHER page; badges: WEATHER WATCHER (be out in 3, then all 6 kinds of weather) and RAIN OR
   SHINE (catch all three).
+- **Seasons.** Spring, summer, autumn and winter cycle over real days (7 each,
+  `AQ.TUNING.seasons.daysPerSeason`); a new game (or an older save, the first time) starts on the first
+  day of spring, and each season eases into the next over its last 12 hours. How each looks
+  (`data/seasons.js`): the sky and the sunlit water lean toward the season (spring's green shallows,
+  summer's brightness, autumn's warm gold, winter's cold pale blue); the coral, kelp and seagrass change
+  colour (the terrain is redrawn when the season turns, one region a frame; nothing moves); coral spawn
+  drifts up off the reef in spring; in winter ice floes drift past the ice shelf and snow falls over the
+  ice; on the hill the grass turns gold with leaves drifting down in autumn and lies under snow in
+  winter. Every graphics level, CLASSIC included. The HUD shows a small season mark left of the sun /
+  moon, the map shows the season and its day, and a short line says when a new one arrives. Saved: when
+  the first spring began (a number). Testing: `debug.season`, `debug.seasonKeys` (4 = the next season).
 - **Falling stars and meteor showers.** Some nights a star visibly falls and lands somewhere in the
   sea or on the shore: always a spot you can reach at upgrade level 0 (the same scan and checks as the
   message bottles), with a clear drop from the sky (never in a cave), never inside terrain, past the
@@ -1075,6 +1086,7 @@ src/nudges.js         friendly nudges: noticing a stuck player (net spam, no cat
 src/guide.js          the GUIDE: a paged field-guide book (title, pause menu, help-line key)
 src/savefile.js       SAVE & BACKUP: backing up (file, one file, save code), restoring (checks + confirm), erasing, reminders, the save-recovery choice
 src/starfall.js       falling stars + meteor showers: nightly plan, landings, light columns, map/HUD marks
+src/seasons.js        the seasons: the real-day clock, sky / water / plant colours, spawn, floes, snow, hill
 src/weather.js        each sea region's weather: real-time stretches, rain, waves, fog, clouds, lightning, HUD/map
 src/weathersound.js   how the weather sounds: rain above / below, wind, waves, thunder, hydrophone static
 src/bottles.js        message bottles: deterministic, reachable placement, pickup, glint
@@ -1099,6 +1111,7 @@ src/gfx/shaders.js    the shaders (GLSL strings): sharp upscale, grading, fog, b
 src/touchtest.js      the TOUCH TEST screen (SETTINGS > TOUCH): every finger, button and the joystick, live
 data/tutorial.js      tutorial structure: tips, guided dive steps, Guide pages (their text is in data/lang/)
 src/langdata.js       gives the data files their text (names, hints, field notes...) from data/lang/
+data/seasons.js       how each season looks: sky, water tints, plant colours, the hill, what drifts
 data/weather.js       the weather's kinds (how each looks) and how likely each is per region
 data/music.js         ATARAXIA's setting for each place, the reward phrases, creature voice map, audio files
 data/songs.js         DELTA: the ten composed songs
