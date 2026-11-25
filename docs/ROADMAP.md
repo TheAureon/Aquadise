@@ -114,7 +114,7 @@ FLASHING-gentle version.
 - Inside: a bottle, a rare plant or a little scene.
 - They're marked on the map once found, and appear in a Guide line.
 
-**D4. Creature friendships.**
+**D4. Creature friendships.** *(Done.)*
 - Visiting a wild creature often (calm, sneaking, no net) makes it friendlier.
 - A friend follows you for a few seconds, glows when you're near, and now and then leaves a shell or a
   shiny thing.

@@ -83,6 +83,9 @@ AQ.Save = (function () {
     // hidden grottoes opened and letters taken (numbers only); older saves have found none
     const gr = st.grottoes && typeof st.grottoes === 'object' ? st.grottoes : {}, nums = (o) => (o && typeof o === 'object' ? Object.fromEntries(Object.entries(o).filter(([, v]) => typeof v === 'number')) : {});
     AQ.State.grottoes = { found: nums(gr.found), letters: nums(gr.letters) };
+    // friendships (numbers only); older saves have none yet
+    const fr = st.friends && typeof st.friends === 'object' ? st.friends : {};
+    AQ.State.friends = { visits: nums(fr.visits), keepsakes: typeof fr.keepsakes === 'number' ? fr.keepsakes : 0 };
     // migrations seen (numbers only); older saves have seen none
     const mg = st.migrations && typeof st.migrations === 'object' && st.migrations.seen && typeof st.migrations.seen === 'object' ? st.migrations.seen : {};
     AQ.State.migrations = { seen: Object.fromEntries(Object.entries(mg).filter(([, v]) => typeof v === 'number')) };
@@ -175,6 +178,7 @@ AQ.Save = (function () {
     AQ.State.seasons = undefined;                                  // ...and on the first day of spring
     AQ.State.migrations = { seen: {} };
     AQ.State.grottoes = { found: {}, letters: {} };
+    AQ.State.friends = { visits: {}, keepsakes: 0 };
     AQ.State.starfall = { night: 0, lastStar: 0, phase: null, plan: null, landings: [] };
     if (AQ.Creatures) AQ.Creatures.list.filter((c) => c.landing).forEach((c) => { c.fadedOut = true; AQ.Creatures.remove(c); });   // no stars waiting in a new game
     AQ.State.upgrades = { net: 1, speed: 1, lantern: 0, depth: 0, hydro: 0 };

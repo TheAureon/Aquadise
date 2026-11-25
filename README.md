@@ -549,6 +549,13 @@ kept in git. `node tools/check-game.js --build` checks every screen of the built
   dawn. Each has field notes in a bottle and a log tag (FOG ONLY, RAIN ONLY, STORM NIGHTS); the Guide
   has a WEATHER page; badges: WEATHER WATCHER (be out in 3, then all 6 kinds of weather) and RAIN OR
   SHINE (catch all three).
+- **Creature friendships.** Stay calmly near a wild creature for a few seconds (slow or sneaking, net
+  away): that's a visit, one per stay. After 6 visits on different trips, that species is your friend
+  (`src/friends.js`, `AQ.TUNING.friends`). Friends swim along beside you for a while, glow softly when
+  you're near, and now and then leave a gift to swim into: a shell (a keepsake) or a shiny bit of glass
+  (+1 glass pane). In your tanks a friend's cousins show a small heart, and the log tags friends with ♥.
+  Badges: NEW FRIEND (1 / 5 / 15 kinds) and KEEPSAKES. A Guide page explains it. Nothing is lost if you
+  never do it, and catching works as before.
 - **Hidden grottoes.** Cracks in the rock (a dark fissure, loose pebbles, now and then a glint) hide
   small rooms, a couple in each part of the sea where the rock is thick enough (`src/grottoes.js`).
   Swing the net at a crack and hold it there to pry the rock loose: it crumbles into a little
@@ -1123,6 +1130,7 @@ src/nudges.js         friendly nudges: noticing a stuck player (net spam, no cat
 src/guide.js          the GUIDE: a paged field-guide book (title, pause menu, help-line key)
 src/savefile.js       SAVE & BACKUP: backing up (file, one file, save code), restoring (checks + confirm), erasing, reminders, the save-recovery choice
 src/starfall.js       falling stars + meteor showers: nightly plan, landings, light columns, map/HUD marks
+src/friends.js        creature friendships: calm visits, friends following, gifts, hearts
 src/grottoes.js       hidden grottoes behind cracked rock: placement, prying open, contents, letters
 src/migrations.js     rare migrations (whale, mantas, turtles) crossing the open ocean; sightings
 src/nightlights.js    glowing plankton in your wake at night / in caves, glowing creatures' trails

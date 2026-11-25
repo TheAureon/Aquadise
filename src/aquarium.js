@@ -1345,6 +1345,7 @@ AQ.Aquarium = (function () {
         const chompX = f.chomp > 0 && Math.sin(f.chomp * 40) > 0 ? f.facing : 0;
         AQ.Assets.draw(g, f.key, moving && !asleep ? 'move' : 'idle', f.x + (f.shake && f.stress ? 1 : 0) + chompX, f.y - (f.peck || 0) - Math.round(f.hop || 0), { t: asleep ? f.t * 0.25 : f.t, flip: f.facing < 0, alpha: f.stress ? 0.8 : 1 });
         if (icons) moodIcon(g, f);
+        if (icons && AQ.Friends && AQ.Friends.isFriend(f.def.id) && (AQ.U.calm() || (A.t * 0.5 + (f.moodPh || 0)) % 4 < 1.5)) AQ.Friends.heart(g, Math.round(f.x + f.r) - 1, Math.round(f.y - f.r) - 4 - Math.round(f.hop || 0));   // a friend's cousin
         if (icons && !f.juv && f.entry.bornAt && inNursery()) AQ.Assets.draw(g, 'ui.gradcap', 'idle', f.x - 4, f.y - f.r - 5 - (f.hop || 0), { t: A.t });   // grown: ready to graduate
         if (A.card === f.uid && !A.photo.on) selectMark(g, f);
         if (icons && (f.state === 'sleep' || (f.state === 'rest' && (f.def.category === 'mammal' || f.def.category === 'reptile'))) && !f.stress) F().draw(g, 'z', f.x + 4, f.y - f.r - 6 - Math.round((A.t * 4) % 4), '#e8f4ff');

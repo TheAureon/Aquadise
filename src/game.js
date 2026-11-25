@@ -170,7 +170,8 @@ AQ.Game = (function () {
     if (AQ.Seasons && G.player) AQ.Seasons.update(dt, G);
     if (AQ.NightLights && G.player) AQ.NightLights.update(dt, G);
     if (AQ.Migrations && G.player) AQ.Migrations.update(dt, G);
-    if (AQ.Grottoes && G.player) AQ.Grottoes.update(dt, G);         // a grotto's message bottle   // a whale, mantas or turtles crossing the open ocean now and then   // glowing plankton in your wake, glowing creatures' trails   // the season: redraws plants when it turns, drifting specks
+    if (AQ.Grottoes && G.player) AQ.Grottoes.update(dt, G);         // a grotto's message bottle
+    if (AQ.Friends && G.player) AQ.Friends.update(dt, G);           // creature friendships: calm visits, friends following, gifts   // a whale, mantas or turtles crossing the open ocean now and then   // glowing plankton in your wake, glowing creatures' trails   // the season: redraws plants when it turns, drifting specks
     if (AQ.Weather && G.player) AQ.Weather.update(dt, G);   // each sea region's weather (rain, fog, waves, storms)
     if (AQ.SlowWatch) AQ.SlowWatch.update(G);       // a slow device: lighter music, and a LOW EFFECTS hint once
     AQ.Transition.update(dt);
@@ -224,6 +225,7 @@ AQ.Game = (function () {
       G.player.draw(ctx);
       if (AQ.Catching) AQ.Catching.draw(ctx, G);
       if (AQ.Creatures) AQ.Creatures.drawFront(ctx, G);
+      if (AQ.Friends) AQ.Friends.draw(ctx);                                 // friends' hearts, their gifts
     }
     AQ.FX.draw(ctx);
     ctx.restore();
@@ -289,6 +291,7 @@ AQ.Game = (function () {
     if (AQ.Starfall && G.state !== 'title') AQ.Starfall.lights(L);
     if (AQ.NightLights && G.state !== 'title') AQ.NightLights.lights(L);
     if (AQ.Grottoes && G.state !== 'title') AQ.Grottoes.lights(L);
+    if (AQ.Friends && G.state !== 'title') AQ.Friends.lights(L);
     return L;
   }
 

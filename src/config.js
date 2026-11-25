@@ -540,6 +540,22 @@ AQ.TUNING = {
     pryTime: 1.4,             // seconds of holding the net on the crack to open it
     kinds: ['scene', 'plant', 'bottle']   // what's inside, in turn
   },
+  // Creature friendships (src/friends.js): calm visits make a species your friend. Never needed for anything.
+  friends: {
+    enabled: true,
+    visitRange: 46,           // px: close enough to count as a visit...
+    visitSeconds: 3,          // ...calmly (slow or sneaking, the net away) for this long
+    calmSpeed: 30,            // px/s: slower than this counts as calm (sneaking always does)
+    visitCooldown: 45,        // seconds before the same species can count another visit
+    visitsNeeded: 6,          // visits to become friends
+    followRange: 70,          // a friend this close (and you calm) swims along beside you...
+    followSeconds: [5, 9],    // ...for this long...
+    followRest: 25,           // ...then rests this long before it can again
+    glowRange: 80,            // a friend glows softly while you're this close
+    giftEvery: [60, 140],     // seconds near a friend between little gifts
+    glassShare: 0.35,         // share of gifts that are a shiny bit of glass (a glass pane); the rest are shells
+    giftStays: 90             // seconds a gift waits to be picked up
+  },
   // The slow-device watch (src/slowwatch.js): real frame times while playing. Slow for a while: the music plays
   // fewer notes at once (music.lowFxVoices) and a toast suggests LOW EFFECTS (once per save).
   slowWatch: {

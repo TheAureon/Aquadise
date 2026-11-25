@@ -554,6 +554,24 @@ AQ.langFiles.en = {
   'season.arrive.autumn': 'Autumn has come. The kelp is turning gold.',
   'season.arrive.winter': 'Winter is here. Ice drifts beyond the ice shelf.',
   'map.season': '{season}, DAY {n} OF {total}',   // top-left of the map
+  // ---------------------------------------------------------------- creature friendships (src/friends.js)
+  'friend.likes': 'The {name} seems to like having you around.',   // halfway to a friendship
+  'friend.made': 'The {name} is your friend now!',
+  'friend.giftShell': 'A little shell, left for you by a friend.',
+  'friend.giftGlass': 'A shiny bit of glass from a friend: +1 glass pane!',
+  'req.friend': '♥ friend',   // the log's tag for a species that's your friend
+  'guide.friends.title': 'Friends',
+  'guide.friends.1': 'Stay calmly near a wild creature for a few seconds (slow or sneaking, net away): that\'s a visit.',
+  'guide.friends.2': 'After a few visits on different trips, that kind of creature becomes your friend.',
+  'guide.friends.3': 'Friends swim along beside you for a while and glow softly when you\'re near.',
+  'guide.friends.4': 'Now and then a friend leaves a gift: a shell or a shiny bit of glass. Swim into it.',
+  'guide.friends.5': 'In your tanks, a friend\'s cousins show a little heart. You can still catch their kind.',
+  'badge.best_friends.name': 'New Friend',
+  'badge.best_friends.desc': { one: 'Make friends with a creature.', other: 'Make friends with {n} kinds of creature.' },
+  'badge.best_friends.tier2': 'Friendly Face',
+  'badge.best_friends.tier3': 'Friend of the Sea',
+  'badge.keepsake_keeper.name': 'Keepsakes',
+  'badge.keepsake_keeper.desc': 'Pick up {n} shells your friends left for you.',
   // ---------------------------------------------------------------- hidden grottoes (src/grottoes.js)
   'grotto.found': 'The rock crumbles... a hidden grotto!',
   'grotto.letterFound': 'A letter in a bottle! It is in the log: NOTES.',
