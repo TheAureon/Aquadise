@@ -241,7 +241,8 @@ AQ.Station = (function () {
     const bd = AQ.Aquarium.backdropOf(b), sw = Math.round(bd.height * iw / ih), spare = bd.width - sw, base = AQ.Tanks.width(b.id, 0) - sw;
     const pan = spare > base ? 0.5 - 0.5 * Math.cos(t * Math.PI * 2 / AQ.TUNING.station.windowPanSeconds) : 0.5;
     ctx.drawImage(bd, Math.round(spare * pan), 0, sw, bd.height, ix, iy, iw, ih);
-    if (st.dark) { ctx.fillStyle = `rgba(2,6,16,${st.dark * 0.6})`; ctx.fillRect(ix, iy, iw, ih); }
+    if (st.dark) { ctx.fillStyle = `rgba(${(st.darkCol || [2, 6, 16]).join(',')},${st.dark * 0.6})`; ctx.fillRect(ix, iy, iw, ih); }
+    if (st.tint) { ctx.fillStyle = `rgba(${st.tint.join(',')},${st.tintA})`; ctx.fillRect(ix, iy, iw, ih); }   // (its LIGHT mood)
     // its creatures, drifting about
     tank.creatures.slice(0, 7 + 3 * AQ.Tanks.size(b.id)).forEach((e, k) => {   // (a bigger tank shows a few more)
       const def = AQ.Creatures.defs[e.id], juv = AQ.Breeding.isJuvenile(e);

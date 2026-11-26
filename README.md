@@ -141,6 +141,11 @@ straight from disk (file://) the sprites load from `assets/sprites-embedded.js` 
 `tools/gen-placeholders.js`, or run `node tools/embed-sprites.js` after replacing art), because
 browsers won't let a page save pictures made from file:// images.
 
+**Tank lighting moods:** the small light icon left of PHOTO switches a tank between DAYLIGHT, GOLDEN HOUR
+(a warm sunset wash), MOONLIGHT (a cool blue dark with a pale beam) and GLOW (deep dark: glowing creatures
+and decor shine, and every creature gets a soft halo of its colour). Saved per tank; photos, the TANKS
+overview and the station's windows show it too. Tuning: `AQ.TUNING.tankLights`. Badge: MOOD LIGHTING.
+
 **The photo album** (`src/album.js`): every photo is also kept in the game, in the log's PHOTOS tab
 (tank and date). Click a photo twice (or Enter) to see it big; SAVE PNG downloads it again, COVER makes it
 that tank's picture in TANKS (the overview), DELETE asks once more. At most 24 photos

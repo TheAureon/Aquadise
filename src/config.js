@@ -556,6 +556,15 @@ AQ.TUNING = {
     glassShare: 0.35,         // share of gifts that are a shiny bit of glass (a glass pane); the rest are shells
     giftStays: 90             // seconds a gift waits to be picked up
   },
+  // Tank lighting moods (src/aquarium.js, the tank screen's LIGHT switch; the station's windows follow).
+  tankLights: {
+    moods: {
+      day: {},
+      golden: { tint: [255, 168, 88], tintA: 0.2, windowGlow: '#ffc080' },                      // a warm sunset wash
+      moon: { dark: 0.5, darkCol: [6, 14, 40], tint: [140, 170, 255], tintA: 0.06, beam: true, windowGlow: '#a8c0ff' },   // cool blue dark, a pale beam
+      glow: { dark: 0.78, darkCol: [4, 4, 14], glowAll: true, windowGlow: '#c0a0ff' }           // deep dark: glowing creatures and decor shine
+    }
+  },
   // The photo album (src/album.js): tank photos kept in the game (the log's PHOTOS tab), apart from the save.
   album: {
     max: 24,                  // most photos kept (delete some to make room)

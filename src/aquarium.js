@@ -26,7 +26,22 @@ AQ.Aquarium = (function () {
   A.tankRect = () => ({ x: TANK.x, y: TANK.y, w: TANK.w, h: TANK.h });   // the water (touch: taps there are never snapped to a button)
   const TRAY_Y = 149, CELL = 26, NCELL = 36;     // NCELL: the nursery's FISH tray (room for a GRADUATE button)
 
-  const styleOf = (id) => Object.assign({}, AQ.data.tankStyles.default, AQ.data.tankStyles[id] || {});
+  // a tank's look: its biome style, then its LIGHT mood on top (daylight / golden hour / moonlight / glow;
+  // AQ.TUNING.tankLights, saved per tank in AQ.State.tankLight). Everything that draws a tank asks this,
+  // so the tank screen, photos, the overview and the station's windows all follow the mood.
+  const styleOf = (id) => {
+    const s = Object.assign({}, AQ.data.tankStyles.default, AQ.data.tankStyles[id] || {});
+    const M = AQ.TUNING.tankLights.moods[A.lightOf(id)];
+    if (!M || A.lightOf(id) === 'day') return s;
+    s.dark = Math.max(s.dark || 0, M.dark || 0);
+    if (M.darkCol) s.darkCol = M.darkCol;
+    if (M.tint) { s.tint = M.tint; s.tintA = M.tintA; }
+    if (M.windowGlow) s.windowGlow = M.windowGlow;
+    s.moonBeam = !!M.beam; s.glowAll = !!M.glowAll; s.mood = A.lightOf(id);
+    return s;
+  };
+  A.LIGHTS = ['day', 'golden', 'moon', 'glow'];
+  A.lightOf = (id) => { const m = AQ.State.tankLight && AQ.State.tankLight[id]; return A.LIGHTS.indexOf(m) >= 0 ? m : 'day'; };
   const defOf = (id) => AQ.Creatures.defs[id] || AQ.data.creatures.find((d) => d.id === id);
   const decorDef = (id) => AQ.data.decorations.find((d) => d.id === id);
   // every tank (biome tanks + predator tanks) in building order; Q/E steps through this list
@@ -442,6 +457,7 @@ AQ.Aquarium = (function () {
     ui.push({ id: 'prev', x: 2, y: 2, w: 9, h: 10, label: '<' });
     ui.push({ id: 'next', x: 72, y: 2, w: 9, h: 10, label: '>' });
     ui.push({ id: 'stars', x: 84, y: 2, w: 40, h: 10, label: '' });
+    ui.push({ id: 'light', x: 130, y: 2, w: 14, h: 10, label: '' });   // the LIGHT switch: a small icon of the mood
     ui.push({ id: 'photo', x: 147, y: 2, w: 26, h: 10, label: AQ.t('tank.photo') });
     ui.push({ id: 'tanks', x: 175, y: 2, w: 27, h: 10, label: AQ.t('tank.tanks') });
     ui.push({ id: 'undo', x: 204, y: 2, w: 22, h: 10, label: AQ.t('tank.undo'), off: !A.undo.length });
@@ -449,7 +465,7 @@ AQ.Aquarium = (function () {
     ui.push({ id: 'feed', x: 256, y: 2, w: 20, h: 10, label: AQ.t('tank.feed') });
     ui.push({ id: 'log', x: 278, y: 2, w: 16, h: 10, label: AQ.t('tank.log') });
     ui.push({ id: 'back', x: 296, y: 2, w: 22, h: 10, label: AQ.t(A.returnTo === 'title' ? 'tank.home' : 'ui.back') });
-    A.fitRow(ui.filter((r) => ['photo', 'tanks', 'undo', 'clear', 'feed', 'log', 'back'].indexOf(r.id) >= 0), 128, 318, 2, 'right');
+    A.fitRow(ui.filter((r) => ['photo', 'tanks', 'undo', 'clear', 'feed', 'log', 'back'].indexOf(r.id) >= 0), 146, 318, 2, 'right');
     if (A.select) {                                 // choosing creatures to release: the tabs make way for RELEASE (n) / DONE
       [...A.select].forEach((u) => { if (!storageEntry(u)) A.select.delete(u); });   // (only ones still in storage)
       const n = A.select.size;
@@ -748,6 +764,13 @@ AQ.Aquarium = (function () {
       case 'next': switchTank(1); break;
       case 'feed': feed(); break;
       case 'photo': enterPhoto(); break;
+      case 'light': {                                 // the next LIGHT mood for this tank (saved)
+        const ms = A.LIGHTS, next = ms[(ms.indexOf(A.lightOf(A.biome)) + 1) % ms.length];
+        AQ.State.tankLight = AQ.State.tankLight || {}; AQ.State.tankLight[A.biome] = next;
+        note(AQ.t('tank.light.now', { mood: AQ.t(`tank.light.${next}`) }), '#ffe9a8', 3);   // LANG_PREFIX: 'tank.light.'
+        AQ.Audio.play('menu_select'); if (AQ.Save) AQ.Save.dirty(); if (AQ.Badges) AQ.Badges.addTo('tankLights', next);
+        break;
+      }
       case 'stars': break;
       case 'undo': undo(tank); break;
       case 'tanks': openOverview(); break;
@@ -1366,6 +1389,28 @@ AQ.Aquarium = (function () {
       rg.addColorStop(0, `rgba(${c[0]},${c[1]},${c[2]},${pulse.toFixed(3)})`); rg.addColorStop(1, `rgba(${c[0]},${c[1]},${c[2]},0)`);
       g.save(); g.globalCompositeOperation = 'lighter'; g.fillStyle = rg; g.fillRect(TANK.x, TANK.y, TANK.w, TANK.h); g.restore();
     }
+    // the LIGHT mood's own touches: golden hour's warm wash, moonlight's pale beam, glow's halos
+    if (st.tint) {
+      const [r, gg, bb] = st.tint, tg = g.createLinearGradient(0, TANK.y, 0, TANK.y + TANK.h);
+      tg.addColorStop(0, `rgba(${r},${gg},${bb},${st.tintA.toFixed(3)})`); tg.addColorStop(1, `rgba(${r},${gg},${bb},${(st.tintA * 0.35).toFixed(3)})`);
+      g.fillStyle = tg; g.fillRect(TANK.x, TANK.y, TANK.w, TANK.h);
+    }
+    if (st.moonBeam) {
+      g.save(); g.globalCompositeOperation = 'lighter'; g.fillStyle = 'rgba(180,200,255,0.07)';
+      const bx = TANK.x + TANK.w * 0.66;
+      g.beginPath(); g.moveTo(bx, TANK.y); g.lineTo(bx + 26, TANK.y); g.lineTo(bx - 14, TANK.y + TANK.h); g.lineTo(bx - 50, TANK.y + TANK.h); g.fill(); g.restore();
+    }
+    if (st.glowAll) {
+      g.save(); g.globalCompositeOperation = 'lighter';
+      A.fish.forEach((f) => {
+        const col = f.def.glow ? f.def.glow.color : f.def.accent;
+        if (!col) return;
+        const c = U.hex(col), a = f.def.glow ? 0.28 : 0.1, rg = g.createRadialGradient(f.x, f.y, 0, f.x, f.y, f.r + 10);
+        rg.addColorStop(0, `rgba(${c[0]},${c[1]},${c[2]},${a})`); rg.addColorStop(1, `rgba(${c[0]},${c[1]},${c[2]},0)`);
+        g.fillStyle = rg; g.fillRect(f.x - f.r - 10, f.y - f.r - 10, (f.r + 10) * 2, (f.r + 10) * 2);
+      });
+      g.restore();
+    }
     // soft vignette in the tank corners
     for (let i = 0; i < 6; i++) {
       g.fillStyle = `rgba(4,16,30,${(0.12 - i * 0.018).toFixed(3)})`;
@@ -1914,12 +1959,13 @@ AQ.Aquarium = (function () {
     lg.globalCompositeOperation = 'source-over';
     lg.clearRect(0, 0, TANK.w, TANK.h);
     const grad = lg.createLinearGradient(0, 0, 0, TANK.h);
-    grad.addColorStop(0, `rgba(2,6,16,${st.dark * 0.55})`); grad.addColorStop(1, `rgba(2,6,16,${st.dark})`);
+    const dc = (st.darkCol || [2, 6, 16]).join(',');                // (moonlight: a deep blue; glow: almost black)
+    grad.addColorStop(0, `rgba(${dc},${st.dark * 0.55})`); grad.addColorStop(1, `rgba(${dc},${st.dark})`);
     lg.fillStyle = grad; lg.fillRect(0, 0, TANK.w, TANK.h);
     lg.globalCompositeOperation = 'destination-out';
     const hole = (x, y, r, a) => { const rg = lg.createRadialGradient(x, y, 0, x, y, r); rg.addColorStop(0, `rgba(0,0,0,${a})`); rg.addColorStop(1, 'rgba(0,0,0,0)'); lg.fillStyle = rg; lg.fillRect(x - r, y - r, r * 2, r * 2); };
     src.forEach((s) => hole(s.x - TANK.x, s.y - TANK.y, s.r, 1));
-    A.fish.forEach((f) => hole(f.x - TANK.x, f.y - TANK.y, f.r + 8, 0.55));
+    A.fish.forEach((f) => hole(f.x - TANK.x, f.y - TANK.y, f.r + (st.glowAll && f.def.glow ? 18 : 8), st.glowAll && f.def.glow ? 0.9 : 0.55));
     g.drawImage(lightC, TANK.x, TANK.y);
     g.save(); g.globalCompositeOperation = 'lighter';
     src.forEach((s) => {
@@ -2076,6 +2122,10 @@ AQ.Aquarium = (function () {
   // A row of buttons that keeps its usual layout while every label fits. If a label is too long (a
   // longer language), the buttons grow to their text and re-flow between x0 and x1 (align 'left' or
   // 'right'); if the row still doesn't fit, they shrink back evenly and the labels squeeze.
+  // the LIGHT switch's little picture: a sun, a sunset, a moon or a sparkle
+  const GLYPH = { day: ['.#.#.', '..#..', '#####', '..#..', '.#.#.'], golden: ['.....', '.###.', '#####', '.....', '#####'], moon: ['.##..', '#....', '#....', '#....', '.##..'], glow: ['..#..', '.#.#.', '#...#', '.#.#.', '..#..'] };
+  const GCOL = { day: '#ffe36b', golden: '#ffa860', moon: '#d8e4ff', glow: '#c8a8ff' };
+  function moodGlyph(g, x, y, m) { g.fillStyle = GCOL[m]; GLYPH[m].forEach((row, ry) => [...row].forEach((v, rx) => { if (v === '#') g.fillRect(x + rx, y + 1 + ry, 1, 1); })); }
   A.fitRow = function (items, x0, x1, gap, align) {
     if (items.every((r) => !r.label || F().width(r.label) <= r.w - 2)) return items;
     items.forEach((r) => { r.w = Math.max(r.w, r.label ? F().width(r.label) + 4 : 0); });
@@ -2157,6 +2207,7 @@ AQ.Aquarium = (function () {
       }
       else if (r.id === 'grad_all') button(g, Object.assign({}, r, { on: !r.off }), hover);
       else if (r.id !== 'stars' && r.id !== 'strip') button(g, r, hover);
+      if (r.id === 'light') moodGlyph(g, r.x + 4, r.y + 2, A.lightOf(A.biome));
     }
     if (wide()) drawStrip(g, A.hover && A.hover.id === 'strip');
     if (A.tray === 'tank') drawTankPanel(g, tank);

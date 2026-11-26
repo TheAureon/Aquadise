@@ -130,7 +130,7 @@ FLASHING-gentle version.
 - Kept small: a limited number of photos, compressed, stored separately from the main save so backups
   stay small. Their own backup option is included.
 
-**E2. Tank lighting and moods.** Each tank gets a light switch with a few moods: daylight, golden hour,
+**E2. Tank lighting and moods.** *(Done.)* Each tank gets a light switch with a few moods: daylight, golden hour,
 moonlight, glow. The windows in the station show it too.
 
 **E3. The café / gift shop.** A new small room in the station, decorated with things you've unlocked,

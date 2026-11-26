@@ -99,6 +99,7 @@ AQ.data.badges = [
   { id: 'meteor_witness', group: 'sky', icon: 'star', cond: { event: 'shower' } },
   { id: 'comet_chaser', group: 'sky', icon: 'star', cond: { check: 'discovered', where: { id: 'comet_ray' } }, target: 'all' },
   { id: 'weather_watcher', group: 'sky', icon: 'moon', cond: { counter: 'weathers' }, tiers: [{ target: 3 }, { target: 'all' }] },   // (src/weather.js counts each kind you're out in)
+  { id: 'mood_lighting', group: 'aquarium', icon: 'heart', cond: { counter: 'tankLights' }, target: 'all' },   // (try every LIGHT mood)
   { id: 'album_keeper', group: 'aquarium', icon: 'camera', cond: { counter: 'albumPhotos' }, tiers: [{ target: 1 }, { target: 10 }, { target: 24 }] },   // (src/album.js)
   { id: 'cover_story', group: 'aquarium', icon: 'camera', cond: { event: 'cover' } },
   { id: 'best_friends', group: 'explore', icon: 'heart', cond: { counter: 'friends' }, tiers: [{ target: 1 }, { target: 5 }, { target: 15 }] },   // (src/friends.js)
