@@ -1530,6 +1530,8 @@ AQ.Aquarium = (function () {
     let shot;
     try { shot = composePhoto(b, tank); } catch (e) { note(AQ.t('photo.failed'), '#ffb08a'); return; }
     const file = `Aquadise-${AQ.Tanks.fileName(b)}-${isoDate()}.png`;   // plain ASCII whatever the language
+    const kept = AQ.Album ? AQ.Album.add(shot.small, A.biome) : null;   // ...and kept in the album (the log's PHOTOS)
+    if (kept === 'full') note(AQ.t('album.full', { max: AQ.TUNING.album.max }), '#ffcf8a', 5);
     const done = (ok) => {
       P.preview = shot.small; P.previewT = ok ? pcfg().previewSeconds : 0;
       P.saved = ok ? 'saved' : 'failed';                              // shown as photo.saved / photo.couldNotSave
@@ -1791,11 +1793,13 @@ AQ.Aquarium = (function () {
       // thumbnail: the tank's own backdrop + its creatures
       const tx = r.x + 2, ty = r.y + 9, tw = r.w - 4, th = 12;
       const bd = backdrop(b); g.drawImage(bd, 0, 30, bd.width, TANK.h - 30, tx, ty, tw, th);   // (a bigger tank: all of it, squeezed)
+      const cover = AQ.Album && AQ.Album.coverFor(b.id);            // a photo set as this tank's cover (the album)
+      if (cover) { const s = Math.max(tw / cover.naturalWidth, th / cover.naturalHeight), sw = tw / s, sh = th / s; g.imageSmoothingEnabled = true; g.drawImage(cover, (cover.naturalWidth - sw) / 2, (cover.naturalHeight - sh) / 2, sw, sh, tx, ty, tw, th); g.imageSmoothingEnabled = false; }
       const st = styleOf(b.id);
       if (st.dark) { g.fillStyle = `rgba(2,6,16,${st.dark * 0.6})`; g.fillRect(tx, ty, tw, th); }
       const nurs = !!v.nursery, ids = [...new Set(tank.creatures.map((e) => e.id))];
       const stressed = nurs ? new Set() : AQ.Vibe.stressedIds(tank.creatures, b.id);
-      ids.slice(0, 4).forEach((id, k) => {
+      (cover ? [] : ids.slice(0, 4)).forEach((id, k) => {
         const def = defOf(id), key = (nurs && def && AQ.Sex.babyKey(def, false)) || 'creature.' + id, e = AQ.Assets.entry(key);
         if (!e) return;
         const sc = Math.min(0.5, 9 / Math.max(e.fw, e.fh)), cx = tx + 6 + k * 12, cy = ty + 6 + Math.round(Math.sin(A.t * 2 + k) * 1);

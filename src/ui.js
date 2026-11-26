@@ -5,7 +5,7 @@ AQ.LogUI = (function () {
   const U = AQ.U, F = () => AQ.Font;
   const L = { from: 'play', tab: 'species', biomeIdx: 0, sel: 0, scroll: 0, vsel: 0, vscroll: 0, nsel: 0, nscroll: 0, bsel: 0, bscroll: 0, entry: null, ui: [],
     sy: 0, vsy: 0, nsy: 0, bsy: 0, newIds: {} };   // scroll / vscroll / nscroll / bscroll: target offsets in px; sy / vsy / nsy / bsy: the eased offsets drawn
-  const TABS = [['species', 'log.tab.species', 36], ['variants', 'log.tab.variants', 40], ['notes', 'log.tab.notes', 28], ['badges', 'log.tab.badges', 32]];
+  const TABS = [['species', 'log.tab.species', 36], ['variants', 'log.tab.variants', 40], ['notes', 'log.tab.notes', 28], ['badges', 'log.tab.badges', 32]].concat(AQ.Album ? [['photos', 'log.tab.photos', 30]] : []);
   // one look for every tab: header bar (title, tabs, bottles, close), a context row, the content, a footer hint
   const C = { bg: '#06101c', bar: '#0b1a2c', line: '#1c3a52', panel: '#0d2236', title: '#ffe9a8', text: '#d8eef8', dim: '#8aa4b8', info: '#9fd3ee', hint: '#4f6f86', good: '#7ef0c0', warn: '#ffcf8a', gold: '#ffd25a' };
   const COLS = 5, CELL_H = 47, HEAD_H = 10, VIEW_H = 94;            // species grid area (y 30..124)
@@ -225,7 +225,8 @@ AQ.LogUI = (function () {
       });
       if (L.bscroll > 0) ui.push({ id: 'up', x: 311, y: 30, w: 8, h: 9, label: '' });
       if (L.bscroll < maxS) ui.push({ id: 'down', x: 311, y: 131, w: 8, h: 9, label: '' });
-    } else if (L.tab === 'notes') {
+    } else if (L.tab === 'photos') AQ.Album.layout(ui);             // the photo album (src/album.js)
+    else if (L.tab === 'notes') {
       const rows = noteRows(), maxS = maxScroll(rows, NVIEW_H);
       L.nscroll = U.clamp(L.nscroll, 0, maxS);
       placeRows(ui, rows, L.nsy, 30, NVIEW_H, (row, y) => {
@@ -256,6 +257,7 @@ AQ.LogUI = (function () {
       else if (I.wasPressed('Escape', 'Enter', 'Space', 'Backspace') || m.pressed[0]) { L.entry = null; AQ.Audio.play('page_turn'); }
       return;
     }
+    if (L.tab === 'photos' && AQ.Album.view) { L.hover = null; AQ.Album.update(dt, L, game); return; }   // (a photo full size)
     if (I.wasPressed('Escape', 'KeyL')) { L.close(game); return; }
     // tabs: left / right arrows (or A / D)
     const ti = TABS.findIndex((t) => t[0] === L.tab);
@@ -316,6 +318,7 @@ AQ.LogUI = (function () {
     if (L.hover && moved && L.hover.id === 'ncell') L.nsel = L.hover.i;
     if (L.hover && moved && L.hover.id === 'bcell') L.bsel = L.hover.i;
     L.mx = m.x; L.my = m.y;
+    if (L.tab === 'photos') { L.hover = L.ui.find((r) => m.x >= r.x && m.y >= r.y && m.x < r.x + r.w && m.y < r.y + r.h) || L.hover; AQ.Album.update(dt, L, game); }
     if (m.pressed[0] && L.hover) {
       const h = L.hover;
       if (h.id === 'tab') setTab(h.tab);
@@ -396,7 +399,17 @@ AQ.LogUI = (function () {
     F().draw(g, AQ.t('log.title'), 6, 4, C.title, { shadow: false, max: 60 });   // (the tabs start at x 68)
     const bp = AQ.Bottles ? AQ.Bottles.progress() : { found: 0, total: 0 };
     const bc = AQ.Badges ? AQ.Badges.count() : null;               // (the BADGES tab: badges earned instead of bottles)
-    F().draw(g, L.tab === 'badges' && bc ? AQ.t('log.badgesCount', { n: bc.earned, total: bc.total }) : AQ.t('log.bottles', { n: bp.found, total: bp.total }), 276, 4, C.info, { align: 'right', shadow: false, max: 276 - 216 });   // (the tabs end at x 210)
+    // the count after the tabs: in words if it fits, else a small icon (a bottle / a star) and the numbers
+    const tabsEnd = Math.max(...L.ui.filter((r) => r.id === 'tab').map((r) => r.x + r.w)) + 4, badgeTab = L.tab === 'badges' && bc;
+    const long = badgeTab ? AQ.t('log.badgesCount', { n: bc.earned, total: bc.total }) : AQ.t('log.bottles', { n: bp.found, total: bp.total });
+    if (F().width(long) <= 276 - tabsEnd) F().draw(g, long, 276, 4, C.info, { align: 'right', shadow: false });
+    else {
+      const short = badgeTab ? `${bc.earned}/${bc.total}` : `${bp.found}/${bp.total}`, x = 276 - F().width(short) - 5;
+      F().draw(g, short, 276, 4, C.info, { align: 'right', shadow: false, max: 276 - tabsEnd - 5 });
+      g.fillStyle = C.info;
+      if (badgeTab) { g.fillRect(x + 1, 4, 1, 5); g.fillRect(x, 6, 3, 1); g.fillRect(x - 1, 5, 5, 1); }       // a little star
+      else { g.fillRect(x + 1, 4, 1, 1); g.fillRect(x, 5, 3, 4); }                                        // a little bottle
+    }
     for (const r of L.ui) if (r.id === 'tab' || r.id === 'close') AQ.Aquarium.button(g, r, L.hover === r);
     // the NEW dot on the BADGES tab while there are badges you haven't looked at
     const bt = L.ui.find((r) => r.id === 'tab' && r.tab === 'badges');
@@ -411,6 +424,7 @@ AQ.LogUI = (function () {
     if (L.tab === 'species') drawSpecies(g);
     else if (L.tab === 'variants') drawVariants(g);
     else if (L.tab === 'badges') drawBadges(g);
+    else if (L.tab === 'photos') AQ.Album.draw(g, L, C);
     else drawNotes(g);
   };
   // a small "NEW" dot (pulses gently; steady with REDUCE FLASHING)

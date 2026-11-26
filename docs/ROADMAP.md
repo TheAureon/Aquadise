@@ -123,7 +123,7 @@ FLASHING-gentle version.
 
 ## E. The aquarium and station
 
-**E1. The photo album.**
+**E1. The photo album.** *(Done.)*
 - Tank photos you take are kept in the game (a PHOTOS page in the log), with the date and tank.
 - You can delete them, set one as a tank's cover in the directory, and save them out as PNG as now.
 - A photo badge set.

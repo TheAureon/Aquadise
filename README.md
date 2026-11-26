@@ -141,6 +141,13 @@ straight from disk (file://) the sprites load from `assets/sprites-embedded.js` 
 `tools/gen-placeholders.js`, or run `node tools/embed-sprites.js` after replacing art), because
 browsers won't let a page save pictures made from file:// images.
 
+**The photo album** (`src/album.js`): every photo is also kept in the game, in the log's PHOTOS tab
+(tank and date). Click a photo twice (or Enter) to see it big; SAVE PNG downloads it again, COVER makes it
+that tank's picture in TANKS (the overview), DELETE asks once more. At most 24 photos
+(`AQ.TUNING.album.max`), each a small JPEG of the picture as framed, kept in their own browser storage,
+apart from the save, so game backups stay small; the album has its own BACK UP / RESTORE (an
+`.aquadise-photos` file). Badges: PHOTO ALBUM (1 / 10 / 24 kept) and COVER STORY.
+
 ## Uploading (one file)
 
 `node tools/build.js` packs the whole game into **one file**: `build/Aquadise/index.html` holds the style
@@ -1130,6 +1137,7 @@ src/nudges.js         friendly nudges: noticing a stuck player (net spam, no cat
 src/guide.js          the GUIDE: a paged field-guide book (title, pause menu, help-line key)
 src/savefile.js       SAVE & BACKUP: backing up (file, one file, save code), restoring (checks + confirm), erasing, reminders, the save-recovery choice
 src/starfall.js       falling stars + meteor showers: nightly plan, landings, light columns, map/HUD marks
+src/album.js          the photo album: kept photos, the log's PHOTOS tab, covers, its own backup
 src/friends.js        creature friendships: calm visits, friends following, gifts, hearts
 src/grottoes.js       hidden grottoes behind cracked rock: placement, prying open, contents, letters
 src/migrations.js     rare migrations (whale, mantas, turtles) crossing the open ocean; sightings

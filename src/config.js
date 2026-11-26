@@ -556,6 +556,11 @@ AQ.TUNING = {
     glassShare: 0.35,         // share of gifts that are a shiny bit of glass (a glass pane); the rest are shells
     giftStays: 90             // seconds a gift waits to be picked up
   },
+  // The photo album (src/album.js): tank photos kept in the game (the log's PHOTOS tab), apart from the save.
+  album: {
+    max: 24,                  // most photos kept (delete some to make room)
+    quality: 0.82             // each one is kept as a small JPEG of this quality (0-1)
+  },
   // The slow-device watch (src/slowwatch.js): real frame times while playing. Slow for a while: the music plays
   // fewer notes at once (music.lowFxVoices) and a toast suggests LOW EFFECTS (once per save).
   slowWatch: {
